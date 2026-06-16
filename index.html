@@ -1160,8 +1160,10 @@ function renderDayDateList() {
 
 // ── 인원 선택 ──
 function renderDayPax() {
-  if(DS.tourIdx < 0 || !DB) return;
+  var el = document.getElementById('day-pax-area');
+  if(!el || DS.tourIdx < 0 || !DB || !DB.day_tours) return;
   var tour = DB.day_tours[DS.tourIdx];
+  if(!tour) return;
   var html = '';
   Object.entries(tour.prices).forEach(function(e) {
     var lbl = e[0], price = e[1], cnt = DS.pax[lbl]||0;
@@ -1173,8 +1175,7 @@ function renderDayPax() {
     html += '<button class="cnt-btn plus" data-lbl="'+lbl+'" data-delta="1" onclick="hDayPax(this)">+</button>';
     html += '</div></div>';
   });
-  var el = document.getElementById('day-pax-area');
-  if(el) el.innerHTML = html;
+  el.innerHTML = html;
 }
 
 function hDayPax(el){adjPax(el.getAttribute("data-lbl"),parseInt(el.getAttribute("data-delta")));}
@@ -1187,9 +1188,12 @@ function adjPax(lbl, delta) {
 function buildDaySummary() {
   if(!DB || DS.tourIdx < 0) return;
   var tour = DB.day_tours[DS.tourIdx];
-  var hotel = document.getElementById('d-hotel-area') ? document.getElementById('d-hotel-area').value : '';
-  var hname = document.getElementById('d-hotel-name') ? document.getElementById('d-hotel-name').value : '';
-  var hnote = document.getElementById('d-hotel-note') ? document.getElementById('d-hotel-note').value : '';
+  var _ha = document.getElementById('d-hotel-area');
+  var _hn = document.getElementById('d-hotel-name');
+  var _hnt = document.getElementById('d-hotel-note');
+  var hotel = (_ha && _ha.value) ? _ha.value : '';
+  var hname = (_hn && _hn.value) ? _hn.value : '';
+  var hnote = (_hnt && _hnt.value) ? _hnt.value : '';
   var validDates = DS.entries.filter(function(e){ return e.date; });
 
   // 상단 요약
@@ -1250,9 +1254,9 @@ function submitDay() {
   var hotelEl = document.getElementById('d-hotel-area');
   var hnameEl = document.getElementById('d-hotel-name');
   var hnoteEl = document.getElementById('d-hotel-note');
-  var hotel = hotelEl ? hotelEl.value||'미입력' : '미입력';
-  var hname = hnameEl ? hnameEl.value||'미입력' : '미입력';
-  var hnote = hnoteEl ? hnoteEl.value : '';
+  var hotel = (hotelEl && hotelEl.value) ? hotelEl.value : '미입력';
+  var hname = (hnameEl && hnameEl.value) ? hnameEl.value : '미입력';
+  var hnote = (hnoteEl && hnoteEl.value) ? hnoteEl.value : '';
   var validDates = DS.entries.filter(function(e){ return e.date; });
 
   var lines = [
