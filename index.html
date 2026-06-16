@@ -1244,11 +1244,15 @@ function buildDaySummary() {
 
 // ── 카카오톡 제출 ──
 function submitDay() {
-  if(!DB || DS.tourIdx < 0) return;
-  var tour = DB.day_tours[DS.tourIdx];
-  var hotel = document.getElementById('d-hotel-area').value||'미입력';
-  var hname = document.getElementById('d-hotel-name').value||'미입력';
-  var hnote = document.getElementById('d-hotel-note').value;
+  if(!DB) { openKakao(); return; }
+  var tourIdx = DS.tourIdx >= 0 ? DS.tourIdx : 0;
+  var tour = DB.day_tours[tourIdx];
+  var hotelEl = document.getElementById('d-hotel-area');
+  var hnameEl = document.getElementById('d-hotel-name');
+  var hnoteEl = document.getElementById('d-hotel-note');
+  var hotel = hotelEl ? hotelEl.value||'미입력' : '미입력';
+  var hname = hnameEl ? hnameEl.value||'미입력' : '미입력';
+  var hnote = hnoteEl ? hnoteEl.value : '';
   var validDates = DS.entries.filter(function(e){ return e.date; });
 
   var lines = [
@@ -1276,10 +1280,38 @@ function submitDay() {
   lines.push('확인 후 연락 주세요!');
 
   var msg = lines.filter(function(l){ return l !== undefined; }).join('\n');
-  navigator.clipboard.writeText(msg).then(function(){
+  try {
+    if(navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(msg).then(function(){
+        showToast('✅ 내용이 복사되었습니다! 카카오톡이 열리면 붙여넣기 해주세요 😊');
+        setTimeout(function(){ window.open(DB.brand.kakao,'_blank'); }, 1500);
+      }).catch(function(){
+        fallbackCopy(msg);
+      });
+    } else {
+      fallbackCopy(msg);
+    }
+  } catch(e) {
+    fallbackCopy(msg);
+  }
+}
+
+function fallbackCopy(msg) {
+  var ta = document.createElement('textarea');
+  ta.value = msg;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try {
+    document.execCommand('copy');
     showToast('✅ 내용이 복사되었습니다! 카카오톡이 열리면 붙여넣기 해주세요 😊');
     setTimeout(function(){ window.open(DB.brand.kakao,'_blank'); }, 1500);
-  }).catch(function(){ window.open(DB.brand.kakao,'_blank'); });
+  } catch(e) {
+    window.open(DB.brand.kakao,'_blank');
+  }
+  document.body.removeChild(ta);
 }
 
 // ── 모드 전환 시 초기화 ──
@@ -1436,10 +1468,14 @@ function submitPkg() {
   lines.push('확인 후 연락 주세요!');
 
   var msg = lines.filter(function(l){return l!==undefined&&l!==null;}).join('\n');
-  navigator.clipboard.writeText(msg).then(function(){
-    showToast('✅ 내용이 복사되었습니다!\n카카오톡이 열리면 붙여넣기 해주세요 😊');
-    setTimeout(function(){window.open(DB.brand.kakao,'_blank');},1500);
-  }).catch(function(){window.open(DB.brand.kakao,'_blank');});
+  try {
+    if(navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(msg).then(function(){
+        showToast('✅ 내용이 복사되었습니다! 카카오톡이 열리면 붙여넣기 해주세요 😊');
+        setTimeout(function(){window.open(DB.brand.kakao,'_blank');},1500);
+      }).catch(function(){ fallbackCopy(msg); });
+    } else { fallbackCopy(msg); }
+  } catch(e) { fallbackCopy(msg); }
 }
 
 // ── DAY TOURS ──
