@@ -79,6 +79,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:#f0f2f5;color:#1a2a5e;min-
 
 <div class="top-bar">
   <div class="top-title">🛠️ 로투차 관리자</div>
+  <button onclick="saveToGitHub()" id="github-save-btn" style="background:#2ea44f;color:#fff;border:none;border-radius:6px;padding:7px 14px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;margin-right:6px">💾 GitHub 저장</button>
+  <button onclick="resetToken()" style="background:transparent;color:#8892c4;border:1px solid #2d3a7a;border-radius:6px;padding:7px 10px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;margin-right:8px">🔑 토큰 재설정</button>
   <div class="top-badge">ADMIN</div>
 </div>
 <div class="tab-bar">
@@ -499,6 +501,87 @@ function importJSON(input){
 }
 
 // ── TOAST ──
+
+// ── GitHub 자동 저장 ──
+var GITHUB_TOKEN = localStorage.getItem('gh_token') || '';
+var GITHUB_OWNER = 'nanyingkui';
+var GITHUB_REPO = 'lotocha';
+var GITHUB_FILE = 'lotocha_data.json';
+
+
+function resetToken(){
+  localStorage.removeItem('gh_token');
+  showToast('토큰이 초기화되었습니다. 다음 저장 시 재입력해 주세요.');
+}
+
+async function saveToGitHub() {
+  GITHUB_TOKEN = localStorage.getItem('gh_token') || '';
+  if(!GITHUB_TOKEN) {
+    var token = prompt('GitHub Personal Access Token을 입력하세요:');
+    if(!token) return;
+    localStorage.setItem('gh_token', token);
+    GITHUB_TOKEN = token;
+  }
+  var btn = document.getElementById('github-save-btn');
+  btn.textContent = '⏳ 저장 중...';
+  btn.disabled = true;
+
+  try {
+    // 1. 현재 파일의 SHA 가져오기
+    var getRes = await fetch(
+      'https://api.github.com/repos/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/contents/' + GITHUB_FILE,
+      { headers: { 'Authorization': 'token ' + GITHUB_TOKEN, 'Accept': 'application/vnd.github.v3+json' } }
+    );
+    var fileData = await getRes.json();
+    var sha = fileData.sha;
+
+    // 2. 데이터 준비
+    var jsonStr = JSON.stringify(DB, null, 2);
+    var encoded = btoa(unescape(encodeURIComponent(jsonStr)));
+
+    // 3. 파일 업데이트
+    var putRes = await fetch(
+      'https://api.github.com/repos/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/contents/' + GITHUB_FILE,
+      {
+        method: 'PUT',
+        headers: {
+          'Authorization': 'token ' + GITHUB_TOKEN,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: '관리자 페이지에서 데이터 업데이트',
+          content: encoded,
+          sha: sha
+        })
+      }
+    );
+
+    if(putRes.ok) {
+      btn.textContent = '✅ 저장 완료！';
+      btn.style.background = '#1a7a34';
+      setTimeout(function() {
+        btn.textContent = '💾 GitHub 저장';
+        btn.style.background = '#2ea44f';
+        btn.disabled = false;
+      }, 3000);
+      showToast('✅ GitHub에 저장 완료！
+약 1분 후 고객 페이지에 반영됩니다.');
+    } else {
+      throw new Error('저장 실패');
+    }
+  } catch(e) {
+    btn.textContent = '❌ 저장 실패';
+    btn.style.background = '#c62828';
+    setTimeout(function() {
+      btn.textContent = '💾 GitHub 저장';
+      btn.style.background = '#2ea44f';
+      btn.disabled = false;
+    }, 3000);
+    showToast('❌ 저장 실패: ' + e.message);
+  }
+}
+
 function showToast(msg){
   var t=document.getElementById('toast');
   t.textContent=msg;t.classList.add('show');
