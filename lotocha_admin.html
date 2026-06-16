@@ -209,15 +209,25 @@ body{font-family:'Noto Sans KR',sans-serif;background:#f0f2f5;color:#1a2a5e;min-
 // ── DATA ──
 var DB = null;
 
-// 같은 폴더의 lotocha_data.json 로드
-fetch('lotocha_data.json')
+// GitHub에서 JSON 로드
+var GITHUB_RAW = 'https://raw.githubusercontent.com/nanyingkui/lotocha/main/lotocha_data.json';
+fetch(GITHUB_RAW + '?t=' + Date.now())
   .then(function(r){return r.json();})
   .then(function(data){
     DB = JSON.parse(JSON.stringify(data));
     renderAll();
   })
   .catch(function(){
-    showToast('lotocha_data.json을 찾을 수 없습니다. 내보내기 탭에서 파일을 불러오세요.');
+    // GitHub 로드 실패 시 로컬 시도
+    fetch('lotocha_data.json')
+      .then(function(r){return r.json();})
+      .then(function(data){
+        DB = JSON.parse(JSON.stringify(data));
+        renderAll();
+      })
+      .catch(function(){
+        showToast('데이터를 불러올 수 없습니다. 내보내기 탭에서 파일을 불러오세요.');
+      });
   });
 
 // ── TAB ──
