@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로투차 관리자</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans KR',sans-serif;background:#f0f2f5;color:#1a2a5e;min-height:100vh}
+.top-bar{background:#1a2a5e;padding:0 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:200;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.top-title{color:#f5a623;font-size:16px;font-weight:900;padding:14px 0;flex:1}
+.top-badge{background:#f5a623;color:#1a2a5e;font-size:10px;font-weight:900;padding:3px 10px;border-radius:20px}
+.tab-bar{background:#1a2a5e;border-top:1px solid rgba(255,255,255,.1);display:flex;overflow-x:auto}
+.tab-btn{padding:11px 16px;border:none;background:transparent;color:#8892c4;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s}
+.tab-btn.on{color:#f5a623;border-bottom-color:#f5a623}
+.wrap{max-width:900px;margin:0 auto;padding:20px 16px 80px}
+.panel{display:none}.panel.on{display:block}
+.card{background:#fff;border-radius:14px;padding:20px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.card-title{font-size:14px;font-weight:900;color:#1a2a5e;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.info-box{background:#e3f2fd;border-radius:10px;padding:12px 16px;font-size:12px;color:#1565c0;line-height:1.7;margin-bottom:14px}
+.warn-box{background:#fff3e0;border-radius:10px;padding:12px 16px;font-size:12px;color:#e65100;line-height:1.7;margin-bottom:14px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.fgrid.triple{grid-template-columns:1fr 1fr 1fr}
+.fgrid.quad{grid-template-columns:1fr 1fr 1fr 1fr}
+.fitem{display:flex;flex-direction:column;gap:4px}
+.fitem.full{grid-column:1/-1}
+.fitem label{font-size:11px;font-weight:700;color:#888}
+.fitem input,.fitem select,.fitem textarea{border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:13px;outline:none;transition:border .2s;background:#fff;color:#1a2a5e}
+.fitem input:focus,.fitem select:focus,.fitem textarea:focus{border-color:#f5a623}
+.fitem textarea{resize:vertical;min-height:70px}
+.divider{font-size:12px;font-weight:900;color:#888;margin:14px 0 8px;padding-bottom:6px;border-bottom:1px solid #eee}
+.btn{border:none;border-radius:8px;padding:9px 16px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-primary{background:#1a2a5e;color:#f5a623}
+.btn-primary:hover{opacity:.9}
+.btn-success{background:#2e7d32;color:#fff}
+.btn-danger{background:#ffebee;color:#c62828;border:1px solid #ffcdd2}
+.btn-warning{background:#fff8e1;color:#e65100;border:1px solid #ffe082}
+.btn-sm{padding:6px 12px;font-size:11px}
+.btn-export{width:100%;background:linear-gradient(135deg,#1a2a5e,#2d4a9e);color:#fff;border:none;border-radius:10px;padding:16px;font-family:inherit;font-size:15px;font-weight:900;cursor:pointer;margin-top:8px}
+.btn-import{background:#e8f5e9;color:#2e7d32;border:1.5px solid #a5d6a7}
+.price-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:12px}
+.price-table th{background:#1a2a5e;color:#f5a623;padding:8px 12px;text-align:left;font-size:11px;font-weight:700}
+.price-table td{padding:8px 12px;border-bottom:1px solid #f0f0f0}
+.price-table tr:last-child td{border:none}
+.price-table input{width:80px;border:1.5px solid #e0e0e0;border-radius:6px;padding:5px 8px;font-family:inherit;font-size:13px;font-weight:700;text-align:right;outline:none}
+.price-table input:focus{border-color:#f5a623}
+.spot-row{border:1.5px solid #e8edf3;border-radius:10px;overflow:hidden;margin-bottom:10px}
+.spot-hdr{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;background:#fafafa;transition:background .15s}
+.spot-hdr:hover{background:#f0f4ff}
+.spot-icon-big{font-size:20px}
+.spot-name-lbl{font-size:13px;font-weight:700;flex:1}
+.spot-type-badge{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700}
+.type-attraction{background:#e3f2fd;color:#1565c0}
+.type-meal{background:#e8f5e9;color:#2e7d32}
+.type-transport{background:#fce4ec;color:#c62828}
+.type-hotel{background:#f3e5f5;color:#6a1b9a}
+.type-activity{background:#fff8e1;color:#e65100}
+.type-show{background:#fce4ec;color:#880e4f}
+.spot-body{display:none;padding:16px;border-top:1px solid #e8edf3;background:#fff}
+.spot-row.open .spot-body{display:block}
+.spot-row.open .spot-hdr{background:#fffbf2}
+.photo-area{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.photo-thumb{position:relative;width:80px;height:65px}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;border-radius:7px}
+.photo-del{position:absolute;top:-4px;right:-4px;background:#e53935;color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;line-height:1}
+.photo-add{width:80px;height:65px;border:2px dashed #ddd;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:10px;color:#bbb;gap:3px;transition:all .2s}
+.photo-add:hover{border-color:#f5a623;color:#e8940f}
+.photo-add-icon{font-size:20px;color:#ccc}
+.notice-item{border:1.5px solid #e8edf3;border-radius:10px;padding:12px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start}
+.notice-item textarea{flex:1;border:1.5px solid #e0e0e0;border-radius:7px;padding:8px 10px;font-family:inherit;font-size:12px;resize:none;outline:none;min-height:60px}
+.notice-item textarea:focus{border-color:#f5a623}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a2a5e;color:#f5a623;padding:11px 22px;border-radius:20px;font-size:13px;font-weight:700;opacity:0;transition:all .3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:600px){.fgrid{grid-template-columns:1fr}.fgrid.triple{grid-template-columns:1fr 1fr}.fgrid.quad{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="top-title">🛠️ 로투차 관리자</div>
+  <div class="top-badge">ADMIN</div>
+</div>
+<div class="tab-bar">
+  <button class="tab-btn on" onclick="switchTab(0)">📦 패키지/가격</button>
+  <button class="tab-btn" onclick="switchTab(1)">🏔️ 경관/일정</button>
+  <button class="tab-btn" onclick="switchTab(2)">⚙️ 옵션설정</button>
+  <button class="tab-btn" onclick="switchTab(3)">☀️ 1일 투어</button>
+  <button class="tab-btn" onclick="switchTab(4)">📋 유의사항</button>
+  <button class="tab-btn" onclick="switchTab(5)">🏷️ 브랜드</button>
+  <button class="tab-btn" onclick="switchTab(6)">📥 내보내기</button>
+</div>
+
+<div class="wrap">
+
+<!-- ═══ PANEL 0: 패키지/가격 ═══ -->
+<div class="panel on" id="panel-0">
+  <div class="info-box">💡 인원별 단가(만원/인)와 포함/불포함 사항을 수정하세요. 수정 후 <strong>내보내기</strong> 탭에서 저장하세요.</div>
+  <div id="pkg-panels"></div>
+</div>
+
+<!-- ═══ PANEL 1: 경관/일정 ═══ -->
+<div class="panel" id="panel-1">
+  <div class="info-box">💡 각 경관을 클릭해서 내용을 수정하세요. 사진은 URL 추가 또는 파일 업로드가 가능합니다.</div>
+  <div id="spot-list"></div>
+</div>
+
+<!-- ═══ PANEL 2: 옵션설정 ═══ -->
+<div class="panel" id="panel-2">
+  <div class="info-box">💡 각 옵션의 가격과 설명을 수정하세요.</div>
+
+  <div class="card">
+    <div class="card-title">🏨 호텔 옵션</div>
+    <div id="hotel-editor"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🎭 공연 옵션</div>
+    <div id="show-editor"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">💆 마사지 옵션</div>
+    <div id="massage-editor"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🚌 부용진 교통</div>
+    <div id="fuyong-editor"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🏯 봉황고성 대체</div>
+    <div class="divider">봉황고성 추가비용 (만원/인)</div>
+    <div class="fgrid quad" id="phoenix-price-editor"></div>
+    <div class="divider" style="margin-top:4px">봉황고성 교통 옵션</div>
+    <div id="phoenix-transport-editor"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🚁 헬기 옵션</div>
+    <div id="heli-editor"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">➕ 추가 옵션</div>
+    <div id="extras-editor"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">⭐ 스타 가이드</div>
+    <div class="fgrid">
+      <div class="fitem"><label>하루당 팁 (만원/일)</label><input type="number" id="star-guide-price" min="0" onchange="updateStarGuide(this.value)"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PANEL 3: 1일 투어 ═══ -->
+<div class="panel" id="panel-3">
+  <div class="info-box">💡 1일 투어 상품의 내용과 가격을 수정하세요.</div>
+  <div id="day-tour-editor"></div>
+</div>
+
+<!-- ═══ PANEL 4: 유의사항 ═══ -->
+<div class="panel" id="panel-4">
+  <div class="card">
+    <div class="card-title">📋 유의사항</div>
+    <div id="notice-editor"></div>
+    <button class="btn btn-warning btn-sm" style="margin-top:8px" onclick="addNotice()">+ 항목 추가</button>
+  </div>
+  <div class="card">
+    <div class="card-title">⚠️ 취소 규정</div>
+    <div id="cancel-editor"></div>
+    <button class="btn btn-warning btn-sm" style="margin-top:8px" onclick="addCancel()">+ 규정 추가</button>
+  </div>
+</div>
+
+<!-- ═══ PANEL 5: 브랜드 ═══ -->
+<div class="panel" id="panel-5">
+  <div class="card">
+    <div class="card-title">🏷️ 브랜드 설정</div>
+    <div class="fgrid">
+      <div class="fitem"><label>브랜드명</label><input type="text" id="brand-name"></div>
+      <div class="fitem"><label>풀 네임</label><input type="text" id="brand-name-full"></div>
+      <div class="fitem full"><label>슬로건</label><input type="text" id="brand-slogan"></div>
+      <div class="fitem full"><label>카카오톡 채널 URL</label><input type="text" id="brand-kakao"></div>
+      <div class="fitem"><label>전화번호</label><input type="text" id="brand-phone"></div>
+      <div class="fitem"><label>이메일</label><input type="text" id="brand-email"></div>
+      <div class="fitem"><label>인스타그램</label><input type="text" id="brand-instagram"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PANEL 6: 내보내기 ═══ -->
+<div class="panel" id="panel-6">
+  <div class="warn-box">⚠️ 수정 후 반드시 <strong>내보내기</strong>를 해야 고객 페이지에 반영됩니다.<br>다운로드 후 <strong>index.html과 함께</strong> Netlify에 업로드하세요.</div>
+  <div class="card">
+    <div class="card-title">📥 데이터 내보내기</div>
+    <p style="font-size:13px;color:#555;line-height:1.7;margin-bottom:12px">수정된 내용이 <strong>lotocha_data.json</strong> 파일로 다운로드됩니다.</p>
+    <button class="btn-export" onclick="exportJSON()">📥 lotocha_data.json 내보내기</button>
+  </div>
+  <div class="card">
+    <div class="card-title">📤 데이터 불러오기</div>
+    <p style="font-size:13px;color:#555;line-height:1.7;margin-bottom:12px">기존 <strong>lotocha_data.json</strong> 파일을 불러와서 편집할 수 있습니다.</p>
+    <input type="file" id="import-file" accept=".json" style="display:none" onchange="importJSON(this)">
+    <button class="btn btn-import" onclick="document.getElementById('import-file').click()">📤 lotocha_data.json 불러오기</button>
+  </div>
+</div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──
+var DB = null;
+
+// 같은 폴더의 lotocha_data.json 로드
+fetch('lotocha_data.json')
+  .then(function(r){return r.json();})
+  .then(function(data){
+    DB = JSON.parse(JSON.stringify(data));
+    renderAll();
+  })
+  .catch(function(){
+    showToast('lotocha_data.json을 찾을 수 없습니다. 내보내기 탭에서 파일을 불러오세요.');
+  });
+
+// ── TAB ──
+function switchTab(n){
+  document.querySelectorAll('.tab-btn').forEach(function(b,i){b.classList.toggle('on',i===n)});
+  document.querySelectorAll('.panel').forEach(function(p,i){p.classList.toggle('on',i===n)});
+}
+
+// ── RENDER ALL ──
+function renderAll(){
+  renderPkgPanels();
+  renderSpots();
+  renderOptions();
+  renderDayTours();
+  renderNotices();
+  renderBrand();
+}
+
+// ── 패키지/가격 ──
+function renderPkgPanels(){
+  var html = '';
+  DB.packages.forEach(function(pkg,pi){
+    html += '<div class="card"><div class="card-title">'+pkg.name+'</div>';
+    html += '<table class="price-table"><thead><tr>';
+    [2,3,4,5,6,7,8].forEach(function(n){html+='<th>'+n+'인</th>';});
+    html += '</tr></thead><tbody><tr>';
+    [2,3,4,5,6,7,8].forEach(function(n){
+      html += '<td><input type="number" id="p'+pi+'-'+n+'" value="'+(pkg.prices[String(n)]||0)+'" min="0" onchange="DB.packages['+pi+'].prices[\''+n+'\']=parseInt(this.value)||0"></td>';
+    });
+    html += '</tr></tbody></table>';
+    html += '<div class="divider">✅ 포함 사항 (한 줄에 하나씩)</div>';
+    html += '<textarea id="inc-'+pi+'" onchange="DB.packages['+pi+'].includes=this.value.split(\'\\n\').filter(function(s){return s.trim();})" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:12px;resize:none;outline:none;min-height:100px">'+pkg.includes.join('\n')+'</textarea>';
+    html += '<div class="divider">⚠️ 불포함 사항 (한 줄에 하나씩)</div>';
+    html += '<textarea id="exc-'+pi+'" onchange="DB.packages['+pi+'].excludes=this.value.split(\'\\n\').filter(function(s){return s.trim();})" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:12px;resize:none;outline:none;min-height:60px">'+pkg.excludes.join('\n')+'</textarea>';
+    html += '</div>';
+  });
+  document.getElementById('pkg-panels').innerHTML = html;
+}
+
+// ── 경관 ──
+var typeLabels = {attraction:'관광지',meal:'식사',transport:'교통',hotel:'숙박',activity:'액티비티',show:'공연'};
+
+function renderSpots(){
+  var html = '';
+  Object.keys(DB.spots).forEach(function(sid){
+    var sp = DB.spots[sid];
+    var tclass = 'type-'+(sp.type||'activity');
+    var tlabel = typeLabels[sp.type]||sp.type;
+    html += '<div class="spot-row" id="srow-'+sid+'">';
+    html += '<div class="spot-hdr" onclick="toggleSpotRow(\''+sid+'\')">';
+    html += '<div class="spot-icon-big">'+sp.icon+'</div>';
+    html += '<div class="spot-name-lbl">'+sp.name+'</div>';
+    html += '<span class="spot-type-badge '+tclass+'">'+tlabel+'</span>';
+    html += '<span style="color:#ccc;font-size:12px;margin-left:6px">▼</span></div>';
+    html += '<div class="spot-body">';
+    html += '<div class="fgrid">';
+    html += sf('이름','text','sn-'+sid,sp.name,'updateSpot(\''+sid+'\',\'name\',this.value)');
+    html += sf('아이콘','text','si-'+sid,sp.icon,'updateSpot(\''+sid+'\',\'icon\',this.value)');
+    html += sf('시간','text','st-'+sid,sp.time,'updateSpot(\''+sid+'\',\'time\',this.value)');
+    html += sf('소요시간','text','sd-'+sid,sp.duration||'','updateSpot(\''+sid+'\',\'duration\',this.value)');
+    html += '</div>';
+    html += '<div class="fitem full" style="margin-bottom:10px"><label>설명</label><textarea onchange="updateSpot(\''+sid+'\',\'desc\',this.value)" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:12px;resize:none;outline:none;min-height:70px">'+esc(sp.desc||'')+'</textarea></div>';
+    html += '<div class="fitem full" style="margin-bottom:10px"><label>💡 팁</label><textarea onchange="updateSpot(\''+sid+'\',\'tip\',this.value)" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:12px;resize:none;outline:none;min-height:50px">'+esc(sp.tip||'')+'</textarea></div>';
+    html += '<div class="fitem full" style="margin-bottom:10px"><label>📍 고덕지도 링크</label><input type="text" value="'+esc(sp.gaode||'')+'" onchange="updateSpot(\''+sid+'\',\'gaode\',this.value)" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:12px;outline:none"></div>';
+    // 사진
+    html += '<div class="divider">📷 사진</div>';
+    html += '<div class="photo-area" id="photos-'+sid+'">';
+    (sp.images||[]).forEach(function(url,ii){
+      html += '<div class="photo-thumb" id="pt-'+sid+'-'+ii+'"><img src="'+url+'" onerror="this.style.display=\'none\'"><button class="photo-del" onclick="delPhoto(\''+sid+'\','+ii+')">✕</button></div>';
+    });
+    html += '<div class="photo-add" onclick="addPhotoUrl(\''+sid+'\')"><div class="photo-add-icon">+</div><div>URL</div></div>';
+    html += '<div class="photo-add" onclick="document.getElementById(\'pf-'+sid+'\').click()"><div class="photo-add-icon">📷</div><div>파일</div></div>';
+    html += '<input type="file" id="pf-'+sid+'" accept="image/*" multiple style="display:none" onchange="uploadPhotos(\''+sid+'\',this)">';
+    html += '</div></div></div>';
+  });
+  document.getElementById('spot-list').innerHTML = html;
+}
+
+function sf(label, type, id, val, onchange){
+  return '<div class="fitem"><label>'+label+'</label><input type="'+type+'" id="'+id+'" value="'+esc(val)+'" onchange="'+onchange+'"></div>';
+}
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function toggleSpotRow(sid){document.getElementById('srow-'+sid).classList.toggle('open');}
+function updateSpot(sid,key,val){DB.spots[sid][key]=val;}
+
+function addPhotoUrl(sid){
+  var url=prompt('사진 URL을 입력하세요:');
+  if(!url||!url.trim())return;
+  if(!DB.spots[sid].images)DB.spots[sid].images=[];
+  DB.spots[sid].images.push(url.trim());
+  renderSpots();showToast('사진 추가됨');
+}
+function uploadPhotos(sid,input){
+  var files=Array.from(input.files);
+  if(!DB.spots[sid].images)DB.spots[sid].images=[];
+  var rem=files.length;
+  files.forEach(function(file){
+    var reader=new FileReader();
+    reader.onload=function(e){
+      DB.spots[sid].images.push(e.target.result);
+      rem--;if(rem===0){renderSpots();showToast('사진 '+files.length+'장 추가됨');}
+    };
+    reader.readAsDataURL(file);
+  });
+}
+function delPhoto(sid,idx){DB.spots[sid].images.splice(idx,1);renderSpots();}
+
+// ── 옵션 ──
+function renderOptions(){
+  renderOptGroup('hotel-editor',DB.options.hotel.items,'hotel',false);
+  renderOptGroup('show-editor',DB.options.show.items,'show',true);
+  renderOptGroup('massage-editor',DB.options.massage.items,'massage',true);
+  renderOptGroup('fuyong-editor',DB.options.transport_fuyong.items,'transport_fuyong',true);
+  renderOptGroup('phoenix-transport-editor',DB.options.transport_phoenix.items,'transport_phoenix',true);
+  renderPhoenixPrices();
+  renderHeli();
+  renderExtras();
+  var sg=DB.options.extras.find(function(e){return e.id==='star_guide';});
+  if(sg)document.getElementById('star-guide-price').value=sg.price_per_day||5;
+}
+
+function renderOptGroup(cid,items,gkey,showPrice){
+  var html='';
+  items.forEach(function(item,i){
+    html+='<div style="border:1.5px solid #e8edf3;border-radius:10px;padding:14px;margin-bottom:10px">';
+    html+='<div style="font-size:12px;font-weight:900;color:#555;margin-bottom:10px">'+item.name+'</div>';
+    html+='<div class="fgrid">';
+    html+='<div class="fitem"><label>이름</label><input type="text" value="'+esc(item.name)+'" onchange="DB.options[\''+gkey+'\'].items['+i+'].name=this.value"></div>';
+    if(showPrice)html+='<div class="fitem"><label>가격 (만원/인)</label><input type="number" value="'+(item.price||0)+'" min="-99" onchange="DB.options[\''+gkey+'\'].items['+i+'].price=parseInt(this.value)||0"></div>';
+    html+='<div class="fitem full"><label>설명</label><textarea onchange="DB.options[\''+gkey+'\'].items['+i+'].desc=this.value" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 10px;font-family:inherit;font-size:12px;resize:none;outline:none;min-height:55px">'+esc(item.desc||'')+'</textarea></div>';
+    html+='</div></div>';
+  });
+  document.getElementById(cid).innerHTML=html;
+}
+
+function renderPhoenixPrices(){
+  var prices=DB.options.replace.phoenix_prices;
+  var html='';
+  [2,3,4,5,6,7,8].forEach(function(n){
+    html+='<div class="fitem"><label>'+n+'인 (만원/인)</label><input type="number" value="'+(prices[n]||0)+'" min="0" onchange="DB.options.replace.phoenix_prices['+n+']=parseInt(this.value)||0"></div>';
+  });
+  document.getElementById('phoenix-price-editor').innerHTML=html;
+}
+
+function renderHeli(){
+  var items=DB.options.helicopter.items;
+  var html='';
+  items.forEach(function(item,i){
+    if(item.id==='none')return;
+    html+='<div style="border:1.5px solid #e8edf3;border-radius:10px;padding:12px;margin-bottom:8px">';
+    html+='<div style="font-size:12px;font-weight:900;color:#555;margin-bottom:8px">'+item.name+' '+(item.duration||'')+'</div>';
+    html+='<div class="fgrid">';
+    html+='<div class="fitem"><label>가격 (만원)</label><input type="number" step="0.5" value="'+(item.price||0)+'" onchange="DB.options.helicopter.items['+i+'].price=parseFloat(this.value)||0"></div>';
+    html+='<div class="fitem"><label>시간</label><input type="text" value="'+esc(item.duration||'')+'" onchange="DB.options.helicopter.items['+i+'].duration=this.value"></div>';
+    html+='</div></div>';
+  });
+  document.getElementById('heli-editor').innerHTML=html;
+}
+
+function renderExtras(){
+  var html='';
+  DB.options.extras.forEach(function(item,i){
+    if(item.id==='star_guide')return;
+    html+='<div style="border:1.5px solid #e8edf3;border-radius:10px;padding:12px;margin-bottom:8px">';
+    html+='<div style="font-size:12px;font-weight:900;color:#555;margin-bottom:8px">'+item.name+'</div>';
+    html+='<div class="fgrid">';
+    if(item.type==='per_person')html+='<div class="fitem"><label>가격 (만원/인)</label><input type="number" value="'+(item.price||0)+'" min="0" onchange="DB.options.extras['+i+'].price=parseInt(this.value)||0"></div>';
+    html+='<div class="fitem full"><label>설명</label><textarea onchange="DB.options.extras['+i+'].desc=this.value" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 10px;font-family:inherit;font-size:12px;resize:none;outline:none;min-height:55px">'+esc(item.desc||'')+'</textarea></div>';
+    html+='</div></div>';
+  });
+  document.getElementById('extras-editor').innerHTML=html;
+}
+
+function updateStarGuide(val){
+  var sg=DB.options.extras.find(function(e){return e.id==='star_guide';});
+  if(sg)sg.price_per_day=parseInt(val)||0;
+}
+
+// ── 1일 투어 ──
+function renderDayTours(){
+  var html='';
+  (DB.day_tours||[]).forEach(function(tour,ti){
+    html+='<div class="card"><div class="card-title">'+tour.icon+' '+tour.name+'</div>';
+    html+='<div class="divider">기본 정보</div>';
+    html+='<div class="fgrid">';
+    html+='<div class="fitem"><label>이름</label><input type="text" value="'+esc(tour.name)+'" onchange="DB.day_tours['+ti+'].name=this.value"></div>';
+    html+='<div class="fitem"><label>부제</label><input type="text" value="'+esc(tour.subtitle)+'" onchange="DB.day_tours['+ti+'].subtitle=this.value"></div>';
+    html+='<div class="fitem"><label>아이콘</label><input type="text" value="'+esc(tour.icon)+'" onchange="DB.day_tours['+ti+'].icon=this.value"></div>';
+    html+='<div class="fitem"><label>태그</label><input type="text" value="'+esc(tour.tag||'')+'" onchange="DB.day_tours['+ti+'].tag=this.value"></div>';
+    html+='<div class="fitem full"><label>설명</label><textarea onchange="DB.day_tours['+ti+'].desc=this.value" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:12px;resize:none;outline:none;min-height:70px">'+esc(tour.desc||'')+'</textarea></div>';
+    html+='<div class="fitem full"><label>최소 인원</label><input type="text" value="'+esc(tour.min_pax||'')+'" onchange="DB.day_tours['+ti+'].min_pax=this.value"></div>';
+    html+='</div>';
+    // 요금
+    html+='<div class="divider">💰 요금 (원 단위)</div>';
+    var priceHtml='';
+    Object.entries(tour.prices).forEach(function(e,pi){
+      priceHtml+='<div class="fitem"><label>'+e[0]+'</label><input type="number" value="'+e[1]+'" onchange="DB.day_tours['+ti+'].prices[\''+e[0]+'\']=parseInt(this.value)||0"></div>';
+    });
+    html+='<div class="fgrid">'+priceHtml+'</div>';
+    // 포함/불포함
+    html+='<div class="divider">포함/불포함 사항</div>';
+    html+='<div class="fgrid">';
+    html+='<div class="fitem"><label>✅ 포함 (한 줄에 하나)</label><textarea onchange="DB.day_tours['+ti+'].includes=this.value.split(\'\\n\').filter(function(s){return s.trim();})" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:12px;resize:none;outline:none;min-height:120px">'+esc((tour.includes||[]).join('\n'))+'</textarea></div>';
+    html+='<div class="fitem"><label>⚠️ 불포함 (한 줄에 하나)</label><textarea onchange="DB.day_tours['+ti+'].excludes=this.value.split(\'\\n\').filter(function(s){return s.trim();})" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:12px;resize:none;outline:none;min-height:120px">'+esc((tour.excludes||[]).join('\n'))+'</textarea></div>';
+    html+='</div>';
+    html+='</div>';
+  });
+  document.getElementById('day-tour-editor').innerHTML=html;
+}
+
+// ── 유의사항 ──
+function renderNotices(){
+  var html='';
+  DB.notices.forEach(function(n,i){
+    html+='<div class="notice-item"><textarea onchange="DB.notices['+i+'].text=this.value">'+esc(n.text)+'</textarea><button class="btn btn-danger btn-sm" onclick="delNotice('+i+')">삭제</button></div>';
+  });
+  document.getElementById('notice-editor').innerHTML=html;
+
+  var html2='';
+  DB.cancel_policy.forEach(function(row,i){
+    html2+='<div style="display:grid;grid-template-columns:1fr 2fr auto;gap:8px;margin-bottom:8px;align-items:start">';
+    html2+='<input type="text" value="'+esc(row.when)+'" onchange="DB.cancel_policy['+i+'].when=this.value" style="border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:12px;outline:none">';
+    html2+='<input type="text" value="'+esc(row.rule)+'" onchange="DB.cancel_policy['+i+'].rule=this.value" style="border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:12px;outline:none">';
+    html2+='<button class="btn btn-danger btn-sm" onclick="delCancel('+i+')">삭제</button>';
+    html2+='</div>';
+  });
+  document.getElementById('cancel-editor').innerHTML=html2;
+}
+
+function addNotice(){DB.notices.push({id:'new_'+Date.now(),text:'새 유의사항 입력'});renderNotices();}
+function delNotice(i){DB.notices.splice(i,1);renderNotices();}
+function addCancel(){DB.cancel_policy.push({when:'출발 X일 전',rule:'규정 내용'});renderNotices();}
+function delCancel(i){DB.cancel_policy.splice(i,1);renderNotices();}
+
+// ── 브랜드 ──
+function renderBrand(){
+  var b=DB.brand;
+  var fields=['name','name_full','slogan','kakao','phone','email','instagram'];
+  fields.forEach(function(k){
+    var el=document.getElementById('brand-'+k.replace('_','-'));
+    if(el){
+      el.value=b[k]||'';
+      el.onchange=function(){DB.brand[k]=this.value;};
+    }
+  });
+}
+
+// ── 내보내기/불러오기 ──
+function exportJSON(){
+  // 최신값 수집
+  DB.packages.forEach(function(pkg,pi){
+    [2,3,4,5,6,7,8].forEach(function(n){
+      var el=document.getElementById('p'+pi+'-'+n);
+      if(el)pkg.prices[String(n)]=parseInt(el.value)||0;
+    });
+  });
+  var json=JSON.stringify(DB,null,2);
+  var blob=new Blob([json],{type:'application/json'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='lotocha_data.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('✅ lotocha_data.json 다운로드 완료！');
+}
+
+function importJSON(input){
+  var file=input.files[0];
+  if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      DB=JSON.parse(e.target.result);
+      renderAll();
+      showToast('✅ 데이터 불러오기 완료！');
+    }catch(err){
+      showToast('❌ 파일 형식이 올바르지 않습니다.');
+    }
+  };
+  reader.readAsText(file,'utf-8');
+}
+
+// ── TOAST ──
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},3000);
+}
+</script>
+</body>
+</html>

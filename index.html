@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로투차 — 장가계 투어</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans KR',sans-serif;background:#f4f2ee;color:#1a2a5e;min-height:100vh}
+
+.top-bar{background:#1a2a5e;position:sticky;top:0;z-index:200;box-shadow:0 2px 10px rgba(0,0,0,.3)}
+.top-inner{max-width:720px;margin:0 auto;display:flex;align-items:center;padding:0 14px;gap:8px}
+.top-logo{color:#f5a623;font-size:15px;font-weight:900;flex:1;padding:13px 0}
+.mode-btn{border:1.5px solid #2d3a7a;background:transparent;color:#8892c4;border-radius:6px;padding:6px 11px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s}
+.mode-btn.on{border-color:#f5a623;color:#f5a623;background:rgba(245,166,35,.1)}
+.kakao-btn{background:#FEE500;color:#191919;border:none;border-radius:6px;padding:7px 12px;font-family:inherit;font-size:11px;font-weight:900;cursor:pointer}
+
+.step-bar{background:#1a2a5e;border-top:1px solid rgba(255,255,255,.1);overflow-x:auto}
+.step-inner{max-width:720px;margin:0 auto;display:flex}
+.step-btn{flex:1;padding:11px 6px;border:none;background:transparent;color:#8892c4;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s;text-align:center}
+.step-btn.active{color:#f5a623;border-bottom-color:#f5a623}
+.step-btn.done{color:#4caf50}
+
+.wrap{max-width:720px;margin:0 auto;padding:16px 14px 100px}
+.page{display:none}.page.on{display:block}
+
+.card{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(26,42,94,.08)}
+.card-title{font-size:14px;font-weight:900;color:#1a2a5e;margin-bottom:12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.badge{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:700}
+.badge-gold{background:#fff8e1;color:#e65100}
+.badge-blue{background:#e3f2fd;color:#1565c0}
+.badge-green{background:#e8f5e9;color:#2e7d32}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#1a2a5e,#2d4a9e);color:#fff;border-radius:14px;padding:26px 20px 22px;margin-bottom:14px;text-align:center}
+.hero-title{font-size:20px;font-weight:900;margin-top:8px}
+.hero-sub{font-size:12px;opacity:.8;margin-top:6px;line-height:1.6}
+
+/* PKG TABS */
+.pkg-tabs{display:flex;gap:8px;margin-bottom:14px}
+.pkg-tab{flex:1;border:2px solid #e8edf3;border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;background:#fff;transition:all .2s;position:relative}
+.pkg-tab.on{border-color:#f5a623;background:#fffbf2}
+.pkg-tag{position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:#f5a623;color:#1a2a5e;font-size:9px;font-weight:900;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.pkg-name{font-size:14px;font-weight:900;color:#1a2a5e}
+.pkg-price{font-size:11px;color:#888;margin-top:3px}
+
+/* PAX */
+.pax-row{display:flex;flex-wrap:wrap;gap:7px}
+.pax-btn{width:52px;height:42px;border:2px solid #e0e0e0;border-radius:9px;background:#fff;color:#555;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.pax-btn.on{border-color:#f5a623;background:#f5a623;color:#fff}
+.pax-btn.gray{color:#bbb;border-color:#eee;background:#f9f9f9}
+
+/* PRICE BOX */
+.price-box{background:#1a2a5e;color:#fff;border-radius:12px;padding:16px 18px;margin-bottom:14px}
+.pb-label{font-size:11px;opacity:.65}
+.pb-val{font-size:26px;font-weight:900;color:#f5a623;margin:3px 0}
+.pb-total{font-size:14px;font-weight:700}
+.pb-deposit{font-size:11px;opacity:.65;margin-top:4px}
+
+/* FLIGHT */
+.flight-box{background:#f8f9fc;border:1.5px solid #e8edf3;border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.flight-title{font-size:12px;font-weight:900;color:#1a2a5e;margin-bottom:10px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fitem label{font-size:11px;font-weight:700;color:#888;display:block;margin-bottom:4px}
+.fitem input,.fitem select{width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:13px;outline:none;background:#fff;transition:border .2s}
+.fitem input:focus,.fitem select:focus{border-color:#f5a623}
+.fitem.full{grid-column:1/-1}
+.flight-result{border-radius:10px;padding:12px 14px;font-size:12px;line-height:1.8;margin-top:10px}
+.fr-ok{background:#e8f5e9;border:1px solid #a5d6a7;color:#2e7d32}
+.fr-warn{background:#fff3e0;border:1px solid #ffe082;color:#e65100}
+.fr-upgrade{background:#e3f2fd;border:1px solid #90caf9;color:#1565c0}
+
+/* INC/EXC */
+.inc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.inc-box{border-radius:10px;padding:12px 14px;font-size:12px;line-height:1.8}
+.inc-yes{background:#eaf7ef;border:1px solid #a8ddb5}
+.inc-no{background:#fef5e7;border:1px solid #f9d89c}
+.inc-title{font-weight:900;font-size:13px;margin-bottom:6px}
+
+/* ITINERARY */
+.day-block{margin-bottom:12px}
+.day-hdr{background:#1a2a5e;color:#fff;border-radius:10px 10px 0 0;padding:10px 14px;display:flex;align-items:center;gap:8px}
+.day-badge{background:#f5a623;color:#1a2a5e;font-size:10px;font-weight:900;padding:2px 9px;border-radius:20px}
+.day-body{border:1px solid #e8edf3;border-top:none;border-radius:0 0 10px 10px}
+.spot{padding:12px 14px;border-bottom:1px solid #f5f5f5;cursor:pointer}
+.spot:last-child{border:none}
+.spot-top{display:flex;align-items:flex-start;gap:10px}
+.spot-time{min-width:46px;font-size:10px;font-weight:900;color:#f5a623;background:#1a2a5e;padding:2px 6px;border-radius:4px;text-align:center;margin-top:2px;flex-shrink:0}
+.spot-icon{font-size:18px;flex-shrink:0;line-height:1.3}
+.spot-info{flex:1}
+.spot-name{font-size:13px;font-weight:700;color:#1a2a5e}
+.spot-dur{font-size:10px;color:#aaa}
+.spot-arr{color:#ccc;font-size:11px;flex-shrink:0;margin-top:3px;transition:transform .2s}
+.spot.open .spot-arr{transform:rotate(180deg)}
+.spot-detail{display:none;margin-top:8px;margin-left:56px}
+.spot.open .spot-detail{display:block}
+.spot-desc{font-size:12px;color:#555;line-height:1.7;margin-bottom:6px}
+.spot-tip{background:#fff8e1;border-left:3px solid #f5a623;padding:7px 10px;border-radius:0 6px 6px 0;font-size:11px;color:#856404;line-height:1.6;margin-bottom:6px}
+.spot-map{font-size:11px;padding:3px 9px;border-radius:20px;background:#e8f5e9;color:#2e7d32;text-decoration:none;font-weight:700;display:inline-block}
+
+/* OPTION CARD */
+.opt{border:1.5px solid #e8edf3;border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .2s;margin-bottom:8px;position:relative}
+.opt.on{border-color:#f5a623;background:#fffbf2}
+.opt.cancel-on{border-color:#e53935;background:#fff8f8}
+.opt-radio{position:absolute;top:12px;right:12px;width:16px;height:16px;border:2px solid #ddd;border-radius:50%}
+.opt.on .opt-radio{border-color:#f5a623;background:#f5a623}
+.opt.cancel-on .opt-radio{border-color:#e53935;background:#e53935}
+.opt-name{font-size:13px;font-weight:900;padding-right:24px}
+.opt-desc{font-size:11px;color:#777;margin-top:3px;line-height:1.6;white-space:pre-line}
+.opt-price{font-size:11px;font-weight:700;margin-top:5px}
+.p-free{color:#2e7d32}.p-paid{color:#e65100}.p-refund{color:#e53935}.p-inquiry{color:#1565c0}
+
+/* CHECKBOX */
+.chk{border:1.5px solid #e8edf3;border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .2s;margin-bottom:8px}
+.chk.on{border-color:#f5a623;background:#fffbf2}
+.chk-row{display:flex;align-items:flex-start;gap:10px}
+.chk-icon{width:20px;height:20px;border:2px solid #ddd;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .2s;margin-top:1px}
+.chk.on .chk-icon{border-color:#f5a623;background:#f5a623;color:#fff}
+.chk-name{font-size:13px;font-weight:900}
+.chk-desc{font-size:11px;color:#777;margin-top:3px;line-height:1.6;white-space:pre-line}
+.chk-price{font-size:11px;font-weight:700;margin-top:4px;color:#e65100}
+
+/* HELI */
+.heli-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.heli-opt{border:1.5px solid #e8edf3;border-radius:10px;padding:10px 12px;cursor:pointer;transition:all .2s;text-align:center}
+.heli-opt.on{border-color:#f5a623;background:#fffbf2}
+.heli-opt.full{grid-column:1/-1}
+.heli-dur{font-size:10px;color:#888;margin-bottom:3px}
+.heli-price{font-size:14px;font-weight:900;color:#1a2a5e}
+.heli-unit{font-size:10px;color:#777;margin-top:2px}
+.heli-note{font-size:10px;color:#e65100;margin-top:3px}
+
+/* CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{border:1.5px solid #e0e0e0;background:#fff;color:#555;font-family:inherit;font-size:11px;font-weight:700;padding:5px 11px;border-radius:20px;cursor:pointer;transition:all .2s}
+.chip.on{border-color:#f5a623;background:#f5a623;color:#fff}
+.chip.avoid.on{border-color:#e53935;background:#ffebee;color:#c62828}
+
+/* NOTICE */
+.notice-box{background:#fafafa;border:1px solid #e8e8e8;border-radius:12px;padding:16px 18px;margin-bottom:12px;font-size:12px;color:#555;line-height:1.9}
+.notice-title{font-size:13px;font-weight:900;color:#1a2a5e;margin-bottom:10px}
+.notice-item{padding-left:14px;position:relative;margin-bottom:5px}
+.notice-item::before{content:"·";position:absolute;left:0;color:#bbb}
+.schedule-note{margin-top:10px;padding-top:10px;border-top:1px dashed #e0e0e0;color:#999;font-size:11px}
+.ins-link{color:#e8940f;font-weight:700;text-decoration:none;font-size:11px}
+
+/* CANCEL */
+.cancel-box{background:#fff8f8;border:1px solid #ffcdd2;border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.cancel-title{font-size:13px;font-weight:900;color:#c62828;margin-bottom:10px}
+.cancel-row{display:flex;gap:10px;font-size:11.5px;padding:5px 0;border-bottom:1px dashed #ffcdd2}
+.cancel-row:last-child{border:none}
+.cancel-when{min-width:110px;font-weight:700;color:#555;flex-shrink:0}
+
+/* SUMMARY */
+.sum-card{background:#1a2a5e;color:#fff;border-radius:14px;padding:18px;margin-bottom:12px}
+.sum-title{font-size:14px;font-weight:900;color:#f5a623;margin-bottom:12px}
+.sum-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.sum-row:last-child{border:none}
+.sum-lbl{opacity:.75;flex:1}
+.sum-val{font-weight:700;text-align:right;max-width:60%}
+.sum-val.plus{color:#ffd54f}
+.sum-val.minus{color:#ef9a9a}
+.sum-val.inq{color:#90caf9}
+.bd-box{background:rgba(255,255,255,.06);border-radius:8px;padding:10px 12px;margin-top:10px}
+.bd-title{font-size:10px;font-weight:900;color:#f5a623;opacity:.8;margin-bottom:6px}
+.bd-row{display:flex;justify-content:space-between;font-size:11px;padding:3px 0;opacity:.85}
+.total-row{display:flex;justify-content:space-between;font-size:16px;font-weight:900;padding-top:12px;margin-top:8px;border-top:1px solid rgba(245,166,35,.4)}
+.total-price{color:#f5a623;font-size:18px}
+.sum-note{font-size:10px;opacity:.5;margin-top:8px;line-height:1.7}
+
+/* DAY TOUR */
+.dt-card{background:#fff;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(26,42,94,.08);border:2px solid #e8edf3;cursor:pointer;transition:all .2s}
+.dt-card.on{border-color:#f5a623}
+.dt-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.dt-icon{font-size:32px;flex-shrink:0}
+.dt-info{flex:1}
+.dt-tags{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap}
+.dt-name{font-size:15px;font-weight:900;color:#1a2a5e;line-height:1.4}
+.dt-sub{font-size:11px;color:#888;margin-top:2px}
+.dt-min-price{text-align:right;flex-shrink:0}
+.dt-min-lbl{font-size:10px;color:#aaa}
+.dt-min-val{font-size:16px;font-weight:900;color:#f5a623}
+.dt-desc{font-size:12px;color:#555;line-height:1.7;margin-bottom:12px}
+.dt-schedule{background:#f8f9fc;border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.dt-sch-title{font-size:11px;font-weight:900;color:#888;margin-bottom:8px}
+.dt-sch-row{display:flex;gap:10px;margin-bottom:5px;font-size:12px}
+.dt-sch-time{min-width:44px;font-weight:700;color:#f5a623}
+.dt-price-box{background:#1a2a5e;border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.dt-price-lbl{font-size:11px;color:#f5a623;font-weight:900;margin-bottom:8px}
+.dt-price-row{display:flex;justify-content:space-between;font-size:12px;color:#fff;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.dt-price-row:last-child{border:none}
+.dt-price-name{opacity:.8}
+.dt-price-val{font-weight:700;color:#f5a623}
+.dt-min-pax{font-size:10px;color:rgba(255,255,255,.4);margin-top:6px}
+.dt-select-btn{width:100%;border:none;border-radius:10px;padding:13px;font-family:inherit;font-size:14px;font-weight:900;cursor:pointer;transition:all .2s}
+.dt-select-btn.default{background:linear-gradient(135deg,#1a2a5e,#2d4a9e);color:#fff}
+.dt-select-btn.selected{background:#f5a623;color:#1a2a5e}
+
+/* PAX COUNTER */
+.pax-counter-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f0f0f0}
+.pax-counter-row:last-child{border:none}
+.pax-age{font-size:13px;font-weight:700}
+.pax-price{font-size:12px;color:#f5a623;font-weight:700}
+.counter{display:flex;align-items:center;gap:12px}
+.cnt-btn{width:32px;height:32px;border-radius:50%;font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;border:1.5px solid #e0e0e0;background:#fff;color:#555;transition:all .2s}
+.cnt-btn.plus{border-color:#f5a623;background:#f5a623;color:#1a2a5e}
+.cnt-num{font-size:16px;font-weight:900;min-width:24px;text-align:center}
+
+/* JOIN */
+.join-box{background:linear-gradient(135deg,#1a2a5e,#2d4a9e);color:#fff;border-radius:14px;padding:14px 16px;margin-bottom:12px}
+.join-title{font-size:13px;font-weight:900;color:#f5a623;margin-bottom:6px}
+.join-desc{font-size:12px;line-height:1.8;opacity:.9}
+
+/* HOTEL AREA */
+.hotel-area select,.hotel-area input{width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:9px 12px;font-family:inherit;font-size:13px;outline:none;background:#fff;margin-bottom:8px;transition:border .2s}
+.hotel-area select:focus,.hotel-area input:focus{border-color:#f5a623}
+.hotel-area label{font-size:11px;font-weight:700;color:#888;display:block;margin-bottom:4px}
+
+/* NAV */
+.nav-btns{display:flex;gap:10px;margin-top:12px}
+.btn-back{flex:1;background:#e8edf3;color:#555;border:none;border-radius:10px;padding:13px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.btn-next{flex:2;background:linear-gradient(135deg,#1a2a5e,#2d4a9e);color:#fff;border:none;border-radius:10px;padding:13px;font-family:inherit;font-size:14px;font-weight:900;cursor:pointer}
+.btn-kakao{width:100%;background:#FEE500;color:#191919;border:none;border-radius:12px;padding:15px;font-family:inherit;font-size:15px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px}
+
+/* GAODE */
+.gaode-box{background:#fff8e1;border:1px solid #ffe082;border-radius:10px;padding:12px 14px;margin-bottom:12px;font-size:12px;color:#5d4037;line-height:1.8}
+.gaode-title{font-weight:900;font-size:12px;color:#e65100;margin-bottom:6px}
+.store-btns{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.store-btn{color:#fff;border-radius:7px;padding:7px 13px;font-size:11px;font-weight:700;text-decoration:none;display:inline-block}
+
+/* DEADLINE */
+.deadline{background:#fff3e0;border:1.5px solid #ffe082;border-radius:10px;padding:10px 14px;font-size:12px;color:#e65100;font-weight:700;margin-bottom:12px;text-align:center}
+
+/* TEXTAREA */
+textarea{width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:10px 12px;font-family:inherit;font-size:12px;resize:none;outline:none;margin-top:4px;transition:border .2s}
+textarea:focus{border-color:#f5a623}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a2a5e;color:#f5a623;padding:11px 22px;border-radius:20px;font-size:13px;font-weight:700;opacity:0;transition:all .3s;pointer-events:none;z-index:999;text-align:center;line-height:1.5}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.info-box{background:#e3f2fd;border-radius:8px;padding:10px 12px;font-size:11px;color:#1565c0;line-height:1.7;margin-top:8px}
+.warn-box{background:#fff3e0;border-radius:8px;padding:10px 12px;font-size:11px;color:#e65100;line-height:1.7;margin-top:8px}
+.sub-sec{display:none;margin-top:10px;padding-top:10px;border-top:1px dashed #e8edf3}
+.sub-sec.on{display:block}
+
+@media(max-width:480px){
+  .inc-grid{grid-template-columns:1fr}
+  .pkg-tabs{gap:6px}
+  .heli-grid{grid-template-columns:1fr}
+  .heli-opt.full{grid-column:1}
+  .fgrid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="top-inner">
+    <div class="top-logo">로투차</div>
+    <button class="mode-btn on" id="btn-pkg" onclick="setMode('pkg')">🗓️ 패키지</button>
+    <button class="mode-btn" id="btn-day" onclick="setMode('day')">☀️ 1일 투어</button>
+    <button class="kakao-btn" onclick="openKakao()">💬 카카오톡 문의</button>
+  </div>
+  <div class="step-bar">
+    <div class="step-inner" id="pkg-steps">
+      <button class="step-btn active" onclick="goPkg(0)">① 패키지</button>
+      <button class="step-btn" onclick="goPkg(1)">② 일정</button>
+      <button class="step-btn" onclick="goPkg(2)">③ 옵션</button>
+      <button class="step-btn" onclick="goPkg(3)">④ 식사</button>
+      <button class="step-btn" onclick="goPkg(4)">⑤ 견적</button>
+    </div>
+    <div class="step-inner" id="day-steps" style="display:none">
+      <button class="step-btn active" onclick="goDay(0)">① 투어 선택</button>
+      <button class="step-btn" onclick="goDay(1)">② 인원/옵션</button>
+      <button class="step-btn" onclick="goDay(2)">③ 견적</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ===== PKG PAGES ===== -->
+<div id="pkg-wrap">
+  <div class="page on" id="p0">
+    <div class="hero">
+      <div class="hero-title">🏔️ 장가계 단독투어</div>
+      <div class="hero-sub">노쇼핑 · 노옵션 · 노팁<br>우리끼리만의 프라이빗 투어</div>
+    </div>
+  
+
+  <div class="pkg-tabs" id="pkg-tabs"></div>
+    <div class="card">
+      <div class="card-title">👥 인원 선택</div>
+      <div class="pax-row" id="pax-row"></div>
+    </div>
+    <div id="price-area" style="display:none">
+      <div class="price-box">
+        <div class="pb-label">기본 투어비</div>
+        <div class="pb-val" id="pb-val">—</div>
+        <div class="pb-total" id="pb-total">—</div>
+        <div class="pb-deposit" id="pb-deposit">—</div>
+      </div>
+      <!-- 항공편 -->
+      <div class="card">
+        <div class="card-title">✈️ 항공편 정보 입력</div>
+        <div class="fgrid" style="margin-bottom:10px">
+          <div class="fitem"><label>📅 출발 날짜</label><input type="date" id="f-dep-date" oninput="calcFlight()"></div>
+          <div class="fitem"><label>📅 귀국 날짜</label><input type="date" id="f-ret-date" oninput="calcFlight()"></div>
+        </div>
+        <div class="flight-box">
+          <div class="flight-title">🛬 가는 편 (한국 → 장가계)</div>
+          <div class="fgrid">
+            <div class="fitem"><label>한국 출발 공항</label>
+              <select id="f-dep-apt" oninput="calcFlight()">
+                <option value="">선택하세요</option>
+                <option>인천국제공항 (ICN)</option>
+                <option>김포국제공항 (GMP)</option>
+                <option>김해국제공항 (PUS)</option>
+                <option>대구국제공항 (TAE)</option>
+                <option>제주국제공항 (CJU)</option>
+                <option>청주국제공항 (CJJ)</option>
+                <option>무안국제공항 (MWX)</option>
+                <option>양양국제공항 (YNY)</option>
+                <option>기타</option>
+              </select>
+            </div>
+            <div class="fitem"><label>장가계 도착지</label>
+              <select id="f-arr-apt" oninput="calcFlight()">
+                <option>장가계 허화 국제공항 (DYG)</option>
+                <option>장가계서역 (고속철)</option>
+              </select>
+            </div>
+            <div class="fitem"><label>항공편명</label><input type="text" id="f-arr-flt" placeholder="예: KE163" oninput="calcFlight()"></div>
+            <div class="fitem"><label>장가계 도착 시간</label><input type="time" id="f-arr-time" value="23:00" oninput="calcFlight()"></div>
+          </div>
+        </div>
+        <div class="flight-box" style="margin-top:10px">
+          <div class="flight-title">🛫 오는 편 (장가계 → 한국)</div>
+          <div class="fgrid">
+            <div class="fitem"><label>장가계 출발지</label>
+              <select id="f-ret-dep-apt" oninput="calcFlight()">
+                <option>장가계 허화 국제공항 (DYG)</option>
+                <option>장가계서역 (고속철)</option>
+              </select>
+            </div>
+            <div class="fitem"><label>한국 도착 공항</label>
+              <select id="f-ret-apt" oninput="calcFlight()">
+                <option value="">선택하세요</option>
+                <option>인천국제공항 (ICN)</option>
+                <option>김포국제공항 (GMP)</option>
+                <option>김해국제공항 (PUS)</option>
+                <option>대구국제공항 (TAE)</option>
+                <option>제주국제공항 (CJU)</option>
+                <option>청주국제공항 (CJJ)</option>
+                <option>무안국제공항 (MWX)</option>
+                <option>양양국제공항 (YNY)</option>
+                <option>기타</option>
+              </select>
+            </div>
+            <div class="fitem"><label>항공편명</label><input type="text" id="f-dep-flt" placeholder="예: KE164" oninput="calcFlight()"></div>
+            <div class="fitem"><label>장가계 출발 시간</label><input type="time" id="f-dep-time" value="23:00" oninput="calcFlight()"></div>
+          </div>
+        </div>
+        <div id="flight-result" style="display:none" class="flight-result"></div>
+      </div>
+      <div class="card" id="inc-card">
+        <div class="card-title">포함 / 불포함 사항</div>
+        <div class="inc-grid">
+          <div class="inc-box inc-yes"><div class="inc-title">✅ 포함</div><div id="inc-list"></div></div>
+          <div class="inc-box inc-no"><div class="inc-title">⚠️ 불포함</div><div id="exc-list"></div></div>
+        </div>
+      </div>
+      <div class="nav-btns"><button class="btn-next" onclick="goPkg(1)">일정 확인 →</button></div>
+    </div>
+
+  <!-- ===== 모듈1: 왜 로투차인가 ===== -->
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-title" style="font-size:15px;font-weight:900;color:#1a2a5e;margin-bottom:14px;text-align:center;display:block">왜 로투차를 선택할까요?</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div style="background:#f8f9fc;border-radius:10px;padding:12px 14px;border-left:3px solid #f5a623">
+        <div style="font-size:13px;font-weight:700;color:#1a2a5e">✅ 현지 한국어 가이드</div>
+        <div style="font-size:11px;color:#888;margin-top:3px;line-height:1.5">장가계 현지에서 직접 운영하는 한국어 전담 가이드</div>
+      </div>
+      <div style="background:#f8f9fc;border-radius:10px;padding:12px 14px;border-left:3px solid #f5a623">
+        <div style="font-size:13px;font-weight:700;color:#1a2a5e">✅ 노쇼핑 전문</div>
+        <div style="font-size:11px;color:#888;margin-top:3px;line-height:1.5">강요 없는 쇼핑 제로, 자유여행 전문 서비스</div>
+      </div>
+      <div style="background:#f8f9fc;border-radius:10px;padding:12px 14px;border-left:3px solid #f5a623">
+        <div style="font-size:13px;font-weight:700;color:#1a2a5e">✅ 전 일정 단독 차량</div>
+        <div style="font-size:11px;color:#888;margin-top:3px;line-height:1.5">우리 팀만의 프라이빗 전용 차량 제공</div>
+      </div>
+      <div style="background:#f8f9fc;border-radius:10px;padding:12px 14px;border-left:3px solid #f5a623">
+        <div style="font-size:13px;font-weight:700;color:#1a2a5e">✅ 카카오톡 실시간 상담</div>
+        <div style="font-size:11px;color:#888;margin-top:3px;line-height:1.5">출발 전부터 현지까지 카카오톡으로 빠른 응대</div>
+      </div>
+      <div style="background:#f8f9fc;border-radius:10px;padding:12px 14px;border-left:3px solid #f5a623;grid-column:1/-1">
+        <div style="font-size:13px;font-weight:700;color:#1a2a5e">✅ 한국인 여행객 다수 이용</div>
+        <div style="font-size:11px;color:#888;margin-top:3px;line-height:1.5">실제 다녀온 한국인 여행객들의 꾸준한 재방문 · 지인 추천</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 모듈2: 실제 여행 후기 ===== -->
+  <div class="card" style="margin-bottom:12px">
+    <div style="font-size:15px;font-weight:900;color:#1a2a5e;margin-bottom:14px;text-align:center">📝 실제 여행 후기</div>
+    <a href="https://cafe.naver.com/f-e/cafes/31682774/menus/2" target="_blank" style="display:block;text-decoration:none">
+      <div style="background:linear-gradient(135deg,#1a2a5e,#2d4a9e);border-radius:12px;padding:22px 20px;text-align:center;color:#fff">
+        <div style="font-size:32px;margin-bottom:10px">💬</div>
+        <div style="font-size:15px;font-weight:900;color:#f5a623;margin-bottom:8px">로투차 여행 후기 보러가기</div>
+        <div style="font-size:12px;opacity:.85;line-height:1.7;margin-bottom:14px">실제 다녀온 여행객들의 생생한 후기를<br>네이버 카페에서 확인하세요</div>
+        <div style="display:inline-block;background:#f5a623;color:#1a2a5e;font-size:13px;font-weight:900;padding:10px 24px;border-radius:8px">네이버 카페 후기 보기 →</div>
+      </div>
+    </a>
+  </div>
+
+  <!-- ===== 모듈3<!-- ===== 모듈3<!-- ===== 모듈3: 가이드 소개 ===== -->
+  <div class="card" style="margin-bottom:12px">
+    <div style="font-size:15px;font-weight:900;color:#1a2a5e;margin-bottom:14px;text-align:center">👨‍💼 현지 가이드 소개</div>
+    <div style="display:flex;gap:14px;align-items:flex-start">
+      <!-- 사진 자리 -->
+      <img id="guide-photo-area" src="data:image/jpeg;base64,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" alt="영규 가이드" style="flex-shrink:0;width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #f5a623">
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:900;color:#1a2a5e;margin-bottom:6px">영규 가이드</div>
+        <div style="font-size:12px;color:#555;line-height:1.8;margin-bottom:10px">
+          안녕하세요.<br>
+          장가계 현지에서 활동 중인<br>
+          한국어 가이드 <strong>영규</strong>입니다.<br><br>
+          한국 자유여행객을 위해<br>
+          <span style="color:#f5a623;font-weight:700">✔ 여행 상담</span><br>
+          <span style="color:#f5a623;font-weight:700">✔ 차량 예약</span><br>
+          <span style="color:#f5a623;font-weight:700">✔ 일정 설계</span><br>
+          <span style="color:#f5a623;font-weight:700">✔ 현지 지원</span><br>
+          서비스를 제공하고 있습니다.
+        </div>
+      </div>
+    </div>
+    <!-- 자격증/유튜브 예약 영역 -->
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <div id="cert-area" style="flex:1;min-width:120px;border:1.5px dashed #e0e0e0;border-radius:8px;padding:10px 12px;text-align:center;font-size:11px;color:#bbb">
+        📋 자격증<br><span style="font-size:10px">(준비 중)</span>
+      </div>
+      <a href="https://www.youtube.com/@Lctch" target="_blank" id="youtube-area" style="flex:1;min-width:120px;border:1.5px solid #ff0000;border-radius:8px;padding:10px 12px;text-align:center;font-size:11px;color:#ff0000;text-decoration:none;font-weight:700;display:block">
+        ▶️ 유튜브 채널<br><span style="font-size:10px">@Lctch</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ===== 모듈4: VIP 회원 혜택 ===== -->
+  <div class="card" style="margin-bottom:12px;background:linear-gradient(135deg,#1a2a5e,#2d4a9e);color:#fff">
+    <div style="font-size:15px;font-weight:900;color:#f5a623;margin-bottom:14px;text-align:center">👑 VIP 회원 혜택</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:12px 14px;border:1px solid rgba(245,166,35,.3)">
+        <div style="font-size:20px;margin-bottom:6px">🗺️</div>
+        <div style="font-size:12px;font-weight:700;color:#f5a623">장가계 맛집 지도</div>
+        <div style="font-size:11px;opacity:.8;margin-top:3px;line-height:1.5">현지인만 아는 숨겨진 맛집 가이드</div>
+      </div>
+      <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:12px 14px;border:1px solid rgba(245,166,35,.3)">
+        <div style="font-size:20px;margin-bottom:6px">🚌</div>
+        <div style="font-size:12px;font-weight:700;color:#f5a623">현지 교통 가이드</div>
+        <div style="font-size:11px;opacity:.8;margin-top:3px;line-height:1.5">버스·택시·고속철 이용법 완벽 정리</div>
+      </div>
+      <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:12px 14px;border:1px solid rgba(245,166,35,.3)">
+        <div style="font-size:20px;margin-bottom:6px">💳</div>
+        <div style="font-size:12px;font-weight:700;color:#f5a623">중국 결제 사용법</div>
+        <div style="font-size:11px;opacity:.8;margin-top:3px;line-height:1.5">알리페이·위챗페이 한국인용 설정법</div>
+      </div>
+      <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:12px 14px;border:1px solid rgba(245,166,35,.3)">
+        <div style="font-size:20px;margin-bottom:6px">📋</div>
+        <div style="font-size:12px;font-weight:700;color:#f5a623">여행 체크리스트</div>
+        <div style="font-size:11px;opacity:.8;margin-top:3px;line-height:1.5">출발 전 필수 준비물 완벽 체크</div>
+      </div>
+      <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:12px 14px;border:1px solid rgba(245,166,35,.3);grid-column:1/-1">
+        <div style="font-size:20px;margin-bottom:6px">💬</div>
+        <div style="font-size:12px;font-weight:700;color:#f5a623">카카오톡 우선 상담</div>
+        <div style="font-size:11px;opacity:.8;margin-top:3px;line-height:1.5">VIP 전용 채널로 더 빠른 응답 보장</div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:12px">
+      <a href="https://cafe.naver.com/f-e/cafes/31682774" target="_blank" style="display:inline-block;background:#f5a623;color:#1a2a5e;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:900;text-decoration:none">네이버 카페에서 VIP 되기 →</a>
+    </div>
+  </div>
+
+  <!-- ===== 모듈5: FAQ ===== -->
+  <div class="card" style="margin-bottom:12px">
+    <div style="font-size:15px;font-weight:900;color:#1a2a5e;margin-bottom:14px;text-align:center">❓ 자주 묻는 질문</div>
+    <div id="faq-list">
+      <div class="faq-item" style="border-bottom:1px solid #f0f0f0">
+        <button onclick="toggleFaq(0)" style="width:100%;text-align:left;background:none;border:none;padding:13px 0;font-family:inherit;font-size:13px;font-weight:700;color:#1a2a5e;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+          Q. 한국어 상담이 가능한가요?<span id="faq-icon-0" style="color:#f5a623;font-size:16px;transition:transform .2s">＋</span>
+        </button>
+        <div id="faq-ans-0" style="display:none;font-size:12.5px;color:#555;line-height:1.8;padding:0 0 12px;padding-left:8px;border-left:3px solid #f5a623">
+          네, 가능합니다. 영규 가이드가 직접 한국어로 상담해 드립니다. 카카오톡으로 편하게 문의해 주세요.
+        </div>
+      </div>
+      <div class="faq-item" style="border-bottom:1px solid #f0f0f0">
+        <button onclick="toggleFaq(1)" style="width:100%;text-align:left;background:none;border:none;padding:13px 0;font-family:inherit;font-size:13px;font-weight:700;color:#1a2a5e;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+          Q. 쇼핑 코스가 포함되나요?<span id="faq-icon-1" style="color:#f5a623;font-size:16px;transition:transform .2s">＋</span>
+        </button>
+        <div id="faq-ans-1" style="display:none;font-size:12.5px;color:#555;line-height:1.8;padding:0 0 12px;padding-left:8px;border-left:3px solid #f5a623">
+          전혀 없습니다. 로투차는 노쇼핑 원칙을 엄격하게 지킵니다. 관광지와 식사에만 집중하는 여행을 제공합니다.
+        </div>
+      </div>
+      <div class="faq-item" style="border-bottom:1px solid #f0f0f0">
+        <button onclick="toggleFaq(2)" style="width:100%;text-align:left;background:none;border:none;padding:13px 0;font-family:inherit;font-size:13px;font-weight:700;color:#1a2a5e;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+          Q. 다른 팀과 함께 이동하나요?<span id="faq-icon-2" style="color:#f5a623;font-size:16px;transition:transform .2s">＋</span>
+        </button>
+        <div id="faq-ans-2" style="display:none;font-size:12.5px;color:#555;line-height:1.8;padding:0 0 12px;padding-left:8px;border-left:3px solid #f5a623">
+          패키지 투어는 완전 단독 차량입니다. 우리 팀만을 위한 전용 차량과 가이드로 진행됩니다. (1일 투어는 조인 방식으로 운영됩니다.)
+        </div>
+      </div>
+      <div class="faq-item" style="border-bottom:1px solid #f0f0f0">
+        <button onclick="toggleFaq(3)" style="width:100%;text-align:left;background:none;border:none;padding:13px 0;font-family:inherit;font-size:13px;font-weight:700;color:#1a2a5e;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+          Q. 카카오톡으로 예약 상담이 되나요?<span id="faq-icon-3" style="color:#f5a623;font-size:16px;transition:transform .2s">＋</span>
+        </button>
+        <div id="faq-ans-3" style="display:none;font-size:12.5px;color:#555;line-height:1.8;padding:0 0 12px;padding-left:8px;border-left:3px solid #f5a623">
+          네, 가능합니다. 카카오톡 채널(@로투차)로 문의 주시면 빠르게 응대해 드립니다. 이 페이지 최하단 카카오톡 버튼을 이용해 주세요.
+        </div>
+      </div>
+      <div class="faq-item">
+        <button onclick="toggleFaq(4)" style="width:100%;text-align:left;background:none;border:none;padding:13px 0;font-family:inherit;font-size:13px;font-weight:700;color:#1a2a5e;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+          Q. 항공권도 예약해 주시나요?<span id="faq-icon-4" style="color:#f5a623;font-size:16px;transition:transform .2s">＋</span>
+        </button>
+        <div id="faq-ans-4" style="display:none;font-size:12.5px;color:#555;line-height:1.8;padding:0 0 12px;padding-left:8px;border-left:3px solid #f5a623">
+          직접 예약은 어렵지만, 노선 추천 및 예약 방법에 대한 상담은 가능합니다. 카카오톡으로 문의해 주시면 도움을 드리겠습니다.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="page" id="p1">
+    <div class="gaode-box">
+      <div class="gaode-title">🗺️ 고덕지도 (高德地图) 미리 설치하세요</div>
+      중국 현지 이동 및 위치 확인에 가장 정확한 앱입니다.
+      <div class="store-btns">
+        <a class="store-btn" href="https://apps.apple.com/cn/app/id461703208" target="_blank" style="background:#000">🍎 App Store</a>
+        <a class="store-btn" href="https://play.google.com/store/apps/details?id=com.autonavi.minimap" target="_blank" style="background:#1a7a34">▶ Google Play</a>
+      </div>
+    </div>
+    <div id="itin-area"></div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="goPkg(0)">← 이전</button>
+      <button class="btn-next" onclick="goPkg(2)">옵션 선택 →</button>
+    </div>
+  </div>
+
+  <div class="page" id="p2">
+    <div class="deadline">⏰ 출발 <strong>7일 전까지</strong>만 변경 가능합니다</div>
+    <div id="opts-area"></div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="goPkg(1)">← 이전</button>
+      <button class="btn-next" onclick="goPkg(3)">식사 요구사항 →</button>
+    </div>
+  </div>
+
+  <div class="page" id="p3">
+    <div class="card">
+      <div class="card-title">🍽️ 식사 요구사항</div>
+      <div style="margin-bottom:14px">
+        <div style="font-size:12px;font-weight:900;color:#555;margin-bottom:8px">🚫 못 먹는 음식 / 알레르기</div>
+        <div class="chips" id="avoid-chips">
+          <button class="chip avoid" onclick="toggleChip(this)">매운 음식</button>
+          <button class="chip avoid" onclick="toggleChip(this)">돼지고기</button>
+          <button class="chip avoid" onclick="toggleChip(this)">소고기</button>
+          <button class="chip avoid" onclick="toggleChip(this)">해산물</button>
+          <button class="chip avoid" onclick="toggleChip(this)">고수</button>
+          <button class="chip avoid" onclick="toggleChip(this)">내장류</button>
+          <button class="chip avoid" onclick="toggleChip(this)">마늘</button>
+          <button class="chip avoid" onclick="toggleChip(this)">자극적인 음식</button>
+          <button class="chip avoid" onclick="toggleChip(this)">채식주의</button>
+          <button class="chip avoid" onclick="toggleChip(this)">땅콩 알레르기</button>
+          <button class="chip avoid" onclick="toggleChip(this)">글루텐 알레르기</button>
+        </div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div style="font-size:12px;font-weight:900;color:#555;margin-bottom:8px">😋 좋아하는 음식 스타일</div>
+        <div class="chips" id="pref-chips">
+          <button class="chip" onclick="toggleChip(this)">매운 음식</button>
+          <button class="chip" onclick="toggleChip(this)">담백한 음식</button>
+          <button class="chip" onclick="toggleChip(this)">고기류</button>
+          <button class="chip" onclick="toggleChip(this)">채소류</button>
+          <button class="chip" onclick="toggleChip(this)">국물 요리</button>
+          <button class="chip" onclick="toggleChip(this)">면류</button>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:900;color:#555;margin-bottom:4px">📝 추가 요청사항</div>
+        <textarea id="diet-note" rows="3" placeholder="기타 식사 관련 요청사항"></textarea>
+      </div>
+    </div>
+    <div class="notice-box" id="notice-area"></div>
+    <div class="cancel-box" id="cancel-area"></div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="goPkg(2)">← 이전</button>
+      <button class="btn-next" onclick="goPkg(4)">최종 견적 →</button>
+    </div>
+  </div>
+
+  <div class="page" id="p4">
+    <div class="sum-card">
+      <div class="sum-title">📋 최종 견적</div>
+      <div id="sum-body"></div>
+      <div class="bd-box"><div class="bd-title">💰 비용 상세</div><div id="bd-rows"></div></div>
+      <div class="total-row"><span>최종 합계</span><span class="total-price" id="grand-total">—</span></div>
+      <div class="sum-note" id="sum-note"></div>
+    </div>
+    <button class="btn-kakao" onclick="submitPkg()"><span style="font-size:18px">💬</span> 카카오톡으로 예약 문의하기</button>
+    <div style="font-size:11px;color:#aaa;text-align:center;margin-top:8px">제출 후 담당자가 연락드립니다</div>
+    <div class="nav-btns" style="margin-top:10px"><button class="btn-back" onclick="goPkg(3)">← 수정하기</button></div>
+  </div>
+</div>
+
+<!-- ===== DAY PAGES ===== -->
+<div id="day-wrap" style="display:none">
+  <div class="page on" id="d0">
+    <div id="day-cards"></div>
+  </div>
+  <div class="page" id="d1">
+    <!-- 날짜별 투어 선택 -->
+    <div class="card">
+      <div class="card-title">📅 날짜별 투어 선택</div>
+      <div style="font-size:12px;color:#888;margin-bottom:12px;line-height:1.7">
+        각 날짜에 원하는 투어를 선택하세요. 하루에 하나의 투어만 선택 가능합니다.<br>
+        날짜를 추가해서 여러 날 투어를 함께 신청할 수 있습니다.
+      </div>
+      <div id="day-date-list"></div>
+      <button onclick="addDayEntry()" style="width:100%;border:1.5px dashed #f5a623;background:transparent;color:#e8940f;font-family:inherit;font-size:13px;font-weight:700;padding:11px;border-radius:8px;cursor:pointer;margin-top:8px">＋ 날짜 추가</button>
+    </div>
+
+    <!-- 조인 안내 -->
+    <div class="join-box">
+      <div class="join-title">🤝 조인 투어 안내</div>
+      <div class="join-desc">본 상품은 <strong>다른 분들과 함께 진행되는 조인(합류) 투어</strong>입니다.<br>여행 품질을 위해 체력 및 이동 능력이 비슷한 분들끼리 매칭해 드립니다.<br><span style="font-size:11px;opacity:.7">※ 프라이빗 단독 투어는 패키지 탭을 이용해 주세요</span></div>
+    </div>
+
+    <!-- 픽업 호텔 -->
+    <div class="card">
+      <div class="card-title">🏨 픽업 호텔 정보</div>
+      <div style="font-size:12px;color:#888;margin-bottom:10px">가이드가 호텔로 픽업하러 갑니다. 정확히 입력해 주세요.</div>
+      <div class="hotel-area">
+        <label>숙박 지역</label>
+        <select id="d-hotel-area">
+          <option value="">선택하세요</option>
+          <option>장가계 시내</option>
+          <option>무릉원 (삼림공원 인근)</option>
+          <option>천문산 인근</option>
+          <option>기타</option>
+        </select>
+        <label>호텔명</label>
+        <input type="text" id="d-hotel-name" placeholder="예: 장가계 오렌지 호텔">
+        <label>기타 요청사항</label>
+        <input type="text" id="d-hotel-note" placeholder="예: 로비 앞 미팅, 특이사항 등">
+      </div>
+    </div>
+
+    <!-- 옵션 안내 -->
+    <div style="background:#fff3e0;border:1px solid #ffe082;border-radius:10px;padding:12px 14px;margin-bottom:12px;font-size:12px;color:#e65100;line-height:1.7">
+      ✅ <strong>옵션</strong>은 투어 당일 현장에서 가이드와 상의 후 현금으로 결제합니다.<br>
+      날씨·상황에 따라 이용 가능 여부가 달라질 수 있습니다.
+    </div>
+
+    <div class="nav-btns">
+      <button class="btn-back" onclick="goDay(0)">← 이전</button>
+      <button class="btn-next" onclick="goDay(2)">견적 확인 →</button>
+    </div>
+  </div>
+  <div class="page" id="d1">
+    <div class="card">
+      <div class="card-title">📅 투어 날짜 선택</div>
+      <div style="font-size:12px;color:#888;margin-bottom:10px;line-height:1.6">
+        원하시는 투어 날짜를 선택해 주세요. 최소 <strong>7일 전</strong> 예약을 권장합니다.
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div>
+          <label style="font-size:11px;font-weight:700;color:#888;display:block;margin-bottom:4px">📅 투어 희망 날짜</label>
+          <input type="date" id="d-tour-date" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:9px 12px;font-family:inherit;font-size:13px;outline:none;background:#fff;transition:border .2s" onfocus="this.style.borderColor='#f5a623'" onblur="this.style.borderColor='#e0e0e0'">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;color:#888;display:block;margin-bottom:4px">📅 대체 가능 날짜 (선택사항)</label>
+          <input type="date" id="d-tour-date-alt" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:9px 12px;font-family:inherit;font-size:13px;outline:none;background:#fff;transition:border .2s" onfocus="this.style.borderColor='#f5a623'" onblur="this.style.borderColor='#e0e0e0'">
+        </div>
+      </div>
+      <div style="background:#fff8e1;border-radius:8px;padding:10px 12px;font-size:11px;color:#856404;line-height:1.7;margin-top:10px">
+        ⏰ 조인 투어는 날짜별로 인원을 매칭합니다. 희망 날짜에 자리가 없을 경우 대체 날짜로 안내드립니다.
+      </div>
+    </div>
+
+    <div class="join-box">
+      <div class="join-title">🤝 조인 투어 안내</div>
+      <div class="join-desc">본 상품은 <strong>다른 분들과 함께 진행되는 조인(합류) 투어</strong>입니다.<br>여행 품질을 위해 체력 및 이동 능력이 비슷한 분들끼리 매칭해 드립니다.<br><span style="font-size:11px;opacity:.7">※ 프라이빗 단독 투어는 패키지 탭을 이용해 주세요</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">👥 인원 선택</div>
+      <div id="day-pax-area"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🏨 픽업 호텔 정보</div>
+      <div style="font-size:12px;color:#888;margin-bottom:10px;line-height:1.6">가이드가 호텔로 픽업하러 갑니다. 정확히 입력해 주세요.</div>
+      <div class="hotel-area">
+        <label>숙박 지역</label>
+        <select id="d-hotel-area">
+          <option value="">선택하세요</option>
+          <option>장가계 시내</option>
+          <option>무릉원 (삼림공원 인근)</option>
+          <option>천문산 인근</option>
+          <option>기타</option>
+        </select>
+        <label>호텔명</label>
+        <input type="text" id="d-hotel-name" placeholder="예: 장가계 오렌지 호텔">
+        <label>기타 요청사항</label>
+        <input type="text" id="d-hotel-note" placeholder="예: 로비 앞 미팅, 특이사항 등">
+      </div>
+    </div>
+    <div class="card" id="day-opts-card">
+      <div class="card-title">✅ 옵션 선택 (선택사항)</div>
+      <div id="day-opts-area"></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="goDay(0)">← 이전</button>
+      <button class="btn-next" onclick="goDay(2)">견적 확인 →</button>
+    </div>
+  </div>
+  <div class="page" id="d2">
+    <div class="sum-card">
+      <div class="sum-title">📋 1일 투어 견적</div>
+      <div id="day-sum-body"></div>
+      <div class="bd-box"><div class="bd-title">💰 비용 상세</div><div id="day-bd-rows"></div></div>
+      <div class="total-row"><span>합계</span><span class="total-price" id="day-total">—</span></div>
+    </div>
+    <button class="btn-kakao" onclick="submitDay()"><span style="font-size:18px">💬</span> 카카오톡으로 예약 문의하기</button>
+    <div style="font-size:11px;color:#aaa;text-align:center;margin-top:8px">제출 후 담당자가 연락드립니다</div>
+    <div class="nav-btns" style="margin-top:10px"><button class="btn-back" onclick="goDay(1)">← 수정하기</button></div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+function decodeB64(b64){var bin=atob(b64);var bytes=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++){bytes[i]=bin.charCodeAt(i);}return JSON.parse(new TextDecoder("utf-8").decode(bytes));}
+var DB=decodeB64("eyJicmFuZCI6IHsibmFtZSI6ICLroZztiKzssKgiLCAibmFtZV9mdWxsIjogIkxvY2FsVG91ciBDaGluYSIsICJzbG9nYW4iOiAi7J6Q7Jyg7Jes7ZaJ67O064ukIO2OuO2VmOqzoCwg7Yyo7YKk7KeA67O064ukIOyekOycoOuhreqyjCIsICJrYWthbyI6ICJodHRwOi8vcGYua2FrYW8uY29tL19odnJtbi9jaGF0IiwgInBob25lIjogIis4NiAxODUgODk2MSAwNzAyIiwgImVtYWlsIjogIm5hbnlpbmdrdWlAZ21haWwuY29tIiwgImluc3RhZ3JhbSI6ICJAbG9jYWx0b3VyY2hpbmEifSwgInBhY2thZ2VzIjogW3siaWQiOiAiM240ZCIsICJuYW1lIjogIjPrsJU07J28IiwgIm5pZ2h0cyI6IDMsICJkYXlzIjogNCwgInRhZyI6ICLqsIDsnqUg7J246riwIiwgInByaWNlcyI6IHsiMiI6IDkzLCAiMyI6IDkzLCAiNCI6IDgzLCAiNSI6IDgzLCAiNiI6IDgwLCAiNyI6IDgwLCAiOCI6IDgwfSwgImluY2x1ZGVzIjogWyLtmLjthZQgM+uwlSIsICLsoITsmqnssKjrn4kiLCAi6rSA6rSR7KeAIOyeheyepeujjCDsoITssrQiLCAi7ZWc6rWt7Ja0IOqwgOydtOuTnCIsICLsoITsnbzsoJUg7Iud7IKsIiwgIu2UveyXhSbshLzrlKkiLCAi7Luk7ZS8IOyEnOu5hOyKpCIsICLsl6ztlokg7IKs7KeEIOy0rOyYgSIsICLqs7Xsl7Ag7Yuw7LyTIiwgIuq0gOq0keyngCDrgrQg67O07ZeYIl0sICJleGNsdWRlcyI6IFsi7ZWt6rO16raMIiwgIuqwnOyduCDsp4DstpwiLCAi66ek64SI7YyBKOyekOycqCkiLCAi7Jes7ZaJ7J6Q67O07ZeYKOuzhOuPhCDtlYTsiJgpIl0sICJpdGluZXJhcnkiOiBbeyJkYXkiOiAxLCAidGl0bGUiOiAi7J247LKcIOKGkiDsnqXqsIDqs4Qg64+E7LCpIiwgImRhdGVfcGxhY2Vob2xkZXIiOiAi7Lac67Cc7J28IiwgInNwb3RzIjogWyJhaXJwb3J0X2Fycml2YWwiLCAiaG90ZWxfY2hlY2tpbiJdfSwgeyJkYXkiOiAyLCAidGl0bGUiOiAi6rWt6rCA7IK866a86rO17JuQICsg66ek66Cl7IOB7ISc7Ie8IiwgImRhdGVfcGxhY2Vob2xkZXIiOiAi7Lac67CcICsx7J28IiwgInNwb3RzIjogWyJmb3Jlc3RfcGFya19hbSIsICJmb3Jlc3RfcGFya19wbSIsICJsdW5jaF9zYW5jaGFlIiwgImRpbm5lcl9wb3JrIiwgIm1hZ2ljX3Nob3ciXX0sIHsiZGF5IjogMywgInRpdGxlIjogIuyghO2GteyLnOyepSArIOyynOusuOyCsCArIOyVvOqyvSIsICJkYXRlX3BsYWNlaG9sZGVyIjogIuy2nOuwnCArMuydvCIsICJzcG90cyI6IFsidHJhZGl0aW9uYWxfbWFya2V0IiwgImxvY2FsX2NhZmUiLCAibHVuY2hfaHVuYW4iLCAidGlhbm1lbiIsICJkaW5uZXJfcG9ya19iYnEiLCAibmlnaHRfNzIiXX0sIHsiZGF5IjogNCwgInRpdGxlIjogIu2ZqeujoeuPmeq1tCArIOuMgO2YkeqzoSArIOq3gOq1rSIsICJkYXRlX3BsYWNlaG9sZGVyIjogIuy2nOuwnCArM+ydvCIsICJzcG90cyI6IFsiaHdhbmdyeW9uZyIsICJsdW5jaF9kb25ndGFlIiwgImRheGlhZ3UiLCAiYWlycG9ydF9kZXBhcnR1cmUiXX1dfSwgeyJpZCI6ICI0bjVkIiwgIm5hbWUiOiAiNOuwlTXsnbwiLCAibmlnaHRzIjogNCwgImRheXMiOiA1LCAidGFnIjogIuy2lOyynCIsICJwcmljZXMiOiB7IjIiOiAxMDksICIzIjogMTA5LCAiNCI6IDkzLCAiNSI6IDkzLCAiNiI6IDkxLCAiNyI6IDkxLCAiOCI6IDkxfSwgImluY2x1ZGVzIjogWyLtmLjthZQgNOuwlSIsICLsoITsmqnssKjrn4kiLCAi6rSA6rSR7KeAIOyeheyepeujjCDsoITssrQiLCAi7ZWc6rWt7Ja0IOqwgOydtOuTnCIsICLsoITsnbzsoJUg7Iud7IKsIiwgIu2UveyXhSbshLzrlKkiLCAi67CcIOuniOyCrOyngCA4MOu2hCIsICLsu6TtlLwg7ISc67mE7IqkIiwgIuyXrO2WiSDsgqzsp4Qg7LSs7JiBIiwgIuqzteyXsCDti7DsvJMiLCAi6rSA6rSR7KeAIOuCtCDrs7Ttl5giXSwgImV4Y2x1ZGVzIjogWyLtla3qs7XqtowiLCAi6rCc7J24IOyngOy2nCIsICLrp6TrhIjtjIEo7J6Q7JyoKSIsICLsl6ztlonsnpDrs7Ttl5go67OE64+EIO2VhOyImCkiXSwgIml0aW5lcmFyeSI6IFt7ImRheSI6IDEsICJ0aXRsZSI6ICLsnbjsspwg4oaSIOyepeqwgOqzhCDrj4TssKkiLCAiZGF0ZV9wbGFjZWhvbGRlciI6ICLstpzrsJzsnbwiLCAic3BvdHMiOiBbImFpcnBvcnRfYXJyaXZhbCIsICJob3RlbF9jaGVja2luIl19LCB7ImRheSI6IDIsICJ0aXRsZSI6ICLqta3qsIDsgrzrprzqs7Xsm5AgKyDrp6TroKXsg4HshJzsh7wiLCAiZGF0ZV9wbGFjZWhvbGRlciI6ICLstpzrsJwgKzHsnbwiLCAic3BvdHMiOiBbImZvcmVzdF9wYXJrX2FtIiwgImZvcmVzdF9wYXJrX3BtIiwgImx1bmNoX3NhbmNoYWUiLCAiZGlubmVyX3BvcmsiLCAibWFnaWNfc2hvdyJdfSwgeyJkYXkiOiAzLCAidGl0bGUiOiAi7KCE7Ya17Iuc7J6lICsg7LKc66y47IKwICsg7JW86rK9IiwgImRhdGVfcGxhY2Vob2xkZXIiOiAi7Lac67CcICsy7J28IiwgInNwb3RzIjogWyJ0cmFkaXRpb25hbF9tYXJrZXQiLCAibG9jYWxfY2FmZSIsICJsdW5jaF9odW5hbiIsICJ0aWFubWVuIiwgImRpbm5lcl9wb3JrX2JicSIsICJuaWdodF83MiJdfSwgeyJkYXkiOiA0LCAidGl0bGUiOiAi6riI7Y646rOE6rOhICsg67O067SJ7Zi47IiYICsg66eI7IKs7KeAIiwgImRhdGVfcGxhY2Vob2xkZXIiOiAi7Lac67CcICsz7J28IiwgInNwb3RzIjogWyJnZXVtcGh5ZW9uIiwgImx1bmNoX2J1bGdvZ2kiLCAiYm9mZW5nIiwgIm1hc3NhZ2VfYmFzaWMiXX0sIHsiZGF5IjogNSwgInRpdGxlIjogIu2ZqeujoeuPmeq1tCArIOuMgO2YkeqzoSArIOq3gOq1rSIsICJkYXRlX3BsYWNlaG9sZGVyIjogIuy2nOuwnCArNOydvCIsICJzcG90cyI6IFsiaHdhbmdyeW9uZyIsICJsdW5jaF9kb25ndGFlIiwgImRheGlhZ3UiLCAiYWlycG9ydF9kZXBhcnR1cmUiXX1dfSwgeyJpZCI6ICI1bjZkIiwgIm5hbWUiOiAiNeuwlTbsnbwiLCAibmlnaHRzIjogNSwgImRheXMiOiA2LCAidGFnIjogIu2UhOumrOuvuOyXhCIsICJwcmljZXMiOiB7IjIiOiAxMzIsICIzIjogMTMyLCAiNCI6IDEwOSwgIjUiOiAxMDksICI2IjogMTA3LCAiNyI6IDEwNywgIjgiOiAxMDd9LCAiaW5jbHVkZXMiOiBbIu2YuO2FlCA167CVIiwgIuyghOyaqeywqOufiSIsICLqtIDqtJHsp4Ag7J6F7J6l66OMIOyghOyytCIsICLtlZzqta3slrQg6rCA7J2065OcIiwgIuyghOydvOyglSDsi53sgqwiLCAi7ZS97JeFJuyEvOuUqSIsICLrsJwg66eI7IKs7KeAIDgw67aEIiwgIuy7pO2UvCDshJzruYTsiqQiLCAi7Jes7ZaJIOyCrOynhCDstKzsmIEiLCAi6rO17JewIO2LsOy8kyIsICLqtIDqtJHsp4Ag64K0IOuztO2XmCJdLCAiZXhjbHVkZXMiOiBbIu2Vreqzteq2jCIsICLqsJzsnbgg7KeA7LacIiwgIuunpOuEiO2MgSjsnpDsnKgpIiwgIuyXrO2WieyekOuztO2XmCjrs4Trj4Qg7ZWE7IiYKSJdLCAiaXRpbmVyYXJ5IjogW3siZGF5IjogMSwgInRpdGxlIjogIuyduOyynCDihpIg7J6l6rCA6rOEIOuPhOywqSIsICJkYXRlX3BsYWNlaG9sZGVyIjogIuy2nOuwnOydvCIsICJzcG90cyI6IFsiYWlycG9ydF9hcnJpdmFsIiwgImhvdGVsX2NoZWNraW4iXX0sIHsiZGF5IjogMiwgInRpdGxlIjogIuq1reqwgOyCvOumvOqzteybkCArIOunpOugpeyDgeyEnOyHvCIsICJkYXRlX3BsYWNlaG9sZGVyIjogIuy2nOuwnCArMeydvCIsICJzcG90cyI6IFsiZm9yZXN0X3BhcmtfYW0iLCAiZm9yZXN0X3BhcmtfcG0iLCAibHVuY2hfc2FuY2hhZSIsICJkaW5uZXJfcG9yayIsICJtYWdpY19zaG93Il19LCB7ImRheSI6IDMsICJ0aXRsZSI6ICLsoITthrXsi5zsnqUgKyDsspzrrLjsgrAgKyDslbzqsr0iLCAiZGF0ZV9wbGFjZWhvbGRlciI6ICLstpzrsJwgKzLsnbwiLCAic3BvdHMiOiBbInRyYWRpdGlvbmFsX21hcmtldCIsICJsb2NhbF9jYWZlIiwgImx1bmNoX2h1bmFuIiwgInRpYW5tZW4iLCAiZGlubmVyX3BvcmtfYmJxIiwgIm5pZ2h0XzcyIl19LCB7ImRheSI6IDQsICJ0aXRsZSI6ICLquIjtjrjqs4Tqs6EgKyDrs7TrtIntmLjsiJggKyDrp4jsgqzsp4AiLCAiZGF0ZV9wbGFjZWhvbGRlciI6ICLstpzrsJwgKzPsnbwiLCAic3BvdHMiOiBbImdldW1waHllb24iLCAibHVuY2hfYnVsZ29naSIsICJib2ZlbmciLCAibWFzc2FnZV9iYXNpYyJdfSwgeyJkYXkiOiA1LCAidGl0bGUiOiAi7Lmg7ISx7IKwICsg67aA7Jqp7KeEIiwgImRhdGVfcGxhY2Vob2xkZXIiOiAi7Lac67CcICs07J28IiwgInNwb3RzIjogWyJxaXhpbmdzaGFuIiwgImx1bmNoX2J1bGdvZ2kyIiwgImZ1eW9uZyJdfSwgeyJkYXkiOiA2LCAidGl0bGUiOiAi7Zmp66Oh64+Z6rW0ICsg64yA7ZiR6rOhICsg6reA6rWtIiwgImRhdGVfcGxhY2Vob2xkZXIiOiAi7Lac67CcICs17J28IiwgInNwb3RzIjogWyJod2FuZ3J5b25nIiwgImx1bmNoX2Rvbmd0YWUiLCAiZGF4aWFndSIsICJhaXJwb3J0X2RlcGFydHVyZSJdfV19XSwgInNwb3RzIjogeyJhaXJwb3J0X2Fycml2YWwiOiB7Im5hbWUiOiAi7J6l6rCA6rOEIO2XiO2ZlCDqta3soJzqs7Xtla0g64+E7LCpIiwgImljb24iOiAi4pyI77iPIiwgInRpbWUiOiAi7JW9IDIzOjAwIiwgInR5cGUiOiAidHJhbnNwb3J0IiwgImRlc2MiOiAiS0UxNjPtjrjsnLzroZwg64+E7LCpLiDsnoXqta0g7Ius7IKsIO2bhCDqsIDsnbTrk5zsmYAg66+47YyFLiDroZztiKzssKgg7Yy766eQ7J2EIOuTpOqzoCDrjIDquLAg7KSR7J24IOqwgOydtOuTnOulvCDssL7slYTso7zshLjsmpQuIiwgInRpcCI6ICLsl6zqtozsnYQg6rytIOyxmeqyqOyjvOyEuOyalC4g7J6F6rWtIOyLrOyCrCDsi5wg7ZWE7JqU7ZWp64uI64ukLiIsICJkdXJhdGlvbiI6ICIiLCAiZ2FvZGUiOiAiaHR0cHM6Ly91cmkuYW1hcC5jb20vc2VhcmNoP2tleXdvcmQ95byg5a6255WM6I236Iqx5Zu96ZmF5py65Zy6JmNpdHk95byg5a6255WMIiwgImltYWdlcyI6IFtdfSwgImhvdGVsX2NoZWNraW4iOiB7Im5hbWUiOiAi7Zi47YWUIOyytO2BrOyduCIsICJpY29uIjogIvCfj6giLCAidGltZSI6ICLsnpDsoJV+IiwgInR5cGUiOiAiaG90ZWwiLCAiZGVzYyI6ICLsnqXqsIDqs4Qg7Jik66CM7KeAIO2YuO2FlCDssrTtgazsnbguIOuCtOydvCDsnbzsoJXsnYQg7JyE7ZW0IOy2qeu2hO2VnCDsiJjrqbTsnYQg7Leo7ZWY7IS47JqULiIsICJ0aXAiOiAiIiwgImR1cmF0aW9uIjogIiIsICJnYW9kZSI6ICJodHRwczovL3VyaS5hbWFwLmNvbS9zZWFyY2g/a2V5d29yZD3lvKDlrrbnlYzmoZTlrZDmsLTmmbbphZLlupcmY2l0eT3lvKDlrrbnlYwiLCAiaW1hZ2VzIjogW119LCAiZm9yZXN0X3BhcmtfYW0iOiB7Im5hbWUiOiAi6rWt6rCA7IK866a86rO17JuQICjsmKTsoIQpIiwgImljb24iOiAi8J+MsiIsICJ0aW1lIjogIjA5OjAwIiwgInR5cGUiOiAiYXR0cmFjdGlvbiIsICJkZXNjIjogIuyLreumrO2ZlOuekSDihpIg67Cx66Oh7JeY66as67Kg7J207YSwIOKGkiDsm5DqsIDqs4QuIOuvuO2YvOuMgCwg7JWE67CU7YOAIOy0rOyYgeyngCwg7LKc7ZWY7KCc7J286rWQLiDsmIHtmZQg7JWE67CU7YOA7J2YIOuwsOqyveydtCDrkJwg7ZWg66CQ66Oo7JW8IOyCsOunpeydtCDriIjslZ7sl5Ag7Y687LOQ7KeR64uI64ukLiIsICJ0aXAiOiAi7Jq064+Z7ZmUIO2VhOyImC4g7JeY66as67Kg7J207YSwIOykhOydtCDquLgg7IiYIOyeiOycvOuLiCDsl6zsnKAg7J6I6rKMIOydtOuPme2VmOyEuOyalC4iLCAiZHVyYXRpb24iOiAi7JW9IDIuNeyLnOqwhCIsICJnYW9kZSI6ICJodHRwczovL3VyaS5hbWFwLmNvbS9zZWFyY2g/a2V5d29yZD3lvKDlrrbnlYzlm73lrrbmo67mnpflhazlm60mY2l0eT3lvKDlrrbnlYwiLCAiaW1hZ2VzIjogW119LCAiZm9yZXN0X3BhcmtfcG0iOiB7Im5hbWUiOiAi6rWt6rCA7IK866a86rO17JuQICjsmKTtm4QpIiwgImljb24iOiAi8J+MsiIsICJ0aW1lIjogIjE0OjAwIiwgInR5cGUiOiAiYXR0cmFjdGlvbiIsICJkZXNjIjogIuyWkeqwgOqzhCDtmZjsirkg4oaSIOyWtO2VhOu0iSDihpIg7ISg64WA7ZeM7ZmUIOKGkiDsspzsnpDsgrAg7LyA7J2067iU7Lm0LiDsmKTtm4Qg7ZaH7IK0IOyVhOuemCDrjZTsmrEg7JWE66aE64uk7Jq0IOygiOqyvS4iLCAidGlwIjogIuy8gOydtOu4lOy5tCDrp4nssKgg7Iuc6rCE7J2EIOq8rSDtmZXsnbjtlZjshLjsmpQuIiwgImR1cmF0aW9uIjogIuyVvSAyLjXsi5zqsIQiLCAiZ2FvZGUiOiAiaHR0cHM6Ly91cmkuYW1hcC5jb20vc2VhcmNoP2tleXdvcmQ95aSp5a2Q5bGx6aOO5pmv5Yy6JmNpdHk95byg5a6255WMIiwgImltYWdlcyI6IFtdfSwgImx1bmNoX3NhbmNoYWUiOiB7Im5hbWUiOiAi7KCQ7IusIOKAlCDsgrDssYTruYTruZTrsKUg7KCV7IudIiwgImljb24iOiAi8J+NnCIsICJ0aW1lIjogIjEyOjMwIiwgInR5cGUiOiAibWVhbCIsICJkZXNjIjogIuyCsOyxhOu5hOu5lOuwpSArIOyXrOufrCDqsIDsp4Ag67CY7LCsLiDtmITsp4Ag66Gc7LusIOyLneuLueyXkOyEnCDsp4Tsp5wg7J6l6rCA6rOEIOqwgOygleyLneydhCDrp5vrs7TshLjsmpQuIiwgInRpcCI6ICIiLCAiZHVyYXRpb24iOiAiIiwgImdhb2RlIjogIiIsICJpbWFnZXMiOiBbXX0sICJkaW5uZXJfcG9yayI6IHsibmFtZSI6ICLsoIDrhYEg4oCUIOuPvOyngOqzoOq4sCDqs6DstpTrs7bsnYwiLCAiaWNvbiI6ICLwn42cIiwgInRpbWUiOiAiMTg6MzAiLCAidHlwZSI6ICJtZWFsIiwgImRlc2MiOiAi7J6l6rCA6rOEIOuMgO2RnCDsnYzsi53snbgg6rOg7LaU67O27J2MICsg67O27J2MIOyalOumrC4g66ek7L2k7ZWY6rOgIO2SjeyEse2VnCDtmITsp4Dsi50uIiwgInRpcCI6ICIiLCAiZHVyYXRpb24iOiAiIiwgImdhb2RlIjogIiIsICJpbWFnZXMiOiBbXX0sICJtYWdpY19zaG93IjogeyJuYW1lIjogIuunpOugpeyDgeyEnOyHvCIsICJpY29uIjogIvCfpLkiLCAidGltZSI6ICIyMDowMCIsICJ0eXBlIjogInNob3ciLCAiZGVzYyI6ICLsnqXqsIDqs4Qg7ZiE7KeAIO2GoOqwgOyhseydmCDsl63sgqzsmYAg7IK27J2EIOuLtOydgCDtmZTroKTtlZwg6rO17JewLiDslb0gNjDrtoQuIOqzteyXsCDti7DsvJMg7Y+s7ZWoLiIsICJ0aXAiOiAi6rO17Jew7J6lIOuCtCDsgqzsp4Qg7LSs7JiBIOqwgOuKpe2VqeuLiOuLpC4iLCAiZHVyYXRpb24iOiAi7JW9IDYw67aEIiwgImdhb2RlIjogImh0dHBzOi8vdXJpLmFtYXAuY29tL3NlYXJjaD9rZXl3b3JkPemtheWKm+a5mOilvyZjaXR5PeW8oOWutueVjCIsICJpbWFnZXMiOiBbXX0sICJ0cmFkaXRpb25hbF9tYXJrZXQiOiB7Im5hbWUiOiAi7KCE7Ya17Iuc7J6lIOyLnO2LsO2IrOyWtCIsICJpY29uIjogIvCfm43vuI8iLCAidGltZSI6ICIwOTowMCIsICJ0eXBlIjogImFjdGl2aXR5IiwgImRlc2MiOiAi7ZiE7KeA7J2465Ok66GcIOu2geyggeydtOuKlCDsi5zsnqUg6rOo66qpIO2DkOuwqS4g6rO87J28LCDqsITsi50sIOyeoe2ZlCDqtazqsr3tlZjrqbAg7KeE7KecIOyepeqwgOqzhCDsnbzsg4HsnYQg64qQ6ru067O07IS47JqULiIsICJ0aXAiOiAi7ZiE6riIKOychOyViO2ZlCkg65iQ64qUIOyVjOumrO2OmOydtCDspIDruYQg6raM7J6lLiIsICJkdXJhdGlvbiI6ICLslb0gMeyLnOqwhCIsICJnYW9kZSI6ICIiLCAiaW1hZ2VzIjogW119LCAibG9jYWxfY2FmZSI6IHsibmFtZSI6ICLroZzsu6wg7Lm07Y6YIO2DgOyehCIsICJpY29uIjogIuKYlSIsICJ0aW1lIjogIjEwOjAwIiwgInR5cGUiOiAiYWN0aXZpdHkiLCAiZGVzYyI6ICLtmITsp4Ag6rCQ7ISxIOy5tO2OmOyXkOyEnCDsl6zsnKDroZzsmrQg7Luk7ZS8IO2DgOyehC4g7JWE66mU66as7Lm064W4IOuYkOuKlCDtmITsp4Ag7YuwIDHsnpQg7Y+s7ZWoLiIsICJ0aXAiOiAiIiwgImR1cmF0aW9uIjogIuyVvSA0MOu2hCIsICJnYW9kZSI6ICIiLCAiaW1hZ2VzIjogW119LCAibHVuY2hfaHVuYW4iOiB7Im5hbWUiOiAi7KCQ7IusIOKAlCDtmLjrgqjsmpTrpqwiLCAiaWNvbiI6ICLwn42cIiwgInRpbWUiOiAiMTI6MDAiLCAidHlwZSI6ICJtZWFsIiwgImRlc2MiOiAi7KSR6rWtIO2YuOuCqOyEsSDrjIDtkZwg7Zal7Yag7JqU66asLiDrp6TsvaTtlZjqs6Ag6rmK7J2AIOunm+ydtCDsnbztkojsnoXri4jri6QuIiwgInRpcCI6ICIiLCAiZHVyYXRpb24iOiAiIiwgImdhb2RlIjogIiIsICJpbWFnZXMiOiBbXX0sICJ0aWFubWVuIjogeyJuYW1lIjogIuyynOusuOyCsCIsICJpY29uIjogIuKbsO+4jyIsICJ0aW1lIjogIjEzOjMwIiwgInR5cGUiOiAiYXR0cmFjdGlvbiIsICJkZXNjIjogIuy8gOydtOu4lOy5tCDsmZXrs7Ug4oaSIOyXkOyKpOy7rOugiOydtO2EsCDihpIg7Jyg66as7J6U64+EIOKGkiDsspzrrLjrj5kg4oaSIOq3gOqzoeyelOuPhC4g7ZW067CcIDEsNTAwbSDsnITsl5DshJwg67Cc67CR7Jy866GcIO2OvOyzkOyngOuKlCDsoIjqsr0uIOyynOusuOuPmSDslZ7sl5DshJwg7J247Kad7IO3IO2VhOyImCEiLCAidGlwIjogIuqzoOyGjOqzte2PrOymneydtCDsnojsnLzsi6Ag67aE7J2AIOycoOumrOyelOuPhCDqtazqsITsl5DshJwg7KO87J2Y7ZWY7IS47JqULiDrsJTrnozsnbQg6rCV7ZWgIOyImCDsnojsnLzri4gg6rKJ7Ji3IOykgOu5hCDqtozsnqUuIiwgImR1cmF0aW9uIjogIuyVvSA07Iuc6rCEIiwgImdhb2RlIjogImh0dHBzOi8vdXJpLmFtYXAuY29tL3NlYXJjaD9rZXl3b3JkPeWkqemXqOWxseWbveWutuajruael+WFrOWbrSZjaXR5PeW8oOWutueVjCIsICJpbWFnZXMiOiBbXX0sICJkaW5uZXJfcG9ya19iYnEiOiB7Im5hbWUiOiAi7KCA64WBIOKAlCDsgrzqsrnsgrQg66y07ZWc66as7ZWEIiwgImljb24iOiAi8J+NliIsICJ0aW1lIjogIjE4OjMwIiwgInR5cGUiOiAibWVhbCIsICJkZXNjIjogIu2YhOyngOyLnSDsgrzqsrnsgrQg66y07ZWc66as7ZWELiDsl6ztlokg7KSRIOqwgOyepSDsnbjquLAg7J6I64qUIOuplOuJtCDspJEg7ZWY64KYISIsICJ0aXAiOiAiIiwgImR1cmF0aW9uIjogIiIsICJnYW9kZSI6ICIiLCAiaW1hZ2VzIjogW119LCAibmlnaHRfNzIiOiB7Im5hbWUiOiAiNzLquLDro6gg7JW86rK9IiwgImljb24iOiAi8J+MgyIsICJ0aW1lIjogIjIwOjMwIiwgInR5cGUiOiAiYWN0aXZpdHkiLCAiZGVzYyI6ICLsnqXqsIDqs4Qg7Iuc64K0IOyVvOqyveydhCDssKjssL0g64SI66i466GcIOqwkOyDgS4g7ZiV7ZiV7IOJ7IOJIOyhsOuqheydtCDrrLzrk5zripQg6rGw66asIO2SjeqyvS4iLCAidGlwIjogIiIsICJkdXJhdGlvbiI6ICLslb0gMzDrtoQiLCAiZ2FvZGUiOiAiIiwgImltYWdlcyI6IFtdfSwgImdldW1waHllb24iOiB7Im5hbWUiOiAi6riI7Y646rOE6rOhIO2KuOuemO2CuSIsICJpY29uIjogIvCfjL8iLCAidGltZSI6ICIwOTowMCIsICJ0eXBlIjogImF0dHJhY3Rpb24iLCAiZGVzYyI6ICLrp5HsnYAg6rOE6rOh66y87J2EIOuUsOudvCDqsbfripQg7Z6Q66eBIO2KuOuemO2CuSDsvZTsiqQuIOq4sOyVlOq0tOyEneqzvCDsmrjssL3tlZwg7Iiy7J20IOyWtOyasOufrOynhCDruYTqsr0uIiwgInRpcCI6ICLtjrjtlZwg7Jq064+Z7ZmUIO2VhOyImC4g6rOE6rOh66y87JeQIOuwnOydhCDri7TquIAg7IiY64+EIOyeiOycvOuLiCDsl6zrtoQg7JaR66eQIOykgOu5hCDqtozsnqUuIiwgImR1cmF0aW9uIjogIuyVvSAy7Iuc6rCEIiwgImdhb2RlIjogImh0dHBzOi8vdXJpLmFtYXAuY29tL3NlYXJjaD9rZXl3b3JkPemHkemerea6qiZjaXR5PeW8oOWutueVjCIsICJpbWFnZXMiOiBbXX0sICJsdW5jaF9idWxnb2dpIjogeyJuYW1lIjogIuygkOyLrCDigJQg7IaM67aI6rOg6riwIiwgImljb24iOiAi8J+NnCIsICJ0aW1lIjogIjEyOjAwIiwgInR5cGUiOiAibWVhbCIsICJkZXNjIjogIuu2gOuTnOufrOyatCDshozrtojqs6DquLAgKyDrsJjssKwuIO2KuOuemO2CuSDtm4Qg65Og65Og7ZWY6rKMLiIsICJ0aXAiOiAiIiwgImR1cmF0aW9uIjogIiIsICJnYW9kZSI6ICIiLCAiaW1hZ2VzIjogW119LCAiYm9mZW5nIjogeyJuYW1lIjogIuuztOu0ie2YuOyImCDsnKDrnozshKAiLCAiaWNvbiI6ICLinKgiLCAidGltZSI6ICIxNDowMCIsICJ0eXBlIjogImF0dHJhY3Rpb24iLCAiZGVzYyI6ICLsl5DrqZTrnoTrk5zruZsg7Zi47IiYIOychOulvCDsnKDrnozshKDsnLzroZwg7Jyg7Jyg7Z6IIO2Vre2VtC4g7KO867OAIOygiOuyveqzvCDslrTsmrDrn6zsp4Qg7ZKN6rK97J20IOyVleq2jC4gVklQIO2DkeyKuSDtj6ztlaguIiwgInRpcCI6ICLshKDssKnsnqXsl5DshJwg6rWs66qF7KGw64G866W8IOq8rSDssKnsmqntlZjshLjsmpQuIiwgImR1cmF0aW9uIjogIuyVvSA5MOu2hCIsICJnYW9kZSI6ICJodHRwczovL3VyaS5hbWFwLmNvbS9zZWFyY2g/a2V5d29yZD3lrp3ls7DmuZYmY2l0eT3lvKDlrrbnlYwiLCAiaW1hZ2VzIjogW119LCAibWFzc2FnZV9iYXNpYyI6IHsibmFtZSI6ICLrsJwg66eI7IKs7KeAIDgw67aEIiwgImljb24iOiAi8J+ShiIsICJ0aW1lIjogIuyggOuFgSIsICJ0eXBlIjogImFjdGl2aXR5IiwgImRlc2MiOiAi7KCE66y4IOuwnCDrp4jsgqzsp4DroZwg7Jes7ZaJ7J2YIO2UvOuhnOulvCDtkoDslrTrk5zrpr3ri4jri6QuIDTrsJU17J28IOydtOyDgSDtjKjtgqTsp4Ag6riw67O4IO2PrO2VqC4iLCAidGlwIjogIiIsICJkdXJhdGlvbiI6ICI4MOu2hCIsICJnYW9kZSI6ICIiLCAiaW1hZ2VzIjogW119LCAicWl4aW5nc2hhbiI6IHsibmFtZSI6ICLsuaDshLHsgrAiLCAiaWNvbiI6ICLwn4+U77iPIiwgInRpbWUiOiAiMDk6MDAiLCAidHlwZSI6ICJhdHRyYWN0aW9uIiwgImRlc2MiOiAi7JWE7LCU7ZWcIOygiOuyveqzvCDquLDslZTqtLTshJ3snbQg7Ja07Jqw65+s7KeEIOu5hOqyvS4g7J6l6rCA6rOE7JeQ7ISc64+EIOyGkOq8ve2eiOuKlCDsiKjqsqjsp4Qg66qF7IaMLiIsICJ0aXAiOiAiIiwgImR1cmF0aW9uIjogIuyVvSAyLjXsi5zqsIQiLCAiZ2FvZGUiOiAiIiwgImltYWdlcyI6IFtdfSwgImx1bmNoX2J1bGdvZ2kyIjogeyJuYW1lIjogIuygkOyLrCDigJQg7IaM67aI6rOg6riwIiwgImljb24iOiAi8J+NnCIsICJ0aW1lIjogIjEyOjAwIiwgInR5cGUiOiAibWVhbCIsICJkZXNjIjogIuu2gOuTnOufrOyatCDshozrtojqs6DquLAgKyDrsJjssKwuIiwgInRpcCI6ICIiLCAiZHVyYXRpb24iOiAiIiwgImdhb2RlIjogIiIsICJpbWFnZXMiOiBbXX0sICJmdXlvbmciOiB7Im5hbWUiOiAi67aA7Jqp7KeEIiwgImljb24iOiAi8J+PmO+4jyIsICJ0aW1lIjogIuyYpO2bhCDstpzrsJwiLCAidHlwZSI6ICJhdHRyYWN0aW9uIiwgImRlc2MiOiAi7KCI67K9IOychCDtj63tj6wg7JyE7JeQIO2YleyEseuQnCDsspzrhYQg6rOg7KeELiDrgq4g7ZKN6rK96rO8IOyVvOqyvSDtkoDsvZTsiqQuIDXrsJU27J28IO2UhOumrOuvuOyXhCDsvZTsiqQuIiwgInRpcCI6ICLslbzqsr3snbQg7Yq57Z6IIOyVhOumhOuLpOyasOuLiCDtlbTsp4gg66y066C167aA7YSwIOyLnOqwhOydhCDstqnrtoTtnogg67O064K07IS47JqULiIsICJkdXJhdGlvbiI6ICLrgq4r7JW86rK9IO2SgOy9lOyKpCIsICJnYW9kZSI6ICJodHRwczovL3VyaS5hbWFwLmNvbS9zZWFyY2g/a2V5d29yZD3oipnok4nplYcmY2l0eT3muZjopb8iLCAiaW1hZ2VzIjogW119LCAiaHdhbmdyeW9uZyI6IHsibmFtZSI6ICLtmanro6Hrj5nqtbQiLCAiaWNvbiI6ICLwn6aOIiwgInRpbWUiOiAiMDk6MDAiLCAidHlwZSI6ICJhdHRyYWN0aW9uIiwgImRlc2MiOiAi7KeA7ZWYIO2VmOyynOqzvCDsp4Dsp4gg7J6R7Jqp7Jy866GcIO2YleyEseuQnCDsnqXqsIDqs4Qg64yA7ZGcIOuPmeq1tC4g7KKF7Jyg7ISd6rO8IOyEneyInOydtCDrp4zrk5zripQg7Iug67mE66Gc7Jq0IOyngO2VmCDshLjqs4QuIOyngO2VmCDsiJjroZzrpbwg65Sw6528IOuwsOulvCDtg4Dqs6Ag7J2064+Z7ZWY64qUIOq1rOqwhOydtCDslZXqtowhIiwgInRpcCI6ICLrj5nqtbQg64K067aA6rCAIOyEnOuKmO2VmOuLiCDslofsnYAg6rKJ7Ji3IOykgOu5hCDqtozsnqUuIiwgImR1cmF0aW9uIjogIuyVvSAxLjXsi5zqsIQiLCAiZ2FvZGUiOiAiaHR0cHM6Ly91cmkuYW1hcC5jb20vc2VhcmNoP2tleXdvcmQ96buE6b6Z5rSeJmNpdHk95byg5a6255WMIiwgImltYWdlcyI6IFtdfSwgImx1bmNoX2Rvbmd0YWUiOiB7Im5hbWUiOiAi7KCQ7IusIOKAlCDrj5ntg5zrp6TsmrTtg5UiLCAiaWNvbiI6ICLwn42cIiwgInRpbWUiOiAiMTE6MzAiLCAidHlwZSI6ICJtZWFsIiwgImRlc2MiOiAi7Ja87YGw7ZWY6rOgIOyLnOybkO2VnCDrj5ntg5zrp6TsmrTtg5UuIOuniOyngOuniSDrgqAg7KCQ7Ius7Jy866GcIO2YhOyngOydmCDrp5vsnYQg7KCc64yA66GcIOymkOq4sOyEuOyalC4iLCAidGlwIjogIiIsICJkdXJhdGlvbiI6ICIiLCAiZ2FvZGUiOiAiIiwgImltYWdlcyI6IFtdfSwgImRheGlhZ3UiOiB7Im5hbWUiOiAi64yA7ZiR6rOhICsg7Jyg66as64uk66asIiwgImljb24iOiAi8J+MiSIsICJ0aW1lIjogIjEzOjMwIiwgInR5cGUiOiAiYXR0cmFjdGlvbiIsICJkZXNjIjogIuyEuOqzhCDstZzsnqUg7Jyg66as64uk66as7JeQ7IScIOyVhOywlO2VnCDsiqTrprQhIOycoOumrOuLpOumrCDihpIg66+464GE65+87YuAIOKGkiDsnKDrnozshKAg7Iic7ISc66GcIOynhO2WiS4g6rmK7J2AIO2YkeqzoeqzvCDsi5zsm5DtlZwg7Y+t7Y+s6rCAIO2VqOq7mO2VmOuKlCDsp5zrpr/tlZwg7J287KCVLiIsICJ0aXAiOiAi7Jyg66as64uk66asIOychOyXkOyEnOuKlCDrjafsi6DsnYQg7LCp7Jqp7ZW07JW8IO2VqeuLiOuLpCAo7ZiE7J6lIOygnOqztSkuIOqygeydtCDrgpjrqbQg6rCA7J6l7J6Q66as66W8IOyeoeqzoCDsspzsspztnogg6rG47Ja064+EIOuQqeuLiOuLpCEiLCAiZHVyYXRpb24iOiAi7JW9IDJ+NOyLnOqwhCIsICJnYW9kZSI6ICJodHRwczovL3VyaS5hbWFwLmNvbS9zZWFyY2g/a2V5d29yZD3lvKDlrrbnlYzlpKfls6HosLfnjrvnkoPmoaUmY2l0eT3lvKDlrrbnlYwiLCAiaW1hZ2VzIjogW119LCAiYWlycG9ydF9kZXBhcnR1cmUiOiB7Im5hbWUiOiAi6rO17ZWtIOyEvOuUqSDihpIg6reA6rWtIiwgImljb24iOiAi4pyI77iPIiwgInRpbWUiOiAiMjA6MzAiLCAidHlwZSI6ICJ0cmFuc3BvcnQiLCAiZGVzYyI6ICJLRTE2NO2OuCDtg5HsirkuIOqwgOydtOuTnOqwgCDqs7Xtla3quYzsp4Ag67Cw7JuF7ZW0IOuTnOumveuLiOuLpC4g7J247LKc6rO17ZWtIOuPhOywqSDtm4Qg7ZW07IKwLiIsICJ0aXAiOiAi7Lac6rWtIDLsi5zqsIQg7KCEIOqzte2VrSDrj4TssKnsnYQg6raM7J6l7ZWp64uI64ukLiIsICJkdXJhdGlvbiI6ICIiLCAiZ2FvZGUiOiAiaHR0cHM6Ly91cmkuYW1hcC5jb20vc2VhcmNoP2tleXdvcmQ95byg5a6255WM6I236Iqx5Zu96ZmF5py65Zy6JmNpdHk95byg5a6255WMIiwgImltYWdlcyI6IFtdfX0sICJvcHRpb25zIjogeyJob3RlbCI6IHsibGFiZWwiOiAi8J+PqCDtmLjthZQg7ISg7YOdIiwgIml0ZW1zIjogW3siaWQiOiAib3JhbmdlIiwgIm5hbWUiOiAi7J6l6rCA6rOEIOyYpOugjOyngCDtmLjthZQiLCAiZGVzYyI6ICLtmITsnqwg7J6l6rCA6rOEIOy1nOyduOq4sCDtmLjthZQuIOq5lOuBlO2VmOqzoCDsnITsuZgg7KKL7J2MLiIsICJwcmljZSI6IDAsICJwcmljZV9sYWJlbCI6ICLinIUg6riw67O4IO2PrO2VqCIsICJpbnF1aXJ5IjogZmFsc2V9LCB7ImlkIjogIm1lcmN1cmUiLCAibmFtZSI6ICLrqLjtgZDslrQg7Zi47YWUIiwgImRlc2MiOiAiNOyEseq4iSDqta3soJwg67iM656c65OcLiDrhJPsnYAg6rCd7Iuk6rO8IO2OuOydmOyLnOyEpC4iLCAicHJpY2UiOiAwLCAicHJpY2VfbGFiZWwiOiAi8J+SrCDrrLjsnZgg7ZuEIO2ZleyglSIsICJpbnF1aXJ5IjogdHJ1ZX0sIHsiaWQiOiAiaGFtcHRvbiIsICJuYW1lIjogIu2WhO2KvCDrsJTsnbQg7Z6Q7Yq8IiwgImRlc2MiOiAi7Z6Q7Yq8IOqzhOyXtCA07ISx6riJLiDshLjroKjrkJwg7J247YWM66as7Ja07JmAIOyEnOu5hOyKpC4iLCAicHJpY2UiOiAwLCAicHJpY2VfbGFiZWwiOiAi8J+SrCDrrLjsnZgg7ZuEIO2ZleyglSIsICJpbnF1aXJ5IjogdHJ1ZX1dfSwgInNob3ciOiB7ImxhYmVsIjogIvCfjq0g6rO17JewIOyEoO2DnSIsICJpdGVtcyI6IFt7ImlkIjogIm1hZ2ljIiwgIm5hbWUiOiAi8J+kuSDrp6TroKXsg4HshJzsh7wiLCAiZGVzYyI6ICLqta3qsIDsgrzrprzqs7Xsm5Ag64u57J28IOyggOuFgSDCtyDslb0gNjDrtoQgwrcg7Yag6rCA7KGxIOusuO2ZlCDqs7Xsl7AiLCAicHJpY2UiOiAwLCAicHJpY2VfbGFiZWwiOiAi4pyFIOq4sOuzuCDtj6ztlagifSwgeyJpZCI6ICJ0aWFubWVuIiwgIm5hbWUiOiAi8J+miiDsspzrrLjtmLjshKDsh7wiLCAiZGVzYyI6ICLsspzrrLjsgrAg64u57J28IOyggOuFgSDCtyAyMDoyMH4yMTozMCDCtyDrjIDtmJUg7JW87Jm4IOqzteyXsCIsICJwcmljZSI6IDEsICJwcmljZV9sYWJlbCI6ICIrMeunjOybkC/snbgifSwgeyJpZCI6ICJub25lIiwgIm5hbWUiOiAi4p2MIOqzteyXsCDst6jshowiLCAiZGVzYyI6ICLqs7Xsl7Ag7Iuc6rCE7J2EIOyekOycoOyLnOqwhOycvOuhnCDtmZzsmqkiLCAicHJpY2UiOiAtMSwgInByaWNlX2xhYmVsIjogIjHrp4zsm5Av7J24IO2ZmOu2iCJ9XX0sICJtYXNzYWdlIjogeyJsYWJlbCI6ICLwn5KGIOuniOyCrOyngCDshKDtg50iLCAicGtnX21pbiI6IDEsICJpdGVtcyI6IFt7ImlkIjogImJhc2ljIiwgIm5hbWUiOiAi8J+RoyDrsJwg66eI7IKs7KeAIDgw67aEIiwgImRlc2MiOiAi7KCE66y4IOuwnCDrp4jsgqzsp4Agwrcg7Jes7ZaJIO2UvOuhnCDtmozrs7UiLCAicHJpY2UiOiAwLCAicHJpY2VfbGFiZWwiOiAi4pyFIOq4sOuzuCDtj6ztlagifSwgeyJpZCI6ICJwcmVtaXVtIiwgIm5hbWUiOiAi4pyoIOuwnCArIOyghOyLoCDslYTroZzrp4gg66eI7IKs7KeAIDEwMOu2hCIsICJkZXNjIjogIuuwnCDrp4jsgqzsp4AgKyDsoITsi6AgKyDslYTroZzrp4gg7Jik7J28IMK3IOuNlOyasSDquYrsnYAg7ZS866GcIO2ajOuztSIsICJwcmljZSI6IDIsICJwcmljZV9sYWJlbCI6ICIrMuunjOybkC/snbgifV19LCAidHJhbnNwb3J0X2Z1eW9uZyI6IHsibGFiZWwiOiAi8J+ajCDrtoDsmqnsp4Qg7J2064+ZIOyImOuLqCIsICJwa2dfbWluIjogMSwgIml0ZW1zIjogW3siaWQiOiAiY2FyIiwgIm5hbWUiOiAi8J+alyDsoITsmqnssKjrn4kiLCAiZGVzYyI6ICLslb0gMX4xLjXsi5zqsIQgwrcg7Y647JWI7ZWY6rKMIOydtOuPmSIsICJwcmljZSI6IDAsICJwcmljZV9sYWJlbCI6ICLinIUg6riw67O4IO2PrO2VqCJ9LCB7ImlkIjogInRyYWluIiwgIm5hbWUiOiAi8J+ahCDqs6Dsho3ssqDrj4QiLCAiZGVzYyI6ICLslb0gMjPrtoQgwrcg7ZiE7KeAIO2DneyLnCDsnbTrj5kg7Y+s7ZWoXG7igLsg66eM7ISdIOyLnCDsnpDrj5nsnLzroZwg7KCE7Jqp7LCo65+JIOyghO2ZmCIsICJwcmljZSI6IDQsICJwcmljZV9sYWJlbCI6ICIrNOunjOybkC/snbgifV19LCAicmVwbGFjZSI6IHsibGFiZWwiOiAi8J+PryDrtoDsmqnsp4Qg4oaSIOu0ie2ZqeqzoOyEsSDrs4Dqsr0iLCAicGtnX21pbiI6IDEsICJwaG9lbml4X3ByaWNlcyI6IHsiMiI6IDEzLCAiMyI6IDEzLCAiNCI6IDksICI1IjogOSwgIjYiOiA4LCAiNyI6IDgsICI4IjogOH0sICJpdGVtcyI6IFt7ImlkIjogImtlZXAiLCAibmFtZSI6ICLrtoDsmqnsp4Qg7Jyg7KeAIiwgImRlc2MiOiAi6riw67O4IOydvOygleuMgOuhnCDsp4TtlokiLCAicHJpY2UiOiAwLCAicHJpY2VfbGFiZWwiOiAi4pyFIOq4sOuzuCJ9LCB7ImlkIjogInBob2VuaXgiLCAibmFtZSI6ICLwn4+vIOu0ie2ZqeqzoOyEseycvOuhnCDrs4Dqsr0gKDHrsJUy7J28KSIsICJkZXNjIjogIuuLueydvCDsoIDrhYEg7IKs6rCVIOyVvOqyvSDihpIg64uk7J2M64KgIOyYpOyghCDqtIDqtJEg7ZuEIOq3gO2ZmFxu7LCo65+JK+yImeuwlSDrqqjrkZAg7Y+s7ZWoIiwgInByaWNlX2xhYmVsIjogIuyduOybkOyXkCDrlLDrnbwg7LaU6rCA67mE7JqpIn1dfSwgInRyYW5zcG9ydF9waG9lbml4IjogeyJsYWJlbCI6ICLrtIntmanqs6DshLEg7J2064+ZIOyImOuLqCIsICJpdGVtcyI6IFt7ImlkIjogImNhciIsICJuYW1lIjogIvCfmpcg7KCE7Jqp7LCo65+JIiwgImRlc2MiOiAi7JW9IDIuNX4z7Iuc6rCEIMK3IOu0ie2ZqSDstpTqsIDruYTsmqnsl5Ag7Y+s7ZWoIiwgInByaWNlIjogMCwgInByaWNlX2xhYmVsIjogIuKchSDtj6ztlagifSwgeyJpZCI6ICJ0cmFpbiIsICJuYW1lIjogIvCfmoQg6rOg7IaN7LKg64+EIiwgImRlc2MiOiAi7JW9IDHsi5zqsIQgwrcg7ZiE7KeAIO2DneyLnCDtj6ztlahcbuKAuyDrp4zshJ0g7IucIOyekOuPmeycvOuhnCDsoITsmqnssKjrn4kg7KCE7ZmYIiwgInByaWNlIjogOCwgInByaWNlX2xhYmVsIjogIis466eM7JuQL+yduCDstpTqsIAifV19LCAiZXh0cmFzIjogW3siaWQiOiAic3Rhcl9ndWlkZSIsICJuYW1lIjogIuKtkCDsiqTtg4Ag6rCA7J2065OcIOyLoOyyrSIsICJkZXNjIjogIuyghOusuCDsgqzsp4Qg7LSs7JiBIOuKpeugpeydhCDqsJbstpgg6rCA7J2065Oc66GcIOuwsOyglSDsmpTssq1cbsK3IOuwsOyglSDqsIDriqUg7Iuc7JeQ66eMIOu5hOyaqSDrsJzsg51cbsK3IO2YhOyepeyXkOyEnCDtjIHsnLzroZwg7KeB7KCRIOyngOu2iFxuwrcg67Cw7KCVIOu2iOqwgCDsi5wg7J2867CYIOqwgOydtOuTnOuhnCDsoITtmZgsIOu5hOyaqSDsl4bsnYwiLCAicHJpY2VfcGVyX2RheSI6IDUsICJ0eXBlIjogInBlcl9kYXkifSwgeyJpZCI6ICJodWFuZ3NoaSIsICJuYW1lIjogIvCfj5TvuI8g7Zmp7ISd7LGEIiwgImRlc2MiOiAi7J6l6rCA6rOEIOq1reqwgOyCvOumvOqzteybkCDrgrQg64yA7ZGcIOygleyDgSDsoITrp53rjIAgwrcg67CY64KY7KCIIOyGjOyalFxu7Ja064qQIOuCoOydtOuToCDrsLDsuZgg6rCA64qlIiwgInByaWNlIjogMywgInR5cGUiOiAicGVyX3BlcnNvbiJ9LCB7ImlkIjogInFpeGluZyIsICJuYW1lIjogIvCfj5TvuI8g7Lmg7ISx7IKwIiwgImRlc2MiOiAi7JWE7LCU7ZWcIOygiOuyveqzvCDquLDslZTqtLTshJ3snbQg7Ja07Jqw65+s7KeEIOu5hOqyvSDCtyDrsJjrgpjsoIgg7IaM7JqUXG7qta3qsIDsgrzrprzqs7Xsm5Dqs7wg6rCZ7J2AIOuCoCDrsLDsuZgg67aI6rCAIiwgInByaWNlIjogNSwgInR5cGUiOiAicGVyX3BlcnNvbiJ9LCB7ImlkIjogImJ1bmdlZSIsICJuYW1lIjogIvCfqoIg64yA7ZiR6rOhIOuyiOyngOygkO2UhCIsICJkZXNjIjogIuuMgO2YkeqzoSDrsKnrrLgg64u57J28IO2VqOq7mCDsp4TtlolcbuuhnO2IrOywqOqwgCDrjIDsi6Ag7JiI7JW9IMK3IOy2nOuwnCA37J28IOyghOq5jOyngCDsi6Dssq0g7ZWE7IiYIiwgInByaWNlIjogNDYsICJ0eXBlIjogInBlcl9wZXJzb24ifSwgeyJpZCI6ICJmZXJyYXRhIiwgIm5hbWUiOiAi8J+nlyDrjIDtmJHqs6Eg7JWU67K9IOuTseuwmCDssrTtl5giLCAiZGVzYyI6ICLtmJHqs6Eg7KCI67K9IOyVlOuyvSDrk7HrsJgg7LK07ZeYIMK3IOuwmOuCmOygiCDshozsmpRcbuuhnO2IrOywqOqwgCDrjIDsi6Ag7JiI7JW9IMK3IOy2nOuwnCA37J28IOyghOq5jOyngCDsi6Dssq0g7ZWE7IiYIiwgInByaWNlIjogNiwgInR5cGUiOiAicGVyX3BlcnNvbiJ9LCB7ImlkIjogInR1amlhIiwgIm5hbWUiOiAi8J+RmCDthqDqsIDsobEg66+87IaNIOyytO2XmCIsICJkZXNjIjogIuyepeqwgOqzhCDsm5Dso7zrr7wg7Yag6rCA7KGxIOyghO2GtSDsnZjsg4HsnYQg7J6F6rOgIOq4sOuFkCDsgqzsp4Qg7LSs7JiBXG7ruYTsmqnsnYAg7ZiE7J6l7JeQ7IScIOyngeygkSDqsrDsoJwiLCAicHJpY2UiOiAwLCAidHlwZSI6ICJvbnNpdGUifSwgeyJpZCI6ICJjaXR5IiwgIm5hbWUiOiAi8J+Pme+4jyDsnqXqsIDqs4Qg7Iuc64K0IO2DkOuwqSIsICJkZXNjIjogIuyXrOycoCDsi5zqsITsl5Ag66eb7KeRwrfsg4HsoJDCt+y5tO2OmCDrk7Eg7ZiE7KeAIOy2lOyynCDsvZTsiqQg7JWI64K0XG7qs6DrjZXsp4Drj4QgKyDslYzrpqztjpjsnbQgKyDrlJTrlJTtg53si5wgKOykkeq1rSDsmrDrsoQpIOyVsSDshKTsuZgg6raM7J6lIiwgInByaWNlIjogMCwgInR5cGUiOiAiZnJlZSJ9XSwgImhlbGljb3B0ZXIiOiB7ImxhYmVsIjogIvCfmoEg7Zes6riwIO2IrOyWtCIsICJkZXNjIjogIuustOumieybkCDsoITqsr3snYQg7ZWY64qY7JeQ7IScIOqwkOyDge2VmOuKlCDtirnrs4TtlZwg6rK97ZeYXG7snbzrsJgg7ZWt7ISg7J2AIOyduOuLuSDsmpTquIggwrcg7Zes6riwIOyghOyEuCAo64uo64+FIO2DkeyKuSnripQg64yA64u5IOyalOq4iCAo7LWc64yAIDPsnbgpIiwgIml0ZW1zIjogW3siaWQiOiAibm9uZSIsICJuYW1lIjogIuydtOyaqSDslYjtlagiLCAicHJpY2UiOiAwLCAidW5pdCI6ICIifSwgeyJpZCI6ICJBIiwgIm5hbWUiOiAiQeyEoCIsICJkdXJhdGlvbiI6ICI1fjbrtoQiLCAicHJpY2UiOiAxMS41LCAidW5pdCI6ICLrp4zsm5Av7J24IiwgImNoYXJ0ZXIiOiBmYWxzZX0sIHsiaWQiOiAiQiIsICJuYW1lIjogIkLshKAiLCAiZHVyYXRpb24iOiAiMTB+MTLrtoQiLCAicHJpY2UiOiAyMi41LCAidW5pdCI6ICLrp4zsm5Av7J24IiwgImNoYXJ0ZXIiOiBmYWxzZX0sIHsiaWQiOiAiQyIsICJuYW1lIjogIkPshKAiLCAiZHVyYXRpb24iOiAiMTbrtoQiLCAicHJpY2UiOiAzNC41LCAidW5pdCI6ICLrp4zsm5Av7J24IiwgImNoYXJ0ZXIiOiBmYWxzZX0sIHsiaWQiOiAiRCIsICJuYW1lIjogIkTshKAiLCAiZHVyYXRpb24iOiAiMjDrtoQiLCAicHJpY2UiOiA0NS41LCAidW5pdCI6ICLrp4zsm5Av7J24IiwgImNoYXJ0ZXIiOiBmYWxzZX0sIHsiaWQiOiAiRSIsICJuYW1lIjogIu2XrOq4sCDsoITshLggKOuLqOuPhSDtg5HsirkpIEUiLCAiZHVyYXRpb24iOiAiMzjrtoQiLCAicHJpY2UiOiAyMDIsICJ1bml0IjogIuunjOybkC/rjIAiLCAiY2hhcnRlciI6IHRydWV9LCB7ImlkIjogIkYiLCAibmFtZSI6ICLtl6zquLAg7KCE7IS4ICjri6jrj4Ug7YOR7Iq5KSBGIiwgImR1cmF0aW9uIjogIjHsi5zqsIQiLCAicHJpY2UiOiAzNDUsICJ1bml0IjogIuunjOybkC/rjIAiLCAiY2hhcnRlciI6IHRydWV9XX19LCAibm90aWNlcyI6IFt7ImlkIjogImd1aWRlIiwgInRleHQiOiAi8J+RqOKAjfCfkrwgPGI+6rCA7J2065OcPC9iPiDigJQg66Gc7Yis7LCo6rCAIOyngeygkSDqtZDsnKHtlZjqs6Ag7J247Kad7ZWcIO2VqeuylSDsoJXqt5wg6rCA7J2065Oc66GcIOuwsOygleuQqeuLiOuLpC4g7J287KCV7JeQIOuUsOudvCDri7Tri7kg6rCA7J2065Oc6rCAIOuLrOudvOyniCDsiJgg7J6I7Jy864KYLCDrqqjrk6Ag6rCA7J2065Oc64qUIOy5nOygiO2VqOqzvCDssYXsnoTqsJDsnYQg6riw67O47Jy866GcIOqwluy2lOqzoCDsnojsirXri4jri6QuIn0sIHsiaWQiOiAiaG90ZWwiLCAidGV4dCI6ICLwn4+oIDxiPuyImeuwlTwvYj4g4oCUIO2YhOyerCDsnqXqsIDqs4Tsl5DshJwg6rCA7J6lIOyduOq4sCDsnojripQg7Jik66CM7KeAIO2YuO2FlOydhCDquLDrs7jsnLzroZwg7KCc6rO17ZWp64uI64ukLiDshLHsiJjquLAg65OxIOqwneyLpCDsg4Htmansl5Ag65Sw6528IOuPmeq4iSDtmLjthZTroZwg7KGw7KCV65CgIOyImCDsnojsnLzrqbAsIOydtCDqsr3smrAg7JiI7JW9IOyLnCDrr7jrpqwg7JWI64K065Oc66a964uI64ukLiJ9LCB7ImlkIjogImNhciIsICJ0ZXh0IjogIvCfmpcgPGI+7LCo65+JPC9iPiDigJQg6rWt64K0IDHshKAg67iM656c65OcIOywqOufieycvOuhnCwg7J247JuQ7IiY7JeQIOunnuqyjCDsvozsoIHtlZjqs6Ag7Jes7JygIOyeiOuKlCDsnbTrj5nsnYQg67O07J6l7ZWp64uI64ukLiDsp5Ag6rGx7KCVIOyXhuydtCDtjrjtlZjqsowg7YOA7IS47JqULiJ9LCB7ImlkIjogIm1lYWwiLCAidGV4dCI6ICLwn42cIDxiPuyLneyCrDwvYj4g4oCUIO2YhOyngOyduOuPhCDsppDqsqgg7LC+64qUIOq5lOuBlO2VmOqzoCDsnbjquLAg7J6I64qUIOuhnOy7rCDrp5vsp5HsnLzroZwg7JWI64K065Oc66a964uI64ukLiDso7zrpZjCt+ydjOujjMK37LaU6rCAIOyjvOusuOydgCDtmITsnqXsl5DshJwg67OE64+EIOqysOygnO2VmOyLnOuptCDrkKnri4jri6QuIn0sIHsiaWQiOiAiaW5zdXJhbmNlIiwgInRleHQiOiAi8J+boe+4jyA8Yj7sl6ztlonsnpAg67O07ZeYPC9iPiDigJQg6rSA6rSR7KeAIOuCtCDquLDrs7gg67O07ZeY7J2AIO2PrO2VqOuQmOyWtCDsnojsirXri4jri6QuIOq3uCDsmbgg6rWs6rCE7J2AIOqzoOqwneuLmOq7mOyEnCDsp4HsoJEg6rCA7J6F7ZWY7Iuc6ri4IOq2jOyepeuTnOumveuLiOuLpC4iLCAibGluayI6ICJodHRwczovL3dlYi50cmF2ZWxvdmVyLmNvLmtyL2luc3UvaW50cm8vQUJSLyIsICJsaW5rX3RleHQiOiAi8J+UlyDtlbTsmbjsl6ztlonrs7Ttl5gg6rCA7J6F7ZWY6riwICjtirjrnpjruJTsmKTrsoQpIn1dLCAiY2FuY2VsX3BvbGljeSI6IFt7IndoZW4iOiAi7Lac67CcIDE17J28IOyghCIsICJydWxlIjogIjEw66eM7JuQIOyImOyImOujjCArIOuwnOyDneu5hOyaqSDqs7XsoJwg7ZuEIO2ZmOu2iCJ9LCB7IndoZW4iOiAi7Lac67CcIDh+MTTsnbwg7KCEIiwgInJ1bGUiOiAi7LSdIOu5hOyaqeydmCAzMCUgKyAxMOunjOybkCDsiJjsiJjro4wgKyDrsJzsg53ruYTsmqkg6rO17KCcIn0sIHsid2hlbiI6ICLstpzrsJwgNH437J28IOyghCIsICJydWxlIjogIuy0nSDruYTsmqnsnZggNTAlICsgMTDrp4zsm5Ag7IiY7IiY66OMICsg67Cc7IOd67mE7JqpIOqzteygnCJ9LCB7IndoZW4iOiAi7Lac67CcIDF+M+ydvCDsoIQiLCAicnVsZSI6ICLstJ0g67mE7Jqp7J2YIDcwJSArIDEw66eM7JuQIOyImOyImOujjCArIOuwnOyDneu5hOyaqSDqs7XsoJwifSwgeyJ3aGVuIjogIuy2nOuwnCDri7nsnbwgLyDrhbjsh7wiLCAicnVsZSI6ICLtmZjrtogg67aI6rCAICgxMDAlIOqzteygnCkifV0sICJmbGlnaHRfcnVsZXMiOiB7Im92ZXJ0aW1lX3JhdGUiOiAxLjUsICJmcmVlX2hvdXJzIjogMywgImFycml2YWxfc2xvdHMiOiBbeyJ2YWx1ZSI6ICIwODowMCIsICJsYWJlbCI6ICLsmKTsoIQg64+E7LCpICgwODowMCDsnbTsoIQpIiwgImRheTFfc3BvdHMiOiBbInRpYW5tZW4iXSwgIm5vdGUiOiAi64+E7LCpIOuLueydvCDsmKTtm4Qg7LKc66y47IKwIOuwmOuCmOygiCDsnbzsoJUg7Y+s7ZWoIn0sIHsidmFsdWUiOiAiMTA6MDAiLCAibGFiZWwiOiAi7Jik7KCEIOuPhOywqSAoMTA6MDApIiwgImRheTFfc3BvdHMiOiBbInRpYW5tZW4iXSwgIm5vdGUiOiAi64+E7LCpIOuLueydvCDsmKTtm4Qg7LKc66y47IKwIOuwmOuCmOygiCDsnbzsoJUg7Y+s7ZWoIn0sIHsidmFsdWUiOiAiMTI6MDAiLCAibGFiZWwiOiAi7KSR7IudIOuPhOywqSAoMTI6MDApIiwgImRheTFfc3BvdHMiOiBbInRpYW5tZW4iXSwgIm5vdGUiOiAi64+E7LCpIOuLueydvCDsmKTtm4Qg7LKc66y47IKwIOuwmOuCmOygiCDsnbzsoJUg7Y+s7ZWoIn0sIHsidmFsdWUiOiAiMTM6MzAiLCAibGFiZWwiOiAi7Jik7ZuEIOuPhOywqSAoMTM6MzAg7J207ZuEKSIsICJkYXkxX3Nwb3RzIjogW10sICJub3RlIjogIuuLueydvCDssrTtgazsnbgg7ZuEIO2ctOyLnS4g7J217J2867aA7YSwIOygleyLnSDsnbzsoJUg7Iuc7J6RIn0sIHsidmFsdWUiOiAiMjM6MDAiLCAibGFiZWwiOiAi7JW86rCEIOuPhOywqSAoMjM6MDApIOKAlCDtkZzspIAiLCAiZGF5MV9zcG90cyI6IFtdLCAibm90ZSI6ICLri7nsnbwg7LK07YGs7J24IO2bhCDtnLTsi50uIOydteydvOu2gO2EsCDsoJXsi50g7J287KCVIOyLnOyekSJ9XSwgImRlcGFydHVyZV9zbG90cyI6IFt7InZhbHVlIjogIjA4OjAwIiwgImxhYmVsIjogIuyYpOyghCDstpzrsJwgKDA4OjAwIOydtOyghCkiLCAibGFzdF9kYXlfc3BvdHMiOiBbXSwgImluY2x1ZGVzX2x1bmNoIjogZmFsc2UsICJub3RlIjogIuuniOyngOuniSDrgqAg67CU66GcIOqzte2VreycvOuhnCDsnbTrj5kifSwgeyJ2YWx1ZSI6ICIxMjowMCIsICJsYWJlbCI6ICLspJHsi50g7Lac67CcICgxMjowMCkiLCAibGFzdF9kYXlfc3BvdHMiOiBbXSwgImluY2x1ZGVzX2x1bmNoIjogZmFsc2UsICJub3RlIjogIuuniOyngOuniSDrgqAg7Jik7KCEIOqwgOydtOuTnCDrr7jtjIUg7ZuEIOqzte2VrSDsnbTrj5kgKOygkOyLrCDrr7jtj6ztlagpIn0sIHsidmFsdWUiOiAiMTY6MDAiLCAibGFiZWwiOiAi7Jik7ZuEIOy2nOuwnCAoMTQ6MDB+MTg6MDApIiwgImxhc3RfZGF5X3Nwb3RzIjogWyJod2FuZ3J5b25nIl0sICJpbmNsdWRlc19sdW5jaCI6IHRydWUsICJub3RlIjogIuuniOyngOuniSDrgqAg7Jik7KCEIOydvOyglSArIOygkOyLrCDtm4Qg6rO17ZWtIOydtOuPmSJ9LCB7InZhbHVlIjogIjIzOjAwIiwgImxhYmVsIjogIuyVvOqwhCDstpzrsJwgKDIzOjAwKSDigJQg7ZGc7KSAIiwgImxhc3RfZGF5X3Nwb3RzIjogWyJod2FuZ3J5b25nIiwgImRheGlhZ3UiXSwgImluY2x1ZGVzX2x1bmNoIjogdHJ1ZSwgIm5vdGUiOiAi66eI7KeA66eJIOuCoCDsoITsnbwg7J287KCVIO2bhCDstpzrsJwgKO2RnOykgCkifV0sICJ1cGdyYWRlX3J1bGUiOiAi7Lac67Cc7J20IOuPhOywqSDri6TsnYzrgqDsnbgg6rK97JqwIOyekOuPmeycvOuhnCDri6TsnYwg7Yyo7YKk7KeA66GcIOyXheq3uOugiOydtOuTnCIsICJwYXltZW50X25vdGUiOiAi7LaU6rCAIOyLneyCrCDrsJzsg50g7IucIOqzoOqwnSDsp4HsoJEg6rKw7KCcLiDspJHqta0g6rKw7KCcIOyImOuLqCDsl4bripQg6rK97JqwIOuhnO2IrOywqCDrjIDrgqkg6rCA64qlICjtlZztmZQv7Jm47ZmUIO2YhOq4iCDsiJjroLkpIn0sICJkYXlfdG91cnMiOiBbeyJpZCI6ICJmb3Jlc3RfcGFyayIsICJuYW1lIjogIuyVhOuwlO2DgCDqt7gg7J6Q7LK077yB66y066aJ7JuQIO2VteyLrCDsmYTsoIQg7KCV67O1IiwgInN1YnRpdGxlIjogIuq1reqwgOyCvOumvOqzteybkCDrjbDsnbTtiKzslrQiLCAiaWNvbiI6ICLwn4yyIiwgInRhZyI6ICLsnbjquLAgMeychCIsICJkZXNjIjogIuyVhOuwlO2DgOydmCDshLjqs4Trpbwg7KCc64yA66GcIOuKkOuBvOuKlCDrrLTrponsm5Ag7ZW17IusIOq1rOyXrSDsmYTsoIQg7KCV67O1LiDrj5nrrLgg7J6F7J6l7Jy866GcIO2aqOycqOyggeyduCDrj5nshKAsIO2UvOuhnOuPhCDstZzshoztmZQuIOuwseujoeyXmOuyoMK37LKc7J6Q7IKwIOy8gOydtOu4lOy5tCDrk7Eg64K067aAIOq1kO2GtSDtj6ztlaguIOuwpOyXkOuKlCDtmZTroKTtlZwg66+87KGxIOqzteyXsOycvOuhnCDtlZjro6jrpbwg66eI66y066asLiIsICJwcmljZXMiOiB7IuyEseyduCAo66eMIDE4fjY17IS4KSI6IDI4MDAwMCwgIuyyreyGjOuFhCAo66eMIDE0fjE37IS4KSI6IDI3MDAwMCwgIuqyveuhnCAo66eMIDY17IS4IOydtOyDgSkiOiAyNzAwMDAsICLslrTrprDsnbQgKOunjCAxM+yEuCDsnbTtlZgpIjogMjUwMDAwfSwgIm1pbl9wYXgiOiAi7LWc7IaMIDLsnbgg7Lac67CcICjslrTrprDsnbQg7KCc7Jm4KSIsICJzY2hlZHVsZSI6IFt7InRpbWUiOiAiMDk6MDAiLCAiZGVzYyI6ICLtmLjthZQg7ZS97JeFIO2bhCDqta3qsIDsgrzrprzqs7Xsm5Ag7J6F7J6lIn0sIHsidGltZSI6ICIwODozMCIsICJkZXNjIjogIuyLreumrO2ZlOuekSJ9LCB7InRpbWUiOiAiMTA6MzAiLCAiZGVzYyI6ICLrsLHro6Hsl5jrpqzrsqDsnbTthLAifSwgeyJ0aW1lIjogIjExOjIwIiwgImRlc2MiOiAi7JuQ6rCA6rOEICjrr7jtmLzrjIAv7JWE67CU7YOA7LSs7JiB7KeAL+uvuO2YvOuMgCkifSwgeyJ0aW1lIjogIjEyOjMwIiwgImRlc2MiOiAi7KCQ7Ius7Iud7IKsICjtj6ztlaggLSDrqZTribQg7ISg7YOd6rCA64qlKSJ9LCB7InRpbWUiOiAiMTM6MzAiLCAiZGVzYyI6ICLslpHqsIDqs4Qg7ZmY7Iq5ICsg7LKc7J6Q7IKw7LyA7J2067iU7Lm0In0sIHsidGltZSI6ICIxNjozMCIsICJkZXNjIjogIuyekOycoOyLnOqwhCDrsI8g7KCA64WB7Iud7IKsICjsnpDsnKDsp4TtlokpIn0sIHsidGltZSI6ICIxOToyMCIsICJkZXNjIjogIuunpOugpeyDgeyEnOyHvCDrjIDtmJUg6rO17JewIOq0gOuejCJ9LCB7InRpbWUiOiAiMjA6MzAiLCAiZGVzYyI6ICLrrLTrponsm5Ag7Zi57J2AIOyLnOuCtCDrk5zrno0g7ZuEIO2VtOyCsCJ9XSwgImluY2x1ZGVzIjogWyLqta3rpr3qs7Xsm5Ag7J6F7J6l6raMICg07J286raMKSIsICLsvIDsnbTruJTsubQgMe2ajCAmIOuwseujoeyXmOumrOuyoOydtO2EsCAx7ZqMIiwgIuyLreumrO2ZlOuekSDrqqjrhbjroIjsnbwg7JmV67O16raMIiwgIuunpOugpeyDgeyEnOyHvCDsp4DsoJXshJ0g7Yuw7LyTIiwgIuygkOyLrCDsi53sgqwgMe2ajCAo7LmY7YKo67KE6rGww5cxICsg6rCQ7J6Q7YqA6rmAw5cxICsg7IOd7IiYw5cxKSIsICLtlZzqta3slrQg6rCA7J2065OcIOyEnOu5hOyKpCIsICLssKjrn4nsnbTrj5kgKOyLnOuCtCDtmLnsnYAg66y066aJ7JuQIO2YuO2FlCDtlL3sl4Um7IS865SpKSJdLCAiZXhjbHVkZXMiOiBbIuyXrO2WieyekCDrs7Ttl5giLCAi7KCA64WBIOyLneyCrCIsICLqsJzsnbgg6rK967mEwrfsh7ztlZEiXSwgIm9wdGlvbnMiOiBbeyJuYW1lIjogIuqzteykkeyghOybkCAo7KCV64+Z7Lm0IO2PrO2VqCkiLCAicHJpY2UiOiAiM+unjOybkC/snbgifSwgeyJuYW1lIjogIjgw67aEIOyghOyLoCvrsJzrp4jsgqzsp4AiLCAicHJpY2UiOiAiNOunjOybkCJ9XSwgInJlZmVyZW5jZV9wcmljZXMiOiBbeyJpdGVtIjogIuq1reumveqzteybkCDsnoXsnqXqtowiLCAicHJpY2UiOiAiMjM27JyE7JWIICjslb0gNTQsMDAw7JuQKSJ9LCB7Iml0ZW0iOiAi7LyA7J2067iU7Lm0IDHtmowgJiDrsLHro6Hsl5jrpqzrsqDsnbTthLAgMe2ajCIsICJwcmljZSI6ICIxMzfsnITslYggKOyVvSAzMywwMDDsm5ApIn0sIHsiaXRlbSI6ICLsi63rpqztmZTrnpEg66qo64W466CI7J28IOyZleuztSIsICJwcmljZSI6ICI3NuychOyViCAo7JW9IDE4LDAwMOybkCkifSwgeyJpdGVtIjogIuunpOugpeyDgeyEnOyHvCDti7DsvJMiLCAicHJpY2UiOiAiMTk47JyE7JWIICjslb0gNDYsMDAw7JuQKSJ9XSwgIm5vdGVzIjogWyLsl6zqtowg7KeA7LC4IO2VhOyImCAo7KSR7JqUKSIsICLrgqDslKjsl5Ag65Sw6528IOyGjO2PrSDrs4Drj5kg6rCA64qlIiwgIuy1nOyGjCA37J28IOyghCDsmIjslb0g6raM7J6lIiwgIuuzuCDsg4HtkojsnYAg7KGw7J24IOqwgOuKpSDsg4HtkojsnoXri4jri6QiXSwgImltYWdlcyI6IFtdfSwgeyJpZCI6ICJ0aWFubWVuIiwgIm5hbWUiOiAi7J6l6rCA6rOEIOyDgeynle+8geyynOusuOyCsCDsmYTsoIQg7KCV67O1IO2BtOuemOyLnSIsICJzdWJ0aXRsZSI6ICLsspzrrLjsgrAg642w7J207Yis7Ja0IiwgImljb24iOiAi4puw77iPIiwgInRhZyI6ICLrsqDsiqTtirgiLCAiZGVzYyI6ICLsnqXqsIDqs4Qg7ZWY66m0IOuWoOyYpOultOuKlCDsspzrrLjsgrDsnYQg7KCc64yA66GcIOymkOq4sOuKlCDstZzqs6DsnZgg7L2U7Iqk77yB7KCE7Ya17Iuc7J6lIOq1rOqyveqzvCDsoITthrUg7LCo64+EIOyytO2XmOycvOuhnCDtlZjro6jrpbwg642U7JqxIO2KueuzhO2VmOqzoCDsl6zsnKDroa3qsowuIOy8gOydtOu4lOy5tMK37Jyg66asIOyKpOy5tOydtOybjO2BrMK37LKc66y464+ZIOuTsSDsspzrrLjsgrDsnZgg66qo65OgIO2VteyLrCDrqoXshozrpbwg7ZWcIOuyiOyXkO+8gSIsICJwcmljZXMiOiB7IuydvOuwmCAo66eMIDE07IS4fjY57IS4KSI6IDIxMDAwMCwgIuyWtOumsOydtCAo66eMIDE07IS4IOydtO2VmCkiOiAxNzAwMDAsICLqsr3roZwgKOunjCA3MOyEuCDsnbTsg4EpIjogMTkwMDAwfSwgIm1pbl9wYXgiOiAi7LWc7IaMIDLsnbgg7Lac67CcICjslrTrprDsnbQg7KCc7Jm4KSIsICJzY2hlZHVsZSI6IFt7InRpbWUiOiAiMDg6NDAiLCAiZGVzYyI6ICLrr7jtjIXtm4Qg7Yis7Ja07KeE7ZaJIn0sIHsidGltZSI6ICIwOTowMCIsICJkZXNjIjogIuyghO2GteyLnOyepSDtiKzslrQifSwgeyJ0aW1lIjogIjEwOjAwIiwgImRlc2MiOiAi67Cx7JaR6rOg7LCwICjsgqzssLAg6rSA6rSRKSJ9LCB7InRpbWUiOiAiMTA6NDAiLCAiZGVzYyI6ICLroZzsu6wg7Luk7ZS87YOA7J6EICjsu6TtlLwg7ZWc7J6UKSJ9LCB7InRpbWUiOiAiMTE6MzAiLCAiZGVzYyI6ICLsoJDsi6zsi53sgqwgKO2PrO2VqCAtIOuplOuJtCDshKDtg53qsIDriqUpIn0sIHsidGltZSI6ICIxMzowMCIsICJkZXNjIjogIuyynOusuOyCsCDsnoXsnqUgKOy8gOydtOu4lOy5tCDtg5HsirkpIn0sIHsidGltZSI6ICIxMzozMCIsICJkZXNjIjogIuyynOusuOyCsCDsoJXsg4EgKOycoOumrOyelOuPhC/qt4Dqs6HsnpTrj4Qv7LKc66y464+ZKSJ9LCB7InRpbWUiOiAiMTc6MDAiLCAiZGVzYyI6ICLsi5zrgrQg65Oc656NIO2bhCDtlbTsgrAifV0sICJpbmNsdWRlcyI6IFsi7LKc66y47IKwIOyeheyepeq2jCIsICLsspzrrLjsgrAg7LyA7J2067iU7Lm0IOyZleuztSIsICLsspzrrLjsgrAg7JeQ7Iqk7Lus66CI7J207YSwIOyZleuztSIsICLsnKDrpqwg7Iqk7Lm07J207JuM7YGsICjsnKDrpqzsnpTrj4QpIiwgIuyghO2GteyLnOyepSDtiKzslrQgKyDrsLHslpHtmLjssLAgKOq0gOq0kSkiLCAi7JuQ65GQ7Luk7ZS8IO2VnOyelCAo7Luk7ZS87YOA7J6EKSIsICLsoJDsi6wg7Iud7IKsIDHtmowiLCAi7ZWc6rWt7Ja0IOqwgOydtOuTnCDshJzruYTsiqQiLCAi7LCo65+JIOydtOuPmSAo7Iuc64K0IO2UveyXhSbshLzrlKkpIl0sICJleGNsdWRlcyI6IFsi7Jes7ZaJ7J6QIOuztO2XmCIsICLsoIDrhYEg7Iud7IKsIiwgIuqwnOyduCDqsr3ruYTCt+yHvO2VkSIsICLrrLTrponsm5Bvcuq4sO2DgOyngOyXrSDtlL3sl4Um7IS865SpIl0sICJvcHRpb25zIjogW3sibmFtZSI6ICI4MOu2hCDsoITsi6Ar67Cc66eI7IKs7KeAICjsi5zrgrQpIiwgInByaWNlIjogIjTrp4zsm5AifSwgeyJuYW1lIjogIuuhnO2IrOywqCDsoITsmqnssKjrn4kgKOustOumieybkCDtlL3sl4UpIiwgInByaWNlIjogIjLrp4zsm5Av7J24In1dLCAicmVmZXJlbmNlX3ByaWNlcyI6IFt7Iml0ZW0iOiAi7LKc66y47IKwIOyeheyepeq2jCIsICJwcmljZSI6ICI3MuychOyViCAo7JW9IDE3LDAwMOybkCkifSwgeyJpdGVtIjogIuy8gOydtOu4lOy5tCDsmZXrs7UgKyAxMuuLqCDsl5DsiqTsu6zroIjsnbTthLAg7JmV67O1IiwgInByaWNlIjogIjI2OOychOyViCAo7JW9IDYyLDAwMOybkCkifSwgeyJpdGVtIjogIuycoOumrOyelOuPhCIsICJwcmljZSI6ICI17JyE7JWIICjslb0gMSwyMDDsm5ApIn1dLCAibm90ZXMiOiBbIuyXrOq2jCDsp4DssLgg7ZWE7IiYICjspJHsmpQpIiwgIuuCoOyUqOyXkCDrlLDrnbwg7IaM7Y+tIOuzgOuPmSDqsIDriqUiLCAi7LWc7IaMIDfsnbwg7KCEIOyYiOyVvSDqtozsnqUiLCAi67O4IOyDge2SiOydgCDsobDsnbgg6rCA64qlIOyDge2SiOyeheuLiOuLpCJdLCAiaW1hZ2VzIjogW119LCB7ImlkIjogImNhbnlvbiIsICJuYW1lIjogIuyepeqwgOqzhCDstZzqs6Ag7Iqk66a077yB64yA7ZiR6rOhICsg7Zmp66Oh64+ZIiwgInN1YnRpdGxlIjogIu2ZqeujoeuPmSArIOuMgO2YkeqzoSDrjbDsnbTtiKzslrQiLCAiaWNvbiI6ICLwn4yJIiwgInRhZyI6ICLsiqTrprQg66eM7KCQIiwgImRlc2MiOiAi7Jyg66as64uk66as7JmAIOyynOygnOulvCDqsbjsnLzrqbAg64qQ64G864qUIOynnOumv+2VnCDsiqTrprTqs7wg6raB6raQIOqwmeydgCDtmanro6Hrj5nsnZgg7Iug67mE66Gc7Jq0IOyEuOqzhOulvCDtlZjro6jsl5Ag66qo65GQIOqyve2XmO2VmOuKlCDstZzqs6DsnZgg7Iqk66a0IOy9lOyKpO+8gSIsICJwcmljZXMiOiB7IuyEseyduCAo66eMIDE07IS4fjY07IS4KSI6IDI1MDAwMCwgIuyWtOumsOydtCAo66eMIDEz7IS4IOydtO2VmCkiOiAyMzAwMDAsICLqsr3roZwgKOunjCA2NeyEuCDsnbTsg4EpIjogMjMwMDAwfSwgIm1pbl9wYXgiOiAi7LWc7IaMIDLsnbgg7Lac67CcICjslrTrprDsnbQg7KCc7Jm4KSIsICJzY2hlZHVsZSI6IFt7InRpbWUiOiAiMDk6MDAiLCAiZGVzYyI6ICLtmLjthZQg7ZS97JeFIO2bhCDtiKzslrTsp4TtlokifSwgeyJ0aW1lIjogIjA5OjMwIiwgImRlc2MiOiAi7Zmp66Oh64+ZIOq0gOuejCAo7Z6Y65Oc7Iuc66m0IOycoOuejOyEoCDsmZXrs7Ug7ISg7YOdIOqwgOuKpSkifSwgeyJ0aW1lIjogIjExOjAwIiwgImRlc2MiOiAi7KCQ7Ius7Iud7IKsICjtj6ztlaggLSDrqZTribQg7ISg7YOd6rCA64qlKSJ9LCB7InRpbWUiOiAiMTI6MDAiLCAiZGVzYyI6ICLrjIDtmJHqs6HsnLzroZwg7KeE7ZaJIn0sIHsidGltZSI6ICIxMjozMCIsICJkZXNjIjogIuygkOyLrOyLneyCrCAo7Y+s7ZWoIC0g66mU64m0IOyEoO2DneqwgOuKpSkifSwgeyJ0aW1lIjogIjEzOjAwIiwgImRlc2MiOiAi7J6l6rCA6rOEIOuMgO2YkeqzoSJ9LCB7InRpbWUiOiAiMTM6MzAiLCAiZGVzYyI6ICLsnKDrpqzri6TrpqwgKOyZleuztSkv7Jyg66as7JeY67KgL+ycoOumrOyelOuPhC/tmJHqs6Eg7Yq466CI7YK5In0sIHsidGltZSI6ICIxNzowMCIsICJkZXNjIjogIuustOumieybkCDtmLnsnYAg7Iuc64K0IOuTnOuejSDtm4Qg7ZW07IKwIn1dLCAiaW5jbHVkZXMiOiBbIu2ZqeujoeuPmSDsnoXsnqXqtowgKOycoOuejOyEoCDsmZXrs7Ug7Ji17IWYIO2PrO2VqCkiLCAi7J6l6rCA6rOEIOuMgO2YkeqzoSDsnoXsnqXqtowiLCAi7Jyg66as64uk66asIOyZleuztSArIOuqqOuToOyXmOuyoCDsmZXrs7UgKyDsnKDrpqzsnpTrj4Qg7JmV67O1IiwgIu2YkeqzoSDtirjroIjtgrkiLCAi7KCQ7IusIOyLneyCrCAx7ZqMIiwgIu2VnOq1reyWtCDqsIDsnbTrk5wg7ISc67mE7IqkIiwgIuywqOufiSDsnbTrj5kgKOyLnOuCtC/rrLTrponsm5Ag7ZS97JeFLCDsi5zrgrQv66y066aJ7JuQIOyEvOuUqSkiXSwgImV4Y2x1ZGVzIjogWyLsl6ztlonsnpAg67O07ZeYIiwgIuyggOuFgSDsi53sgqwiLCAi6rCc7J24IOqyveu5hMK37Ie87ZWRIl0sICJvcHRpb25zIjogW3sibmFtZSI6ICLsnqXqsbDrpqwg7LCo65+JIOydtOuPmSAo7Iuc64K0IO2UveyXhSbshLzrlKkpIiwgInByaWNlIjogIjLrp4zsm5Av7J24In1dLCAicmVmZXJlbmNlX3ByaWNlcyI6IFt7Iml0ZW0iOiAi7Zmp66Oh64+ZIOyeheyepeq2jCIsICJwcmljZSI6ICIxMjHsnITslYggKOyVvSAyOCwwMDDsm5ApIn0sIHsiaXRlbSI6ICLrjIDtmJHqs6Eg7J6F7J6l6raMICsg7Jyg66as64uk66asIiwgInByaWNlIjogIjIxNuychOyViCAo7JW9IDQ5LDAwMOybkCkifSwgeyJpdGVtIjogIuy0iOyepSDrr7jrgYTrn7zti4Ar7Jyg66as7JeY67KgK1ZS7JiB7ZmUIiwgInByaWNlIjogIjEyMOychOyViCAo7JW9IDI3LDAwMOybkCkifV0sICJub3RlcyI6IFsi7Jes6raMIOyngOywuCDtlYTsiJggKOykkeyalCkiLCAi64Kg7JSo7JeQIOuUsOudvCDshoztj60g67OA64+ZIOqwgOuKpSAo67mEIOyYpOuKlCDrgqAg7Jyg66as64uk66asIOyjvOydmCkiLCAi7LWc7IaMIDfsnbwg7KCEIOyYiOyVvSDqtozsnqUiLCAi67O4IOyDge2SiOydgCDsobDsnbgg6rCA64qlIOyDge2SiOyeheuLiOuLpCIsICLrjIDtmJHqs6HihpTsi5zrgrQg7JmV67O1IOqxsOumrCAxMzBLTSDigJQg7YOd7IucIOydtOyaqSDsi5wg67mE7Jqp7J20IOuGkuyKteuLiOuLpCJdLCAiaW1hZ2VzIjogW119XX0=");
+
+// ── STATE ──
+var S = {
+  pkgIdx:0, pax:0,
+  hotel:'orange', transport_fuyong:'car', replace:'keep', transport_phoenix:'car',
+  show:'magic', massage:'basic', star_guide:false,
+  huangshi:false, qixing:false, heli:'none',
+  bungee:false, ferrata:false, tujia:false, city:false,
+  avoids:[], prefs:[], diet_note:'',
+  arr_time:'23:00', dep_time:'23:00', arr_flt:'', dep_flt:'',
+  dep_date:'', ret_date:'', dep_apt:'', arr_apt:'DYG', ret_dep_apt:'DYG', ret_apt:'',
+  flight_extra:0
+};
+
+var DS = {tourIdx:-1, pax:{}, options:[], total:0};
+
+var curMode = 'pkg';
+var curPkgStep = 0;
+var curDayStep = 0;
+
+// ── MODE ──
+function setMode(m) {
+  curMode = m;
+  document.getElementById('btn-pkg').classList.toggle('on', m==='pkg');
+  document.getElementById('btn-day').classList.toggle('on', m==='day');
+  document.getElementById('pkg-steps').style.display = m==='pkg'?'flex':'none';
+  document.getElementById('day-steps').style.display = m==='day'?'flex':'none';
+  document.getElementById('pkg-wrap').style.display = m==='pkg'?'block':'none';
+  document.getElementById('day-wrap').style.display = m==='day'?'block':'none';
+  if(m==='day') renderDayCards();
+  window.scrollTo(0,0);
+}
+
+// ── PKG STEPS ──
+function goPkg(n) {
+  document.querySelectorAll('#pkg-wrap .page').forEach(function(p,i){p.classList.toggle('on',i===n)});
+  document.querySelectorAll('#pkg-steps .step-btn').forEach(function(b,i){b.classList.toggle('active',i===n);b.classList.toggle('done',i<n)});
+  curPkgStep = n;
+  if(n===1) renderItinerary();
+  if(n===2) renderOpts();
+  if(n===4) buildPkgSummary();
+  window.scrollTo(0,0);
+}
+
+// ── DAY STEPS ──
+function goDay(n) {
+  document.querySelectorAll('#day-wrap .page').forEach(function(p,i){p.classList.toggle('on',i===n)});
+  document.querySelectorAll('#day-steps .step-btn').forEach(function(b,i){b.classList.toggle('active',i===n);b.classList.toggle('done',i<n)});
+  curDayStep = n;
+  if(n===1) renderDayPax();
+  if(n===2) buildDaySummary();
+  window.scrollTo(0,0);
+}
+
+// ── PKG TABS ──
+function renderPkgTabs() {
+  var html = '';
+  DB.packages.forEach(function(pkg,i){
+    var prices = Object.values(pkg.prices);
+    var mn = Math.min.apply(null,prices), mx = Math.max.apply(null,prices);
+    html += '<div class="pkg-tab'+(i===0?' on':'')+'" onclick="selPkg('+i+')">';
+    if(pkg.tag) html += '<div class="pkg-tag">'+pkg.tag+'</div>';
+    html += '<div class="pkg-name">'+pkg.name+'</div>';
+    html += '<div class="pkg-price">'+mn+'~'+mx+'만원/인</div>';
+    html += '</div>';
+  });
+  document.getElementById('pkg-tabs').innerHTML = html;
+}
+
+function selPkg(i) {
+  S.pkgIdx = i;
+  document.querySelectorAll('.pkg-tab').forEach(function(t,j){t.classList.toggle('on',j===i)});
+  updatePkgPrice();
+}
+
+// ── PAX ──
+function renderPaxBtns() {
+  var html = '';
+  for(var n=2;n<=8;n++) html += '<button class="pax-btn" onclick="selPax('+n+')">'+n+'인</button>';
+  html += '<button class="pax-btn gray">9인↑</button>';
+  document.getElementById('pax-row').innerHTML = html;
+}
+
+function selPax(n) {
+  S.pax = n;
+  document.querySelectorAll('.pax-btn').forEach(function(b){b.classList.toggle('on',parseInt(b.textContent)===n)});
+  updatePkgPrice();
+  document.getElementById('price-area').style.display = 'block';
+}
+
+function updatePkgPrice() {
+  if(!S.pax) return;
+  var pkg = DB.packages[S.pkgIdx];
+  var pp = pkg.prices[String(S.pax)] || 0;
+  var total = pp * S.pax + S.flight_extra;
+  var base = pp * S.pax;
+  var deposit = 20 * S.pax;
+  document.getElementById('pb-val').textContent = pp + '만원 / 인';
+  document.getElementById('pb-total').textContent = S.pax + '인 합계 ' + base + '만원' + (S.flight_extra > 0 ? ' + 초과요금 ' + S.flight_extra + '만원 = ' + total + '만원' : '');
+  document.getElementById('pb-deposit').textContent = '예약금 ' + deposit + '만원 → 잔금 ' + (total - deposit) + '만원 현지 현금';
+  // 포함사항
+  document.getElementById('inc-list').innerHTML = pkg.includes.map(function(x){return '<div>· '+x+'</div>'}).join('');
+  document.getElementById('exc-list').innerHTML = pkg.excludes.map(function(x){return '<div>· '+x+'</div>'}).join('');
+}
+
+// ── FLIGHT ──
+function tToMin(t) { var p=t.split(':'); return parseInt(p[0])*60+parseInt(p[1]); }
+function minToT(m) { var h=Math.floor(m/60),n=m%60; return (h<10?'0':'')+h+':'+(n<10?'0':'')+n; }
+
+function calcFlight() {
+  S.arr_time = document.getElementById('f-arr-time').value || '23:00';
+  S.dep_time = document.getElementById('f-dep-time').value || '23:00';
+  S.dep_date = document.getElementById('f-dep-date').value;
+  S.ret_date = document.getElementById('f-ret-date').value;
+  S.arr_flt = document.getElementById('f-arr-flt').value;
+  S.dep_flt = document.getElementById('f-dep-flt').value;
+
+  var arrMin = tToMin(S.arr_time);
+  var depMin = tToMin(S.dep_time);
+  var resultEl = document.getElementById('flight-result');
+  var html = '';
+  S.flight_extra = 0;
+
+  // 날짜 차이
+  if(S.dep_date && S.ret_date) {
+    var d1 = new Date(S.dep_date), d2 = new Date(S.ret_date);
+    var diff = Math.round((d2-d1)/(1000*60*60*24));
+    var expected = DB.packages[S.pkgIdx].nights;
+    if(diff > expected && S.pkgIdx < 2) {
+      html += '<div style="font-weight:700;margin-bottom:6px">⚡ 날짜 기준으로 <strong>'+DB.packages[S.pkgIdx+1].name+'</strong>로 자동 변경됩니다.</div>';
+      selPkg(S.pkgIdx+1);
+    }
+  }
+
+  // 초과 요금
+  var freeUntil = arrMin + 180;
+  if(depMin > freeUntil) {
+    var overH = Math.ceil((depMin - freeUntil) / 60);
+    S.flight_extra = overH * 1.5;
+    html += '<div>⏱️ 기준시간: <strong>'+minToT(freeUntil)+'</strong> · 초과: <strong>'+overH+'시간</strong> · 초과요금: <strong style="color:#e65100">+'+S.flight_extra+'만원</strong></div>';
+  } else {
+    html += '<div style="color:#2e7d32">✅ 초과요금 없음</div>';
+  }
+
+  // 도착 당일
+  if(arrMin < 780) html += '<div>🏔️ 도착 당일 오후: <strong>천문산</strong> 반나절 일정 포함</div>';
+  else html += '<div>🏨 도착 당일 체크인 후 휴식 · 다음날부터 정식 일정</div>';
+
+  // 출발 당일
+  if(depMin < 480) html += '<div>✈️ 출발 당일: 바로 공항으로 이동</div>';
+  else if(depMin < 720) html += '<div>✈️ 출발 당일: 오전 가이드 미팅 후 공항 이동 (점심 미포함)</div>';
+  else if(depMin < 1080) html += '<div>✈️ 출발 당일: 오전 일정 + 점심 후 공항 이동</div>';
+  else html += '<div>✈️ 출발 당일: 전일 일정 후 심야 출발 (표준)</div>';
+
+  if(S.flight_extra > 0) html += '<div style="font-size:10px;opacity:.7;margin-top:4px">※ 추가 식사 발생 시 고객 직접 결제 (로투차 대납 가능, 한화/외화 현금)</div>';
+
+  resultEl.className = 'flight-result ' + (S.flight_extra > 0 ? 'fr-warn' : 'fr-ok');
+  resultEl.innerHTML = html;
+  resultEl.style.display = 'block';
+  updatePkgPrice();
+}
+
+// ── ITINERARY ──
+function renderItinerary() {
+  var pkg = DB.packages[S.pkgIdx];
+  var html = '';
+  pkg.itinerary.forEach(function(day) {
+    html += '<div class="day-block"><div class="day-hdr"><div class="day-badge">DAY '+day.day+'</div><div style="font-size:13px;font-weight:700;flex:1">'+day.title+'</div></div><div class="day-body">';
+    day.spots.forEach(function(sid) {
+      var sp = DB.spots[sid];
+      if(!sp) return;
+      html += '<div class="spot" id="sp-'+sid+'" data-sid="'+sid+'" onclick="toggleSpot(this.dataset.sid)">';
+      html += '<div class="spot-top"><div class="spot-time">'+sp.time+'</div><div class="spot-icon">'+sp.icon+'</div><div class="spot-info"><div class="spot-name">'+sp.name+'</div>'+(sp.duration?'<div class="spot-dur">'+sp.duration+'</div>':'')+'</div><div class="spot-arr">▼</div></div>';
+      html += '<div class="spot-detail">';
+      if(sp.desc) html += '<div class="spot-desc">'+sp.desc+'</div>';
+      if(sp.tip) html += '<div class="spot-tip">💡 '+sp.tip+'</div>';
+      if(sp.gaode) html += '<a class="spot-map" href="'+sp.gaode+'" target="_blank" onclick="event.stopPropagation()">📍 고덕지도로 보기</a>';
+      if(sp.images && sp.images.length) {
+        html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">';
+        sp.images.forEach(function(img){html+='<img src="'+img+'" style="width:88px;height:68px;object-fit:cover;border-radius:8px;cursor:pointer" data-src="'+img+'" onclick="openModal(this.dataset.src);event.stopPropagation()">';})
+        html += '</div>';
+      }
+      html += '</div></div>';
+    });
+    html += '</div></div>';
+  });
+  document.getElementById('itin-area').innerHTML = html;
+}
+
+function toggleSpot(sid) { document.getElementById('sp-'+sid).classList.toggle('open'); }
+
+// ── OPTIONS ──
+function renderOpts() {
+  var opts = DB.options;
+  var pkg = DB.packages[S.pkgIdx];
+  var hasFuyong = S.pkgIdx >= 1;
+  var hasMassage = S.pkgIdx >= 1;
+  var html = '';
+
+  // 호텔
+  html += '<div class="card"><div class="card-title">🏨 호텔 선택</div>';
+  opts.hotel.items.forEach(function(item){
+    var on = S.hotel === item.id;
+    var pc = item.inquiry?'p-inquiry':item.price===0?'p-free':'p-paid';
+    html += '<div class="opt'+(on?' on':'')+'" onclick="hOpt(this)" data-key="hotel" data-val="'+item.id+'">';
+    html += '<div class="opt-radio"></div><div class="opt-name">'+item.name+'</div>';
+    html += '<div class="opt-desc">'+item.desc+'</div>';
+    html += '<div class="opt-price '+pc+'">'+item.price_label+'</div></div>';
+  });
+  html += '</div>';
+
+  // 부용진/봉황 (4박5일 이상)
+  if(hasFuyong) {
+    html += '<div class="card"><div class="card-title">🚌 부용진 이동 수단 <span class="badge badge-gold">고속철 +4만원/인</span></div>';
+    opts.transport_fuyong.items.forEach(function(item){
+      var on = S.transport_fuyong===item.id;
+      html += '<div class="opt'+(on?' on':'')+'" onclick="hOpt(this)" data-key="transport_fuyong" data-val="'+item.id+'">';
+      html += '<div class="opt-radio"></div><div class="opt-name">'+item.name+'</div>';
+      html += '<div class="opt-desc">'+item.desc+'</div>';
+      html += '<div class="opt-price '+(item.price===0?'p-free':'p-paid')+'">'+item.price_label+'</div></div>';
+    });
+    // 봉황
+    html += '<div style="margin-top:12px;padding-top:12px;border-top:1px dashed #eee"><div style="font-size:12px;font-weight:900;color:#1a2a5e;margin-bottom:8px">🏯 부용진 → 봉황고성 변경</div>';
+    opts.replace.items.forEach(function(item){
+      var on = S.replace===item.id;
+      var pl = item.price_label;
+      if(item.id==='phoenix'&&S.pax){var b=opts.replace.phoenix_prices[S.pax]||8;pl='+'+b+'만원/인 (차량+숙박 포함)';}
+      html += '<div class="opt'+(on?' on':'')+'" id="rep-'+item.id+'" onclick="hReplace(this)" data-val="'+item.id+'">';
+      html += '<div class="opt-radio"></div><div class="opt-name">'+item.name+'</div>';
+      if(item.desc) html += '<div class="opt-desc">'+item.desc+'</div>';
+      html += '<div class="opt-price '+(item.id==='keep'?'p-free':'p-paid')+'">'+pl+'</div></div>';
+    });
+    html += '<div class="sub-sec'+(S.replace==='phoenix'?' on':'')+'" id="phoenix-sub">';
+    html += '<div style="font-size:11px;font-weight:900;color:#555;margin-bottom:6px">봉황고성 이동 수단</div>';
+    opts.transport_phoenix.items.forEach(function(item){
+      var on = S.transport_phoenix===item.id;
+      html += '<div class="opt'+(on?' on':'')+'" onclick="hOpt(this)" data-key="transport_phoenix" data-val="'+item.id+'">';
+      html += '<div class="opt-radio"></div><div class="opt-name">'+item.name+'</div>';
+      html += '<div class="opt-desc">'+item.desc+'</div>';
+      html += '<div class="opt-price '+(item.price===0?'p-free':'p-paid')+'">'+item.price_label+'</div></div>';
+    });
+    html += '</div></div></div>';
+  }
+
+  // 공연
+  html += '<div class="card"><div class="card-title">🎭 공연 선택</div>';
+  opts.show.items.forEach(function(item){
+    var on = S.show===item.id;
+    var pc = item.price>0?'p-paid':item.price<0?'p-refund':'p-free';
+    var cancel = item.id==='none';
+    html += '<div class="opt'+(on?(cancel?' cancel-on':' on'):'')+'" onclick="hOpt(this)" data-key="show" data-val="'+item.id+'">';
+    html += '<div class="opt-radio"></div><div class="opt-name">'+item.name+'</div>';
+    html += '<div class="opt-desc">'+item.desc+'</div>';
+    html += '<div class="opt-price '+pc+'">'+item.price_label+'</div></div>';
+  });
+  html += '</div>';
+
+  // 마사지
+  if(hasMassage) {
+    html += '<div class="card"><div class="card-title">💆 마사지 선택 <span class="badge badge-gold">업그레이드 +2만원/인</span></div>';
+    opts.massage.items.forEach(function(item){
+      var on = S.massage===item.id;
+      html += '<div class="opt'+(on?' on':'')+'" onclick="hOpt(this)" data-key="massage" data-val="'+item.id+'">';
+      html += '<div class="opt-radio"></div><div class="opt-name">'+item.name+'</div>';
+      html += '<div class="opt-desc">'+item.desc+'</div>';
+      html += '<div class="opt-price '+(item.price===0?'p-free':'p-paid')+'">'+item.price_label+'</div></div>';
+    });
+    html += '</div>';
+  }
+
+  // 헬기
+  html += '<div class="card"><div class="card-title">🚁 헬기 투어 <span class="badge badge-gold">별도 추가비용</span></div>';
+  html += '<div style="font-size:11px;color:#888;margin-bottom:10px;line-height:1.6">일반 항선은 인당 요금 · 헬기 전세(단독 탑승)는 대당 요금(최대 3인)</div>';
+  html += '<div class="heli-grid">';
+  opts.helicopter.items.forEach(function(item){
+    var on = S.heli===item.id;
+    var cls = 'heli-opt'+(on?' on':'')+(item.id==='none'?' full':'');
+    html += '<div class="'+cls+'" onclick="hHeli(this)" data-val="'+item.id+'">';
+    if(item.duration) html += '<div class="heli-dur">'+item.duration+'</div>';
+    html += '<div class="heli-price">'+(item.price===0?'이용 안함':item.price+'만원')+'</div>';
+    if(item.unit) html += '<div class="heli-unit">'+item.unit+'</div>';
+    if(item.charter) html += '<div class="heli-note">4인 이상 시 2대 필요</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  if(S.heli!=='none'){var hi=opts.helicopter.items.find(function(i){return i.id===S.heli});if(hi&&hi.charter&&S.pax>3)html+='<div class="warn-box" style="margin-top:8px">⚠️ 4인 이상으로 2대 필요 · 금액 × 2대로 계산됩니다</div>';}
+  html += '</div>';
+
+  // 추가 옵션
+  html += '<div class="card"><div class="card-title">➕ 추가 옵션</div>';
+  opts.extras.forEach(function(item){
+    var on = S[item.id];
+    var pl = item.type==='per_person'?'+'+item.price+'만원/인':item.type==='per_day'?'+'+item.price_per_day+'만원/일(현장팁)':item.type==='onsite'?'현장결제(시가)':'무료';
+    var pc = item.type==='free'?'p-free':item.type==='onsite'?'p-inquiry':'p-paid';
+    html += '<div class="chk'+(on?' on':'')+'" onclick="hToggleExtra(this)" data-id="'+item.id+'">';
+    html += '<div class="chk-row"><div class="chk-icon">'+(on?'✓':'')+'</div><div><div class="chk-name">'+item.name+'</div><div class="chk-desc">'+item.desc+'</div><div class="chk-price '+pc+'">'+pl+'</div></div></div></div>';
+  });
+  html += '</div>';
+
+  document.getElementById('opts-area').innerHTML = html;
+  if(S.replace==='phoenix'){var el=document.getElementById('phoenix-sub');if(el)el.classList.add('on');}
+}
+
+
+
+function hReplace(el){selReplace(el.getAttribute('data-val'));}
+function hHeli(el){selHeli(el.getAttribute('data-val'));}
+function hPax(el){var l=el.getAttribute('data-lbl'),d=parseInt(el.getAttribute('data-delta'));adjPax(l,d);}
+function hDayOpt(el){adjDayOpt(parseInt(el.getAttribute('data-idx')));}
+
+function hToggleExtra(el){toggleExtra(el.getAttribute('data-id'));}
+function hSelDayTour(el){selDayTour(parseInt(el.getAttribute('data-idx')));}
+
+// ══════════════════════════════════════════
+// 1일 투어 STATE
+// ══════════════════════════════════════════
+var DS = {
+  entries: [],   // [{date, tourIdx}]
+  total: 0
+};
+
+// ── 날짜별 투어 선택 UI ──
+function addDayEntry() {
+  DS.entries.push({date:'', tourIdx:-1});
+  renderDayDateList();
+}
+
+function removeDayEntry(idx) {
+  DS.entries.splice(idx, 1);
+  renderDayDateList();
+}
+
+function renderDayDateList() {
+  var html = '';
+  DS.entries.forEach(function(entry, i) {
+    var tourOpts = '<option value="-1">투어를 선택하세요</option>';
+    DB.day_tours.forEach(function(tour, ti) {
+      tourOpts += '<option value="'+ti+'"'+(entry.tourIdx===ti?' selected':'')+'>'+tour.icon+' '+tour.name+'</option>';
+    });
+    html += '<div style="border:1.5px solid #e8edf3;border-radius:10px;padding:12px 14px;margin-bottom:8px">';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">';
+    html += '<input type="date" value="'+entry.date+'" onchange="DS.entries['+i+'].date=this.value;renderDayDateList()" style="flex:1;border:1.5px solid #e0e0e0;border-radius:8px;padding:7px 10px;font-family:inherit;font-size:13px;outline:none">';
+    html += '<button onclick="removeDayEntry('+i+')" style="border:none;background:#ffebee;color:#e53935;border-radius:6px;padding:6px 10px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer">삭제</button>';
+    html += '</div>';
+    html += '<select onchange="DS.entries['+i+'].tourIdx=parseInt(this.value);renderDayDateList()" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:13px;outline:none;background:#fff">';
+    html += tourOpts;
+    html += '</select>';
+    // 선택된 투어 간략 정보
+    if(entry.tourIdx >= 0) {
+      var tour = DB.day_tours[entry.tourIdx];
+      var minPrice = Math.min.apply(null, Object.values(tour.prices));
+      html += '<div style="margin-top:8px;font-size:11px;color:#888;background:#f8f9fc;border-radius:6px;padding:6px 10px">';
+      html += tour.icon+' '+tour.subtitle+' · 최저 '+(minPrice/10000)+'만원~/인';
+      html += '</div>';
+    }
+    html += '</div>';
+  });
+  if(DS.entries.length === 0) {
+    html = '<div style="text-align:center;padding:20px;font-size:12px;color:#bbb">아래 버튼을 눌러 날짜를 추가하세요</div>';
+  }
+  var el = document.getElementById('day-date-list');
+  if(el) el.innerHTML = html;
+}
+
+// ── 견적 ──
+function buildDaySummary() {
+  var hotel = document.getElementById('d-hotel-area') ? document.getElementById('d-hotel-area').value : '';
+  var hname = document.getElementById('d-hotel-name') ? document.getElementById('d-hotel-name').value : '';
+
+  var rows = '';
+  if(hotel) rows += '<div class="sum-row"><span class="sum-lbl">숙박 지역</span><span class="sum-val">'+hotel+'</span></div>';
+  if(hname) rows += '<div class="sum-row"><span class="sum-lbl">호텔명</span><span class="sum-val">'+hname+'</span></div>';
+  document.getElementById('day-sum-body').innerHTML = rows;
+
+  var bdHtml = '';
+  var grand = 0;
+  var depositTotal = 0;
+  var validEntries = DS.entries.filter(function(e){ return e.tourIdx >= 0 && e.date; });
+
+  if(validEntries.length === 0) {
+    bdHtml = '<div style="opacity:.5;font-size:12px">날짜와 투어를 선택해 주세요</div>';
+  } else {
+    validEntries.forEach(function(entry) {
+      var tour = DB.day_tours[entry.tourIdx];
+      var minPrice = Math.min.apply(null, Object.values(tour.prices));
+      bdHtml += '<div class="bd-row"><span>'+entry.date+' '+tour.icon+' '+tour.name+'</span><span style="font-weight:700;color:#ffd54f">'+(minPrice/10000)+'만원~/인</span></div>';
+      depositTotal += 20; // 20만원/팀
+    });
+    bdHtml += '<div style="height:1px;background:rgba(255,255,255,.15);margin:8px 0"></div>';
+    bdHtml += '<div class="bd-row"><span style="color:#f5a623;font-weight:700">예약금 합계</span><span style="font-weight:900;color:#f5a623">'+depositTotal+'만원 (20만원×'+validEntries.length+'투어)</span></div>';
+    bdHtml += '<div style="font-size:10px;opacity:.6;margin-top:4px">※ 옵션은 현장 현금 결제 · 실제 투어비는 연령대별 상이</div>';
+  }
+
+  document.getElementById('day-bd-rows').innerHTML = bdHtml;
+  document.getElementById('day-total').textContent = validEntries.length > 0 ? '예약금 '+depositTotal+'만원 / 팀' : '—';
+  DS.total = depositTotal;
+}
+
+// ── 카카오톡 제출 ──
+function submitDay() {
+  var hotel = document.getElementById('d-hotel-area').value||'미입력';
+  var hname = document.getElementById('d-hotel-name').value||'미입력';
+  var hnote = document.getElementById('d-hotel-note').value;
+  var validEntries = DS.entries.filter(function(e){ return e.tourIdx >= 0 && e.date; });
+
+  var lines = [
+    '안녕하세요! 로투차 1일 투어 예약 문의드립니다 😊','',
+    '━━━━━━━━━━━━━━━━━━',
+    '🏨 픽업 호텔','  지역: '+hotel,'  호텔명: '+hname,
+    (hnote?'  기타: '+hnote:''),
+    '━━━━━━━━━━━━━━━━━━',
+    '☀️ 신청 투어:'
+  ];
+  validEntries.forEach(function(entry){
+    var tour = DB.day_tours[entry.tourIdx];
+    lines.push('  · '+entry.date+' '+tour.icon+' '+tour.name);
+  });
+  lines.push('━━━━━━━━━━━━━━━━━━');
+  lines.push('💰 예약금: '+DS.total+'만원 / 팀 (투어당 20만원)');
+  lines.push('※ 옵션은 현장에서 현금으로 결제합니다');
+  lines.push('━━━━━━━━━━━━━━━━━━');
+  lines.push('확인 후 연락 주세요!');
+
+  var msg = lines.filter(function(l){return l!==undefined;}).join('\n');
+  navigator.clipboard.writeText(msg).then(function(){
+    showToast('✅ 내용이 복사되었습니다!\n카카오톡이 열리면 붙여넣기 해주세요 😊');
+    setTimeout(function(){window.open(DB.brand.kakao,'_blank');},1500);
+  }).catch(function(){window.open(DB.brand.kakao,'_blank');});
+}
+
+// ── 모드 전환 시 초기화 ──
+function hOpt(el){var k=el.dataset.key,v=el.dataset.val;if(k&&v)selOpt(k,v);}
+function selOpt(key,val) {
+  S[key]=val;
+  renderOpts();
+}
+
+function selReplace(val) {
+  S.replace=val;
+  renderOpts();
+}
+
+function selHeli(val) {
+  S.heli=val;
+  renderOpts();
+}
+
+function toggleExtra(key) {
+  S[key]=!S[key];
+  renderOpts();
+}
+
+// ── NOTICES ──
+function renderNotices() {
+  var html = '<div class="notice-title">📋 유의사항</div>';
+  DB.notices.forEach(function(n){
+    html += '<div class="notice-item">'+n.text;
+    if(n.link) html += '<br><a class="ins-link" href="'+n.link+'" target="_blank">'+n.link_text+'</a>';
+    html += '</div>';
+  });
+  html += '<div class="schedule-note">※ 일정은 현지 날씨·상황·컨디션에 따라 더 좋은 방향으로 유연하게 운영될 수 있습니다.</div>';
+  document.getElementById('notice-area').innerHTML = html;
+
+  var html2 = '<div class="cancel-title">⚠️ 취소 및 변경 규정</div>';
+  DB.cancel_policy.forEach(function(row){
+    html2 += '<div class="cancel-row"><div class="cancel-when">'+row.when+'</div><div>'+row.rule+'</div></div>';
+  });
+  html2 += '<div style="font-size:11px;color:#999;margin-top:8px">※ 특색 경관 제외 시 환불 없음 · 부분 취소 환불 불가</div>';
+  document.getElementById('cancel-area').innerHTML = html2;
+}
+
+// ── CHIPS ──
+function toggleChip(btn) { btn.classList.toggle('on'); }
+
+// ── PKG SUMMARY ──
+function calcBreakdown() {
+  var opts = DB.options;
+  var p = S.pax;
+  var pkg = S.pkgIdx;
+  var items = [];
+  var pp = DB.packages[pkg].prices[String(p)]||0;
+  items.push({name:'기본 투어비 ('+DB.packages[pkg].name+')', unit:pp, pax:p, total:pp*p, isBase:true});
+  if(S.flight_extra>0) items.push({name:'항공 초과요금', unit:S.flight_extra, pax:1, total:S.flight_extra, unitLabel:'만원 (고정)'});
+  if(S.replace!=='phoenix'&&S.transport_fuyong==='train'){var tp=opts.transport_fuyong.items.find(function(i){return i.id==='train'});items.push({name:'고속철 부용진',unit:tp.price,pax:p,total:tp.price*p});}
+  if(S.replace==='phoenix'){var b=opts.replace.phoenix_prices[p]||8;items.push({name:'봉황고성 대체(차량+숙박)',unit:b,pax:p,total:b*p});if(S.transport_phoenix==='train'){var tp2=opts.transport_phoenix.items.find(function(i){return i.id==='train'});items.push({name:'봉황 고속철',unit:tp2.price,pax:p,total:tp2.price*p});}}
+  var si=opts.show.items.find(function(i){return i.id===S.show});if(si&&si.price!==0)items.push({name:si.name,unit:si.price,pax:p,total:si.price*p});
+  if(S.massage==='premium'&&S.pkgIdx>=1){var mi=opts.massage.items.find(function(i){return i.id==='premium'});items.push({name:'마사지 업그레이드',unit:mi.price,pax:p,total:mi.price*p});}
+  if(S.star_guide){var days=DB.packages[pkg].days-1;var sgp=opts.extras.find(function(i){return i.id==='star_guide'}).price_per_day;items.push({name:'스타 가이드(현장팁)',unit:sgp,pax:days,total:sgp*days,unitLabel:'만원/일',note:'배정 불가 시 비용 없음'});}
+  if(S.huangshi){var hp=opts.extras.find(function(i){return i.id==='huangshi'}).price;items.push({name:'황석채',unit:hp,pax:p,total:hp*p});}
+  if(S.qixing){var qp=opts.extras.find(function(i){return i.id==='qixing'}).price;items.push({name:'칠성산',unit:qp,pax:p,total:qp*p});}
+  if(S.heli!=='none'){var hi=opts.helicopter.items.find(function(i){return i.id===S.heli});if(hi){if(hi.charter){var na=p>3?2:1;items.push({name:'헬기 전세(단독탑승) '+S.heli+'선',unit:hi.price,pax:na,total:hi.price*na,unitLabel:'만원/대'});}else{items.push({name:'헬기 '+S.heli+'선',unit:hi.price,pax:p,total:hi.price*p});}}}
+  if(S.bungee){var bp=opts.extras.find(function(i){return i.id==='bungee'}).price;items.push({name:'번지점프',unit:bp,pax:p,total:bp*p});}
+  if(S.ferrata){var fp=opts.extras.find(function(i){return i.id==='ferrata'}).price;items.push({name:'암벽 등반 체험',unit:fp,pax:p,total:fp*p});}
+  var grand=0;items.forEach(function(i){grand+=i.total;});
+  return {items:items,grand:grand};
+}
+
+function buildPkgSummary() {
+  S.diet_note = document.getElementById('diet-note').value;
+  var bd = calcBreakdown();
+  var opts = DB.options;
+  var p = S.pax;
+  var hotelItem = opts.hotel.items.find(function(i){return i.id===S.hotel;});
+  var showItem = opts.show.items.find(function(i){return i.id===S.show;});
+
+  var rows = [
+    ['패키지', DB.packages[S.pkgIdx].name],
+    ['인원', p+'인'],
+    ['호텔', hotelItem?hotelItem.name:'—'],
+    ['공연', showItem?showItem.name:'—'],
+  ];
+  if(S.pkgIdx>=1){var tTxt=S.replace==='phoenix'?'봉황고성 변경':'부용진';tTxt+=' / '+(S.replace==='phoenix'?(S.transport_phoenix==='train'?'고속철':'전용차량'):(S.transport_fuyong==='train'?'고속철':'전용차량'));rows.push(['교통', tTxt]);}
+  if(S.pkgIdx>=1)rows.push(['마사지', S.massage==='basic'?'발 마사지 80분 (기본)':'발+전신 아로마 100분 (+2만원/인)']);
+  rows.push(['스타 가이드', S.star_guide?'신청':'신청 안함']);
+  if(S.arr_flt) rows.push(['가는 편', S.arr_flt+' ('+S.arr_time+')']);
+  if(S.dep_flt) rows.push(['오는 편', S.dep_flt+' ('+S.dep_time+')']);
+  var avoids=[],prefs=[];
+  document.querySelectorAll('#avoid-chips .chip.on').forEach(function(b){avoids.push(b.textContent)});
+  document.querySelectorAll('#pref-chips .chip.on').forEach(function(b){prefs.push(b.textContent)});
+  if(avoids.length) rows.push(['못 먹는 음식', avoids.join(', ')]);
+  if(prefs.length) rows.push(['선호 음식', prefs.join(', ')]);
+  if(S.diet_note) rows.push(['식사 메모', S.diet_note]);
+
+  var infoHtml = rows.map(function(r){
+    var vc='';if(r[1].indexOf('+')>-1&&r[1].indexOf('만원')>-1)vc='plus';if(r[1].indexOf('환불')>-1)vc='minus';if(r[1].indexOf('문의')>-1)vc='inq';
+    return '<div class="sum-row"><span class="sum-lbl">'+r[0]+'</span><span class="sum-val '+vc+'">'+r[1]+'</span></div>';
+  }).join('');
+  document.getElementById('sum-body').innerHTML = infoHtml;
+
+  var bdHtml = bd.items.map(function(item){
+    var ul=item.unitLabel||'만원/인';
+    return '<div class="bd-row"><span>'+item.name+'<span style="opacity:.5;font-size:10px"> ('+item.unit+ul+' × '+item.pax+')</span></span><span style="font-weight:700;color:'+(item.total<0?'#ef9a9a':item.isBase?'#fff':'#ffd54f')+'">'+item.total+'만원</span></div>'+(item.note?'<div style="font-size:10px;opacity:.5">※ '+item.note+'</div>':'');
+  }).join('');
+  document.getElementById('bd-rows').innerHTML = bdHtml;
+
+  var hInq = S.hotel!=='orange';
+  document.getElementById('grand-total').textContent = bd.grand + '만원' + (hInq?' + 호텔 별도':'');
+
+  var notes=['※ 예약금 '+(20*p)+'만원 선입금 후 잔금 현지 현금'];
+  if(hInq) notes.push('※ 호텔 업그레이드 비용 별도 문의');
+  if(S.star_guide) notes.push('※ 스타 가이드 배정 불가 시 비용 없음');
+  if(S.bungee||S.ferrata) notes.push('※ 번지/암벽 등반은 출발 7일 전까지 신청 필수');
+  document.getElementById('sum-note').innerHTML = notes.join('<br>');
+}
+
+function submitPkg() {
+  var bd = calcBreakdown();
+  var opts = DB.options;
+  var p = S.pax;
+  var hotelItem = opts.hotel.items.find(function(i){return i.id===S.hotel;});
+  var showItem = opts.show.items.find(function(i){return i.id===S.show;});
+  var avoids=[],prefs=[];
+  document.querySelectorAll('#avoid-chips .chip.on').forEach(function(b){avoids.push(b.textContent)});
+  document.querySelectorAll('#pref-chips .chip.on').forEach(function(b){prefs.push(b.textContent)});
+
+  var lines = [
+    '안녕하세요! 로투차 패키지 예약 문의드립니다 😊','',
+    '━━━━━━━━━━━━━━━━━━',
+    '📦 패키지: '+DB.packages[S.pkgIdx].name,
+    '👥 인원: '+p+'인',
+    (S.dep_date?'📅 출발: '+S.dep_date:''),
+    (S.ret_date?'📅 귀국: '+S.ret_date:''),
+    (S.arr_flt?'✈️ 가는 편: '+S.arr_flt+' (도착 '+S.arr_time+')':''),
+    (S.dep_flt?'✈️ 오는 편: '+S.dep_flt+' (출발 '+S.dep_time+')':''),
+    '🏨 호텔: '+(hotelItem?hotelItem.name:'—'),
+    '🎭 공연: '+(showItem?showItem.name:'—'),
+    '⭐ 스타 가이드: '+(S.star_guide?'신청':'신청 안함'),
+    '━━━━━━━━━━━━━━━━━━',
+    '📅 일정:'
+  ];
+  DB.packages[S.pkgIdx].itinerary.forEach(function(day){
+    lines.push('');lines.push('【DAY '+day.day+'】 '+day.title);
+    day.spots.forEach(function(sid){var sp=DB.spots[sid];if(sp)lines.push('  '+sp.icon+' '+sp.time+' '+sp.name);});
+  });
+  lines.push('━━━━━━━━━━━━━━━━━━');
+  lines.push('💰 비용 상세:');
+  bd.items.forEach(function(i){lines.push('  · '+i.name+': '+i.total+'만원');});
+  lines.push('합계: '+bd.grand+'만원'+(S.hotel!=='orange'?' + 호텔 별도':''));
+  if(avoids.length) lines.push('🚫 못 먹는 음식: '+avoids.join(', '));
+  if(prefs.length) lines.push('😋 선호 음식: '+prefs.join(', '));
+  lines.push('━━━━━━━━━━━━━━━━━━');
+  lines.push('확인 후 연락 주세요!');
+
+  var msg = lines.filter(function(l){return l!==undefined&&l!==null;}).join('\n');
+  navigator.clipboard.writeText(msg).then(function(){
+    showToast('✅ 내용이 복사되었습니다!\n카카오톡이 열리면 붙여넣기 해주세요 😊');
+    setTimeout(function(){window.open(DB.brand.kakao,'_blank');},1500);
+  }).catch(function(){window.open(DB.brand.kakao,'_blank');});
+}
+
+// ── DAY TOURS ──
+function renderDayCards() {
+  var html = '';
+  DB.day_tours.forEach(function(tour,i){
+    var mn = Math.min.apply(null,Object.values(tour.prices));
+    var on = DS.tourIdx===i;
+    html += '<div class="dt-card'+(on?' on':'')+'" id="dtc-'+i+'" onclick="selDayTour('+i+')">';
+    html += '<div class="dt-header"><div class="dt-icon">'+tour.icon+'</div><div class="dt-info">';
+    html += '<div class="dt-tags"><span class="badge badge-gold">'+tour.tag+'</span><span class="badge badge-blue">🤝 조인 가능</span></div>';
+    html += '<div class="dt-name">'+tour.name+'</div><div class="dt-sub">'+tour.subtitle+'</div></div>';
+    html += '<div class="dt-min-price"><div class="dt-min-lbl">최저가</div><div class="dt-min-val">'+(mn/10000)+'만원~</div></div></div>';
+    html += '<div class="dt-desc">'+tour.desc+'</div>';
+    html += '<div class="dt-schedule"><div class="dt-sch-title">📅 일정</div>';
+    tour.schedule.forEach(function(s){html+='<div class="dt-sch-row"><div class="dt-sch-time">'+s.time+'</div><div>'+s.desc+'</div></div>';});
+    html += '</div>';
+    html += '<div class="inc-grid"><div class="inc-box inc-yes"><div class="inc-title">✅ 포함</div>'+tour.includes.map(function(x){return'<div>· '+x+'</div>';}).join('')+'</div><div class="inc-box inc-no"><div class="inc-title">⚠️ 불포함</div>'+tour.excludes.map(function(x){return'<div>· '+x+'</div>';}).join('')+'</div></div>';
+    html += '<div class="dt-price-box"><div class="dt-price-lbl">💰 투어 요금 (1인 기준)</div>';
+    Object.entries(tour.prices).forEach(function(e){html+='<div class="dt-price-row"><span class="dt-price-name">'+e[0]+'</span><span class="dt-price-val">'+(e[1]/10000)+'만원/인</span></div>';});
+    html += '<div class="dt-min-pax">'+tour.min_pax+'</div></div>';
+    html += '<button class="dt-select-btn '+(on?'selected':'default')+'" onclick="event.stopPropagation();selDayTour('+i+');goDay(1)">'+(on?'✅ 선택됨 → 인원 선택하기':''+tour.icon+' 이 투어 신청하기')+'</button>';
+    html += '</div>';
+  });
+  document.getElementById('day-cards').innerHTML = html;
+}
+
+function selDayTour(i) {
+  DS.tourIdx = i;
+  DS.pax = {};
+  DS.options = [];
+  renderDayCards();
+}
+
+function renderDayPax() {
+  if(DS.tourIdx < 0) return;
+  var tour = DB.day_tours[DS.tourIdx];
+  var html = '';
+  Object.entries(tour.prices).forEach(function(e,i){
+    var lbl=e[0],price=e[1],cnt=DS.pax[lbl]||0;
+    html += '<div class="pax-counter-row">';
+    html += '<div><div class="pax-age">'+lbl+'</div><div class="pax-price">'+(price/10000)+'만원/인</div></div>';
+    html += '<div class="counter"><button class="cnt-btn" onclick="hPax(this)\" data-lbl=\"'+lbl+'\" data-delta=\"-1">−</button><div class="cnt-num">'+cnt+'</div><button class="cnt-btn plus" onclick="hPax(this)\" data-lbl=\"'+lbl+'\" data-delta=\"1">+</button></div>';
+    html += '</div>';
+  });
+  document.getElementById('day-pax-area').innerHTML = html;
+
+  // 옵션
+  var opts = tour.options||[];
+  if(opts.length===0){document.getElementById('day-opts-card').style.display='none';return;}
+  document.getElementById('day-opts-card').style.display='block';
+  var oHtml = '';
+  opts.forEach(function(opt,i){
+    var on=DS.options.indexOf(i)>-1;
+    oHtml += '<div class="chk'+(on?' on':'')+'" onclick="adjDayOpt('+i+')">';
+    oHtml += '<div class="chk-row"><div class="chk-icon">'+(on?'✓':'')+'</div><div><div class="chk-name">'+opt.name+'</div><div class="chk-price">'+opt.price+'</div></div></div></div>';
+  });
+  document.getElementById('day-opts-area').innerHTML = oHtml;
+}
+
+function adjPax(lbl, delta) {
+  DS.pax[lbl] = Math.max(0,(DS.pax[lbl]||0)+delta);
+  renderDayPax();
+}
+
+function adjDayOpt(i) {
+  var pos=DS.options.indexOf(i);
+  if(pos>-1)DS.options.splice(pos,1);else DS.options.push(i);
+  renderDayPax();
+}
+
+function buildDaySummary() {
+  if(DS.tourIdx<0) return;
+  var tour = DB.day_tours[DS.tourIdx];
+  var grand = 0;
+  var tourDateVal = document.getElementById('d-tour-date') ? document.getElementById('d-tour-date').value : '';
+  var tourDateAltVal = document.getElementById('d-tour-date-alt') ? document.getElementById('d-tour-date-alt').value : '';
+  var rows = '<div class="sum-row"><span class="sum-lbl">투어명</span><span class="sum-val">'+tour.name+'</span></div>';
+  if(tourDateVal) rows += '<div class="sum-row"><span class="sum-lbl">희망 날짜</span><span class="sum-val">'+tourDateVal+'</span></div>';
+  if(tourDateAltVal) rows += '<div class="sum-row"><span class="sum-lbl">대체 날짜</span><span class="sum-val">'+tourDateAltVal+'</span></div>';
+  var hotel = document.getElementById('d-hotel-area').value;
+  var hname = document.getElementById('d-hotel-name').value;
+  if(hotel) rows += '<div class="sum-row"><span class="sum-lbl">숙박 지역</span><span class="sum-val">'+hotel+'</span></div>';
+  if(hname) rows += '<div class="sum-row"><span class="sum-lbl">호텔명</span><span class="sum-val">'+hname+'</span></div>';
+  document.getElementById('day-sum-body').innerHTML = rows;
+
+  var bdHtml = '';
+  Object.entries(DS.pax).forEach(function(e){
+    var lbl=e[0],cnt=e[1];
+    if(cnt>0){var p=tour.prices[lbl]||0;grand+=p*cnt;bdHtml+='<div class="bd-row"><span>'+lbl+' × '+cnt+'인</span><span style="font-weight:700;color:#ffd54f">'+(p/10000)+'만원 × '+cnt+' = '+(p*cnt/10000)+'만원</span></div>';}
+  });
+  DS.options.forEach(function(i){var o=tour.options[i];if(o)bdHtml+='<div class="bd-row"><span>'+o.name+'</span><span style="color:#ffd54f">'+o.price+'</span></div>';});
+  if(!bdHtml) bdHtml='<div style="opacity:.5;font-size:12px">인원을 선택해 주세요</div>';
+  document.getElementById('day-bd-rows').innerHTML = bdHtml;
+  document.getElementById('day-total').textContent = grand>0?(grand/10000)+'만원':'인원 선택 후 계산';
+  DS.total = grand;
+}
+
+function submitDay() {
+  if(DS.tourIdx<0) return;
+  var tour = DB.day_tours[DS.tourIdx];
+  var tourDate = document.getElementById('d-tour-date').value||'미입력';
+  var tourDateAlt = document.getElementById('d-tour-date-alt').value;
+  var hotel = document.getElementById('d-hotel-area').value||'미입력';
+  var hname = document.getElementById('d-hotel-name').value||'미입력';
+  var hnote = document.getElementById('d-hotel-note').value;
+
+  var lines = [
+    '안녕하세요! 로투차 1일 투어 예약 문의드립니다 😊','',
+    '━━━━━━━━━━━━━━━━━━',
+    '☀️ '+tour.name,'📍 '+tour.subtitle,
+    '━━━━━━━━━━━━━━━━━━',
+    '📅 희망 날짜: '+tourDate,
+    (tourDateAlt?'📅 대체 날짜: '+tourDateAlt:''),
+    '━━━━━━━━━━━━━━━━━━',
+    '🏨 픽업 호텔','  지역: '+hotel,'  호텔명: '+hname,
+    (hnote?'  기타: '+hnote:''),
+    '━━━━━━━━━━━━━━━━━━','👥 인원:'
+  ];
+  Object.entries(DS.pax).forEach(function(e){if(e[1]>0)lines.push('  · '+e[0]+': '+e[1]+'인');});
+  if(DS.options.length){lines.push('✅ 옵션:');DS.options.forEach(function(i){var o=tour.options[i];if(o)lines.push('  · '+o.name+' ('+o.price+')');});}
+  lines.push('━━━━━━━━━━━━━━━━━━');
+  lines.push('💰 합계: '+(DS.total/10000)+'만원');
+  lines.push('━━━━━━━━━━━━━━━━━━');
+  lines.push('확인 후 연락 주세요!');
+
+  var msg = lines.filter(function(l){return l!==undefined;}).join('\n');
+  navigator.clipboard.writeText(msg).then(function(){
+    showToast('✅ 내용이 복사되었습니다!\n카카오톡이 열리면 붙여넣기 해주세요 😊');
+    setTimeout(function(){window.open(DB.brand.kakao,'_blank');},1500);
+  }).catch(function(){window.open(DB.brand.kakao,'_blank');});
+}
+
+// ── UTILS ──
+
+// ── FAQ ──
+
+function toggleReview(idx){
+  var preview = document.getElementById('r'+idx+'-preview');
+  var full = document.getElementById('r'+idx+'-full');
+  var btn = document.getElementById('r'+idx+'-btn');
+  var isOpen = full.style.display !== 'none';
+  preview.style.display = isOpen ? 'block' : 'none';
+  full.style.display = isOpen ? 'none' : 'block';
+  btn.textContent = isOpen ? '더 보기 ▼' : '접기 ▲';
+}
+
+function toggleFaq(idx){
+  var ans = document.getElementById('faq-ans-'+idx);
+  var icon = document.getElementById('faq-icon-'+idx);
+  var isOpen = ans.style.display !== 'none';
+  ans.style.display = isOpen ? 'none' : 'block';
+  icon.textContent = isOpen ? '＋' : '－';
+}
+
+// ── 리뷰 슬라이더 ──
+var slideIdx = 0;
+var slideTotal = 3;
+function goSlide(n){
+  slideIdx = n;
+  var slider = document.getElementById('review-slider');
+  if(slider) slider.style.transform = 'translateX(-'+n+'00%)';
+  document.querySelectorAll('.dot-btn').forEach(function(d,i){
+    d.style.background = i===n ? '#f5a623' : '#ddd';
+    d.classList.toggle('on', i===n);
+  });
+}
+// 자동 슬라이드
+setInterval(function(){goSlide((slideIdx+1)%slideTotal);}, 4000);
+
+function openKakao(){window.open(DB.brand.kakao,'_blank');}
+
+function openModal(src){
+  var m=document.getElementById('photo-modal');
+  if(!m){m=document.createElement('div');m.id='photo-modal';m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:999;display:flex;align-items:center;justify-content:center;cursor:pointer';m.onclick=function(){m.style.display='none';};document.body.appendChild(m);}
+  m.innerHTML='<img src="'+src+'" style="max-width:92vw;max-height:88vh;border-radius:10px">';
+  m.style.display='flex';
+}
+
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.innerHTML=msg;t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},3500);
+}
+
+// ── INIT ──
+renderPkgTabs();
+renderPaxBtns();
+renderNotices();
+</script>
+</body>
+</html>

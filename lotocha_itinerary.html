@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로투차 확정 행정서</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans KR',sans-serif;background:#f4f2ee;color:#1a2a5e;min-height:100vh}
+.top-bar{display:flex;background:#1a2a5e;align-items:center;padding:0 16px;position:sticky;top:0;z-index:200;box-shadow:0 2px 8px rgba(0,0,0,.25);gap:8px}
+.top-title{color:#f5a623;font-weight:900;font-size:15px;flex:1;padding:13px 0}
+.btn-edit{background:transparent;color:#8892c4;border:1px solid #2d3a7a;border-radius:6px;padding:7px 12px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.btn-edit.on{color:#f5a623;border-color:#f5a623}
+.btn-print{background:#f5a623;color:#1a2a5e;border:none;border-radius:6px;padding:7px 12px;font-family:inherit;font-size:12px;font-weight:900;cursor:pointer}
+.edit-banner{background:#fff3cd;border-bottom:2px solid #f5a623;padding:9px 16px;text-align:center;font-size:12px;font-weight:700;color:#856404;display:none}
+.edit-banner.on{display:block}
+.wrap{max-width:720px;margin:0 auto;padding:20px 14px 80px}
+.card{background:#fff;border-radius:14px;padding:20px;margin-bottom:14px;box-shadow:0 2px 10px rgba(26,42,94,.08)}
+.hero{background:linear-gradient(135deg,#1a2a5e,#2d4a9e);color:#fff;border-radius:14px;padding:24px 20px;margin-bottom:14px}
+.hero-title{font-size:18px;font-weight:900;text-align:center;margin-bottom:14px}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.meta-item{background:rgba(255,255,255,.12);border-radius:8px;padding:10px 14px}
+.meta-lbl{font-size:10px;opacity:.7;font-weight:700;letter-spacing:.05em}
+.meta-val{font-size:14px;font-weight:700;margin-top:3px}
+.guide-card{background:#e8f5e9;border:1px solid #a5d6a7;border-radius:12px;padding:14px 16px;margin-bottom:14px}
+.guide-title{font-size:13px;font-weight:900;color:#2e7d32;margin-bottom:10px}
+.guide-row{display:flex;gap:10px;font-size:13px;margin-bottom:6px;align-items:flex-start}
+.guide-lbl{min-width:60px;font-weight:700;color:#555;flex-shrink:0}
+.gaode-box{background:#fff8e1;border:1px solid #ffe082;border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:#5d4037;line-height:1.8}
+.gaode-title{font-weight:900;font-size:13px;color:#e65100;margin-bottom:6px}
+.store-btns{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.store-btn{color:#fff;border-radius:7px;padding:7px 13px;font-size:11px;font-weight:700;text-decoration:none;display:inline-block}
+.sec-title{font-size:15px;font-weight:900;color:#1a2a5e;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.sec-title::after{content:'';flex:1;height:1px;background:#eee}
+.day-card{border:1px solid #e8edf3;border-radius:12px;overflow:hidden;margin-bottom:12px}
+.day-hdr{background:#1a2a5e;color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px}
+.day-num{background:#f5a623;color:#1a2a5e;font-size:10px;font-weight:900;padding:2px 9px;border-radius:20px}
+.day-title-txt{font-size:13px;font-weight:700;flex:1}
+.day-del-btn{display:none;background:#e53935;color:#fff;border:none;border-radius:5px;padding:4px 9px;font-family:inherit;font-size:10px;font-weight:700;cursor:pointer}
+.edit-mode .day-del-btn{display:inline-block}
+.activity{padding:14px 16px;border-bottom:1px solid #f0f0f0}
+.activity:last-child{border:none}
+.act-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px}
+.act-time{font-size:10px;font-weight:900;color:#f5a623;background:#1a2a5e;padding:2px 6px;border-radius:4px;min-width:46px;text-align:center;margin-top:2px;flex-shrink:0}
+.act-icon{font-size:18px;flex-shrink:0;line-height:1.3}
+.act-name{font-size:13px;font-weight:700;flex:1}
+.act-desc{font-size:12px;color:#666;line-height:1.7;margin-left:56px;margin-top:4px}
+.act-tip{background:#fff8e1;border-left:3px solid #f5a623;padding:6px 10px;border-radius:0 6px 6px 0;font-size:11px;color:#856404;line-height:1.6;margin-left:56px;margin-top:6px}
+.act-meta{display:flex;flex-wrap:wrap;gap:6px;margin-left:56px;margin-top:6px}
+.act-map{font-size:11px;padding:3px 9px;border-radius:20px;background:#e8f5e9;color:#2e7d32;text-decoration:none;font-weight:700;display:inline-block}
+.act-photos{display:flex;gap:6px;flex-wrap:wrap;margin-left:56px;margin-top:8px}
+.act-photo{width:88px;height:68px;object-fit:cover;border-radius:8px;cursor:pointer}
+.act-edit-bar{display:none;gap:6px;margin-top:8px;margin-left:56px;flex-wrap:wrap}
+.edit-mode .act-edit-bar{display:flex}
+.mini-btn{border:1px solid #e0e0e0;background:#fafafa;color:#888;font-family:inherit;font-size:11px;font-weight:700;padding:4px 10px;border-radius:5px;cursor:pointer}
+.mini-btn:hover{border-color:#f5a623;color:#e8940f}
+.mini-btn.danger{border-color:#ffcdd2;color:#e53935}
+.add-act-btn{display:none;width:100%;border:1.5px dashed #f5a623;background:transparent;color:#e8940f;font-family:inherit;font-size:12px;font-weight:700;padding:10px;cursor:pointer;border-radius:0 0 12px 12px}
+.edit-mode .add-act-btn{display:block}
+.add-day-btn{display:none;width:100%;border:1.5px dashed #ddd;background:#fafafa;color:#aaa;font-family:inherit;font-size:13px;font-weight:700;padding:12px;cursor:pointer;border-radius:12px;margin-bottom:12px}
+.edit-mode .add-day-btn{display:block}
+[contenteditable]{outline:none;border-radius:3px;transition:background .15s}
+.edit-mode [contenteditable]:hover{background:rgba(245,166,35,.12);cursor:text}
+.edit-mode [contenteditable]:focus{background:rgba(245,166,35,.2);box-shadow:0 0 0 2px #f5a623}
+.cancel-box{background:#fff8f8;border:1px solid #ffcdd2;border-radius:12px;padding:14px 16px;margin-bottom:14px}
+.cancel-title{font-size:13px;font-weight:900;color:#c62828;margin-bottom:10px}
+.cancel-row{display:flex;gap:10px;font-size:12px;padding:6px 0;border-bottom:1px dashed #ffcdd2}
+.cancel-row:last-child{border:none}
+.cancel-when{min-width:110px;font-weight:700;color:#555;flex-shrink:0}
+.contact-card{text-align:center;font-size:13px;line-height:2;padding:16px}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:999;align-items:center;justify-content:center}
+.modal.open{display:flex}
+.modal img{max-width:92vw;max-height:88vh;border-radius:10px}
+.modal-close{position:absolute;top:16px;right:20px;color:#fff;font-size:28px;cursor:pointer;font-weight:700}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a2a5e;color:#f5a623;padding:11px 22px;border-radius:20px;font-size:13px;font-weight:700;opacity:0;transition:all .3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media print{.top-bar,.edit-banner,.act-edit-bar,.add-act-btn,.add-day-btn,.day-del-btn{display:none!important}.wrap{padding:0}}
+@media(max-width:480px){.meta-grid{grid-template-columns:1fr}.act-desc,.act-tip,.act-meta,.act-photos,.act-edit-bar{margin-left:0;margin-top:8px}}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <span class="top-title">📋 로투차 확정 행정서</span>
+  <button class="btn-edit" id="edit-toggle" onclick="toggleEdit()">✏️ 편집</button>
+  <button class="btn-print" onclick="window.print()">🖨️ 인쇄/PDF</button>
+</div>
+<div class="edit-banner" id="edit-banner">✏️ 편집 모드 — 텍스트 클릭으로 수정 · 사진 추가 · 일정 추가/삭제 가능</div>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-title">🏔️ 장가계 단독투어 확정 행정서</div>
+    <div class="meta-grid">
+      <div class="meta-item"><div class="meta-lbl">고객명</div><div class="meta-val" contenteditable="false" id="m-name">홍길동 고객님</div></div>
+      <div class="meta-item"><div class="meta-lbl">인원</div><div class="meta-val" contenteditable="false" id="m-pax">4인</div></div>
+      <div class="meta-item"><div class="meta-lbl">출발일</div><div class="meta-val" contenteditable="false" id="m-dep">2026년 7월 10일</div></div>
+      <div class="meta-item"><div class="meta-lbl">귀국일</div><div class="meta-val" contenteditable="false" id="m-ret">2026년 7월 13일</div></div>
+      <div class="meta-item"><div class="meta-lbl">패키지</div><div class="meta-val" contenteditable="false" id="m-pkg">3박4일 단독투어</div></div>
+      <div class="meta-item"><div class="meta-lbl">투어비 합계</div><div class="meta-val" contenteditable="false" id="m-price">332만원 (83만원×4인)</div></div>
+    </div>
+  </div>
+
+  <!-- 가이드 -->
+  <div class="guide-card">
+    <div class="guide-title">👨‍💼 가이드 미팅 안내</div>
+    <div class="guide-row"><div class="guide-lbl">가이드명</div><div contenteditable="false" id="g-name">담당 가이드 확정 후 안내드립니다</div></div>
+    <div class="guide-row"><div class="guide-lbl">연락처</div><div contenteditable="false" id="g-phone">+86 XXX-XXXX-XXXX</div></div>
+    <div class="guide-row"><div class="guide-lbl">미팅 장소</div><div contenteditable="false" id="g-loc">장가계 허화 국제공항 입국장 출구</div></div>
+    <div class="guide-row"><div class="guide-lbl">미팅 시간</div><div contenteditable="false" id="g-time">KE163 도착 후 (약 23:00)</div></div>
+    <div class="guide-row"><div class="guide-lbl">미팅 방법</div><div contenteditable="false" id="g-sign">로투차 팻말 지참 대기</div></div>
+  </div>
+
+  <!-- 고덕지도 -->
+  <div class="gaode-box">
+    <div class="gaode-title">🗺️ 고덕지도 (高德地图) 미리 설치하세요</div>
+    중국 현지에서 가장 정확한 지도 앱입니다. 오프라인에서도 사용 가능합니다.
+    <div class="store-btns">
+      <a class="store-btn" href="https://apps.apple.com/cn/app/id461703208" target="_blank" style="background:#000">🍎 App Store</a>
+      <a class="store-btn" href="https://play.google.com/store/apps/details?id=com.autonavi.minimap" target="_blank" style="background:#1a7a34">▶ Google Play</a>
+    </div>
+  </div>
+
+  <!-- 일정 -->
+  <div class="sec-title">📅 확정 일정</div>
+  <div id="days-container">
+
+    <div class="day-card" id="day-0">
+      <div class="day-hdr">
+        <div class="day-num">DAY 1</div>
+        <div class="day-title-txt" contenteditable="false">7월 10일 (목) | 인천 → 장가계</div>
+        <button class="day-del-btn" onclick="delDay('day-0')">일 삭제</button>
+      </div>
+      <div class="day-body" id="body-0">
+        <div class="activity" id="act-0-0">
+          <div class="act-top">
+            <div class="act-time" contenteditable="false">23:00</div>
+            <div class="act-icon">✈️</div>
+            <div class="act-name" contenteditable="false">장가계 허화 국제공항 도착</div>
+          </div>
+          <div class="act-desc" contenteditable="false">KE163편으로 도착. 입국 심사 후 가이드와 미팅.</div>
+          <div class="act-meta"><a class="act-map" href="https://uri.amap.com/search?keyword=张家界荷花国际机场&city=张家界" target="_blank">📍 고덕지도로 보기</a></div>
+          <div class="act-photos" id="ap-0-0"></div>
+          <div class="act-edit-bar">
+            <button class="mini-btn" onclick="addPhoto('0-0')">📷 사진</button>
+            <button class="mini-btn" onclick="editMap('0-0')">🗺️ 지도링크</button>
+            <button class="mini-btn danger" onclick="delAct('act-0-0')">✕ 삭제</button>
+          </div>
+          <input type="file" id="pf-0-0" accept="image/*" multiple style="display:none" onchange="handlePhoto(this,'0-0')">
+        </div>
+        <div class="activity" id="act-0-1">
+          <div class="act-top">
+            <div class="act-time" contenteditable="false">자정~</div>
+            <div class="act-icon">🏨</div>
+            <div class="act-name" contenteditable="false">호텔 체크인 — 장가계 오렌지 호텔</div>
+          </div>
+          <div class="act-desc" contenteditable="false">체크인 후 휴식. 내일 일정을 위해 충분한 수면을 취하세요.</div>
+          <div class="act-photos" id="ap-0-1"></div>
+          <div class="act-edit-bar">
+            <button class="mini-btn" onclick="addPhoto('0-1')">📷 사진</button>
+            <button class="mini-btn danger" onclick="delAct('act-0-1')">✕ 삭제</button>
+          </div>
+          <input type="file" id="pf-0-1" accept="image/*" multiple style="display:none" onchange="handlePhoto(this,'0-1')">
+        </div>
+      </div>
+      <button class="add-act-btn" onclick="addAct('body-0','0')">＋ 이 날에 일정 추가</button>
+    </div>
+
+    <div class="day-card" id="day-1">
+      <div class="day-hdr">
+        <div class="day-num">DAY 2</div>
+        <div class="day-title-txt" contenteditable="false">7월 11일 (금) | 국가삼림공원 + 매력상서쇼</div>
+        <button class="day-del-btn" onclick="delDay('day-1')">일 삭제</button>
+      </div>
+      <div class="day-body" id="body-1">
+        <div class="activity" id="act-1-0">
+          <div class="act-top">
+            <div class="act-time" contenteditable="false">09:00</div>
+            <div class="act-icon">🌲</div>
+            <div class="act-name" contenteditable="false">국가삼림공원 (오전) — 십리화랑 → 백룡엘리베이터 → 원가계</div>
+          </div>
+          <div class="act-desc" contenteditable="false">미혼대, 아바타 촬영지, 천하제일교. 아바타의 배경이 된 할렐루야 산맥이 눈앞에 펼쳐집니다.</div>
+          <div class="act-tip">💡 운동화 필수. 엘리베이터 줄이 길 수 있으니 여유 있게 이동하세요.</div>
+          <div class="act-meta"><a class="act-map" href="https://uri.amap.com/search?keyword=张家界国家森林公园&city=张家界" target="_blank">📍 고덕지도로 보기</a></div>
+          <div class="act-photos" id="ap-1-0"></div>
+          <div class="act-edit-bar">
+            <button class="mini-btn" onclick="addPhoto('1-0')">📷 사진</button>
+            <button class="mini-btn" onclick="editMap('1-0')">🗺️ 지도링크</button>
+            <button class="mini-btn danger" onclick="delAct('act-1-0')">✕ 삭제</button>
+          </div>
+          <input type="file" id="pf-1-0" accept="image/*" multiple style="display:none" onchange="handlePhoto(this,'1-0')">
+        </div>
+        <div class="activity" id="act-1-1">
+          <div class="act-top">
+            <div class="act-time" contenteditable="false">12:30</div>
+            <div class="act-icon">🍜</div>
+            <div class="act-name" contenteditable="false">점심 — 산채비빔밥 정식</div>
+          </div>
+          <div class="act-desc" contenteditable="false">현지 로컬 식당에서 진짜 장가계 가정식.</div>
+          <div class="act-photos" id="ap-1-1"></div>
+          <div class="act-edit-bar">
+            <button class="mini-btn" onclick="addPhoto('1-1')">📷 사진</button>
+            <button class="mini-btn danger" onclick="delAct('act-1-1')">✕ 삭제</button>
+          </div>
+          <input type="file" id="pf-1-1" accept="image/*" multiple style="display:none" onchange="handlePhoto(this,'1-1')">
+        </div>
+        <div class="activity" id="act-1-2">
+          <div class="act-top">
+            <div class="act-time" contenteditable="false">14:00</div>
+            <div class="act-icon">🌲</div>
+            <div class="act-name" contenteditable="false">국가삼림공원 (오후) — 양가계 → 어필봉 → 천자산</div>
+          </div>
+          <div class="act-desc" contenteditable="false">오후 햇살 아래 더욱 아름다운 절경.</div>
+          <div class="act-photos" id="ap-1-2"></div>
+          <div class="act-edit-bar">
+            <button class="mini-btn" onclick="addPhoto('1-2')">📷 사진</button>
+            <button class="mini-btn danger" onclick="delAct('act-1-2')">✕ 삭제</button>
+          </div>
+          <input type="file" id="pf-1-2" accept="image/*" multiple style="display:none" onchange="handlePhoto(this,'1-2')">
+        </div>
+        <div class="activity" id="act-1-3">
+          <div class="act-top">
+            <div class="act-time" contenteditable="false">18:30</div>
+            <div class="act-icon">🍜</div>
+            <div class="act-name" contenteditable="false">저녁 — 돼지고기 고추볶음</div>
+          </div>
+          <div class="act-desc" contenteditable="false">장가계 대표 음식. 매콤하고 풍성한 현지식.</div>
+          <div class="act-photos" id="ap-1-3"></div>
+          <div class="act-edit-bar">
+            <button class="mini-btn" onclick="addPhoto('1-3')">📷 사진</button>
+            <button class="mini-btn danger" onclick="delAct('act-1-3')">✕ 삭제</button>
+          </div>
+          <input type="file" id="pf-1-3" accept="image/*" multiple style="display:none" onchange="handlePhoto(this,'1-3')">
+        </div>
+        <div class="activity" id="act-1-4">
+          <div class="act-top">
+            <div class="act-time" contenteditable="false">20:00</div>
+            <div class="act-icon">🤹</div>
+            <div class="act-name" contenteditable="false">매력상서쇼</div>
+          </div>
+          <div class="act-desc" contenteditable="false">토가족의 역사와 삶을 담은 화려한 공연 · 약 60분 · 티켓 포함</div>
+          <div class="act-meta"><a class="act-map" href="https://uri.amap.com/search?keyword=魅力湘西&city=张家界" target="_blank">📍 고덕지도로 보기</a></div>
+          <div class="act-photos" id="ap-1-4"></div>
+          <div class="act-edit-bar">
+            <button class="mini-btn" onclick="addPhoto('1-4')">📷 사진</button>
+            <button class="mini-btn" onclick="editMap('1-4')">🗺️ 지도링크</button>
+            <button class="mini-btn danger" onclick="delAct('act-1-4')">✕ 삭제</button>
+          </div>
+          <input type="file" id="pf-1-4" accept="image/*" multiple style="display:none" onchange="handlePhoto(this,'1-4')">
+        </div>
+      </div>
+      <button class="add-act-btn" onclick="addAct('body-1','1')">＋ 이 날에 일정 추가</button>
+    </div>
+
+    <div class="day-card" id="day-2">
+      <div class="day-hdr">
+        <div class="day-num">DAY 3</div>
+        <div class="day-title-txt" contenteditable="false">7월 12일 (토) | 천문산 + 야경</div>
+        <button class="day-del-btn" onclick="delDay('day-2')">일 삭제</button>
+      </div>
+      <div class="day-body" id="body-2">
+        <div class="activity" id="act-2-0">
+          <div class="act-top">
+            <div class="act-time" contenteditable="false">09:00</div>
+            <div class="act-icon">🛍️</div>
+            <div class="act-name" contenteditable="false">전통시장 + 로컬 카페</div>
+          </div>
+          <div class="act-desc" contenteditable="false">현지인들로 북적이는 시장 탐방 + 원두커피 한 잔.</div>
+          <div class="act-photos" id="ap-2-0"></div>
+          <div class="act-edit-bar">
+            <button class="mini-btn" onclick="addPhoto('2-0')">📷 사진</button>
+            <button class="mini-btn danger" onclick="delAct('act-2-0')">✕ 삭제</button>
+          </div>
+          <input type="file" id="pf-2-0" accept="image/*" multiple style="display:none" onchange="handlePhoto(this,'2-0')">
+        </div>
+        <div class="activity" id="act-2-1">
+          <div class="act-top">
+            <div class="act-time" contenteditable="false">13:00</div>
+            <div class="act-icon">⛰️</div>
+            <div class="act-name" contenteditable="false">천문산 — 케이블카 → 유리잔도 → 천문동 → 귀곡잔도</div>
+          </div>
+          <div class="act-desc" contenteditable="false">해발 1,500m 위에서 발밑으로 펼쳐지는 절경. 천문동 앞 인증샷 필수!</div>
+          <div class="act-tip">💡 고소공포증이 있으신 분은 유리잔도 구간 주의. 바람이 강할 수 있으니 겉옷 준비 권장.</div>
+          <div class="act-meta"><a class="act-map" href="https://uri.amap.com/search?keyword=天门山国家森林公园&city=张家界" target="_blank">📍 고덕지도로 보기</a></div>
+          <div class="act-photos" id="ap-2-1"></div>
+          <div class="act-edit-bar">
+            <button class="mini-btn" onclick="addPhoto('2-1')">📷 사진</button>
+            <button class="mini-btn" onclick="editMap('2-1')">🗺️ 지도링크</button>
+            <button class="mini-btn danger" onclick="delAct('act-2-1')">✕ 삭제</button>
+          </div>
+          <input type="file" id="pf-2-1" accept="image/*" multiple style="display:none" onchange="handlePhoto(this,'2-1')">
+        </div>
+        <div class="activity" id="act-2-2">
+          <div class="act-top">
+            <div class="act-time" contenteditable="false">18:30</div>
+            <div class="act-icon">🍖</div>
+            <div class="act-name" contenteditable="false">저녁 — 삼겹살 무한리필</div>
+          </div>
+          <div class="act-desc" contenteditable="false">현지식 삼겹살 무한리필. 여행 중 가장 인기 메뉴!</div>
+          <div class="act-photos" id="ap-2-2"></div>
+          <div class="act-edit-bar">
+            <button class="mini-btn" onclick="addPhoto('2-2')">📷 사진</button>
+            <button class="mini-btn danger" onclick="delAct('act-2-2')">✕ 삭제</button>
+          </div>
+          <input type="file" id="pf-2-2" accept="image/*" multiple style="display:none" onchange="handlePhoto(this,'2-2')">
+        </div>
+        <div class="activity" id="act-2-3">
+          <div class="act-top">
+            <div class="act-time" contenteditable="false">20:30</div>
+            <div class="act-icon">🌃</div>
+            <div class="act-name" contenteditable="false">72기루 야경 (차창관광)</div>
+          </div>
+          <div class="act-desc" contenteditable="false">장가계 시내 야경을 차창 너머로 감상.</div>
+          <div class="act-photos" id="ap-2-3"></div>
+          <div class="act-edit-bar">
+            <button class="mini-btn" onclick="addPhoto('2-3')">📷 사진</button>
+            <button class="mini-btn danger" onclick="delAct('act-2-3')">✕ 삭제</button>
+          </div>
+          <input type="file" id="pf-2-3" accept="image/*" multiple style="display:none" onchange="handlePhoto(this,'2-3')">
+        </div>
+      </div>
+      <button class="add-act-btn" onclick="addAct('body-2','2')">＋ 이 날에 일정 추가</button>
+    </div>
+
+    <div class="day-card" id="day-3">
+      <div class="day-hdr">
+        <div class="day-num">DAY 4</div>
+        <div class="day-title-txt" contenteditable="false">7월 13일 (일) | 황룡동굴 + 대협곡 + 귀국</div>
+        <button class="day-del-btn" onclick="delDay('day-3')">일 삭제</button>
+      </div>
+      <div class="day-body" id="body-3">
+        <div class="activity" id="act-3-0">
+          <div class="act-top">
+            <div class="act-time" contenteditable="false">09:00</div>
+            <div class="act-icon">🦎</div>
+            <div class="act-name" contenteditable="false">황룡동굴</div>
+          </div>
+          <div class="act-desc" contenteditable="false">지하 수로를 따라 배를 타고 이동하는 구간이 압권! 동굴 내부가 서늘하니 겉옷 준비 권장.</div>
+          <div class="act-meta"><a class="act-map" href="https://uri.amap.com/search?keyword=黄龙洞&city=张家界" target="_blank">📍 고덕지도로 보기</a></div>
+          <div class="act-photos" id="ap-3-0"></div>
+          <div class="act-edit-bar">
+            <button class="mini-btn" onclick="addPhoto('3-0')">📷 사진</button>
+            <button class="mini-btn" onclick="editMap('3-0')">🗺️ 지도링크</button>
+            <button class="mini-btn danger" onclick="delAct('act-3-0')">✕ 삭제</button>
+          </div>
+          <input type="file" id="pf-3-0" accept="image/*" multiple style="display:none" onchange="handlePhoto(this,'3-0')">
+        </div>
+        <div class="activity" id="act-3-1">
+          <div class="act-top">
+            <div class="act-time" contenteditable="false">11:30</div>
+            <div class="act-icon">🍜</div>
+            <div class="act-name" contenteditable="false">점심 — 동태매운탕</div>
+          </div>
+          <div class="act-desc" contenteditable="false">얼큰하고 시원한 동태매운탕. 마지막 날 현지의 맛을 제대로!</div>
+          <div class="act-photos" id="ap-3-1"></div>
+          <div class="act-edit-bar">
+            <button class="mini-btn" onclick="addPhoto('3-1')">📷 사진</button>
+            <button class="mini-btn danger" onclick="delAct('act-3-1')">✕ 삭제</button>
+          </div>
+          <input type="file" id="pf-3-1" accept="image/*" multiple style="display:none" onchange="handlePhoto(this,'3-1')">
+        </div>
+        <div class="activity" id="act-3-2">
+          <div class="act-top">
+            <div class="act-time" contenteditable="false">13:30</div>
+            <div class="act-icon">🌉</div>
+            <div class="act-name" contenteditable="false">대협곡 + 유리다리</div>
+          </div>
+          <div class="act-desc" contenteditable="false">유리다리 → 미끄럼틀 → 유람선. 깊은 협곡과 폭포가 함께하는 짜릿한 마지막 일정!</div>
+          <div class="act-tip">💡 유리다리 위에서 덧신 착용 필수 (현장 제공).</div>
+          <div class="act-meta"><a class="act-map" href="https://uri.amap.com/search?keyword=张家界大峡谷玻璃桥&city=张家界" target="_blank">📍 고덕지도로 보기</a></div>
+          <div class="act-photos" id="ap-3-2"></div>
+          <div class="act-edit-bar">
+            <button class="mini-btn" onclick="addPhoto('3-2')">📷 사진</button>
+            <button class="mini-btn" onclick="editMap('3-2')">🗺️ 지도링크</button>
+            <button class="mini-btn danger" onclick="delAct('act-3-2')">✕ 삭제</button>
+          </div>
+          <input type="file" id="pf-3-2" accept="image/*" multiple style="display:none" onchange="handlePhoto(this,'3-2')">
+        </div>
+        <div class="activity" id="act-3-3">
+          <div class="act-top">
+            <div class="act-time" contenteditable="false">20:30</div>
+            <div class="act-icon">✈️</div>
+            <div class="act-name" contenteditable="false">공항 센딩 → 귀국</div>
+          </div>
+          <div class="act-desc" contenteditable="false">KE164편 탑승. 가이드가 공항까지 배웅해 드립니다.</div>
+          <div class="act-meta"><a class="act-map" href="https://uri.amap.com/search?keyword=张家界荷花国际机场&city=张家界" target="_blank">📍 공항 위치</a></div>
+          <div class="act-photos" id="ap-3-3"></div>
+          <div class="act-edit-bar">
+            <button class="mini-btn" onclick="addPhoto('3-3')">📷 사진</button>
+            <button class="mini-btn danger" onclick="delAct('act-3-3')">✕ 삭제</button>
+          </div>
+          <input type="file" id="pf-3-3" accept="image/*" multiple style="display:none" onchange="handlePhoto(this,'3-3')">
+        </div>
+      </div>
+      <button class="add-act-btn" onclick="addAct('body-3','3')">＋ 이 날에 일정 추가</button>
+    </div>
+
+    <button class="add-day-btn" onclick="addDay()">＋ 날짜 추가</button>
+  </div>
+
+  <!-- 취소 규정 -->
+  <div class="sec-title" style="margin-top:4px">📌 취소 및 변경 규정</div>
+  <div class="cancel-box">
+    <div class="cancel-title">⚠️ 출발 7일 전까지만 변경 가능합니다</div>
+    <div class="cancel-row"><div class="cancel-when">출발 15일 전</div><div>10만원 수수료 + 발생비용 공제 후 환불</div></div>
+    <div class="cancel-row"><div class="cancel-when">출발 8~14일 전</div><div>총 비용의 30% + 10만원 수수료 + 발생비용 공제</div></div>
+    <div class="cancel-row"><div class="cancel-when">출발 4~7일 전</div><div>총 비용의 50% + 10만원 수수료 + 발생비용 공제</div></div>
+    <div class="cancel-row"><div class="cancel-when">출발 1~3일 전</div><div>총 비용의 70% + 10만원 수수료 + 발생비용 공제</div></div>
+    <div class="cancel-row"><div class="cancel-when">출발 당일/노쇼</div><div>환불 불가 (100% 공제)</div></div>
+    <div style="font-size:11px;color:#999;margin-top:10px">※ 특색 경관 제외 시 환불 없음 · 불가항력 또는 고객 사유로 인한 부분 취소 환불 불가</div>
+  </div>
+
+  <!-- 연락처 -->
+  <div class="card contact-card">
+    <div style="font-weight:900;font-size:14px;margin-bottom:8px">📞 로투차 연락처</div>
+    카카오톡: <strong>Buta200</strong><br>
+    전화: <strong>+86 185 8961 0702</strong><br>
+    이메일: <strong>nanyingkui@gmail.com</strong>
+  </div>
+
+</div>
+
+<div class="modal" id="photo-modal" onclick="closeModal()">
+  <span class="modal-close">✕</span>
+  <img id="modal-img" src="" alt="">
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+var editOn = false;
+var dayCount = 4;
+var actCounters = {};
+
+function toggleEdit(){
+  editOn = !editOn;
+  document.body.classList.toggle('edit-mode', editOn);
+  document.getElementById('edit-banner').classList.toggle('on', editOn);
+  var btn = document.getElementById('edit-toggle');
+  btn.classList.toggle('on', editOn);
+  btn.textContent = editOn ? '✅ 편집 완료' : '✏️ 편집';
+  document.querySelectorAll('[contenteditable]').forEach(function(el){
+    el.contentEditable = editOn ? 'true' : 'false';
+  });
+}
+
+// 사진
+function addPhoto(actId){document.getElementById('pf-'+actId).click();}
+function handlePhoto(input, actId){
+  Array.from(input.files).forEach(function(file){
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var container = document.getElementById('ap-'+actId);
+      var img = document.createElement('img');
+      img.src = e.target.result;
+      img.className = 'act-photo';
+      img.onclick = function(){openModal(e.target.result);};
+      container.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// 지도링크
+function editMap(actId){
+  var actEl = document.getElementById('act-'+actId);
+  var mapEl = actEl ? actEl.querySelector('.act-map') : null;
+  var cur = mapEl ? mapEl.href : '';
+  var newUrl = prompt('고덕지도 링크를 입력하세요:', cur);
+  if(newUrl && newUrl.trim()){
+    if(mapEl){mapEl.href = newUrl.trim();}
+    else{
+      var meta = actEl.querySelector('.act-meta');
+      if(!meta){meta=document.createElement('div');meta.className='act-meta';actEl.appendChild(meta);}
+      var a = document.createElement('a');
+      a.className = 'act-map';
+      a.href = newUrl.trim();
+      a.target = '_blank';
+      a.textContent = '📍 고덕지도로 보기';
+      meta.appendChild(a);
+    }
+    showToast('지도 링크 수정됨');
+  }
+}
+
+// 일정 삭제
+function delAct(id){
+  if(confirm('이 일정을 삭제할까요?')){
+    var el = document.getElementById(id);
+    if(el) el.remove();
+  }
+}
+
+// 일정 추가
+function addAct(bodyId, dayIdx){
+  var body = document.getElementById(bodyId);
+  if(!body) return;
+  if(!actCounters[dayIdx]) actCounters[dayIdx] = 99;
+  actCounters[dayIdx]++;
+  var aid = dayIdx + '-' + actCounters[dayIdx];
+  var div = document.createElement('div');
+  div.className = 'activity';
+  div.id = 'act-' + aid;
+  div.innerHTML =
+    '<div class="act-top">' +
+      '<div class="act-time" contenteditable="true">시간</div>' +
+      '<div class="act-icon" contenteditable="true">📌</div>' +
+      '<div class="act-name" contenteditable="true">일정 이름을 입력하세요</div>' +
+    '</div>' +
+    '<div class="act-desc" contenteditable="true">설명을 입력하세요</div>' +
+    '<div class="act-meta"><a class="act-map" href="#" target="_blank">📍 고덕지도로 보기</a></div>' +
+    '<div class="act-photos" id="ap-' + aid + '"></div>' +
+    '<div class="act-edit-bar">' +
+      '<button class="mini-btn" onclick="addPhoto(\'' + aid + '\')">📷 사진</button>' +
+      '<button class="mini-btn" onclick="editMap(\'' + aid + '\')">🗺️ 지도링크</button>' +
+      '<button class="mini-btn danger" onclick="delAct(\'act-' + aid + '\')">✕ 삭제</button>' +
+    '</div>' +
+    '<input type="file" id="pf-' + aid + '" accept="image/*" multiple style="display:none" onchange="handlePhoto(this,\'' + aid + '\')">';
+  // 편집 모드면 contenteditable 활성화
+  if(editOn) div.querySelectorAll('[contenteditable]').forEach(function(el){el.contentEditable='true';});
+  body.appendChild(div);
+}
+
+// 날짜 삭제
+function delDay(id){
+  if(confirm('이 날 전체 일정을 삭제할까요?')){
+    var el = document.getElementById(id);
+    if(el) el.remove();
+  }
+}
+
+// 날짜 추가
+function addDay(){
+  var container = document.getElementById('days-container');
+  var addBtn = container.querySelector('.add-day-btn');
+  dayCount++;
+  var div = document.createElement('div');
+  div.className = 'day-card';
+  div.id = 'day-' + dayCount;
+  div.innerHTML =
+    '<div class="day-hdr">' +
+      '<div class="day-num">DAY ' + dayCount + '</div>' +
+      '<div class="day-title-txt" contenteditable="true">날짜와 일정 제목을 입력하세요</div>' +
+      '<button class="day-del-btn" onclick="delDay(\'day-' + dayCount + '\')">일 삭제</button>' +
+    '</div>' +
+    '<div class="day-body" id="body-' + dayCount + '"></div>' +
+    '<button class="add-act-btn" onclick="addAct(\'body-' + dayCount + '\',\'' + dayCount + '\')">＋ 이 날에 일정 추가</button>';
+  container.insertBefore(div, addBtn);
+}
+
+// 모달
+function openModal(src){
+  document.getElementById('modal-img').src = src;
+  document.getElementById('photo-modal').classList.add('open');
+}
+function closeModal(){document.getElementById('photo-modal').classList.remove('open');}
+
+// 토스트
+function showToast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');}, 2500);
+}
+</script>
+</body>
+</html>
