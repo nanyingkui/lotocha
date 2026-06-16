@@ -272,9 +272,8 @@ textarea:focus{border-color:#f5a623}
       <button class="step-btn" onclick="goPkg(4)">⑤ 견적</button>
     </div>
     <div class="step-inner" id="day-steps" style="display:none">
-      <button class="step-btn active" onclick="goDay(0)">① 투어 선택</button>
-      <button class="step-btn" onclick="goDay(1)">② 인원/옵션</button>
-      <button class="step-btn" onclick="goDay(2)">③ 견적</button>
+      <button class="step-btn active" onclick="goDay(0)">① 날짜/투어/인원</button>
+      <button class="step-btn" onclick="goDay(1)">② 견적 확인</button>
     </div>
   </div>
 </div>
@@ -616,117 +615,64 @@ textarea:focus{border-color:#f5a623}
 <!-- ===== DAY PAGES ===== -->
 <div id="day-wrap" style="display:none">
 
-  <!-- STEP 1: 투어 선택 -->
+  <!-- STEP 1: 날짜별 투어 카드 -->
   <div class="page on" id="d0">
-    <div class="hero" style="text-align:center;margin-bottom:14px">
-      <div style="font-size:14px;opacity:.8">장가계 현지 가이드와 함께하는</div>
-      <div class="hero-title" style="font-size:18px;margin-top:4px">☀️ 1일 투어 선택</div>
+    <div style="background:linear-gradient(135deg,#1a2a5e,#2d4a9e);border-radius:14px;padding:18px 16px;margin-bottom:14px;text-align:center;color:#fff">
+      <div style="font-size:13px;opacity:.8;margin-bottom:4px">장가계 현지 가이드와 함께하는</div>
+      <div style="font-size:18px;font-weight:900;color:#f5a623">☀️ 1일 투어 신청</div>
+      <div style="font-size:11px;opacity:.7;margin-top:6px">날짜마다 다른 투어 선택 가능 · 인원 및 픽업/샌딩 장소 개별 설정</div>
     </div>
-    <div id="day-cards"></div>
+    <div id="day-entry-list"></div>
+    <button onclick="addEntry()" style="width:100%;border:2px dashed #f5a623;background:transparent;color:#e8940f;font-family:inherit;font-size:14px;font-weight:700;padding:13px;border-radius:10px;cursor:pointer;margin-bottom:12px">＋ 날짜 추가</button>
+    <div style="background:#fff3e0;border:1px solid #ffe082;border-radius:10px;padding:12px 14px;font-size:12px;color:#e65100;line-height:1.7;margin-bottom:12px">
+      🤝 본 상품은 <strong>조인(합류) 투어</strong>입니다. 다른 여행객과 함께 진행되며, 체력·이동 능력이 비슷한 분들끼리 매칭해 드립니다.<br>
+      ✅ <strong>옵션</strong>은 날씨·상황에 따라 달라질 수 있어 현장에서 가이드와 상의 후 현금 결제합니다.
+    </div>
+    <button class="btn-next" onclick="goDay(1)" style="width:100%">견적 확인 →</button>
   </div>
 
-  <!-- STEP 2: 날짜/인원/호텔 -->
+  <!-- STEP 2: 견적 확인 -->
   <div class="page" id="d1">
-    <div id="selected-tour-banner" style="background:linear-gradient(135deg,#1a2a5e,#2d4a9e);color:#fff;border-radius:12px;padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px">
-      <div id="stb-icon" style="font-size:28px"></div>
-      <div>
-        <div id="stb-name" style="font-size:14px;font-weight:900;color:#f5a623"></div>
-        <div id="stb-sub" style="font-size:11px;opacity:.8"></div>
-      </div>
-    </div>
-
-    <!-- 날짜 선택 -->
-    <div class="card">
-      <div class="card-title">📅 투어 날짜 선택</div>
-      <div style="font-size:12px;color:#888;margin-bottom:12px;line-height:1.6">
-        원하시는 날짜를 추가하세요. 날짜마다 같은 투어로 진행됩니다.<br>
-        다른 투어를 원하시면 STEP 1로 돌아가서 따로 신청해 주세요.
-      </div>
-      <div id="day-date-list"></div>
-      <button onclick="addDayEntry()" style="width:100%;border:1.5px dashed #f5a623;background:transparent;color:#e8940f;font-family:inherit;font-size:13px;font-weight:700;padding:11px;border-radius:8px;cursor:pointer;margin-top:8px">＋ 날짜 추가</button>
-    </div>
-
-    <!-- 인원 선택 -->
-    <div class="card">
-      <div class="card-title">👥 인원 선택</div>
-      <div id="day-pax-area"></div>
-    </div>
-
-    <!-- 조인 안내 -->
-    <div class="join-box">
-      <div class="join-title">🤝 조인 투어 안내</div>
-      <div class="join-desc">
-        본 상품은 <strong>다른 분들과 함께 진행되는 조인(합류) 투어</strong>입니다.<br>
-        여행 품질을 위해 체력 및 이동 능력이 비슷한 분들끼리 매칭해 드립니다.<br>
-        <span style="font-size:11px;opacity:.7">※ 프라이빗 단독 투어는 패키지 탭을 이용해 주세요</span>
-      </div>
-    </div>
-
-    <!-- 픽업 호텔 -->
-    <div class="card">
-      <div class="card-title">🏨 픽업 호텔 정보</div>
-      <div style="font-size:12px;color:#888;margin-bottom:10px">가이드가 호텔로 픽업하러 갑니다. 정확히 입력해 주세요.</div>
-      <div class="hotel-area">
-        <label>숙박 지역</label>
-        <select id="d-hotel-area">
-          <option value="">선택하세요</option>
-          <option>장가계 시내</option>
-          <option>무릉원 (삼림공원 인근)</option>
-          <option>천문산 인근</option>
-          <option>기타</option>
-        </select>
-        <label>호텔명</label>
-        <input type="text" id="d-hotel-name" placeholder="예: 장가계 오렌지 호텔">
-        <label>기타 요청사항</label>
-        <input type="text" id="d-hotel-note" placeholder="예: 로비 앞 미팅, 특이사항 등">
-      </div>
-    </div>
-
-    <!-- 옵션 안내 -->
-    <div style="background:#fff3e0;border:1px solid #ffe082;border-radius:10px;padding:12px 14px;margin-bottom:12px;font-size:12px;color:#e65100;line-height:1.7">
-      ✅ <strong>옵션</strong>은 날씨·상황에 따라 이용 가능 여부가 달라질 수 있어 현장에서 가이드와 상의 후 현금으로 결제합니다.
-    </div>
-
-    <div class="nav-btns">
-      <button class="btn-back" onclick="goDay(0)">← 투어 다시 선택</button>
-      <button class="btn-next" onclick="goDay(2)">견적 확인 →</button>
-    </div>
-  </div>
-
-  <!-- STEP 3: 견적 -->
-  <div class="page" id="d2">
-    <div class="sum-card">
+    <div class="sum-card" id="day-quote-card">
       <div class="sum-title">📋 1일 투어 예약 견적</div>
-      <div id="day-sum-body"></div>
-      <div class="bd-box">
-        <div class="bd-title">☀️ 신청 내역</div>
-        <div id="day-bd-rows"></div>
-      </div>
-      <div class="total-row">
+      <div id="day-quote-body"></div>
+      <div class="total-row" style="margin-top:12px">
         <span>예약금 합계</span>
         <span class="total-price" id="day-total">—</span>
       </div>
-      <div style="font-size:11px;opacity:.6;margin-top:10px;line-height:1.8">
-        ※ 예약금은 투어당 20만원/팀 고정<br>
+      <div style="font-size:11px;opacity:.55;margin-top:8px;line-height:1.8">
+        ※ 예약금은 투어당 20만원/팀 고정 (날짜별로 청구)<br>
         ※ 실제 투어비는 연령대별 상이 · 카카오톡으로 안내드립니다<br>
         ※ 옵션은 현장에서 가이드와 상의 후 현금 결제
       </div>
     </div>
+    <!-- 팝업 복사 안내 -->
     <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:10px;padding:12px 14px;margin-bottom:12px;font-size:12px;color:#2e7d32;line-height:1.7">
-      💬 아래 버튼을 누르면 예약 내용이 자동 복사됩니다.<br>
-      카카오톡이 열리면 <strong>붙여넣기</strong> 후 전송해 주세요!
+      💬 아래 버튼을 누르면 예약 내용이 담긴 팝업이 열립니다.<br>
+      내용을 <strong>복사</strong>한 뒤 카카오톡에 <strong>붙여넣기</strong>해 주세요!
     </div>
-    <button class="btn-kakao" onclick="submitDay()">
+    <button onclick="openDayKakaoPopup()" style="width:100%;background:#FEE500;color:#191919;border:none;border-radius:12px;padding:15px;font-family:inherit;font-size:15px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
       <span style="font-size:18px">💬</span> 카카오톡으로 예약 문의하기
     </button>
     <div style="font-size:11px;color:#aaa;text-align:center;margin-top:8px">문의 후 담당자가 확인하여 연락드립니다</div>
     <div class="nav-btns" style="margin-top:12px">
-      <button class="btn-back" onclick="goDay(1)">← 수정하기</button>
+      <button class="btn-back" onclick="goDay(0)">← 수정하기</button>
     </div>
   </div>
 
 </div>
 </div><!-- /wrap -->
+
+<!-- 카카오톡 팝업 -->
+<div id="kakao-popup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;padding:16px">
+  <div style="background:#fff;border-radius:16px;padding:20px;width:100%;max-width:480px;max-height:80vh;display:flex;flex-direction:column;gap:12px">
+    <div style="font-size:15px;font-weight:900;color:#1a2a5e">📋 예약 내용 복사</div>
+    <textarea id="kakao-text" readonly style="flex:1;min-height:200px;border:1.5px solid #e0e0e0;border-radius:8px;padding:10px 12px;font-family:inherit;font-size:12px;line-height:1.8;resize:none;outline:none;background:#f8f9fc"></textarea>
+    <button onclick="copyKakaoText()" id="copy-btn" style="background:#1a2a5e;color:#f5a623;border:none;border-radius:8px;padding:12px;font-family:inherit;font-size:14px;font-weight:900;cursor:pointer">📋 내용 복사하기</button>
+    <a id="kakao-link" href="" target="_blank" style="display:block;background:#FEE500;color:#191919;border-radius:8px;padding:12px;font-family:inherit;font-size:14px;font-weight:900;cursor:pointer;text-align:center;text-decoration:none">💬 카카오톡 채널 열기</a>
+    <button onclick="document.getElementById('kakao-popup').style.display='none'" style="background:#f5f5f5;color:#888;border:none;border-radius:8px;padding:10px;font-family:inherit;font-size:13px;cursor:pointer">닫기</button>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -762,7 +708,7 @@ function setMode(m) {
   document.getElementById('day-steps').style.display = m==='day'?'flex':'none';
   document.getElementById('pkg-wrap').style.display = m==='pkg'?'block':'none';
   document.getElementById('day-wrap').style.display = m==='day'?'block':'none';
-  if(m==='day') renderDayCards();
+  if(m==='day') renderEntries();
   window.scrollTo(0,0);
 }
 
@@ -1053,269 +999,209 @@ function hSelDayTour(el){selDayTour(parseInt(el.getAttribute('data-idx')));}
 // 1일 투어 STATE
 // ══════════════════════════════════════════
 var DS = {
-  tourIdx: -1,
-  entries: [],   // [{date}]
-  pax: {},       // {연령대: 인원수}
-  total: 0
+  entries: []
+  // 각 entry: { date, tourIdx, pax:{}, pickup, dropoff }
 };
 
-// ── 투어 카드 렌더링 ──
-function renderDayCards() {
+// ── 날짜 카드 추가 ──
+function addEntry() {
+  DS.entries.push({ date:'', tourIdx:-1, pax:{}, pickup:'', dropoff:'' });
+  renderEntries();
+}
+
+function removeEntry(idx) {
+  DS.entries.splice(idx, 1);
+  renderEntries();
+}
+
+// ── 날짜 카드 렌더링 ──
+function renderEntries() {
   if(!DB || !DB.day_tours) return;
   var html = '';
-  DB.day_tours.forEach(function(tour, i) {
-    var minPrice = Math.min.apply(null, Object.values(tour.prices));
-    var on = DS.tourIdx === i;
-    html += '<div style="border:2px solid '+(on?'#f5a623':'#e8edf3')+';border-radius:14px;padding:16px;margin-bottom:14px;background:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(26,42,94,.08)" onclick="selDayTour('+i+')">';
-    html += '<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px">';
-    html += '<div style="font-size:32px;flex-shrink:0">'+tour.icon+'</div>';
-    html += '<div style="flex:1">';
-    html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">';
-    if(tour.tag) html += '<span class="badge badge-gold">'+tour.tag+'</span>';
-    html += '<span class="badge badge-blue">🤝 조인 가능</span>';
-    html += '</div>';
-    html += '<div style="font-size:15px;font-weight:900;color:#1a2a5e">'+tour.name+'</div>';
-    html += '<div style="font-size:11px;color:#888;margin-top:2px">'+tour.subtitle+'</div>';
-    html += '</div>';
-    html += '<div style="text-align:right;flex-shrink:0"><div style="font-size:10px;color:#aaa">최저가</div><div style="font-size:16px;font-weight:900;color:#f5a623">'+(minPrice/10000)+'만원~</div></div>';
-    html += '</div>';
-    html += '<div style="font-size:12px;color:#555;line-height:1.7;margin-bottom:12px">'+tour.desc+'</div>';
-    // 일정 타임라인
-    html += '<div style="background:#f8f9fc;border-radius:10px;padding:12px;margin-bottom:12px">';
-    html += '<div style="font-size:11px;font-weight:900;color:#888;margin-bottom:8px">📅 일정</div>';
-    tour.schedule.forEach(function(s) {
-      html += '<div style="display:flex;gap:10px;font-size:12px;margin-bottom:4px">';
-      html += '<div style="min-width:44px;font-weight:700;color:#f5a623">'+s.time+'</div>';
-      html += '<div style="color:#333">'+s.desc+'</div></div>';
-    });
-    html += '</div>';
-    // 포함/불포함
-    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">';
-    html += '<div style="background:#eaf7ef;border:1px solid #a8ddb5;border-radius:8px;padding:10px;font-size:11px">';
-    html += '<div style="font-weight:900;margin-bottom:4px">✅ 포함</div>';
-    (tour.includes||[]).forEach(function(x){ html += '<div>· '+x+'</div>'; });
-    html += '</div>';
-    html += '<div style="background:#fef5e7;border:1px solid #f9d89c;border-radius:8px;padding:10px;font-size:11px">';
-    html += '<div style="font-weight:900;margin-bottom:4px">⚠️ 불포함</div>';
-    (tour.excludes||[]).forEach(function(x){ html += '<div>· '+x+'</div>'; });
-    html += '</div></div>';
-    // 요금표
-    html += '<div style="background:#1a2a5e;border-radius:10px;padding:12px;margin-bottom:12px">';
-    html += '<div style="font-size:11px;font-weight:900;color:#f5a623;margin-bottom:8px">💰 투어 요금 (1인 기준)</div>';
-    Object.entries(tour.prices).forEach(function(e) {
-      html += '<div style="display:flex;justify-content:space-between;font-size:12px;color:#fff;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.07)">';
-      html += '<span style="opacity:.8">'+e[0]+'</span><span style="font-weight:700;color:#f5a623">'+(e[1]/10000)+'만원/인</span></div>';
-    });
-    html += '<div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:6px">'+tour.min_pax+'</div></div>';
-    // 선택 버튼
-    html += '<button onclick="event.stopPropagation();selDayTour('+i+');goDay(1)" style="width:100%;border:none;border-radius:10px;padding:13px;font-family:inherit;font-size:14px;font-weight:900;cursor:pointer;background:'+(on?'#f5a623':'linear-gradient(135deg,#1a2a5e,#2d4a9e)')+';color:'+(on?'#1a2a5e':'#fff')+'">';
-    html += (on?'✅ 선택됨 → 날짜/인원 선택하기':''+tour.icon+' 이 투어 신청하기');
-    html += '</button>';
-    html += '</div>';
-  });
-  var el = document.getElementById('day-cards');
-  if(el) el.innerHTML = html;
-}
-
-function selDayTour(i) {
-  DS.tourIdx = i;
-  DS.entries = [];
-  DS.pax = {};
-  renderDayCards();
-  // 배너 업데이트
-  var tour = DB.day_tours[i];
-  var bi = document.getElementById('stb-icon');
-  var bn = document.getElementById('stb-name');
-  var bs = document.getElementById('stb-sub');
-  if(bi) bi.textContent = tour.icon;
-  if(bn) bn.textContent = tour.name;
-  if(bs) bs.textContent = tour.subtitle;
-}
-
-// ── 날짜 추가 ──
-function addDayEntry() {
-  DS.entries.push({date:''});
-  renderDayDateList();
-}
-
-function removeDayEntry(idx) {
-  DS.entries.splice(idx, 1);
-  renderDayDateList();
-}
-
-function renderDayDateList() {
-  var html = '';
   DS.entries.forEach(function(entry, i) {
-    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">';
-    html += '<input type="date" value="'+entry.date+'" onchange="DS.entries['+i+'].date=this.value" style="flex:1;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:13px;outline:none">';
-    html += '<button onclick="removeDayEntry('+i+')" style="border:none;background:#ffebee;color:#e53935;border-radius:6px;padding:8px 12px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">삭제</button>';
+    html += '<div style="border:1.5px solid #e8edf3;border-radius:12px;overflow:hidden;margin-bottom:14px">';
+    // 헤더
+    html += '<div style="background:#1a2a5e;padding:10px 14px;display:flex;align-items:center;gap:10px">';
+    html += '<span style="background:#f5a623;color:#1a2a5e;font-size:10px;font-weight:900;padding:2px 8px;border-radius:20px">DAY '+(i+1)+'</span>';
+    html += '<input type="date" value="'+entry.date+'" onchange="DS.entries['+i+'].date=this.value" style="flex:1;border:none;border-radius:6px;padding:6px 10px;font-family:inherit;font-size:13px;font-weight:700;outline:none;color:#1a2a5e">';
+    html += '<button onclick="removeEntry('+i+')" style="border:none;background:rgba(255,255,255,.15);color:#fff;border-radius:6px;padding:5px 10px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer">삭제</button>';
+    html += '</div>';
+    // 투어 선택
+    html += '<div style="padding:14px 14px 0">';
+    html += '<div style="font-size:12px;font-weight:900;color:#888;margin-bottom:8px">☀️ 투어 선택</div>';
+    DB.day_tours.forEach(function(tour, ti) {
+      var minPrice = Math.min.apply(null, Object.values(tour.prices));
+      var sel = entry.tourIdx === ti;
+      html += '<div onclick="selEntry('+i+','+ti+')" style="border:1.5px solid '+(sel?'#f5a623':'#e8edf3')+';border-radius:8px;padding:10px 12px;margin-bottom:6px;cursor:pointer;background:'+(sel?'#fffbf2':'#fff')+';display:flex;align-items:center;gap:10px">';
+      html += '<div style="width:18px;height:18px;border-radius:50%;border:2px solid '+(sel?'#f5a623':'#ccc')+';background:'+(sel?'#f5a623':'transparent')+';flex-shrink:0"></div>';
+      html += '<div style="font-size:20px">'+tour.icon+'</div>';
+      html += '<div style="flex:1"><div style="font-size:13px;font-weight:700;color:#1a2a5e">'+tour.name+'</div><div style="font-size:11px;color:#888">'+tour.subtitle+'</div></div>';
+      html += '<div style="font-size:12px;font-weight:700;color:#f5a623">'+(minPrice/10000)+'만원~</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+    // 인원 (투어 선택 시 표시)
+    if(entry.tourIdx >= 0) {
+      var tour = DB.day_tours[entry.tourIdx];
+      html += '<div style="padding:10px 14px 0">';
+      html += '<div style="font-size:12px;font-weight:900;color:#888;margin-bottom:8px">👥 인원 선택</div>';
+      Object.entries(tour.prices).forEach(function(e) {
+        var lbl = e[0], price = e[1], cnt = entry.pax[lbl]||0;
+        html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f5f5f5">';
+        html += '<div><div style="font-size:12px;font-weight:700;color:#1a2a5e">'+lbl+'</div><div style="font-size:11px;color:#f5a623;font-weight:700">'+(price/10000)+'만원/인</div></div>';
+        html += '<div style="display:flex;align-items:center;gap:10px">';
+        html += '<button data-i="'+i+'" data-lbl="'+lbl+'" data-d="-1" onclick="adjEntry(this)" style="width:30px;height:30px;border-radius:50%;border:1.5px solid #e0e0e0;background:#fff;font-size:16px;font-weight:700;cursor:pointer;color:#555">−</button>';
+        html += '<div style="font-size:15px;font-weight:900;min-width:20px;text-align:center">'+cnt+'</div>';
+        html += '<button data-i="'+i+'" data-lbl="'+lbl+'" data-d="1" onclick="adjEntry(this)" style="width:30px;height:30px;border-radius:50%;border:1.5px solid #f5a623;background:#f5a623;font-size:16px;font-weight:700;cursor:pointer;color:#1a2a5e">+</button>';
+        html += '</div></div>';
+      });
+      html += '</div>';
+    }
+    // 픽업/샌딩 장소
+    html += '<div style="padding:10px 14px 14px">';
+    html += '<div style="font-size:12px;font-weight:900;color:#888;margin-bottom:8px">🚗 픽업 / 샌딩 장소</div>';
+    html += '<div style="margin-bottom:8px">';
+    html += '<label style="font-size:11px;font-weight:700;color:#888;display:block;margin-bottom:3px">🚗 픽업 장소 (출발지)</label>';
+    html += '<input type="text" value="'+escAttr(entry.pickup)+'" placeholder="예: 장가계 오렌지 호텔 로비" oninput="DS.entries['+i+'].pickup=this.value" style="width:100%;border:1.5px solid #e0e0e0;border-radius:7px;padding:8px 11px;font-family:inherit;font-size:12px;outline:none">';
+    html += '</div>';
+    html += '<div>';
+    html += '<label style="font-size:11px;font-weight:700;color:#888;display:block;margin-bottom:3px">🚗 샌딩 장소 (도착지)</label>';
+    html += '<input type="text" value="'+escAttr(entry.dropoff)+'" placeholder="예: 허화 국제공항 / 장가계서역 / 호텔명" oninput="DS.entries['+i+'].dropoff=this.value" style="width:100%;border:1.5px solid #e0e0e0;border-radius:7px;padding:8px 11px;font-family:inherit;font-size:12px;outline:none">';
+    html += '</div></div>';
     html += '</div>';
   });
   if(DS.entries.length === 0) {
-    html = '<div style="text-align:center;padding:16px;font-size:12px;color:#bbb">아래 버튼을 눌러 날짜를 추가하세요</div>';
+    html = '<div style="text-align:center;padding:24px;font-size:13px;color:#bbb;border:1.5px dashed #e0e0e0;border-radius:12px;margin-bottom:12px">위 버튼을 눌러 날짜를 추가하세요</div>';
   }
-  var el = document.getElementById('day-date-list');
+  var el = document.getElementById('day-entry-list');
   if(el) el.innerHTML = html;
 }
 
-// ── 인원 선택 ──
-function renderDayPax() {
-  var el = document.getElementById('day-pax-area');
-  if(!el || DS.tourIdx < 0 || !DB || !DB.day_tours) return;
-  var tour = DB.day_tours[DS.tourIdx];
-  if(!tour) return;
-  var html = '';
-  Object.entries(tour.prices).forEach(function(e) {
-    var lbl = e[0], price = e[1], cnt = DS.pax[lbl]||0;
-    html += '<div class="pax-counter-row">';
-    html += '<div><div class="pax-age">'+lbl+'</div><div class="pax-price">'+(price/10000)+'만원/인</div></div>';
-    html += '<div class="counter">';
-    html += '<button class="cnt-btn" data-lbl="'+lbl+'" data-delta="-1" onclick="hDayPax(this)">−</button>';
-    html += '<div class="cnt-num">'+cnt+'</div>';
-    html += '<button class="cnt-btn plus" data-lbl="'+lbl+'" data-delta="1" onclick="hDayPax(this)">+</button>';
-    html += '</div></div>';
-  });
-  el.innerHTML = html;
+function escAttr(s) { return (s||'').replace(/"/g,'&quot;'); }
+
+function selEntry(i, ti) {
+  DS.entries[i].tourIdx = ti;
+  DS.entries[i].pax = {};
+  renderEntries();
 }
 
-function hDayPax(el){adjPax(el.getAttribute("data-lbl"),parseInt(el.getAttribute("data-delta")));}
-function adjPax(lbl, delta) {
-  DS.pax[lbl] = Math.max(0, (DS.pax[lbl]||0) + delta);
-  renderDayPax();
+function adjEntry(btn) {
+  var i = parseInt(btn.getAttribute('data-i'));
+  var lbl = btn.getAttribute('data-lbl');
+  var d = parseInt(btn.getAttribute('data-d'));
+  DS.entries[i].pax[lbl] = Math.max(0, (DS.entries[i].pax[lbl]||0) + d);
+  renderEntries();
 }
 
-// ── 견적 ──
+// ── 견적 빌드 ──
 function buildDaySummary() {
-  if(!DB || DS.tourIdx < 0) return;
-  var tour = DB.day_tours[DS.tourIdx];
-  var _ha = document.getElementById('d-hotel-area');
-  var _hn = document.getElementById('d-hotel-name');
-  var _hnt = document.getElementById('d-hotel-note');
-  var hotel = (_ha && _ha.value) ? _ha.value : '';
-  var hname = (_hn && _hn.value) ? _hn.value : '';
-  var hnote = (_hnt && _hnt.value) ? _hnt.value : '';
-  var validDates = DS.entries.filter(function(e){ return e.date; });
-
-  // 상단 요약
-  var rows = '<div class="sum-row"><span class="sum-lbl">투어</span><span class="sum-val">'+tour.icon+' '+tour.name+'</span></div>';
-  if(hotel) rows += '<div class="sum-row"><span class="sum-lbl">숙박 지역</span><span class="sum-val">'+hotel+'</span></div>';
-  if(hname) rows += '<div class="sum-row"><span class="sum-lbl">호텔명</span><span class="sum-val">'+hname+'</span></div>';
-  if(hnote) rows += '<div class="sum-row"><span class="sum-lbl">기타</span><span class="sum-val">'+hnote+'</span></div>';
-  document.getElementById('day-sum-body').innerHTML = rows;
-
-  // 상세 내역
-  var bdHtml = '';
+  if(!DB) return;
+  var html = '';
   var depositTotal = 0;
+  var validEntries = DS.entries.filter(function(e){ return e.date && e.tourIdx >= 0; });
 
-  if(validDates.length === 0) {
-    bdHtml = '<div style="opacity:.5;font-size:12px;text-align:center;padding:12px">날짜를 선택해 주세요</div>';
-  } else {
-    validDates.forEach(function(entry) {
-      bdHtml += '<div style="border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:10px 12px;margin-bottom:8px">';
-      bdHtml += '<div style="font-size:12px;font-weight:700;color:#f5a623;margin-bottom:4px">📅 '+entry.date+'</div>';
-      bdHtml += '<div style="font-size:11px;color:#fff;opacity:.8;margin-bottom:6px">'+tour.icon+' '+tour.name+'</div>';
-      // 인원별 요금
-      var hasPax = false;
-      Object.entries(DS.pax).forEach(function(e) {
-        if(e[1] > 0) {
-          hasPax = true;
-          var subtotal = (tour.prices[e[0]]||0) * e[1];
-          bdHtml += '<div style="display:flex;justify-content:space-between;font-size:11px;color:#ddd;padding:2px 0">';
-          bdHtml += '<span>'+e[0]+' × '+e[1]+'인</span>';
-          bdHtml += '<span style="color:#ffd54f">'+(subtotal/10000)+'만원</span></div>';
-        }
-      });
-      if(!hasPax) {
-        bdHtml += '<div style="font-size:11px;color:rgba(255,255,255,.4)">인원 미선택</div>';
-      }
-      bdHtml += '<div style="margin-top:6px;padding-top:6px;border-top:1px dashed rgba(255,255,255,.15);display:flex;justify-content:space-between;font-size:11px">';
-      bdHtml += '<span style="color:#f5a623;font-weight:700">예약금</span>';
-      bdHtml += '<span style="color:#f5a623;font-weight:900">20만원/팀</span></div>';
-      bdHtml += '</div>';
-      depositTotal += 20;
-    });
-    if(validDates.length > 1) {
-      bdHtml += '<div style="display:flex;justify-content:space-between;padding:8px 4px;border-top:1px solid rgba(245,166,35,.4);margin-top:4px">';
-      bdHtml += '<span style="color:#f5a623;font-weight:700">총 예약금</span>';
-      bdHtml += '<span style="color:#f5a623;font-weight:900">'+depositTotal+'만원 (20만원×'+validDates.length+'일)</span></div>';
-    }
+  if(validEntries.length === 0) {
+    html = '<div style="opacity:.5;font-size:12px;text-align:center;padding:16px">날짜와 투어를 선택해 주세요</div>';
+    document.getElementById('day-quote-body').innerHTML = html;
+    document.getElementById('day-total').textContent = '—';
+    return;
   }
 
-  document.getElementById('day-bd-rows').innerHTML = bdHtml;
-  document.getElementById('day-total').textContent = depositTotal > 0 ? depositTotal+'만원 / 팀' : '날짜 선택 후 계산';
-  DS.total = depositTotal;
+  validEntries.forEach(function(entry) {
+    var tour = DB.day_tours[entry.tourIdx];
+    html += '<div style="border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:12px 14px;margin-bottom:10px">';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">';
+    html += '<span style="font-size:20px">'+tour.icon+'</span>';
+    html += '<div><div style="font-size:13px;font-weight:700;color:#f5a623">'+entry.date+'</div>';
+    html += '<div style="font-size:12px;color:#fff;opacity:.9">'+tour.name+'</div></div>';
+    html += '</div>';
+    // 인원별 요금
+    var hasPax = false;
+    Object.entries(entry.pax).forEach(function(e) {
+      if(e[1] > 0) {
+        hasPax = true;
+        var subtotal = (tour.prices[e[0]]||0) * e[1];
+        html += '<div style="display:flex;justify-content:space-between;font-size:11.5px;color:#ddd;padding:3px 0">';
+        html += '<span>'+e[0]+' × '+e[1]+'인</span>';
+        html += '<span style="color:#ffd54f">'+(subtotal/10000)+'만원</span></div>';
+      }
+    });
+    if(!hasPax) html += '<div style="font-size:11px;color:rgba(255,255,255,.4)">인원 미선택 (카카오톡에서 확인)</div>';
+    // 픽업/샌딩
+    if(entry.pickup) html += '<div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:4px">🚗 픽업: '+entry.pickup+'</div>';
+    if(entry.dropoff) html += '<div style="font-size:11px;color:rgba(255,255,255,.7)">🚗 샌딩: '+entry.dropoff+'</div>';
+    // 예약금
+    html += '<div style="display:flex;justify-content:space-between;padding-top:8px;margin-top:8px;border-top:1px dashed rgba(255,255,255,.2)">';
+    html += '<span style="font-size:12px;color:#f5a623;font-weight:700">예약금</span>';
+    html += '<span style="font-size:12px;color:#f5a623;font-weight:900">20만원 / 팀</span></div>';
+    html += '</div>';
+    depositTotal += 20;
+  });
+
+  document.getElementById('day-quote-body').innerHTML = html;
+  document.getElementById('day-total').textContent = depositTotal + '만원 / 팀';
 }
 
-// ── 카카오톡 제출 ──
-function submitDay() {
-  if(!DB) { openKakao(); return; }
-  var tourIdx = DS.tourIdx >= 0 ? DS.tourIdx : 0;
-  var tour = DB.day_tours[tourIdx];
-  var hotelEl = document.getElementById('d-hotel-area');
-  var hnameEl = document.getElementById('d-hotel-name');
-  var hnoteEl = document.getElementById('d-hotel-note');
-  var hotel = (hotelEl && hotelEl.value) ? hotelEl.value : '미입력';
-  var hname = (hnameEl && hnameEl.value) ? hnameEl.value : '미입력';
-  var hnote = (hnoteEl && hnoteEl.value) ? hnoteEl.value : '';
-  var validDates = DS.entries.filter(function(e){ return e.date; });
-
+// ── 카카오톡 팝업 ──
+function openDayKakaoPopup() {
+  if(!DB) return;
+  var validEntries = DS.entries.filter(function(e){ return e.date && e.tourIdx >= 0; });
   var lines = [
-    '안녕하세요! 로투차 1일 투어 예약 문의드립니다 😊','',
-    '━━━━━━━━━━━━━━━━━━',
-    '☀️ '+tour.icon+' '+tour.name,
-    '📍 '+tour.subtitle,'',
-    '🏨 픽업 호텔',
-    '  지역: '+hotel,
-    '  호텔명: '+hname,
-    (hnote ? '  기타: '+hnote : ''),
-    '━━━━━━━━━━━━━━━━━━',
-    '📅 신청 날짜:'
+    '안녕하세요! 로투차 1일 투어 예약 문의드립니다 😊',
+    '━━━━━━━━━━━━━━━━━━'
   ];
-  validDates.forEach(function(e){ lines.push('  · '+e.date); });
-  lines.push('');
-  lines.push('👥 인원:');
-  Object.entries(DS.pax).forEach(function(e){
-    if(e[1]>0) lines.push('  · '+e[0]+': '+e[1]+'인');
-  });
-  lines.push('━━━━━━━━━━━━━━━━━━');
-  lines.push('💰 예약금: '+DS.total+'만원 / 팀 (투어당 20만원)');
-  lines.push('※ 옵션은 현장에서 현금으로 결제합니다');
+  if(validEntries.length === 0) {
+    lines.push('(날짜와 투어를 선택해 주세요)');
+  } else {
+    validEntries.forEach(function(entry, i) {
+      var tour = DB.day_tours[entry.tourIdx];
+      lines.push('');
+      lines.push('【'+(i+1)+'번째 투어】');
+      lines.push('📅 날짜: '+entry.date);
+      lines.push('☀️ 투어: '+tour.icon+' '+tour.name);
+      var hasPax = false;
+      Object.entries(entry.pax).forEach(function(e) {
+        if(e[1] > 0) { hasPax = true; lines.push('👥 '+e[0]+': '+e[1]+'인'); }
+      });
+      if(!hasPax) lines.push('👥 인원: (추후 확인)');
+      if(entry.pickup) lines.push('🚗 픽업: '+entry.pickup);
+      if(entry.dropoff) lines.push('🚗 샌딩: '+entry.dropoff);
+      lines.push('💰 예약금: 20만원 / 팀');
+    });
+    lines.push('');
+    lines.push('━━━━━━━━━━━━━━━━━━');
+    lines.push('💰 예약금 합계: '+(validEntries.length*20)+'만원 (20만원×'+validEntries.length+'일)');
+    lines.push('※ 옵션은 현장 현금 결제');
+  }
   lines.push('━━━━━━━━━━━━━━━━━━');
   lines.push('확인 후 연락 주세요!');
 
-  var msg = lines.filter(function(l){ return l !== undefined; }).join('\n');
+  var msg = lines.join('\n');
+  document.getElementById('kakao-text').value = msg;
+  document.getElementById('kakao-link').href = DB.brand.kakao;
+  document.getElementById('copy-btn').textContent = '📋 내용 복사하기';
+  document.getElementById('kakao-popup').style.display = 'flex';
+}
+
+function copyKakaoText() {
+  var ta = document.getElementById('kakao-text');
+  ta.select();
+  ta.setSelectionRange(0, 99999);
   try {
-    if(navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(msg).then(function(){
-        showToast('✅ 내용이 복사되었습니다! 카카오톡이 열리면 붙여넣기 해주세요 😊');
-        setTimeout(function(){ window.open(DB.brand.kakao,'_blank'); }, 1500);
-      }).catch(function(){
-        fallbackCopy(msg);
-      });
-    } else {
-      fallbackCopy(msg);
-    }
+    document.execCommand('copy');
+    document.getElementById('copy-btn').textContent = '✅ 복사 완료！';
+    document.getElementById('copy-btn').style.background = '#2e7d32';
   } catch(e) {
-    fallbackCopy(msg);
+    document.getElementById('copy-btn').textContent = '⚠️ 직접 선택 후 복사해 주세요';
   }
 }
 
-function fallbackCopy(msg) {
-  var ta = document.createElement('textarea');
-  ta.value = msg;
-  ta.style.position = 'fixed';
-  ta.style.opacity = '0';
-  document.body.appendChild(ta);
-  ta.focus();
-  ta.select();
-  try {
-    document.execCommand('copy');
-    showToast('✅ 내용이 복사되었습니다! 카카오톡이 열리면 붙여넣기 해주세요 😊');
-    setTimeout(function(){ window.open(DB.brand.kakao,'_blank'); }, 1500);
-  } catch(e) {
-    window.open(DB.brand.kakao,'_blank');
-  }
-  document.body.removeChild(ta);
+// ── goDay 수정 ──
+function goDay(n) {
+  document.querySelectorAll('#day-wrap .page').forEach(function(p,i){p.classList.toggle('on',i===n)});
+  document.querySelectorAll('#day-steps .step-btn').forEach(function(b,i){b.classList.toggle('active',i===n);b.classList.toggle('done',i<n)});
+  if(n===1) buildDaySummary();
+  window.scrollTo(0,0);
 }
 
 // ── 모드 전환 시 초기화 ──
