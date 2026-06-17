@@ -539,7 +539,9 @@
       "tip": "유리다리 위에서는 덧신을 착용해야 합니다 (현장 제공). 겁이 나면 가장자리를 잡고 천천히 걸어도 됩니다!",
       "duration": "약 2~4시간",
       "gaode": "https://uri.amap.com/search?keyword=张家界大峡谷玻璃桥&city=张家界",
-      "images": []
+      "images": [
+        "https://i.ibb.co/ycm69YcJ/IMG-7623.jpg"
+      ]
     },
     "airport_departure": {
       "name": "공항 센딩 → 귀국",
