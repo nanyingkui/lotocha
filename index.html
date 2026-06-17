@@ -714,6 +714,22 @@ var curMode = 'pkg';
 var curPkgStep = 0;
 var curDayStep = 0;
 
+// ── 从JSON同步管理员上传的图片 ──
+var LOTOCHA_JSON = 'https://raw.githubusercontent.com/nanyingkui/lotocha/main/lotocha_data.json';
+fetch(LOTOCHA_JSON + '?t=' + Date.now())
+  .then(function(r){ return r.json(); })
+  .then(function(remote){
+    if(remote.day_tours) {
+      remote.day_tours.forEach(function(rt, i){
+        if(DB.day_tours[i] && rt.images && rt.images.length > 0){
+          DB.day_tours[i].images = rt.images;
+        }
+      });
+    }
+    if(curMode === 'day') renderEntries();
+  })
+  .catch(function(){});
+
 // ── MODE ──
 function setMode(m) {
   curMode = m;
