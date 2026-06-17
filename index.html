@@ -1031,23 +1031,32 @@ function removeEntry(idx) {
 
 // ── 날짜 카드 렌더링 ──
 
-// ── 투어별 경관 이미지 ──
-var TOUR_IMAGES = [
-  [  // 0: 국가삼림공원
+// ── 투어별 경관 이미지 (관리자에서 업로드한 이미지 우선, 없으면 기본 이미지) ──
+var TOUR_IMAGES_DEFAULT = [
+  [
     {src:'https://nanyingkui.github.io/lotocha/forest1.jpg',cap:'장가계 산수 전경'},
     {src:'https://nanyingkui.github.io/lotocha/forest2.jpg',cap:'보봉호'},
     {src:'https://nanyingkui.github.io/lotocha/forest3.jpg',cap:'금편계'}
   ],
-  [  // 1: 천문산
+  [
     {src:'https://nanyingkui.github.io/lotocha/tianmen1.jpg',cap:'천문동'},
     {src:'https://nanyingkui.github.io/lotocha/tianmen2.jpg',cap:'공항에서 본 천문산'},
     {src:'https://nanyingkui.github.io/lotocha/tianmen3.jpg',cap:'공중전원'}
   ],
-  [  // 2: 황룡동+대협곡
+  [
     {src:'https://nanyingkui.github.io/lotocha/canyon1.jpg',cap:'황룡동'},
     {src:'https://nanyingkui.github.io/lotocha/canyon2.jpg',cap:'대협곡 유리다리'}
   ]
 ];
+function getTourImages(ti){
+  var tour=DB&&DB.day_tours&&DB.day_tours[ti];
+  if(tour&&tour.images&&tour.images.length>0){
+    return tour.images.map(function(img){
+      return typeof img==='string'?{src:img,cap:''}:img;
+    });
+  }
+  return TOUR_IMAGES_DEFAULT[ti]||[];
+}
 
 function renderEntries() {
   if(!DB || !DB.day_tours) return;
@@ -1562,8 +1571,9 @@ function renderDayCards() {
     html += '<div class="dt-min-price"><div class="dt-min-lbl">최저가</div><div class="dt-min-val">'+(mn/10000)+'만원~</div></div></div>';
     html += '<div class="dt-desc">'+tour.desc+'</div>';
     html += '<div style="display:flex;gap:6px;overflow-x:auto;margin-bottom:10px;padding-bottom:2px">';
-    if(TOUR_IMAGES[ti]) {
-      TOUR_IMAGES[ti].forEach(function(img){
+    var tourImgs=getTourImages(ti);
+    if(tourImgs.length>0) {
+      tourImgs.forEach(function(img){
         html += '<div style="flex-shrink:0;border-radius:8px;overflow:hidden;position:relative">';
         html += '<img src="'+img.src+'" alt="'+img.cap+'" style="width:130px;height:86px;object-fit:cover;display:block" loading="lazy">';
         html += '<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.5);color:#fff;font-size:9px;padding:2px 6px;font-family:inherit">'+img.cap+'</div>';
