@@ -320,20 +320,64 @@ function addPhotoUrl(sid){
   DB.spots[sid].images.push(url.trim());
   renderSpots();showToast('사진 추가됨');
 }
+var IMGBB_KEY = '88858fb6a8615a96823bc77823f01569';
+
+async function uploadToImgBB(file){
+  var formData = new FormData();
+  formData.append('image', file);
+  var res = await fetch('https://api.imgbb.com/1/upload?key='+IMGBB_KEY, {method:'POST',body:formData});
+  var json = await res.json();
+  if(json.success) return json.data.url;
+  throw new Error('ImgBB 업로드 실패');
+}
+
 function uploadPhotos(sid,input){
   var files=Array.from(input.files);
   if(!DB.spots[sid].images)DB.spots[sid].images=[];
-  var rem=files.length;
+  var done=0;
+  showToast('⏳ 업로드 중... (0/'+files.length+')');
   files.forEach(function(file){
-    var reader=new FileReader();
-    reader.onload=function(e){
-      DB.spots[sid].images.push(e.target.result);
-      rem--;if(rem===0){renderSpots();showToast('사진 '+files.length+'장 추가됨');}
-    };
-    reader.readAsDataURL(file);
+    uploadToImgBB(file).then(function(url){
+      DB.spots[sid].images.push(url);
+      done++;
+      if(done===files.length){renderSpots();showToast('✅ '+files.length+'장 업로드 완료!');}
+      else showToast('⏳ 업로드 중... ('+done+'/'+files.length+')');
+    }).catch(function(){
+      done++;
+      showToast('❌ 일부 업로드 실패');
+    });
   });
+  input.value='';
 }
 function delPhoto(sid,idx){DB.spots[sid].images.splice(idx,1);renderSpots();}
+
+// ── 1일 투어 사진 ──
+function addTourPhotoUrl(ti){
+  var url=prompt('사진 URL을 입력하세요:');
+  if(!url||!url.trim())return;
+  if(!DB.day_tours[ti].images)DB.day_tours[ti].images=[];
+  DB.day_tours[ti].images.push({src:url.trim(),cap:''});
+  renderDayTours();showToast('사진 추가됨');
+}
+function uploadTourPhotos(ti,input){
+  var files=Array.from(input.files);
+  if(!DB.day_tours[ti].images)DB.day_tours[ti].images=[];
+  var done=0;
+  showToast('⏳ 업로드 중... (0/'+files.length+')');
+  files.forEach(function(file){
+    uploadToImgBB(file).then(function(url){
+      DB.day_tours[ti].images.push({src:url,cap:''});
+      done++;
+      if(done===files.length){renderDayTours();showToast('✅ '+files.length+'장 업로드 완료!');}
+      else showToast('⏳ 업로드 중... ('+done+'/'+files.length+')');
+    }).catch(function(){
+      done++;
+      showToast('❌ 일부 업로드 실패');
+    });
+  });
+  input.value='';
+}
+function delTourPhoto(ti,idx){DB.day_tours[ti].images.splice(idx,1);renderDayTours();}
 
 // ── 옵션 ──
 function renderOptions(){
@@ -419,6 +463,21 @@ function renderDayTours(){
     html+='<div class="fitem"><label>태그</label><input type="text" value="'+esc(tour.tag||'')+'" onchange="DB.day_tours['+ti+'].tag=this.value"></div>';
     html+='<div class="fitem full"><label>설명</label><textarea onchange="DB.day_tours['+ti+'].desc=this.value" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:12px;resize:none;outline:none;min-height:70px">'+esc(tour.desc||'')+'</textarea></div>';
     html+='<div class="fitem full"><label>최소 인원</label><input type="text" value="'+esc(tour.min_pax||'')+'" onchange="DB.day_tours['+ti+'].min_pax=this.value"></div>';
+    html+='</div>';
+    // 경관 사진
+    html+='<div class="divider">📷 경관 사진 <span style="font-size:11px;color:#888;font-weight:400">(index.html 투어 카드에 표시됨)</span></div>';
+    html+='<div class="photo-area" id="tour-photos-'+ti+'">';
+    (tour.images||[]).forEach(function(img,ii){
+      var src=typeof img==='object'?img.src:img;
+      var cap=typeof img==='object'?(img.cap||''):'';
+      html+='<div style="position:relative;display:inline-block">';
+      html+='<div class="photo-thumb"><img src="'+src+'" onerror="this.style.display=\'none\'"><button class="photo-del" onclick="delTourPhoto('+ti+','+ii+')">✕</button></div>';
+      html+='<input type="text" value="'+esc(cap)+'" placeholder="캡션" onchange="DB.day_tours['+ti+'].images['+ii+'].cap=this.value" style="width:80px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;padding:2px 5px;margin-top:2px;outline:none">';
+      html+='</div>';
+    });
+    html+='<div class="photo-add" onclick="addTourPhotoUrl('+ti+')"><div class="photo-add-icon">+</div><div>URL</div></div>';
+    html+='<div class="photo-add" onclick="document.getElementById(\'tpf-'+ti+'\').click()"><div class="photo-add-icon">📷</div><div>업로드</div></div>';
+    html+='<input type="file" id="tpf-'+ti+'" accept="image/*" multiple style="display:none" onchange="uploadTourPhotos('+ti+',this)">';
     html+='</div>';
     // 요금
     html+='<div class="divider">💰 요금 (원 단위)</div>';
@@ -599,3 +658,4 @@ function showToast(msg){
 </script>
 </body>
 </html>
+
