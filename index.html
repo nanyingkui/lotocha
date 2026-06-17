@@ -1030,6 +1030,25 @@ function removeEntry(idx) {
 }
 
 // ── 날짜 카드 렌더링 ──
+
+// ── 투어별 경관 이미지 ──
+var TOUR_IMAGES = [
+  [  // 0: 국가삼림공원
+    {src:'https://nanyingkui.github.io/lotocha/forest1.jpg',cap:'장가계 산수 전경'},
+    {src:'https://nanyingkui.github.io/lotocha/forest2.jpg',cap:'보봉호'},
+    {src:'https://nanyingkui.github.io/lotocha/forest3.jpg',cap:'금편계'}
+  ],
+  [  // 1: 천문산
+    {src:'https://nanyingkui.github.io/lotocha/tianmen1.jpg',cap:'천문동'},
+    {src:'https://nanyingkui.github.io/lotocha/tianmen2.jpg',cap:'공항에서 본 천문산'},
+    {src:'https://nanyingkui.github.io/lotocha/tianmen3.jpg',cap:'공중전원'}
+  ],
+  [  // 2: 황룡동+대협곡
+    {src:'https://nanyingkui.github.io/lotocha/canyon1.jpg',cap:'황룡동'},
+    {src:'https://nanyingkui.github.io/lotocha/canyon2.jpg',cap:'대협곡 유리다리'}
+  ]
+];
+
 function renderEntries() {
   if(!DB || !DB.day_tours) return;
   var html = '';
@@ -1542,6 +1561,16 @@ function renderDayCards() {
     html += '<div class="dt-name">'+tour.name+'</div><div class="dt-sub">'+tour.subtitle+'</div></div>';
     html += '<div class="dt-min-price"><div class="dt-min-lbl">최저가</div><div class="dt-min-val">'+(mn/10000)+'만원~</div></div></div>';
     html += '<div class="dt-desc">'+tour.desc+'</div>';
+    html += '<div style="display:flex;gap:6px;overflow-x:auto;margin-bottom:10px;padding-bottom:2px">';
+    if(TOUR_IMAGES[ti]) {
+      TOUR_IMAGES[ti].forEach(function(img){
+        html += '<div style="flex-shrink:0;border-radius:8px;overflow:hidden;position:relative">';
+        html += '<img src="'+img.src+'" alt="'+img.cap+'" style="width:130px;height:86px;object-fit:cover;display:block" loading="lazy">';
+        html += '<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.5);color:#fff;font-size:9px;padding:2px 6px;font-family:inherit">'+img.cap+'</div>';
+        html += '</div>';
+      });
+    }
+    html += '</div>';
     html += '<div class="dt-schedule"><div class="dt-sch-title">📅 일정</div>';
     tour.schedule.forEach(function(s){html+='<div class="dt-sch-row"><div class="dt-sch-time">'+s.time+'</div><div>'+s.desc+'</div></div>';});
     html += '</div>';
@@ -1706,6 +1735,43 @@ function openModal(src){
   if(!m){m=document.createElement('div');m.id='photo-modal';m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:999;display:flex;align-items:center;justify-content:center;cursor:pointer';m.onclick=function(){m.style.display='none';};document.body.appendChild(m);}
   m.innerHTML='<img src="'+src+'" style="max-width:92vw;max-height:88vh;border-radius:10px">';
   m.style.display='flex';
+}
+
+
+// ── index.html GitHub 자동 저장 ──
+var GH_TOKEN = localStorage.getItem('gh_token') || '';
+var GH_OWNER = 'nanyingkui';
+var GH_REPO = 'lotocha';
+
+async function saveIndexToGitHub() {
+  GH_TOKEN = localStorage.getItem('gh_token') || '';
+  if(!GH_TOKEN) {
+    var t = prompt('GitHub Personal Access Token을 입력하세요:');
+    if(!t) return;
+    localStorage.setItem('gh_token', t);
+    GH_TOKEN = t;
+  }
+  var btn = document.getElementById('gh-save-btn');
+  if(btn) { btn.textContent = '⏳ 저장 중...'; btn.disabled = true; }
+  try {
+    // 현재 HTML 가져오기
+    var html = document.documentElement.outerHTML;
+    var encoded = btoa(unescape(encodeURIComponent(html)));
+    // SHA 가져오기
+    var r = await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/index.html',
+      {headers:{'Authorization':'token '+GH_TOKEN,'Accept':'application/vnd.github.v3+json'}});
+    var sha = (await r.json()).sha;
+    // 업데이트
+    var pr = await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/index.html',
+      {method:'PUT',headers:{'Authorization':'token '+GH_TOKEN,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+       body:JSON.stringify({message:'index.html 업데이트',content:encoded,sha:sha})});
+    if(pr.ok) {
+      if(btn) { btn.textContent = '✅ 저장 완료!'; btn.style.background='#1a7a34'; }
+      setTimeout(function(){ if(btn){btn.textContent='💾 변경사항 저장';btn.style.background='#2ea44f';btn.disabled=false;}},3000);
+    } else { throw new Error('저장 실패'); }
+  } catch(e) {
+    if(btn) { btn.textContent = '❌ 실패 - 다시 시도'; btn.style.background='#c62828'; btn.disabled=false; }
+  }
 }
 
 function showToast(msg){
