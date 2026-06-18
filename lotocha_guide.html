@@ -7,14 +7,11 @@
 <title>장가계 여행 가이드 — 로투차</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<!-- Supabase JS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{--navy:#1a2a5e;--gold:#f5a623;--bg:#f0ede8;--red:#e53935;--green:#2e7d32;--blue:#1565c0}
 body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:var(--bg);color:var(--navy);min-height:100vh;max-width:480px;margin:0 auto}
-
-/* ── 고덕 배너 ── */
 .install-banner{background:linear-gradient(135deg,#00b140,#007a2f);color:#fff;padding:11px 13px;display:flex;align-items:flex-start;gap:9px}
 .ib-icon{font-size:26px;flex-shrink:0;margin-top:2px}
 .ib-text{flex:1}
@@ -23,12 +20,8 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .ib-btns{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
 .ib-btn{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:6px;padding:5px 10px;font-size:10px;font-weight:700;text-decoration:none}
 .ib-x{background:none;border:none;color:rgba(255,255,255,.5);font-size:20px;cursor:pointer;flex-shrink:0;line-height:1}
-
-/* ── 방문자 수 ── */
 .visitor-bar{background:var(--navy);color:rgba(255,255,255,.6);font-size:10px;font-weight:700;text-align:center;padding:5px;letter-spacing:.3px}
 .visitor-bar span{color:var(--gold)}
-
-/* ── 상단 ── */
 .top-bar{background:var(--navy);position:sticky;top:0;z-index:500;box-shadow:0 2px 10px rgba(0,0,0,.3)}
 .top-inner{display:flex;align-items:center;gap:8px;padding:0 13px;height:48px}
 .back-btn{background:none;border:none;color:#8892c4;font-size:12px;font-weight:700;cursor:pointer;padding:6px 0;flex-shrink:0}
@@ -38,32 +31,20 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .attr-bar::-webkit-scrollbar{display:none}
 .attr-btn{display:inline-flex;align-items:center;gap:5px;border:1.5px solid rgba(255,255,255,.15);background:transparent;color:#8892c4;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;margin-right:6px;font-family:inherit;transition:all .2s}
 .attr-btn.on{border-color:var(--gold);color:var(--gold);background:rgba(245,166,35,.1)}
-
-/* ── 카운트다운 ── */
 .cdbar{display:none;padding:8px 13px;font-size:12px;font-weight:700;text-align:center;position:sticky;top:48px;z-index:490}
 .cdbar.safe{background:#e8f5e9;color:var(--green)}.cdbar.warn{background:#fff3e0;color:#e65100}.cdbar.danger{background:#ffebee;color:var(--red);animation:blink .8s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
-
-/* ── 탭 바 ── */
 .tab-bar{background:#fff;border-bottom:1px solid #e0e7f0;display:flex;overflow-x:auto;scrollbar-width:none;position:sticky;top:48px;z-index:480}
 .tab-bar::-webkit-scrollbar{display:none}
 .tab-btn{flex-shrink:0;padding:10px 11px;font-size:11px;font-weight:700;color:#aaa;cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;border-top:none;border-left:none;border-right:none;background:none;font-family:inherit;transition:all .2s}
 .tab-btn.on{color:var(--navy);border-bottom-color:var(--gold)}
-
-/* ── 레이아웃 ── */
 .wrap{padding:13px 13px 80px}
 .page{display:none}.page.on{display:block}
 .stitle{font-size:10px;font-weight:900;color:#aaa;text-transform:uppercase;letter-spacing:.5px;margin:14px 0 7px;padding-left:2px}
-
-/* ── 카드 ── */
 .card{background:#fff;border-radius:13px;padding:14px;margin-bottom:11px;box-shadow:0 2px 7px rgba(26,42,94,.07)}
 .ctitle{font-size:14px;font-weight:900;color:var(--navy);margin-bottom:11px;display:flex;align-items:center;gap:7px}
-
-/* ── 배지 ── */
 .badge{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px}
 .b-gold{background:#fff8e1;color:#e65100}.b-green{background:#e8f5e9;color:var(--green)}.b-red{background:#ffebee;color:var(--red)}.b-blue{background:#e3f2fd;color:var(--blue)}
-
-/* ── 이동 탭 ── */
 .hotel-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:11px}
 .hotel-btn{border:1.5px solid #e0e0e0;background:#fff;border-radius:20px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;color:#555}
 .hotel-btn.on{border-color:var(--gold);background:#fffbf2;color:var(--navy)}
@@ -84,8 +65,6 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .lt-ok{background:rgba(76,175,80,.2);color:#81c784}.lt-warn{background:rgba(255,152,0,.2);color:#ffb74d}.lt-pass{background:rgba(255,255,255,.08);color:rgba(255,255,255,.35);text-decoration:line-through}
 .gaode-btn{display:flex;align-items:center;gap:6px;background:#00b140;color:#fff;border-radius:9px;padding:10px 14px;font-size:13px;font-weight:700;text-decoration:none;margin-bottom:8px;justify-content:center}
 .gaode-btn.navy{background:var(--navy)}
-
-/* ── 지도 탭 ── */
 #map-wrap{border-radius:13px;overflow:hidden;margin-bottom:11px;height:240px;position:relative}
 #map{height:100%;width:100%}
 .map-overlay{position:absolute;bottom:9px;right:9px;z-index:400;display:flex;flex-direction:column;gap:5px}
@@ -98,8 +77,6 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .zone-btn{flex-shrink:0;border:1.5px solid #e0e0e0;background:#fff;border-radius:8px;padding:6px 11px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;color:#555}
 .zone-btn.on{border-color:var(--navy);background:var(--navy);color:#fff}
 .shuttle-box{background:#e3f2fd;border-radius:9px;padding:10px 12px;margin-bottom:9px;font-size:11px;color:var(--blue);line-height:1.8}
-
-/* 스팟 아이템 */
 .spot-item{border-radius:10px;border:1.5px solid #eee;overflow:hidden;margin-bottom:8px;cursor:pointer;transition:border-color .2s;background:#fff}
 .spot-item:active{border-color:var(--gold)}
 .spot-head{display:flex;gap:9px;padding:11px 12px;align-items:flex-start}
@@ -116,9 +93,6 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .spot-action-btn{border:1.5px solid;border-radius:7px;padding:7px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;text-decoration:none}
 .btn-gaode{border-color:#00b140;color:#00b140;background:#f0faf3}
 .btn-review{border-color:var(--navy);color:var(--navy);background:#f4f6fb}
-.type-icons{landmark:'🏔️',transport:'🚌',viewpoint:'🌅',toilet:'🚻',food:'🍜',rest:'☕',ticket:'🎫',info:'ℹ️',danger:'⚠️'}
-
-/* ── 플랜 탭 ── */
 .time-card{background:var(--navy);border-radius:12px;padding:13px 15px;margin-bottom:11px;text-align:center}
 .time-big{font-size:34px;font-weight:900;color:#fff}
 .time-sub{font-size:10px;color:rgba(255,255,255,.45);margin-top:2px}
@@ -139,8 +113,6 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .rain-title{font-size:13px;font-weight:900;color:var(--blue);margin-bottom:9px}
 .rain-item{padding:6px 0;border-bottom:1px solid rgba(144,202,249,.3);font-size:12px;color:#333;line-height:1.7}
 .rain-item:last-child{border:none}
-
-/* ── 결제 탭 ── */
 .pay-method{background:#fff;border-radius:12px;overflow:hidden;margin-bottom:11px;box-shadow:0 2px 7px rgba(26,42,94,.07)}
 .pay-head{display:flex;align-items:center;gap:10px;padding:13px 14px;cursor:pointer}
 .pay-logo{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
@@ -158,9 +130,6 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .pay-step-text b{font-weight:700;color:var(--navy)}
 .pay-note{background:#fff8e1;border-radius:8px;padding:9px 11px;font-size:11px;color:#856404;line-height:1.7;margin-top:8px}
 .pay-link{display:flex;align-items:center;justify-content:space-between;background:#f8f9fc;border-radius:8px;padding:9px 12px;font-size:12px;font-weight:700;color:var(--navy);text-decoration:none;margin-top:6px}
-
-/* ── 현지생활 탭 ── */
-.local-section{margin-bottom:14px}
 .local-item{background:#fff;border-radius:11px;padding:13px 14px;margin-bottom:8px;box-shadow:0 2px 6px rgba(26,42,94,.06)}
 .local-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px}
 .local-name{font-size:13px;font-weight:900;color:var(--navy)}
@@ -183,8 +152,6 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .train-info-row{font-size:12px;color:#555;line-height:1.9;padding:4px 0;border-bottom:1px solid #f5f5f5}
 .train-info-row:last-child{border:none}
 .train-info-row b{font-weight:700;color:var(--navy)}
-
-/* ── 도움말 탭 ── */
 .kakao-cta{background:#FEE500;border-radius:12px;padding:13px 15px;display:flex;align-items:center;gap:11px;text-decoration:none;margin-bottom:11px}
 .kakao-text{flex:1}
 .kakao-title{font-size:13px;font-weight:900;color:#191919}
@@ -203,8 +170,6 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .phrase-ko{font-size:11px;color:#555}
 .phrase-hint{font-size:9px;color:#ccc;margin-top:4px}
 .phrase-cat{font-size:10px;font-weight:900;color:#aaa;margin:13px 0 7px;letter-spacing:.5px}
-
-/* ── 리뷰 바텀시트 ── */
 .sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:800;display:none;opacity:0;transition:opacity .25s}
 .sheet-overlay.show{display:block;opacity:1}
 .sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:480px;background:#fff;border-radius:18px 18px 0 0;z-index:900;transition:transform .3s;padding-bottom:env(safe-area-inset-bottom);max-height:85vh;display:flex;flex-direction:column}
@@ -232,12 +197,8 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .review-nick-input:focus{border-color:var(--navy)}
 .submit-btn{width:100%;background:var(--navy);color:#fff;border:none;border-radius:9px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px;font-family:inherit}
 .submit-btn:active{opacity:.85}
-
-/* ── 토스트 ── */
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--navy);color:var(--gold);padding:10px 20px;border-radius:20px;font-size:12px;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
 .toast.show{opacity:1}
-
-/* ── 하단 내비 ── */
 .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid #e8edf3;display:flex;z-index:600;box-shadow:0 -2px 9px rgba(0,0,0,.06)}
 .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 0 7px;cursor:pointer;border:none;background:none;font-family:inherit}
 .nav-icon{font-size:19px;opacity:.3;transition:opacity .2s}
@@ -247,8 +208,6 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 </style>
 </head>
 <body>
-
-<!-- 고덕 배너 -->
 <div class="install-banner" id="ib">
   <div class="ib-icon">🗺️</div>
   <div class="ib-text">
@@ -261,11 +220,7 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
   </div>
   <button class="ib-x" onclick="document.getElementById('ib').style.display='none'">✕</button>
 </div>
-
-<!-- 방문자 수 -->
 <div class="visitor-bar">이 가이드를 이용한 여행자 <span id="visitor-count">...</span>명</div>
-
-<!-- 상단 바 -->
 <div class="top-bar">
   <div class="top-inner">
     <button class="back-btn" onclick="location.href='index.html'">← 로투차</button>
@@ -278,11 +233,7 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
     <button class="attr-btn" onclick="selectAttr('canyon')" id="attr-canyon">🌉 황룡동+대협곡</button>
   </div>
 </div>
-
-<!-- 카운트다운 -->
 <div class="cdbar" id="cdbar"></div>
-
-<!-- 탭 바 -->
 <div class="tab-bar">
   <button class="tab-btn on" onclick="selectTab('go')" id="tab-go">🚌 이동</button>
   <button class="tab-btn" onclick="selectTab('map')" id="tab-map">🗺️ 지도</button>
@@ -291,10 +242,7 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
   <button class="tab-btn" onclick="selectTab('local')" id="tab-local">🎭 현지</button>
   <button class="tab-btn" onclick="selectTab('help')" id="tab-help">🛟 도움말</button>
 </div>
-
 <div class="wrap">
-
-<!-- ══ 이동 탭 ══ -->
 <div class="page on" id="page-go">
   <div class="card">
     <div class="ctitle">📍 숙소 위치</div>
@@ -314,8 +262,6 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
     <div id="gaode-nav-btns"></div>
   </div>
 </div>
-
-<!-- ══ 지도 탭 ══ -->
 <div class="page" id="page-map">
   <div id="zone-section" style="display:none">
     <div class="stitle">구역 선택 — 국가삼림공원</div>
@@ -338,8 +284,6 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
   <div class="stitle" id="spot-section-title">📍 스팟 목록</div>
   <div id="spot-list"></div>
 </div>
-
-<!-- ══ 플랜 탭 ══ -->
 <div class="page" id="page-plan">
   <div class="time-card">
     <div class="time-big" id="plan-time">--:--</div>
@@ -358,249 +302,149 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
   </div>
   <div class="card"><div class="ctitle">💡 여행 팁</div><div id="plan-tips"></div></div>
 </div>
-
-<!-- ══ 결제 탭 ══ -->
 <div class="page" id="page-pay">
   <div class="card" style="background:linear-gradient(135deg,#fff3cd,#fff8e1)">
-    <div style="font-size:12px;color:#856404;line-height:1.8"><b>💡 중국 결제 TIP</b><br>카카오페이 > 알리페이 순으로 준비하세요. 알리페이는 여행 전 한국에서 반드시 등록 완료하세요.</div>
+    <div style="font-size:12px;color:#856404;line-height:1.8"><b>💡 중국 결제 TIP</b><br>카카오페이 > 알리페이 순으로 준비하세요.</div>
   </div>
-
-  <!-- 카카오페이 -->
   <div class="pay-method" id="pay-kakao">
     <div class="pay-head" onclick="togglePay('kakao')">
       <div class="pay-logo" style="background:#FEE500">💛</div>
-      <div class="pay-head-text">
-        <div class="pay-name">카카오페이 × 알리페이플러스</div>
-        <div class="pay-sub">한국인 가장 간편 — 별도 가입 없음</div>
-      </div>
+      <div class="pay-head-text"><div class="pay-name">카카오페이 × 알리페이플러스</div><div class="pay-sub">한국인 가장 간편</div></div>
       <div class="pay-toggle">⌄</div>
     </div>
     <div class="pay-body">
-      <div class="pay-step"><div class="pay-num">1</div><div class="pay-step-text">카카오톡 앱 열기 → 하단 <b>···</b> → 상단 <b>카카오페이</b></div></div>
-      <div class="pay-step"><div class="pay-num">2</div><div class="pay-step-text"><b>결제</b> 탭 → 화면 상단 <b>🌐 지구본 아이콘</b> → <b>중국(China)</b> 선택</div></div>
-      <div class="pay-step"><div class="pay-num">3</div><div class="pay-step-text">바코드/QR코드 화면 표시 → 가맹점 리더기에 스캔</div></div>
-      <div class="pay-step"><div class="pay-num">4</div><div class="pay-step-text">결제 금액은 <b>카카오페이머니(원화)</b>에서 자동 환산 차감</div></div>
-      <div class="pay-note">⚠️ 출발 전 카카오페이머니에 충분한 잔고 확인. 결제 환율은 카카오페이 당일 환율 적용.</div>
-      <a href="https://pay.kakao.com" target="_blank" class="pay-link">카카오페이 공식 사이트 →</a>
+      <div class="pay-step"><div class="pay-num">1</div><div class="pay-step-text">카카오톡 → 하단 <b>···</b> → <b>카카오페이</b></div></div>
+      <div class="pay-step"><div class="pay-num">2</div><div class="pay-step-text"><b>결제</b> 탭 → <b>🌐 지구본</b> → <b>중국(China)</b></div></div>
+      <div class="pay-step"><div class="pay-num">3</div><div class="pay-step-text">QR코드 → 가맹점 스캔</div></div>
+      <div class="pay-note">⚠️ 출발 전 카카오페이머니 잔고 확인.</div>
+      <a href="https://pay.kakao.com" target="_blank" class="pay-link">카카오페이 공식 →</a>
     </div>
   </div>
-
-  <!-- 알리페이 -->
   <div class="pay-method" id="pay-alipay">
     <div class="pay-head" onclick="togglePay('alipay')">
       <div class="pay-logo" style="background:#1677ff">🔵</div>
-      <div class="pay-head-text">
-        <div class="pay-name">알리페이 (支付宝)</div>
-        <div class="pay-sub">여권 인증 + 한국 카드 등록 — 가장 범용적</div>
-      </div>
+      <div class="pay-head-text"><div class="pay-name">알리페이 (支付宝)</div><div class="pay-sub">여권 인증 + 한국 카드 등록</div></div>
       <div class="pay-toggle">⌄</div>
     </div>
     <div class="pay-body">
-      <div class="pay-step"><div class="pay-num">1</div><div class="pay-step-text"><b>한국에서 미리</b> App Store / Google Play에서 <b>Alipay</b> 설치</div></div>
-      <div class="pay-step"><div class="pay-num">2</div><div class="pay-step-text">가입 시 국가코드 <b>+82</b> 선택 → 한국 휴대폰 번호로 SMS 인증</div></div>
-      <div class="pay-step"><div class="pay-num">3</div><div class="pay-step-text">앱 내 검색창에 <b>"Tour Pass"</b> 입력 → 여권 사진 업로드 → 여권번호 입력 (1~3분 인증)</div></div>
-      <div class="pay-step"><div class="pay-num">4</div><div class="pay-step-text">Tour Pass → <b>Visa/Mastercard 한국 카드 등록</b> (충전 없이 카드 직접 결제)</div></div>
-      <div class="pay-step"><div class="pay-num">5</div><div class="pay-step-text">중국 도착 후 QR 스캔 또는 코드 보여주기로 결제</div></div>
-      <div class="pay-note">⚠️ 인증에 최대 1~3일 소요. 출발 3일 전에 미리 완료 필수.<br>200위안 이상 결제 시 약 3% 수수료 발생 가능.</div>
-      <a href="https://intl.alipay.com" target="_blank" class="pay-link">알리페이 다운로드 / 공식 사이트 →</a>
+      <div class="pay-step"><div class="pay-num">1</div><div class="pay-step-text"><b>한국에서 미리</b> Alipay 설치</div></div>
+      <div class="pay-step"><div class="pay-num">2</div><div class="pay-step-text">국가코드 <b>+82</b> → SMS 인증</div></div>
+      <div class="pay-step"><div class="pay-num">3</div><div class="pay-step-text">"Tour Pass" 검색 → 여권 업로드</div></div>
+      <div class="pay-step"><div class="pay-num">4</div><div class="pay-step-text">Visa/Mastercard 한국 카드 등록</div></div>
+      <div class="pay-note">⚠️ 인증 1~3일 소요. 출발 3일 전 완료 필수.</div>
+      <a href="https://intl.alipay.com" target="_blank" class="pay-link">알리페이 →</a>
     </div>
   </div>
-
-  <!-- 위챗페이 -->
   <div class="pay-method" id="pay-wechat">
     <div class="pay-head" onclick="togglePay('wechat')">
       <div class="pay-logo" style="background:#07c160">💚</div>
-      <div class="pay-head-text">
-        <div class="pay-name">위챗페이 (WeChat Pay)</div>
-        <div class="pay-sub">위챗 앱 내 결제 기능 — 카드 등록 필요</div>
-      </div>
+      <div class="pay-head-text"><div class="pay-name">위챗페이 (WeChat Pay)</div><div class="pay-sub">카드 등록 필요</div></div>
       <div class="pay-toggle">⌄</div>
     </div>
     <div class="pay-body">
-      <div class="pay-step"><div class="pay-num">1</div><div class="pay-step-text">App Store / Google Play에서 <b>WeChat(微信)</b> 설치 → 한국 번호로 가입</div></div>
-      <div class="pay-step"><div class="pay-num">2</div><div class="pay-step-text">Me → <b>Services</b> → <b>Wallet</b> → <b>Cards</b> → Add Card</div></div>
-      <div class="pay-step"><div class="pay-num">3</div><div class="pay-step-text"><b>해외 카드 등록</b>: VISA/Mastercard/JCB/AMEX → 카드번호·만료일·CVV·여권이름 입력</div></div>
-      <div class="pay-step"><div class="pay-num">4</div><div class="pay-step-text">실명인증 (여권 정보 입력 + 얼굴 인식 요청될 수 있음)</div></div>
-      <div class="pay-step"><div class="pay-num">5</div><div class="pay-step-text">결제: Scan QR 또는 My QR Code 제시</div></div>
-      <div class="pay-note">⚠️ 외국인은 개인 간 송금 기능 제한. 결제 전용으로만 사용 가능.</div>
-      <a href="https://www.wechat.com" target="_blank" class="pay-link">WeChat 다운로드 →</a>
+      <div class="pay-step"><div class="pay-num">1</div><div class="pay-step-text">WeChat 설치 → 한국 번호 가입</div></div>
+      <div class="pay-step"><div class="pay-num">2</div><div class="pay-step-text">Me → Services → Wallet → Cards</div></div>
+      <div class="pay-step"><div class="pay-num">3</div><div class="pay-step-text">해외 카드 등록 + 여권 인증</div></div>
+      <div class="pay-note">⚠️ 외국인은 개인 간 송금 제한.</div>
+      <a href="https://www.wechat.com" target="_blank" class="pay-link">WeChat →</a>
     </div>
   </div>
-
-  <!-- DiDi -->
   <div class="pay-method" id="pay-didi">
     <div class="pay-head" onclick="togglePay('didi')">
       <div class="pay-logo" style="background:#ff6400">🚕</div>
-      <div class="pay-head-text">
-        <div class="pay-name">디디택시 (DiDi) — 알리페이 내</div>
-        <div class="pay-sub">알리페이 앱에서 바로 호출 — 중국어 불필요</div>
-      </div>
+      <div class="pay-head-text"><div class="pay-name">디디택시 (DiDi)</div><div class="pay-sub">알리페이 앱에서 호출</div></div>
       <div class="pay-toggle">⌄</div>
     </div>
     <div class="pay-body">
-      <div class="pay-step"><div class="pay-num">1</div><div class="pay-step-text">알리페이 앱 열기 → 홈화면 상단 검색창에 <b>"滴滴出行"</b> 또는 <b>"Didi"</b> 입력</div></div>
-      <div class="pay-step"><div class="pay-num">2</div><div class="pay-step-text">목적지 입력: <b>영문 또는 중문</b> 모두 지원. 고덕지도에서 목적지 이름 복사해서 붙여넣기</div></div>
-      <div class="pay-step"><div class="pay-num">3</div><div class="pay-step-text">차량 종류 선택 후 <b>Confirm</b> → 드라이버 배차 확인</div></div>
-      <div class="pay-step"><div class="pay-num">4</div><div class="pay-step-text">탑승 후 결제는 <b>알리페이 자동 결제</b> (내리면 자동 차감)</div></div>
-      <div class="pay-note">💡 장가계 시내·무릉원 구역 내에서 디디 호출 가능.<br>대협곡·황룡동 같은 외진 곳은 현지 택시 기사와 직접 협상 권장.<br>목적지 중국어: 天门山索道下站 / 张家界国家森林公园南门</div>
+      <div class="pay-step"><div class="pay-num">1</div><div class="pay-step-text">알리페이 → 검색 <b>"滴滴出行"</b></div></div>
+      <div class="pay-step"><div class="pay-num">2</div><div class="pay-step-text">목적지 입력 (영문/중문)</div></div>
+      <div class="pay-step"><div class="pay-num">3</div><div class="pay-step-text">Confirm → 배차 후 탑승</div></div>
+      <div class="pay-note">💡 하차 시 알리페이 자동 결제.</div>
       <div class="phrase-card" onclick="copyText('请去张家界国家森林公园南门')" style="margin-top:8px">
         <div class="phrase-cn">请去张家界国家森林公园南门</div>
         <div class="phrase-py">Qǐng qù zhāngjiājiè guójiā sēnlín gōngyuán nán mén</div>
         <div class="phrase-ko">삼림공원 남문으로 가주세요</div>
-        <div class="phrase-hint">👆 탭하면 복사 — 기사에게 보여주세요</div>
+        <div class="phrase-hint">👆 탭하면 복사</div>
       </div>
     </div>
   </div>
-
-  <!-- 현금 ATM -->
   <div class="pay-method" id="pay-cash">
     <div class="pay-head" onclick="togglePay('cash')">
       <div class="pay-logo" style="background:#f5f5f5">💴</div>
-      <div class="pay-head-text">
-        <div class="pay-name">현금 (위안화) & ATM</div>
-        <div class="pay-sub">모바일 안 될 때 최후 수단</div>
-      </div>
+      <div class="pay-head-text"><div class="pay-name">현금 & ATM</div><div class="pay-sub">최후 수단</div></div>
       <div class="pay-toggle">⌄</div>
     </div>
     <div class="pay-body">
-      <div class="pay-step"><div class="pay-num">1</div><div class="pay-step-text"><b>중국은행(中国银行)</b> 또는 <b>공상은행(工商银行)</b> ATM — 외국 카드 인출 가능</div></div>
-      <div class="pay-step"><div class="pay-num">2</div><div class="pay-step-text">Visa/Mastercard 체크·신용카드 모두 사용 가능. 1회 최대 인출 2,000~3,000위안</div></div>
-      <div class="pay-step"><div class="pay-num">3</div><div class="pay-step-text">수수료: 카드사 해외 인출 수수료 + ATM 수수료 ¥25~50</div></div>
-      <div class="pay-note">💡 경관지 매표소는 Visa/Mastercard 카드 단말기 대부분 구비.<br>시골 식당·소규모 가게는 현금 또는 QR결제만 가능한 경우 많음.</div>
+      <div class="pay-step"><div class="pay-num">1</div><div class="pay-step-text"><b>중국은행</b> 또는 <b>공상은행</b> ATM</div></div>
+      <div class="pay-step"><div class="pay-num">2</div><div class="pay-step-text">Visa/Mastercard. 1회 최대 2,000~3,000위안</div></div>
+      <div class="pay-note">💡 경관지 매표소는 카드 단말기 대부분 구비.</div>
     </div>
   </div>
 </div>
-
-<!-- ══ 현지생활 탭 ══ -->
 <div class="page" id="page-local">
-
-  <div class="stitle">🎭 공연 티켓 예약</div>
-
+  <div class="stitle">🎭 공연 티켓</div>
   <div class="show-card">
     <div class="show-title">매력상서 (魅力湘西)</div>
-    <div class="show-sub">후난 토가족·묘족 전통 민속 공연. 장가계 대표 야간 엔터테인먼트.</div>
-    <div class="show-info-row"><div class="show-label">공연 시간</div><div class="show-val">매일 저녁 19:30 (약 80분)</div></div>
-    <div class="show-info-row"><div class="show-label">위치</div><div class="show-val">장가계 시내 (영정구)</div></div>
-    <div class="show-info-row"><div class="show-label">가격</div><div class="show-val">¥160~280 (좌석 등급별)</div></div>
-    <div class="show-info-row"><div class="show-label">소요</div><div class="show-val">약 80분</div></div>
+    <div class="show-sub">후난 토가족·묘족 전통 민속 공연.</div>
+    <div class="show-info-row"><div class="show-label">시간</div><div class="show-val">매일 19:30 (약 80분)</div></div>
+    <div class="show-info-row"><div class="show-label">가격</div><div class="show-val">¥160~280</div></div>
     <div class="local-btns" style="margin-top:12px">
-      <a href="https://kr.trip.com/attraction/buy/zhangjiajie-charming-xiangxi/" target="_blank" class="local-btn lb-gold">🎫 Trip.com 예매</a>
+      <a href="https://kr.trip.com/attraction/buy/zhangjiajie-charming-xiangxi/" target="_blank" class="local-btn lb-gold">🎫 Trip.com</a>
       <a href="https://experiences.myrealtrip.com/search?query=장가계+매력상서" target="_blank" class="local-btn lb-green">🎫 마이리얼트립</a>
-      <a href="https://uri.amap.com/search?keyword=魅力湘西&city=张家界" target="_blank" class="local-btn lb-blue">🗺️ 위치 보기</a>
     </div>
   </div>
-
   <div class="show-card" style="margin-top:-5px">
     <div class="show-title">천문호선 (天门狐仙)</div>
-    <div class="show-sub">천문산 절벽을 배경으로 한 대규모 야외 공연. 나무꾼과 여우선녀의 사랑 이야기.</div>
-    <div class="show-info-row"><div class="show-label">공연 시간</div><div class="show-val">매일 저녁 20:00 (약 50분)</div></div>
-    <div class="show-info-row"><div class="show-label">위치</div><div class="show-val">천문산 케이블카 하단 인근</div></div>
-    <div class="show-info-row"><div class="show-label">가격</div><div class="show-val">¥180~380 (좌석 등급별)</div></div>
-    <div class="show-info-row"><div class="show-label">참고</div><div class="show-val">우천 시 취소 가능 (사전 확인)</div></div>
+    <div class="show-sub">천문산 절벽 야외 대형 공연.</div>
+    <div class="show-info-row"><div class="show-label">시간</div><div class="show-val">매일 20:00 (약 50분)</div></div>
+    <div class="show-info-row"><div class="show-label">가격</div><div class="show-val">¥180~380</div></div>
     <div class="local-btns" style="margin-top:12px">
-      <a href="https://www.waug.com/ko/activities/143405" target="_blank" class="local-btn lb-gold">🎫 와그 예매</a>
+      <a href="https://www.waug.com/ko/activities/143405" target="_blank" class="local-btn lb-gold">🎫 와그</a>
       <a href="https://kr.trip.com/moments/theme/poi-tianmen-fox-fairy-93422-attraction-993137/" target="_blank" class="local-btn lb-green">🎫 Trip.com</a>
-      <a href="https://uri.amap.com/search?keyword=天门狐仙&city=张家界" target="_blank" class="local-btn lb-blue">🗺️ 위치 보기</a>
     </div>
   </div>
-
-  <div class="stitle">🎫 경관지 온라인 티켓</div>
+  <div class="stitle">🎫 경관지 티켓</div>
   <div class="card">
-    <div class="ctitle">사전 예약하면 현장 줄 없이 바로 입장</div>
     <div class="local-item">
-      <div class="local-head"><div class="local-name">🌲 국가삼림공원 입장권</div><div class="local-price">¥236 (4일권)</div></div>
-      <div class="local-desc">여권 1개당 4일간 재입장 가능. 온라인 예약 후 매표소에서 여권 제시하면 됩니다.</div>
-      <div class="local-btns">
-        <a href="https://kr.trip.com/travel-guide/attraction/zhangjiajie/zhangjiajie-national-forest-park/" target="_blank" class="local-btn lb-gold">Trip.com</a>
-        <a href="https://experiences.myrealtrip.com/search?query=장가계+삼림공원" target="_blank" class="local-btn lb-green">마이리얼트립</a>
-      </div>
+      <div class="local-head"><div class="local-name">🌲 국가삼림공원</div><div class="local-price">¥236 (4일권)</div></div>
+      <div class="local-desc">여권 1개당 4일 재입장.</div>
+      <div class="local-btns"><a href="https://kr.trip.com/travel-guide/attraction/zhangjiajie/zhangjiajie-national-forest-park/" target="_blank" class="local-btn lb-gold">Trip.com</a></div>
     </div>
     <div class="local-item">
       <div class="local-head"><div class="local-name">⛰️ 천문산 케이블카+입장</div><div class="local-price">¥268</div></div>
-      <div class="local-desc">케이블카 왕복 + 천문산 입장권 통합. 온라인 예약 강력 추천 (성수기 현장 매진 多).</div>
-      <div class="local-btns">
-        <a href="https://experiences.myrealtrip.com/products/3887183" target="_blank" class="local-btn lb-gold">마이리얼트립</a>
-        <a href="https://experiences.myrealtrip.com/products/4158176" target="_blank" class="local-btn lb-green">천문산 A라인</a>
-      </div>
+      <div class="local-desc">온라인 예약 강력 추천.</div>
+      <div class="local-btns"><a href="https://experiences.myrealtrip.com/products/3887183" target="_blank" class="local-btn lb-gold">마이리얼트립</a></div>
     </div>
     <div class="local-item">
       <div class="local-head"><div class="local-name">🌉 대협곡 유리다리</div><div class="local-price">¥216</div></div>
-      <div class="local-desc">1일 8,000명 제한. 성수기·주말에는 당일 현장 구매 불가능한 경우 많음. 반드시 사전 예약.</div>
-      <div class="local-btns">
-        <a href="https://kr.trip.com/travel-guide/attraction/zhangjiajie/zhangjiajie-grand-canyon/" target="_blank" class="local-btn lb-gold">Trip.com</a>
-        <a href="https://www.eastchinatrip.com/ko/china-attraction-tickets/zhangjiajie/" target="_blank" class="local-btn lb-green">EastChinaTrip</a>
-      </div>
+      <div class="local-desc">1일 8,000명 제한. 사전 예약 필수.</div>
+      <div class="local-btns"><a href="https://kr.trip.com/travel-guide/attraction/zhangjiajie/zhangjiajie-grand-canyon/" target="_blank" class="local-btn lb-gold">Trip.com</a></div>
     </div>
   </div>
-
-  <div class="stitle">🚄 고속철 (高铁)</div>
+  <div class="stitle">🚄 고속철</div>
   <div class="train-card">
     <div class="train-route">
-      <div><div class="train-city">서울/인천</div><div class="train-time">비행기</div></div>
+      <div><div class="train-city">인천</div><div class="train-time">비행기</div></div>
       <div class="train-arrow">→</div>
-      <div><div class="train-city">장사(창사)</div><div class="train-time">약 3시간 30분</div></div>
+      <div><div class="train-city">창사</div><div class="train-time">3.5시간</div></div>
       <div class="train-arrow">→</div>
       <div><div class="train-city">장가계</div><div class="train-time">고속철 2시간</div></div>
     </div>
-    <div class="train-info-row"><b>창사 → 장가계</b> 고속철: 약 2시간 / 2등석 ¥84~115</div>
-    <div class="train-info-row"><b>장가계역(张家界站)</b> → 시내: 택시 10분 ¥15~20</div>
-    <div class="train-info-row"><b>예매 방법 ①</b> — Trip.com(트립닷컴): 한국어·외국 카드 지원. 가장 편리.<br>kr.trip.com → 기차 → 출발지/목적지 입력</div>
-    <div class="train-info-row"><b>예매 방법 ②</b> — 12306 공식앱: 중국어 지원. 영문 버전 있음. 중국 전화번호 없이도 가능.<br>여권 정보 등록 후 예매 → 역 창구에서 여권 제시 후 승차권 수령</div>
-    <div class="train-info-row"><b>탑승 시</b> 여권 지참 필수. 개찰구에 여권 스캔.</div>
+    <div class="train-info-row"><b>창사→장가계</b> 2등석 ¥84~115</div>
     <div class="local-btns" style="margin-top:10px">
-      <a href="https://kr.trip.com/trains/" target="_blank" class="local-btn lb-gold">🚄 Trip.com 기차 예매</a>
-      <a href="https://www.12306.cn" target="_blank" class="local-btn lb-blue">12306 공식</a>
+      <a href="https://kr.trip.com/trains/" target="_blank" class="local-btn lb-gold">🚄 Trip.com 예매</a>
     </div>
   </div>
-
   <div class="stitle">🍜 추천 식당</div>
-  <div id="restaurant-list">
-    <div class="local-item">
-      <div class="local-head"><div class="local-name">🌶️ 토가족 훠궈 (土家火锅)</div><div class="local-price">¥30~60/인</div></div>
-      <div class="local-desc">장가계 대표 현지 요리. 매운 육수에 두부·채소·고기를 넣어 먹는 전통 훠궈. 무릉원 구역 식당가에서 흔히 볼 수 있음.</div>
-      <div class="local-btns">
-        <a href="https://uri.amap.com/search?keyword=土家火锅&city=张家界" target="_blank" class="local-btn lb-blue">🗺️ 근처 검색</a>
-      </div>
-    </div>
-    <div class="local-item">
-      <div class="local-head"><div class="local-name">🐟 장가계 홍소어 (红烧鱼)</div><div class="local-price">¥40~80/인</div></div>
-      <div class="local-desc">현지 민물생선 조림. 매콤달콤한 소스와 함께 쌀밥에 곁들여 먹는 향토 음식.</div>
-      <div class="local-btns">
-        <a href="https://uri.amap.com/search?keyword=红烧鱼&city=张家界" target="_blank" class="local-btn lb-blue">🗺️ 근처 검색</a>
-      </div>
-    </div>
-    <div class="local-item">
-      <div class="local-head"><div class="local-name">☕ 무릉원 카페 거리</div><div class="local-price">¥20~50/잔</div></div>
-      <div class="local-desc">무릉원 구역 숙소 밀집 지역 인근 카페 거리. 현지 밀크티·과일 음료 등.</div>
-      <div class="local-btns">
-        <a href="https://uri.amap.com/search?keyword=武陵源咖啡&city=张家界" target="_blank" class="local-btn lb-blue">🗺️ 근처 검색</a>
-      </div>
-    </div>
+  <div class="local-item">
+    <div class="local-head"><div class="local-name">🌶️ 토가족 훠궈</div><div class="local-price">¥30~60/인</div></div>
+    <div class="local-btns"><a href="https://uri.amap.com/search?keyword=土家火锅&city=张家界" target="_blank" class="local-btn lb-blue">🗺️ 검색</a></div>
   </div>
-
-  <div class="stitle">🛡️ 여행자 보험</div>
-  <div class="card">
-    <div style="font-size:12px;color:#555;line-height:1.8;margin-bottom:12px">중국 여행 시 <b>여행자 보험 가입 강력 권장</b>. 병원비·구급차비용·휴대품 분실 등 보장. 출발 전 한국에서 가입하세요.</div>
-    <div class="local-item">
-      <div class="local-head"><div class="local-name">삼성화재 해외여행보험</div></div>
-      <div class="local-desc">국내 최대 손해보험사. 해외 병원비 실손 보장.</div>
-      <div class="local-btns"><a href="https://direct.samsungfire.com/PD/TRVL/DTRVL_MAIN.do" target="_blank" class="local-btn lb-gold">가입하기 →</a></div>
-    </div>
-    <div class="local-item">
-      <div class="local-head"><div class="local-name">현대해상 해외여행보험</div></div>
-      <div class="local-desc">액티비티(케이블카·유리잔도 등) 중 사고 포함 여부 확인 후 가입.</div>
-      <div class="local-btns"><a href="https://www.hi.co.kr/product/overseas/travel" target="_blank" class="local-btn lb-green">가입하기 →</a></div>
-    </div>
-    <div class="local-item">
-      <div class="local-head"><div class="local-name">트래블로버 (온라인 최저가)</div></div>
-      <div class="local-desc">여러 보험사 비교 후 최저가 가입.</div>
-      <div class="local-btns"><a href="https://www.travellover.co.kr" target="_blank" class="local-btn lb-blue">가입하기 →</a></div>
-    </div>
+  <div class="local-item">
+    <div class="local-head"><div class="local-name">🐟 홍소어 (红烧鱼)</div><div class="local-price">¥40~80/인</div></div>
+    <div class="local-btns"><a href="https://uri.amap.com/search?keyword=红烧鱼&city=张家界" target="_blank" class="local-btn lb-blue">🗺️ 검색</a></div>
   </div>
-
 </div>
-
-<!-- ══ 도움말 탭 ══ -->
 <div class="page" id="page-help">
   <a href="http://pf.kakao.com/_hvrmn/chat" target="_blank" class="kakao-cta">
     <div class="kakao-text">
@@ -612,32 +456,29 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
   <div class="card">
     <div class="ctitle">🚨 긴급 전화</div>
     <div class="emg-grid">
-      <a href="tel:110" class="emg-btn"><div class="emg-num">110</div><div class="emg-label">경찰 警察</div></a>
-      <a href="tel:120" class="emg-btn"><div class="emg-num">120</div><div class="emg-label">구급차 救护车</div></a>
-      <a href="tel:119" class="emg-btn"><div class="emg-num">119</div><div class="emg-label">소방 消防</div></a>
-      <a href="tel:12301" class="emg-btn" style="background:var(--blue)"><div class="emg-num">12301</div><div class="emg-label">관광 불편 신고</div></a>
+      <a href="tel:110" class="emg-btn"><div class="emg-num">110</div><div class="emg-label">경찰</div></a>
+      <a href="tel:120" class="emg-btn"><div class="emg-num">120</div><div class="emg-label">구급차</div></a>
+      <a href="tel:119" class="emg-btn"><div class="emg-num">119</div><div class="emg-label">소방</div></a>
+      <a href="tel:12301" class="emg-btn" style="background:var(--blue)"><div class="emg-num">12301</div><div class="emg-label">관광 불편</div></a>
     </div>
   </div>
   <div class="card">
     <div class="ctitle">🏥 병원 · 영사관</div>
-    <div class="info-row"><div class="info-lbl">시내 병원</div><div class="info-val">장가계시 인민병원 ☎ +86-744-8222120</div></div>
-    <div class="info-row"><div class="info-lbl">무릉원</div><div class="info-val">무릉원구 인민병원 ☎ +86-744-5610120</div></div>
-    <div class="info-row"><div class="info-lbl">🇰🇷 영사관</div><div class="info-val">주창사 한국총영사관 ☎ +86-731-8256-0525 (3시간 거리)</div></div>
+    <div class="info-row"><div class="info-lbl">시내 병원</div><div>장가계시 인민병원 ☎ +86-744-8222120</div></div>
+    <div class="info-row"><div class="info-lbl">무릉원</div><div>무릉원구 인민병원 ☎ +86-744-5610120</div></div>
+    <div class="info-row"><div class="info-lbl">🇰🇷 영사관</div><div>주창사 한국총영사관 ☎ +86-731-8256-0525</div></div>
   </div>
   <div class="card">
     <div class="ctitle">📶 인터넷 · VPN</div>
-    <div class="info-row"><div class="info-lbl">VPN</div><div class="info-val">한국 출국 전 설치 필수. ExpressVPN·Surfshark 추천.</div></div>
-    <div class="info-row"><div class="info-lbl">SIM</div><div class="info-val">공항 도착장: 차이나유니콤 관광 SIM 30일 ¥100</div></div>
+    <div class="info-row"><div class="info-lbl">VPN</div><div>출국 전 설치 필수. ExpressVPN·Surfshark</div></div>
+    <div class="info-row"><div class="info-lbl">SIM</div><div>공항: 차이나유니콤 관광 SIM 30일 ¥100</div></div>
   </div>
   <div class="card">
-    <div class="ctitle">💬 현지 회화 (탭하면 중국어 복사)</div>
+    <div class="ctitle">💬 현지 회화</div>
     <div id="phrase-list"></div>
   </div>
 </div>
-
-</div><!-- /wrap -->
-
-<!-- 하단 내비 -->
+</div>
 <div class="bottom-nav">
   <button class="nav-item on" onclick="selectTab('go')" id="nav-go"><div class="nav-icon">🚌</div><div class="nav-label">이동</div></button>
   <button class="nav-item" onclick="selectTab('map')" id="nav-map"><div class="nav-icon">🗺️</div><div class="nav-label">지도</div></button>
@@ -646,8 +487,6 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
   <button class="nav-item" onclick="selectTab('local')" id="nav-local"><div class="nav-icon">🎭</div><div class="nav-label">현지</div></button>
   <button class="nav-item" onclick="selectTab('help')" id="nav-help"><div class="nav-icon">🛟</div><div class="nav-label">도움말</div></button>
 </div>
-
-<!-- 리뷰 바텀시트 -->
 <div class="sheet-overlay" id="sheet-overlay" onclick="closeSheet()"></div>
 <div class="sheet" id="review-sheet">
   <div class="sheet-handle"></div>
@@ -666,629 +505,269 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
         <button class="star-btn" onclick="setStar(4)" id="s4">⭐</button>
         <button class="star-btn" onclick="setStar(5)" id="s5">⭐</button>
       </div>
-      <input class="review-nick-input" id="review-nick" placeholder="닉네임 (예: 여행자홍길동)">
-      <textarea class="review-input" id="review-text" rows="3" placeholder="이 스팟에 대한 경험을 공유해 주세요…"></textarea>
+      <input class="review-nick-input" id="review-nick" placeholder="닉네임">
+      <textarea class="review-input" id="review-text" rows="3" placeholder="경험을 공유해 주세요…"></textarea>
       <button class="submit-btn" onclick="submitReview()">리뷰 제출</button>
     </div>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
-
 <script>
-// ══════════════════════════════════════════
-// Supabase 설정
-// ══════════════════════════════════════════
 const SUPA_URL = 'https://qbzoepglovwlarjssqjg.supabase.co';
 const SUPA_KEY = 'sb_publishable_oxeR92SfBDMzYAvcNitbPw_Vf0u1y0K';
-let supabase = null;
-try {
-  supabase = window.supabase.createClient(SUPA_URL, SUPA_KEY);
-} catch(e) { console.warn('Supabase init failed', e); }
+let sb = null;
+try { sb = window.supabase.createClient(SUPA_URL, SUPA_KEY); } catch(e) { console.warn('Supabase init failed', e); }
 
-// ══════════════════════════════════════════
-// 경관지 데이터
-// ══════════════════════════════════════════
 const ATTRS = {
-  forest:{
-    name:'국가삼림공원', icon:'🌲',
-    center:[29.3387,110.5358], zoom:13,
+  forest:{name:'국가삼림공원',icon:'🌲',center:[29.3387,110.5358],zoom:13,
     gaode:'https://uri.amap.com/search?keyword=张家界国家森林公园&city=张家界',
     gaodeNav:'https://uri.amap.com/navigation?to=110.5358,29.3387,张家界国家森林公园南门&mode=car&src=lotocha&coordinate=gaode&callnative=1',
-    lastTransport:[
-      {name:'백룡엘리베이터', time:'18:00'},
-      {name:'천자산 케이블카', time:'18:00'},
-      {name:'공원 내 셔틀버스', time:'18:30'},
-    ],
+    lastTransport:[{name:'백룡엘리베이터',time:'18:00'},{name:'천자산 케이블카',time:'18:00'},{name:'공원 내 셔틀버스',time:'18:30'}],
     plan:[
-      {time:'08:30',name:'남문 입장·매표',desc:'여권 지참. 외국인 창구 이용.', warn:''},
-      {time:'09:00',name:'십리화랑 모노레일',desc:'¥76 왕복. 계곡 풍경 감상.',warn:''},
-      {time:'10:00',name:'백룡엘리베이터',desc:'줄 짧을 때 바로 탑승. 2분 326m.',warn:'성수기 대기 60분'},
-      {time:'10:30',name:'원가계·아바타 산',desc:'아바타 촬영지. 능선 끝까지 탐방.',warn:''},
-      {time:'12:30',name:'점심식사',desc:'공원 내 식당 또는 도시락.',warn:''},
-      {time:'14:00',name:'양가계 환승 → 천자산',desc:'셔틀 환승 후 케이블카 탑승.',warn:''},
-      {time:'15:00',name:'천자산 정상',desc:'어필봉·전망대 탐방.',warn:''},
-      {time:'16:30',name:'⚠️ 하산 시작',desc:'케이블카 마지막 18:00 전 여유 있게.',warn:'절대 놓치면 안 됨!'},
-      {time:'17:30',name:'남문 출구·귀환',desc:'셔틀 탑승 후 숙소 귀환.',warn:''},
+      {time:'08:30',name:'남문 입장·매표',desc:'여권 지참.',warn:''},
+      {time:'09:00',name:'십리화랑 모노레일',desc:'¥76 왕복.',warn:''},
+      {time:'10:00',name:'백룡엘리베이터',desc:'2분 326m.',warn:'성수기 대기 60분'},
+      {time:'10:30',name:'원가계·아바타 산',desc:'아바타 촬영지.',warn:''},
+      {time:'12:30',name:'점심식사',desc:'공원 내 식당.',warn:''},
+      {time:'14:00',name:'양가계 환승 → 천자산',desc:'셔틀 환승.',warn:''},
+      {time:'15:00',name:'천자산 정상',desc:'어필봉·전망대.',warn:''},
+      {time:'16:30',name:'⚠️ 하산 시작',desc:'케이블카 마지막 18:00.',warn:'절대 놓치면 안 됨!'},
+      {time:'17:30',name:'남문 출구·귀환',desc:'숙소 귀환.',warn:''},
     ],
-    rainPlan:[
-      {item:'🌲 삼림공원 자체는 비 와도 입장 가능 — 운무 경치가 오히려 신비로움'},
-      {item:'🦎 황룡동 동굴 — 완전 실내. 비와 무관.'},
-      {item:'🛍️ 시내 전통시장·카페 탐방'},
-      {item:'🍜 현지 훠궈·호남요리 식당 투어'},
-    ],
-    rainAvoid:[
-      {item:'🌉 유리다리 — 비 오면 무조건 폐쇄'},
-      {item:'🌉 천문산 유리잔도 — 미끄러워 위험'},
-      {item:'🚡 천문산 케이블카 — 강풍 시 운행 중단'},
-    ],
-    tips:[
-      '👟 운동화 필수. 최대 15km 보행.',
-      '⏰ 4일권이라 나눠서 방문하면 여유롭게 즐김.',
-      '📱 공원 내 신호 약함 — 고덕지도 오프라인 지도 미리 다운로드.',
-      '🌫️ 오전 안개는 보통 10시 이후 걷힘.',
-      '🔋 보조배터리 필수.',
-    ],
+    rainPlan:[{item:'🌲 삼림공원 운무 경치'},{item:'🦎 황룡동 동굴 — 실내'},{item:'🛍️ 시내 탐방'},{item:'🍜 훠궈 식당'}],
+    rainAvoid:[{item:'🌉 유리다리 — 비 폐쇄'},{item:'🌉 천문산 유리잔도'},{item:'🚡 천문산 케이블카'}],
+    tips:['👟 운동화 필수.','⏰ 4일권.','📱 오프라인 지도 다운로드.','🌫️ 오전 안개는 10시 이후 걷힘.','🔋 보조배터리 필수.'],
   },
-  tianmen:{
-    name:'천문산', icon:'⛰️',
-    center:[29.1280,110.4750], zoom:13,
+  tianmen:{name:'천문산',icon:'⛰️',center:[29.1280,110.4750],zoom:13,
     gaode:'https://uri.amap.com/search?keyword=天门山国家森林公园&city=张家界',
     gaodeNav:'https://uri.amap.com/navigation?to=110.4740,29.1180,天门山索道下站&mode=car&src=lotocha&coordinate=gaode&callnative=1',
-    lastTransport:[
-      {name:'천문산 케이블카', time:'17:30'},
-      {name:'에스컬레이터 마감', time:'17:00'},
-    ],
+    lastTransport:[{name:'천문산 케이블카',time:'17:30'},{name:'에스컬레이터 마감',time:'17:00'}],
     plan:[
-      {time:'08:40',name:'가이드 미팅',desc:'케이블카 하단 앞. 로투차 가이드.',warn:''},
-      {time:'09:00',name:'시내 시장 탐방',desc:'전통시장 30분.',warn:''},
-      {time:'10:00',name:'사찰 관광',desc:'백양사찰. 15~20분.',warn:''},
-      {time:'10:40',name:'로컬 카페',desc:'케이블카 전 커피 타임 (투어 포함).',warn:''},
+      {time:'08:40',name:'가이드 미팅',desc:'케이블카 하단.',warn:''},
+      {time:'10:00',name:'사찰 관광',desc:'백양사찰.',warn:''},
       {time:'11:30',name:'점심식사',desc:'호남요리.',warn:''},
-      {time:'13:00',name:'케이블카 탑승 (30분)',desc:'가는 편 왼쪽 좌석 추천.',warn:'안개 시 시야 제한'},
-      {time:'13:30',name:'유리잔도',desc:'절벽 투명 산책로. 신발 커버 필수.',warn:'강풍 시 폐쇄'},
-      {time:'14:30',name:'천문동 (에스컬레이터 15분)',desc:'131m 아치형 자연 동굴.',warn:''},
-      {time:'15:30',name:'정상 전망대',desc:'파노라마 조망.',warn:''},
-      {time:'16:30',name:'케이블카 하산',desc:'17:00 전 탑승 권장.',warn:'마지막 17:30'},
+      {time:'13:00',name:'케이블카 탑승',desc:'가는 편 왼쪽 추천.',warn:'안개 시 시야 제한'},
+      {time:'13:30',name:'유리잔도',desc:'절벽 투명 산책로.',warn:'강풍 시 폐쇄'},
+      {time:'14:30',name:'천문동',desc:'131m 아치형 동굴.',warn:''},
+      {time:'15:30',name:'정상 전망대',desc:'파노라마.',warn:''},
+      {time:'16:30',name:'케이블카 하산',desc:'17:00 전 탑승.',warn:'마지막 17:30'},
     ],
-    rainPlan:[
-      {item:'⛰️ 약한 비에는 케이블카 운행 — 구름 속 탑승이 몽환적'},
-      {item:'⚠️ 강풍 시 케이블카 중단 — 출발 전 확인 필수'},
-      {item:'🛍️ 시내 탐방·마사지 대안'},
-    ],
-    rainAvoid:[
-      {item:'🌉 유리잔도 — 비 오면 즉시 폐쇄'},
-      {item:'🚡 케이블카 — 강풍 시 운행 중단'},
-    ],
-    tips:[
-      '🧥 정상은 계곡보다 6°C 낮음. 여름에도 겉옷 필수.',
-      '📸 케이블카 가는 편에서 시내 항공 사진 찍기 좋음.',
-      '⏰ 최소 4시간 확보 필요.',
-    ],
+    rainPlan:[{item:'⛰️ 약한 비엔 운행'},{item:'⚠️ 강풍 시 중단 — 확인 필수'},{item:'🛍️ 시내 탐방'}],
+    rainAvoid:[{item:'🌉 유리잔도 — 비 폐쇄'},{item:'🚡 케이블카 — 강풍 중단'}],
+    tips:['🧥 정상 6°C 낮음. 겉옷 필수.','📸 케이블카에서 항공 사진.','⏰ 최소 4시간.'],
   },
-  canyon:{
-    name:'황룡동+대협곡', icon:'🌉',
-    center:[29.3630,110.2700], zoom:13,
+  canyon:{name:'황룡동+대협곡',icon:'🌉',center:[29.3630,110.2700],zoom:13,
     gaode:'https://uri.amap.com/search?keyword=张家界大峡谷&city=张家界',
     gaodeNav:'https://uri.amap.com/navigation?to=110.2700,29.3640,黄龙洞景区&mode=car&src=lotocha&coordinate=gaode&callnative=1',
-    lastTransport:[
-      {name:'유리다리 입장 마감', time:'17:00'},
-      {name:'황룡동 마지막 입장', time:'16:30'},
-    ],
+    lastTransport:[{name:'유리다리 입장 마감',time:'17:00'},{name:'황룡동 마지막 입장',time:'16:30'}],
     plan:[
-      {time:'09:00',name:'픽업 후 이동',desc:'시내/무릉원 픽업. 1시간~1.5시간.',warn:''},
-      {time:'09:30',name:'황룡동 관람',desc:'동굴 탐험·지하 유람선. 약 1.5시간.',warn:''},
+      {time:'09:00',name:'픽업 후 이동',desc:'1~1.5시간.',warn:''},
+      {time:'09:30',name:'황룡동 관람',desc:'지하 유람선. 약 1.5시간.',warn:''},
       {time:'11:00',name:'점심식사',desc:'황룡동 인근.',warn:''},
-      {time:'12:00',name:'대협곡 입장',desc:'셔틀 탑승.',warn:''},
-      {time:'12:30',name:'유리다리',desc:'신발 커버 착용 필수.',warn:'비 오면 폐쇄'},
-      {time:'13:30',name:'협곡 트레킹',desc:'수직 절벽 경치.',warn:''},
-      {time:'15:00',name:'미끄럼틀·유람선 (옵션)',desc:'¥40/¥30 추가.',warn:''},
-      {time:'16:30',name:'출구 이동·해산',desc:'귀환 1.5시간.',warn:''},
+      {time:'12:30',name:'유리다리',desc:'신발 커버 필수.',warn:'비 오면 폐쇄'},
+      {time:'13:30',name:'협곡 트레킹',desc:'수직 절벽.',warn:''},
+      {time:'16:30',name:'출구·해산',desc:'귀환 1.5시간.',warn:''},
     ],
-    rainPlan:[
-      {item:'🦎 황룡동 동굴 — 완전 실내. 비 전혀 무관.'},
-      {item:'⚠️ 유리다리 — 비 오면 즉시 폐쇄'},
-      {item:'🌲 국가삼림공원 대안으로 변경 추천'},
-    ],
-    rainAvoid:[
-      {item:'🪟 유리다리 — 비 오면 무조건 폐쇄'},
-      {item:'🎢 미끄럼틀 — 비 오면 위험, 운영 중단'},
-    ],
-    tips:[
-      '🚗 시내에서 130km. 이동만 1.5시간.',
-      '📅 유리다리 1일 8,000명 제한 — 사전 예약 권장.',
-      '💧 협곡 내부 매점 드묾. 물·간식 넉넉히.',
-      '👟 트레킹 구간 많음.',
-    ],
+    rainPlan:[{item:'🦎 황룡동 — 실내'},{item:'⚠️ 유리다리 — 비 폐쇄'},{item:'🌲 삼림공원 대안'}],
+    rainAvoid:[{item:'🪟 유리다리 — 비 폐쇄'},{item:'🎢 미끄럼틀 — 비 위험'}],
+    tips:['🚗 시내에서 130km.','📅 유리다리 8,000명 제한.','💧 물·간식 넉넉히.'],
   },
 };
 
 const TRANSPORT = {
   wulingyuan:{
-    forest:[
-      {icon:'🚶',name:'도보',detail:'무릉원 숙소 → 남문. 15~25분.',price:'무료',badge:'b-green',badgeTxt:'가까움'},
-      {icon:'🚕',name:'택시',detail:'무릉원 → 남문. 5~10분.',price:'¥10~15',badge:'b-green',badgeTxt:'빠름'},
-    ],
-    tianmen:[
-      {icon:'🚕',name:'택시',detail:'무릉원 → 천문산 케이블카 하단. 약 45분.',price:'¥100~130',badge:'b-gold',badgeTxt:'추천'},
-      {icon:'🚌',name:'시외버스+환승',detail:'무릉원 버스터미널 → 시내 → 천문산. 1시간 20분.',price:'¥25',badge:'b-green',badgeTxt:'저렴'},
-    ],
-    canyon:[
-      {icon:'🚕',name:'로투차 전용 차량',detail:'무릉원 → 황룡동+대협곡. 약 40분.',price:'투어 포함',badge:'b-green',badgeTxt:'추천'},
-      {icon:'🚕',name:'택시 개인',detail:'무릉원 → 대협곡. 약 40분. 왕복 예약 필수.',price:'¥120~160',badge:'b-gold',badgeTxt:'왕복 필요'},
-    ],
+    forest:[{icon:'🚶',name:'도보',detail:'무릉원 숙소 → 남문. 15~25분.',price:'무료',badge:'b-green',badgeTxt:'가까움'},{icon:'🚕',name:'택시',detail:'5~10분.',price:'¥10~15',badge:'b-green',badgeTxt:'빠름'}],
+    tianmen:[{icon:'🚕',name:'택시',detail:'약 45분.',price:'¥100~130',badge:'b-gold',badgeTxt:'추천'},{icon:'🚌',name:'버스+환승',detail:'1시간 20분.',price:'¥25',badge:'b-green',badgeTxt:'저렴'}],
+    canyon:[{icon:'🚕',name:'로투차 전용 차량',detail:'약 40분.',price:'투어 포함',badge:'b-green',badgeTxt:'추천'},{icon:'🚕',name:'택시 개인',detail:'왕복 예약 필수.',price:'¥120~160',badge:'b-gold',badgeTxt:'왕복 필요'}],
   },
   city:{
-    forest:[
-      {icon:'🚌',name:'108번 버스',detail:'시내 버스터미널 → 삼림공원. 약 1시간 30분.',price:'¥12',badge:'b-green',badgeTxt:'저렴'},
-      {icon:'🚕',name:'택시',detail:'시내 → 남문. 약 50분.',price:'¥100~130',badge:'b-gold',badgeTxt:'편리'},
-    ],
-    tianmen:[
-      {icon:'🚕',name:'택시',detail:'시내 → 천문산 케이블카 하단. 약 15~20분.',price:'¥25~35',badge:'b-green',badgeTxt:'가까움'},
-    ],
-    canyon:[
-      {icon:'🚕',name:'로투차 전용 차량',detail:'시내 → 황룡동+대협곡. 약 1시간 30분.',price:'투어 포함',badge:'b-green',badgeTxt:'추천'},
-      {icon:'🚕',name:'택시 개인',detail:'시내 → 대협곡. 1.5시간. 왕복 예약 필수.',price:'¥250~320 왕복',badge:'b-red',badgeTxt:'비쌈'},
-    ],
+    forest:[{icon:'🚌',name:'108번 버스',detail:'약 1시간 30분.',price:'¥12',badge:'b-green',badgeTxt:'저렴'},{icon:'🚕',name:'택시',detail:'약 50분.',price:'¥100~130',badge:'b-gold',badgeTxt:'편리'}],
+    tianmen:[{icon:'🚕',name:'택시',detail:'15~20분.',price:'¥25~35',badge:'b-green',badgeTxt:'가까움'}],
+    canyon:[{icon:'🚕',name:'로투차 전용 차량',detail:'약 1시간 30분.',price:'투어 포함',badge:'b-green',badgeTxt:'추천'},{icon:'🚕',name:'택시 개인',detail:'왕복 예약 필수.',price:'¥250~320',badge:'b-red',badgeTxt:'비쌈'}],
   },
   airport:{
-    forest:[
-      {icon:'🚕',name:'공항 → 무릉원 택시',detail:'공항 → 무릉원(삼림공원). 약 1시간.',price:'¥130~160',badge:'b-gold',badgeTxt:'1단계'},
-    ],
-    tianmen:[
-      {icon:'🚕',name:'공항 → 시내 택시',detail:'공항 → 시내. 약 20분.',price:'¥30~50',badge:'b-green',badgeTxt:'가까움'},
-    ],
-    canyon:[
-      {icon:'🚕',name:'공항 → 대협곡 직행',detail:'공항 → 황룡동+대협곡. 약 1시간 20분.',price:'¥180~220',badge:'b-gold',badgeTxt:'직행'},
-      {icon:'🚕',name:'로투차 공항 픽업',detail:'투어 예약 시 공항 픽업 포함.',price:'투어 포함',badge:'b-green',badgeTxt:'추천'},
-    ],
+    forest:[{icon:'🚕',name:'공항 → 무릉원',detail:'약 1시간.',price:'¥130~160',badge:'b-gold',badgeTxt:'1단계'}],
+    tianmen:[{icon:'🚕',name:'공항 → 시내',detail:'약 20분.',price:'¥30~50',badge:'b-green',badgeTxt:'가까움'}],
+    canyon:[{icon:'🚕',name:'공항 → 대협곡 직행',detail:'약 1시간 20분.',price:'¥180~220',badge:'b-gold',badgeTxt:'직행'},{icon:'🚕',name:'로투차 공항 픽업',detail:'투어 예약 시 포함.',price:'투어 포함',badge:'b-green',badgeTxt:'추천'}],
   },
 };
 
 const PHRASES = [
   {cat:'🚕 교통',items:[
-    {cn:'请带我去张家界国家森林公园南门',py:'Qǐng dài wǒ qù zhāngjiājiè guójiā sēnlín gōngyuán nán mén',ko:'삼림공원 남문으로 데려다주세요'},
-    {cn:'请带我去天门山索道下站',py:'Qǐng dài wǒ qù tiānménshān suǒdào xià zhàn',ko:'천문산 케이블카 하단으로 가주세요'},
-    {cn:'请带我去张家界大峡谷',py:'Qǐng dài wǒ qù zhāngjiājiè dàxiágǔ',ko:'장가계 대협곡으로 가주세요'},
+    {cn:'请带我去张家界国家森林公园南门',py:'Qǐng dài wǒ qù... nán mén',ko:'삼림공원 남문으로'},
+    {cn:'请带我去天门山索道下站',py:'Qǐng dài wǒ qù tiānménshān suǒdào xià zhàn',ko:'천문산 케이블카 하단'},
+    {cn:'请带我去张家界大峡谷',py:'Qǐng dài wǒ qù zhāngjiājiè dàxiágǔ',ko:'대협곡으로'},
     {cn:'多少钱？',py:'Duōshǎo qián?',ko:'얼마예요?'},
     {cn:'请打表',py:'Qǐng dǎ biǎo',ko:'미터기 켜주세요'},
-    {cn:'在这里停车',py:'Zài zhèlǐ tíng chē',ko:'여기서 세워주세요'},
   ]},
   {cat:'🎫 경관지',items:[
-    {cn:'我是韩国人，需要购票',py:'Wǒ shì hánguórén, xūyào gòupiào',ko:'한국인인데 입장권을 사고 싶어요'},
-    {cn:'最后一班缆车几点？',py:'Zuìhòu yī bān lǎnchē jǐ diǎn?',ko:'마지막 케이블카 몇 시예요?'},
-    {cn:'厕所在哪里？',py:'Cèsuǒ zài nǎlǐ?',ko:'화장실이 어디예요?'},
-    {cn:'出口在哪里？',py:'Chūkǒu zài nǎlǐ?',ko:'출구가 어디예요?'},
-    {cn:'帮我拍张照片可以吗？',py:'Bāng wǒ pāi zhāng zhàopiàn kěyǐ ma?',ko:'사진 찍어주실 수 있어요?'},
+    {cn:'最后一班缆车几点？',py:'Zuìhòu yī bān lǎnchē jǐ diǎn?',ko:'마지막 케이블카 몇 시?'},
+    {cn:'厕所在哪里？',py:'Cèsuǒ zài nǎlǐ?',ko:'화장실 어디?'},
+    {cn:'出口在哪里？',py:'Chūkǒu zài nǎlǐ?',ko:'출구 어디?'},
   ]},
   {cat:'🍜 식사',items:[
-    {cn:'不要太辣',py:'Bù yào tài là',ko:'너무 맵지 않게 해주세요'},
-    {cn:'我对海鲜过敏',py:'Wǒ duì hǎixiān guòmǐn',ko:'해산물 알레르기가 있어요'},
+    {cn:'不要太辣',py:'Bù yào tài là',ko:'너무 맵지 않게'},
     {cn:'买单',py:'Mǎi dān',ko:'계산해주세요'},
-    {cn:'WiFi密码是什么？',py:'WiFi mìmǎ shì shénme?',ko:'와이파이 비밀번호가 뭔가요?'},
+    {cn:'WiFi密码是什么？',py:'WiFi mìmǎ shì shénme?',ko:'와이파이 비번?'},
   ]},
   {cat:'🚨 긴급',items:[
     {cn:'我需要帮助！',py:'Wǒ xūyào bāngzhù!',ko:'도움이 필요해요!'},
-    {cn:'请叫救护车',py:'Qǐng jiào jiùhùchē',ko:'구급차를 불러주세요'},
+    {cn:'请叫救护车',py:'Qǐng jiào jiùhùchē',ko:'구급차 불러주세요'},
     {cn:'我迷路了',py:'Wǒ mí lù le',ko:'길을 잃었어요'},
-    {cn:'我的钱包被偷了',py:'Wǒ de qiánbāo bèi tōu le',ko:'지갑을 소매치기 당했어요'},
   ]},
 ];
 
-// ══════════════════════════════════════════
-// 상태
-// ══════════════════════════════════════════
-let currentAttr = 'forest';
-let currentTab = 'go';
-let currentHotel = 'wulingyuan';
-let currentZone = 'south';
-let weatherMode = 'sunny';
-let map, userMarker, mapMarkers = [];
-let cdTimer = null;
-let spotsData = {};
-let currentReviewSpotId = null;
-let currentReviewAttrId = null;
-let selectedRating = 0;
+let currentAttr='forest',currentTab='go',currentHotel='wulingyuan',currentZone='south',weatherMode='sunny';
+let map,userMarker,mapMarkers=[],cdTimer=null,spotsData={};
+let currentReviewSpotId=null,currentReviewAttrId=null,selectedRating=0;
+const TYPE_ICON={landmark:'🏔️',transport:'🚌',viewpoint:'🌅',toilet:'🚻',food:'🍜',rest:'☕',ticket:'🎫',info:'ℹ️',danger:'⚠️'};
 
-const TYPE_ICON = {landmark:'🏔️',transport:'🚌',viewpoint:'🌅',toilet:'🚻',food:'🍜',rest:'☕',ticket:'🎫',info:'ℹ️',danger:'⚠️'};
-
-// ══════════════════════════════════════════
-// 초기화
-// ══════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', async () => {
-  initMap();
-  updateClock(); setInterval(updateClock, 15000);
-  renderPhrases();
-  startGPS();
+document.addEventListener('DOMContentLoaded',async()=>{
+  initMap(); updateClock(); setInterval(updateClock,15000);
+  renderPhrases(); startGPS();
   await loadSpotsData();
-  selectAttr('forest');
-  selectTab('go');
-  logVisit();
-  loadVisitorCount();
+  selectAttr('forest'); selectTab('go');
+  logVisit(); loadVisitorCount();
 });
 
-async function loadSpotsData() {
-  try {
-    const r = await fetch('lotocha_spots.json');
-    const d = await r.json();
-    spotsData = d.attractions || {};
-  } catch(e) { spotsData = {}; }
-}
+async function loadSpotsData(){try{const r=await fetch('lotocha_spots.json');const d=await r.json();spotsData=d.attractions||{};}catch(e){spotsData={};}}
+function updateClock(){const n=new Date();const s=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');document.getElementById('top-time').textContent=s;document.getElementById('plan-time').textContent=s;}
 
-function updateClock() {
-  const n = new Date();
-  const s = String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
-  document.getElementById('top-time').textContent = s;
-  document.getElementById('plan-time').textContent = s;
-}
-
-// ══════════════════════════════════════════
-// 경관지 선택
-// ══════════════════════════════════════════
-function selectAttr(id) {
-  currentAttr = id;
-  document.querySelectorAll('.attr-btn').forEach(b => b.classList.remove('on'));
+function selectAttr(id){
+  currentAttr=id;
+  document.querySelectorAll('.attr-btn').forEach(b=>b.classList.remove('on'));
   document.getElementById('attr-'+id).classList.add('on');
-  currentZone = 'south';
-
-  if (map) {
-    const a = ATTRS[id];
-    map.setView(a.center, a.zoom);
-    renderMapSpots();
-  }
-  document.getElementById('zone-section').style.display = id === 'forest' ? 'block' : 'none';
-  if (id === 'forest') {
-    document.querySelectorAll('.zone-btn').forEach(b => b.classList.remove('on'));
-    const zb = document.getElementById('zone-south');
-    if (zb) zb.classList.add('on');
-    renderShuttleInfo('south');
-  }
-  renderTransport(); renderLastTransport(); renderGaodeBtns();
-  renderZoneSpots(); renderSmartPlan(); renderRainPlan(); renderPlanTips();
+  currentZone='south';
+  if(map){const a=ATTRS[id];map.setView(a.center,a.zoom);renderMapSpots();}
+  document.getElementById('zone-section').style.display=id==='forest'?'block':'none';
+  if(id==='forest'){document.querySelectorAll('.zone-btn').forEach(b=>b.classList.remove('on'));const zb=document.getElementById('zone-south');if(zb)zb.classList.add('on');renderShuttleInfo('south');}
+  renderTransport();renderLastTransport();renderGaodeBtns();
+  renderZoneSpots();renderSmartPlan();renderRainPlan();renderPlanTips();
   startCountdown();
 }
 
-// ══════════════════════════════════════════
-// 탭 선택
-// ══════════════════════════════════════════
-function selectTab(id) {
-  currentTab = id;
-  ['go','map','plan','pay','local','help'].forEach(t => {
-    document.getElementById('tab-'+t).classList.toggle('on', t===id);
-    document.getElementById('page-'+t).classList.toggle('on', t===id);
-    document.getElementById('nav-'+t).classList.toggle('on', t===id);
+function selectTab(id){
+  currentTab=id;
+  ['go','map','plan','pay','local','help'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('on',t===id);
+    document.getElementById('page-'+t).classList.toggle('on',t===id);
+    document.getElementById('nav-'+t).classList.toggle('on',t===id);
   });
-  if (id === 'map' && map) setTimeout(() => map.invalidateSize(), 100);
+  if(id==='map'&&map)setTimeout(()=>map.invalidateSize(),100);
 }
 
-// ══════════════════════════════════════════
-// 이동 탭
-// ══════════════════════════════════════════
-function selectHotel(id) {
-  currentHotel = id;
-  document.querySelectorAll('.hotel-btn').forEach(b => b.classList.remove('on'));
-  document.getElementById('hotel-'+id).classList.add('on');
-  renderTransport();
+function selectHotel(id){currentHotel=id;document.querySelectorAll('.hotel-btn').forEach(b=>b.classList.remove('on'));document.getElementById('hotel-'+id).classList.add('on');renderTransport();}
+
+function renderTransport(){
+  const list=(TRANSPORT[currentHotel]||{})[currentAttr]||[];
+  document.getElementById('transport-list').innerHTML=list.map(t=>`<div class="trow"><div class="t-icon">${t.icon}</div><div class="t-info"><div class="t-name">${t.name}</div><div class="t-detail">${t.detail}</div>${t.price?`<div class="t-price">${t.price}</div>`:''}<span class="badge ${t.badge}">${t.badgeTxt}</span></div></div>`).join('');
 }
 
-function renderTransport() {
-  const list = (TRANSPORT[currentHotel]||{})[currentAttr]||[];
-  document.getElementById('transport-list').innerHTML = list.map(t =>
-    `<div class="trow">
-      <div class="t-icon">${t.icon}</div>
-      <div class="t-info">
-        <div class="t-name">${t.name}</div>
-        <div class="t-detail">${t.detail}</div>
-        ${t.price?`<div class="t-price">${t.price}</div>`:''}
-        <span class="badge ${t.badge}">${t.badgeTxt}</span>
-      </div>
-    </div>`
-  ).join('');
-}
-
-function renderLastTransport() {
-  const now = new Date(), nowMin = now.getHours()*60+now.getMinutes();
-  document.getElementById('lt-list').innerHTML = ATTRS[currentAttr].lastTransport.map(t => {
-    const [h,m] = t.time.split(':').map(Number);
-    const diff = (h*60+m)-nowMin;
-    let cls, txt;
-    if (diff<0){cls='lt-pass';txt='운행 종료';}
-    else if(diff<60){cls='lt-warn';txt=diff+'분 남음 ⚠️';}
-    else{cls='lt-ok';txt=Math.floor(diff/60)+'시간 '+diff%60+'분';}
-    return `<div class="lt-row">
-      <div class="lt-name">${t.name}</div>
-      <div style="display:flex;align-items:center;gap:7px">
-        <div class="lt-time">${t.time}</div>
-        <div class="lt-st ${cls}">${txt}</div>
-      </div>
-    </div>`;
+function renderLastTransport(){
+  const now=new Date(),nowMin=now.getHours()*60+now.getMinutes();
+  document.getElementById('lt-list').innerHTML=ATTRS[currentAttr].lastTransport.map(t=>{
+    const[h,m]=t.time.split(':').map(Number);const diff=(h*60+m)-nowMin;
+    let cls,txt;
+    if(diff<0){cls='lt-pass';txt='운행 종료';}else if(diff<60){cls='lt-warn';txt=diff+'분 남음 ⚠️';}else{cls='lt-ok';txt=Math.floor(diff/60)+'시간 '+diff%60+'분';}
+    return`<div class="lt-row"><div class="lt-name">${t.name}</div><div style="display:flex;align-items:center;gap:7px"><div class="lt-time">${t.time}</div><div class="lt-st ${cls}">${txt}</div></div></div>`;
   }).join('');
 }
 
-function renderGaodeBtns() {
-  const a = ATTRS[currentAttr];
-  document.getElementById('gaode-nav-btns').innerHTML =
-    `<a href="${a.gaodeNav}" target="_blank" class="gaode-btn">🧭 ${a.name} — 길 안내 시작</a>
-     <a href="${a.gaode}" target="_blank" class="gaode-btn navy">🔍 ${a.name} — 지도에서 검색</a>`;
-}
+function renderGaodeBtns(){const a=ATTRS[currentAttr];document.getElementById('gaode-nav-btns').innerHTML=`<a href="${a.gaodeNav}" target="_blank" class="gaode-btn">🧭 ${a.name} — 길 안내</a><a href="${a.gaode}" target="_blank" class="gaode-btn navy">🔍 ${a.name} — 지도 검색</a>`;}
 
-// ══════════════════════════════════════════
-// 카운트다운
-// ══════════════════════════════════════════
-function startCountdown() {
-  if (cdTimer) clearInterval(cdTimer);
-  updateCountdown();
-  cdTimer = setInterval(updateCountdown, 60000);
-}
-function updateCountdown() {
-  const now = new Date(), nowMin = now.getHours()*60+now.getMinutes();
-  const bar = document.getElementById('cdbar');
-  let closest = null, closestDiff = Infinity;
-  ATTRS[currentAttr].lastTransport.forEach(t => {
-    const [h,m] = t.time.split(':').map(Number);
-    const diff = (h*60+m)-nowMin;
-    if (diff>0 && diff<closestDiff){closest=t;closestDiff=diff;}
-  });
-  if (!closest){bar.style.display='none';return;}
+function startCountdown(){if(cdTimer)clearInterval(cdTimer);updateCountdown();cdTimer=setInterval(updateCountdown,60000);}
+function updateCountdown(){
+  const now=new Date(),nowMin=now.getHours()*60+now.getMinutes();
+  const bar=document.getElementById('cdbar');let closest=null,closestDiff=Infinity;
+  ATTRS[currentAttr].lastTransport.forEach(t=>{const[h,m]=t.time.split(':').map(Number);const diff=(h*60+m)-nowMin;if(diff>0&&diff<closestDiff){closest=t;closestDiff=diff;}});
+  if(!closest){bar.style.display='none';return;}
   bar.style.display='block';
-  const h=Math.floor(closestDiff/60),m=closestDiff%60;
-  const ts = h>0?`${h}시간 ${m}분`:`${m}분`;
+  const h=Math.floor(closestDiff/60),m=closestDiff%60;const ts=h>0?`${h}시간 ${m}분`:`${m}분`;
   if(closestDiff<=45){bar.className='cdbar danger';bar.textContent=`🔴 즉시 하산! ${closest.name} ${closest.time} — ${ts} 남음`;}
   else if(closestDiff<=90){bar.className='cdbar warn';bar.textContent=`🟡 하산 시작 권장 — ${closest.name} ${closest.time} (${ts})`;}
   else if(closestDiff<=180){bar.className='cdbar safe';bar.textContent=`🟢 마지막 ${closest.name} ${closest.time} — ${ts} 남음`;}
   else{bar.style.display='none';}
 }
 
-// ══════════════════════════════════════════
-// 지도 탭
-// ══════════════════════════════════════════
-function initMap() {
-  map = L.map('map',{zoomControl:false,attributionControl:false}).setView([29.3387,110.5358],13);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(map);
-}
-function renderMapSpots() {
-  mapMarkers.forEach(m => map.removeLayer(m));
-  mapMarkers = [];
-  const a = ATTRS[currentAttr];
-  const attrData = spotsData[currentAttr];
-  if (!attrData) return;
-  const zone = currentAttr==='forest' ? currentZone : Object.keys(attrData.zones||{})[0];
-  const spots = ((attrData.zones||{})[zone]||{}).spots||[];
-  spots.forEach((s,i) => {
-    if (!s.lat||!s.lon) return;
-    const m = L.marker([s.lat,s.lon],{
-      icon: L.divIcon({
-        html:`<div style="background:${s.type==='toilet'?'#777':s.type==='transport'?'#1565c0':'#1a2a5e'};color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;box-shadow:0 2px 5px rgba(0,0,0,.3);white-space:nowrap">${TYPE_ICON[s.type]||'📍'} ${i+1}</div>`,
-        className:'',iconAnchor:[0,10]
-      })
-    }).addTo(map);
-    m.bindPopup(`<b>${s.name_ko}</b>${s.gaode?`<br><a href="${s.gaode}" target="_blank" style="color:green;font-weight:700">고덕지도 열기</a>`:''}`);
+function initMap(){map=L.map('map',{zoomControl:false,attributionControl:false}).setView([29.3387,110.5358],13);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(map);}
+function renderMapSpots(){
+  mapMarkers.forEach(m=>map.removeLayer(m));mapMarkers=[];
+  const attrData=spotsData[currentAttr];if(!attrData)return;
+  const zone=currentAttr==='forest'?currentZone:Object.keys(attrData.zones||{})[0];
+  const spots=((attrData.zones||{})[zone]||{}).spots||[];
+  spots.forEach((s,i)=>{
+    if(!s.lat||!s.lon)return;
+    const m=L.marker([s.lat,s.lon],{icon:L.divIcon({html:`<div style="background:${s.type==='toilet'?'#777':s.type==='transport'?'#1565c0':'#1a2a5e'};color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;box-shadow:0 2px 5px rgba(0,0,0,.3);white-space:nowrap">${TYPE_ICON[s.type]||'📍'} ${i+1}</div>`,className:'',iconAnchor:[0,10]})}).addTo(map);
+    m.bindPopup(`<b>${s.name_ko}</b>${s.gaode?`<br><a href="${s.gaode}" target="_blank" style="color:green;font-weight:700">고덕지도</a>`:''}`);
     mapMarkers.push(m);
   });
 }
-function selectZone(id) {
-  currentZone = id;
-  document.querySelectorAll('.zone-btn').forEach(b => b.classList.remove('on'));
-  document.getElementById('zone-'+id).classList.add('on');
-  renderZoneSpots(); renderMapSpots(); renderShuttleInfo(id);
+function selectZone(id){currentZone=id;document.querySelectorAll('.zone-btn').forEach(b=>b.classList.remove('on'));document.getElementById('zone-'+id).classList.add('on');renderZoneSpots();renderMapSpots();renderShuttleInfo(id);}
+function renderShuttleInfo(zone){const info={south:'🚌 <b>셔틀:</b> 양가계 환승센터 10~15분 | <b>막차 18:30</b>',yuanjia:'🛗 <b>백룡엘리베이터</b> | <b>막차 18:00</b>',tianzi:'🚡 <b>천자산 케이블카</b> | <b>막차 18:00</b>',yangjiajie:'🔄 <b>환승 허브</b> | 막차 <b>18:30</b>'};const el=document.getElementById('shuttle-box');if(el)el.innerHTML=info[zone]||'';}
+function renderZoneSpots(){
+  const attrData=spotsData[currentAttr];
+  const zone=currentAttr==='forest'?currentZone:(attrData?Object.keys(attrData.zones||{})[0]:'south');
+  const spots=attrData?((attrData.zones||{})[zone]||{}).spots||[]:[];
+  document.getElementById('spot-section-title').textContent=`📍 ${ATTRS[currentAttr].name} 스팟`;
+  document.getElementById('spot-list').innerHTML=spots.length?spots.map((s,i)=>`<div class="spot-item" id="si-${s.id}"><div class="spot-head" onclick="toggleSpot('${s.id}')"><div class="spot-img">${s.image?`<img src="${s.image}" style="width:100%;height:100%;object-fit:cover;border-radius:8px" onerror="this.parentNode.textContent='${TYPE_ICON[s.type]||'📍'}'">`:(TYPE_ICON[s.type]||'📍')}</div><div class="spot-body"><div class="spot-name">${s.name_ko}</div><div class="spot-cn">${s.name_cn}</div><div class="spot-tags">${(s.tags||[]).map(t=>`<span class="badge b-${t.c}">${t.t}</span>`).join('')}${s.hours?`<span class="badge b-blue">${s.hours}</span>`:''}</div></div></div><div class="spot-expand"><div class="spot-desc">${s.desc_ko||''}</div>${s.tip_ko?`<div class="spot-tip">💡 ${s.tip_ko}</div>`:''}<div class="spot-actions">${s.gaode?`<a href="${s.gaode}" target="_blank" class="spot-action-btn btn-gaode">🗺️ 고덕지도</a>`:''}<button class="spot-action-btn btn-review" onclick="openReviewSheet('${s.id}','${currentAttr}','${s.name_ko.replace(/'/g,"\\'")}')">💬 리뷰</button></div></div></div>`).join(''):'<div style="color:#aaa;font-size:12px;padding:14px 0;text-align:center">스팟 데이터 준비 중</div>';
 }
-function renderShuttleInfo(zone) {
-  const info = {
-    south:'🚌 <b>셔틀:</b> 양가계 환승센터까지 10~15분 | 배차 10~20분 간격 | <b>막차 18:30</b>',
-    yuanjia:'🛗 <b>백룡엘리베이터</b> 탑승 후 원가계 도착 | 엘리베이터 <b>막차 18:00</b>',
-    tianzi:'🚡 <b>양가계 환승 → 천자산 케이블카</b> | 케이블카 <b>막차 18:00</b> (17:30 탑승 권장)',
-    yangjiajie:'🔄 <b>모든 구역 환승 허브</b> | 셔틀 막차 <b>18:30</b> 절대 주의',
-  };
-  const el = document.getElementById('shuttle-box');
-  if (el) el.innerHTML = info[zone]||'';
-}
-function renderZoneSpots() {
-  const attrData = spotsData[currentAttr];
-  const zone = currentAttr==='forest' ? currentZone : (attrData ? Object.keys(attrData.zones||{})[0] : 'south');
-  const spots = attrData ? ((attrData.zones||{})[zone]||{}).spots||[] : [];
-  document.getElementById('spot-section-title').textContent = `📍 ${ATTRS[currentAttr].name} 스팟`;
-  document.getElementById('spot-list').innerHTML = spots.length ? spots.map((s,i) => `
-    <div class="spot-item" id="si-${s.id}">
-      <div class="spot-head" onclick="toggleSpot('${s.id}')">
-        <div class="spot-img">${s.image?`<img src="${s.image}" style="width:100%;height:100%;object-fit:cover;border-radius:8px" onerror="this.parentNode.textContent='${TYPE_ICON[s.type]||'📍'}'">`:(TYPE_ICON[s.type]||'📍')}</div>
-        <div class="spot-body">
-          <div class="spot-name">${s.name_ko}</div>
-          <div class="spot-cn">${s.name_cn}</div>
-          <div class="spot-tags">
-            ${(s.tags||[]).map(t=>`<span class="badge b-${t.c}">${t.t}</span>`).join('')}
-            ${s.hours?`<span class="badge b-blue">${s.hours}</span>`:''}
-          </div>
-        </div>
-      </div>
-      <div class="spot-expand">
-        <div class="spot-desc">${s.desc_ko||''}</div>
-        ${s.tip_ko?`<div class="spot-tip">💡 ${s.tip_ko}</div>`:''}
-        <div class="spot-actions">
-          ${s.gaode?`<a href="${s.gaode}" target="_blank" class="spot-action-btn btn-gaode">🗺️ 고덕지도</a>`:''}
-          <button class="spot-action-btn btn-review" onclick="openReviewSheet('${s.id}','${currentAttr}','${s.name_ko.replace(/'/g,"\\'")}')">💬 리뷰</button>
-        </div>
-      </div>
-    </div>`).join('') : '<div style="color:#aaa;font-size:12px;padding:14px 0;text-align:center">이 구역 스팟 데이터 준비 중</div>';
-}
-function toggleSpot(id) {
-  const el = document.getElementById('si-'+id);
-  if (el) el.classList.toggle('open');
-}
-function centerMap() {
-  navigator.geolocation&&navigator.geolocation.getCurrentPosition(p=>map.setView([p.coords.latitude,p.coords.longitude],16));
-}
-function fitAttr() { const a=ATTRS[currentAttr]; map.setView(a.center,a.zoom); }
-function startGPS() {
-  if (!navigator.geolocation){document.getElementById('gps-status').textContent='GPS 사용 불가';return;}
-  navigator.geolocation.watchPosition(p=>{
-    const{latitude:lat,longitude:lng,accuracy:acc}=p.coords;
-    document.getElementById('gps-status').textContent=`±${Math.round(acc)}m`;
-    userMarker?userMarker.setLatLng([lat,lng]):userMarker=L.circleMarker([lat,lng],{radius:8,fillColor:'#2196F3',color:'#fff',weight:2,fillOpacity:.9}).addTo(map).bindPopup('현재 위치');
-  },()=>{document.getElementById('gps-status').textContent='GPS 꺼짐';},{enableHighAccuracy:true,maximumAge:10000});
-}
+function toggleSpot(id){const el=document.getElementById('si-'+id);if(el)el.classList.toggle('open');}
+function centerMap(){navigator.geolocation&&navigator.geolocation.getCurrentPosition(p=>map.setView([p.coords.latitude,p.coords.longitude],16));}
+function fitAttr(){const a=ATTRS[currentAttr];map.setView(a.center,a.zoom);}
+function startGPS(){if(!navigator.geolocation){document.getElementById('gps-status').textContent='GPS 사용 불가';return;}navigator.geolocation.watchPosition(p=>{const{latitude:lat,longitude:lng,accuracy:acc}=p.coords;document.getElementById('gps-status').textContent=`±${Math.round(acc)}m`;userMarker?userMarker.setLatLng([lat,lng]):userMarker=L.circleMarker([lat,lng],{radius:8,fillColor:'#2196F3',color:'#fff',weight:2,fillOpacity:.9}).addTo(map).bindPopup('현재 위치');},()=>{document.getElementById('gps-status').textContent='GPS 꺼짐';},{enableHighAccuracy:true,maximumAge:10000});}
 
-// ══════════════════════════════════════════
-// 플랜 탭
-// ══════════════════════════════════════════
-function setWeather(mode) {
-  weatherMode = mode;
-  document.getElementById('mode-sunny').classList.toggle('on',mode==='sunny');
-  document.getElementById('mode-rainy').classList.toggle('on',mode==='rainy');
-  document.getElementById('plan-sunny').style.display = mode==='sunny'?'block':'none';
-  document.getElementById('plan-rainy').style.display = mode==='rainy'?'block':'none';
-}
-function renderSmartPlan() {
-  const a = ATTRS[currentAttr];
-  const now = new Date(), nowMin = now.getHours()*60+now.getMinutes();
-  document.getElementById('smart-plan').innerHTML = a.plan.map(step => {
-    const [h,m] = step.time.split(':').map(Number);
-    const diff = (h*60+m)-nowMin;
-    const dot = diff<-30?'done':diff<30?'now':'future';
-    const skip = diff<-120;
-    return `<div class="pstep">
-      <div class="pdot ${dot}"></div>
-      <div class="ptime" style="${skip?'color:#ddd':''}">${step.time}</div>
-      <div style="flex:1">
-        <div class="pname" style="${skip?'color:#ccc':''}">${step.name}${skip?' <span style="font-size:10px;color:#e53935">(지남)</span>':''}</div>
-        ${!skip?`<div class="pdesc">${step.desc}</div>`:''}
-        ${step.warn&&!skip?`<div class="pwarn">⚠️ ${step.warn}</div>`:''}
-        ${dot==='now'?'<div class="now-label">◀ 지금 이 단계</div>':''}
-      </div>
-    </div>`;
+function setWeather(mode){weatherMode=mode;document.getElementById('mode-sunny').classList.toggle('on',mode==='sunny');document.getElementById('mode-rainy').classList.toggle('on',mode==='rainy');document.getElementById('plan-sunny').style.display=mode==='sunny'?'block':'none';document.getElementById('plan-rainy').style.display=mode==='rainy'?'block':'none';}
+function renderSmartPlan(){
+  const a=ATTRS[currentAttr];const now=new Date(),nowMin=now.getHours()*60+now.getMinutes();
+  document.getElementById('smart-plan').innerHTML=a.plan.map(step=>{
+    const[h,m]=step.time.split(':').map(Number);const diff=(h*60+m)-nowMin;
+    const dot=diff<-30?'done':diff<30?'now':'future';const skip=diff<-120;
+    return`<div class="pstep"><div class="pdot ${dot}"></div><div class="ptime" style="${skip?'color:#ddd':''}">${step.time}</div><div style="flex:1"><div class="pname" style="${skip?'color:#ccc':''}">${step.name}${skip?' <span style="font-size:10px;color:#e53935">(지남)</span>':''}</div>${!skip?`<div class="pdesc">${step.desc}</div>`:''}${step.warn&&!skip?`<div class="pwarn">⚠️ ${step.warn}</div>`:''}${dot==='now'?'<div class="now-label">◀ 지금 이 단계</div>':''}</div></div>`;
   }).join('');
 }
-function renderRainPlan() {
-  const a = ATTRS[currentAttr];
-  document.getElementById('rain-plan').innerHTML = a.rainPlan.map(r=>`<div class="rain-item">${r.item}</div>`).join('');
-  document.getElementById('rain-avoid').innerHTML = a.rainAvoid.map(r=>`<div style="font-size:12px;color:#c62828;line-height:1.8;padding:6px 0;border-bottom:1px solid #f5f5f5">${r.item}</div>`).join('');
-}
-function renderPlanTips() {
-  document.getElementById('plan-tips').innerHTML = ATTRS[currentAttr].tips.map(t=>`<div style="font-size:12px;color:#555;line-height:1.8;padding:6px 0;border-bottom:1px solid #f5f5f5">${t}</div>`).join('');
-}
+function renderRainPlan(){const a=ATTRS[currentAttr];document.getElementById('rain-plan').innerHTML=a.rainPlan.map(r=>`<div class="rain-item">${r.item}</div>`).join('');document.getElementById('rain-avoid').innerHTML=a.rainAvoid.map(r=>`<div style="font-size:12px;color:#c62828;line-height:1.8;padding:6px 0;border-bottom:1px solid #f5f5f5">${r.item}</div>`).join('');}
+function renderPlanTips(){document.getElementById('plan-tips').innerHTML=ATTRS[currentAttr].tips.map(t=>`<div style="font-size:12px;color:#555;line-height:1.8;padding:6px 0;border-bottom:1px solid #f5f5f5">${t}</div>`).join('');}
+function togglePay(id){const el=document.getElementById('pay-'+id);if(el)el.classList.toggle('open');}
 
-// ══════════════════════════════════════════
-// 결제 탭
-// ══════════════════════════════════════════
-function togglePay(id) {
-  const el = document.getElementById('pay-'+id);
-  if (el) el.classList.toggle('open');
-}
+function renderPhrases(){document.getElementById('phrase-list').innerHTML=PHRASES.map(cat=>`<div class="phrase-cat">${cat.cat}</div>`+cat.items.map(p=>`<div class="phrase-card" onclick="copyText('${p.cn.replace(/'/g,"\\'")}')"><div class="phrase-cn">${p.cn}</div><div class="phrase-py">${p.py}</div><div class="phrase-ko">${p.ko}</div><div class="phrase-hint">👆 탭 → 중국어 복사</div></div>`).join('')).join('');}
+function copyText(text){navigator.clipboard.writeText(text).then(()=>showToast('✓ 복사됨!'));}
 
-// ══════════════════════════════════════════
-// 도움말 탭
-// ══════════════════════════════════════════
-function renderPhrases() {
-  document.getElementById('phrase-list').innerHTML = PHRASES.map(cat =>
-    `<div class="phrase-cat">${cat.cat}</div>` +
-    cat.items.map(p=>`<div class="phrase-card" onclick="copyText('${p.cn.replace(/'/g,"\\'")}')">
-      <div class="phrase-cn">${p.cn}</div>
-      <div class="phrase-py">${p.py}</div>
-      <div class="phrase-ko">${p.ko}</div>
-      <div class="phrase-hint">👆 탭 → 중국어 복사</div>
-    </div>`).join('')
-  ).join('');
-}
-
-function copyText(text) {
-  navigator.clipboard.writeText(text).then(()=>showToast('✓ 복사됨! 현지인에게 보여주세요'));
-}
-
-// ══════════════════════════════════════════
-// 리뷰 바텀시트
-// ══════════════════════════════════════════
-async function openReviewSheet(spotId, attrId, spotName) {
-  currentReviewSpotId = spotId;
-  currentReviewAttrId = attrId;
-  selectedRating = 0;
-  setStar(0);
-  document.getElementById('review-nick').value = '';
-  document.getElementById('review-text').value = '';
-  document.getElementById('sheet-spot-name').textContent = spotName;
-  document.getElementById('reviews-container').innerHTML = '<div style="text-align:center;padding:20px;color:#aaa;font-size:12px">로딩 중…</div>';
+async function openReviewSheet(spotId,attrId,spotName){
+  currentReviewSpotId=spotId;currentReviewAttrId=attrId;selectedRating=0;setStar(0);
+  document.getElementById('review-nick').value='';document.getElementById('review-text').value='';
+  document.getElementById('sheet-spot-name').textContent=spotName;
+  document.getElementById('reviews-container').innerHTML='<div style="text-align:center;padding:20px;color:#aaa;font-size:12px">로딩 중…</div>';
   document.getElementById('sheet-overlay').classList.add('show');
   document.getElementById('review-sheet').classList.add('show');
-  document.body.style.overflow = 'hidden';
+  document.body.style.overflow='hidden';
   await loadReviews(spotId);
 }
-function closeSheet() {
-  document.getElementById('sheet-overlay').classList.remove('show');
-  document.getElementById('review-sheet').classList.remove('show');
-  document.body.style.overflow = '';
+function closeSheet(){document.getElementById('sheet-overlay').classList.remove('show');document.getElementById('review-sheet').classList.remove('show');document.body.style.overflow='';}
+async function loadReviews(spotId){
+  const container=document.getElementById('reviews-container');
+  if(!sb){container.innerHTML='<div class="no-reviews">리뷰 기능 준비 중</div>';return;}
+  try{
+    const{data,error}=await sb.from('guide_reviews').select('*').eq('spot_id',spotId).eq('approved',true).order('created_at',{ascending:false}).limit(20);
+    if(error||!data||data.length===0){container.innerHTML='<div class="no-reviews">아직 리뷰가 없어요 🌟</div>';return;}
+    container.innerHTML=data.map(r=>`<div class="review-item"><div class="review-header"><div><div class="review-nick">${r.nickname}</div><div class="review-date">${new Date(r.created_at).toLocaleDateString('ko-KR')}</div></div><div class="review-stars">${'⭐'.repeat(r.rating)}</div></div><div class="review-text">${r.comment}</div></div>`).join('');
+  }catch(e){container.innerHTML='<div class="no-reviews">리뷰를 불러오지 못했습니다</div>';}
 }
-async function loadReviews(spotId) {
-  const container = document.getElementById('reviews-container');
-  if (!supabase) {
-    container.innerHTML = '<div class="no-reviews">Supabase 미연결 — 리뷰 기능 준비 중</div>';
-    return;
-  }
-  try {
-    const {data,error} = await supabase.from('guide_reviews').select('*').eq('spot_id',spotId).eq('approved',true).order('created_at',{ascending:false}).limit(20);
-    if (error||!data||data.length===0){container.innerHTML='<div class="no-reviews">아직 리뷰가 없어요. 첫 리뷰를 남겨보세요! 🌟</div>';return;}
-    container.innerHTML = data.map(r=>`
-      <div class="review-item">
-        <div class="review-header">
-          <div>
-            <div class="review-nick">${r.nickname}</div>
-            <div class="review-date">${new Date(r.created_at).toLocaleDateString('ko-KR')}</div>
-          </div>
-          <div class="review-stars">${'⭐'.repeat(r.rating)}</div>
-        </div>
-        <div class="review-text">${r.comment}</div>
-      </div>`).join('');
-  } catch(e){container.innerHTML='<div class="no-reviews">리뷰를 불러오지 못했습니다</div>';}
+function setStar(n){selectedRating=n;for(let i=1;i<=5;i++)document.getElementById('s'+i).classList.toggle('on',i<=n);}
+async function submitReview(){
+  const nick=document.getElementById('review-nick').value.trim();
+  const txt=document.getElementById('review-text').value.trim();
+  if(!nick||!txt||!selectedRating){showToast('별점·닉네임·내용을 모두 입력해 주세요');return;}
+  if(!sb){showToast('Supabase 미연결');return;}
+  try{
+    const{error}=await sb.from('guide_reviews').insert({spot_id:currentReviewSpotId,attr_id:currentReviewAttrId,nickname:nick,rating:selectedRating,comment:txt});
+    if(error)throw error;
+    showToast('리뷰 제출됐습니다! 승인 후 게시됩니다 😊');
+    document.getElementById('review-nick').value='';document.getElementById('review-text').value='';setStar(0);
+  }catch(e){showToast('제출 실패. 다시 시도해 주세요');}
 }
-function setStar(n) {
-  selectedRating = n;
-  for(let i=1;i<=5;i++) document.getElementById('s'+i).classList.toggle('on',i<=n);
-}
-async function submitReview() {
-  const nick = document.getElementById('review-nick').value.trim();
-  const txt = document.getElementById('review-text').value.trim();
-  if (!nick||!txt||!selectedRating){showToast('별점·닉네임·내용을 모두 입력해 주세요');return;}
-  if (!supabase){showToast('Supabase 미연결 상태입니다');return;}
-  try {
-    const {error} = await supabase.from('guide_reviews').insert({
-      spot_id: currentReviewSpotId,
-      attr_id: currentReviewAttrId,
-      nickname: nick,
-      rating: selectedRating,
-      comment: txt,
-    });
-    if (error) throw error;
-    showToast('리뷰가 제출됐습니다! 관리자 승인 후 게시됩니다 😊');
-    document.getElementById('review-nick').value='';
-    document.getElementById('review-text').value='';
-    setStar(0);
-  } catch(e){showToast('제출에 실패했습니다. 다시 시도해 주세요');}
-}
-
-// ══════════════════════════════════════════
-// Supabase 통계
-// ══════════════════════════════════════════
-async function logVisit() {
-  if (!supabase) return;
-  try {
-    await supabase.from('guide_stats').insert({page:'guide',attr_id:currentAttr,user_agent:navigator.userAgent.slice(0,100)});
-  } catch(e){}
-}
-async function loadVisitorCount() {
-  const el = document.getElementById('visitor-count');
-  if (!supabase){el.textContent='—';return;}
-  try {
-    const {count,error} = await supabase.from('guide_stats').select('*',{count:'exact',head:true});
-    if (!error) el.textContent = (count||0).toLocaleString();
-  } catch(e){el.textContent='—';}
-}
-
-// ══════════════════════════════════════════
-// 유틸
-// ══════════════════════════════════════════
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2500);
-}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+async function logVisit(){if(!sb)return;try{const d=new Date().toISOString().slice(0,10);await sb.from('guide_stats').upsert({guide_id:'zjj',visit_date:d,visit_count:1},{onConflict:'guide_id,visit_date'});}catch(e){}}
+async function loadVisitorCount(){if(!sb)return;try{const{data}=await sb.from('guide_stats').select('visit_count');const total=data?data.reduce((s,r)=>s+(r.visit_count||0),0):0;document.getElementById('visitor-count').textContent=total.toLocaleString()+'+';}catch(e){}}
 </script>
 </body>
 </html>
