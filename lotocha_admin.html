@@ -2,660 +2,635 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>로투차 관리자</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>관리자 — 로투차</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Noto Sans KR',sans-serif;background:#f0f2f5;color:#1a2a5e;min-height:100vh}
-.top-bar{background:#1a2a5e;padding:0 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:200;box-shadow:0 2px 8px rgba(0,0,0,.3)}
-.top-title{color:#f5a623;font-size:16px;font-weight:900;padding:14px 0;flex:1}
-.top-badge{background:#f5a623;color:#1a2a5e;font-size:10px;font-weight:900;padding:3px 10px;border-radius:20px}
-.tab-bar{background:#1a2a5e;border-top:1px solid rgba(255,255,255,.1);display:flex;overflow-x:auto}
-.tab-btn{padding:11px 16px;border:none;background:transparent;color:#8892c4;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s}
-.tab-btn.on{color:#f5a623;border-bottom-color:#f5a623}
-.wrap{max-width:900px;margin:0 auto;padding:20px 16px 80px}
-.panel{display:none}.panel.on{display:block}
-.card{background:#fff;border-radius:14px;padding:20px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-.card-title{font-size:14px;font-weight:900;color:#1a2a5e;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.info-box{background:#e3f2fd;border-radius:10px;padding:12px 16px;font-size:12px;color:#1565c0;line-height:1.7;margin-bottom:14px}
-.warn-box{background:#fff3e0;border-radius:10px;padding:12px 16px;font-size:12px;color:#e65100;line-height:1.7;margin-bottom:14px}
-.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
-.fgrid.triple{grid-template-columns:1fr 1fr 1fr}
-.fgrid.quad{grid-template-columns:1fr 1fr 1fr 1fr}
-.fitem{display:flex;flex-direction:column;gap:4px}
-.fitem.full{grid-column:1/-1}
-.fitem label{font-size:11px;font-weight:700;color:#888}
-.fitem input,.fitem select,.fitem textarea{border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:13px;outline:none;transition:border .2s;background:#fff;color:#1a2a5e}
-.fitem input:focus,.fitem select:focus,.fitem textarea:focus{border-color:#f5a623}
-.fitem textarea{resize:vertical;min-height:70px}
-.divider{font-size:12px;font-weight:900;color:#888;margin:14px 0 8px;padding-bottom:6px;border-bottom:1px solid #eee}
-.btn{border:none;border-radius:8px;padding:9px 16px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
-.btn-primary{background:#1a2a5e;color:#f5a623}
-.btn-primary:hover{opacity:.9}
-.btn-success{background:#2e7d32;color:#fff}
-.btn-danger{background:#ffebee;color:#c62828;border:1px solid #ffcdd2}
-.btn-warning{background:#fff8e1;color:#e65100;border:1px solid #ffe082}
-.btn-sm{padding:6px 12px;font-size:11px}
-.btn-export{width:100%;background:linear-gradient(135deg,#1a2a5e,#2d4a9e);color:#fff;border:none;border-radius:10px;padding:16px;font-family:inherit;font-size:15px;font-weight:900;cursor:pointer;margin-top:8px}
-.btn-import{background:#e8f5e9;color:#2e7d32;border:1.5px solid #a5d6a7}
-.price-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:12px}
-.price-table th{background:#1a2a5e;color:#f5a623;padding:8px 12px;text-align:left;font-size:11px;font-weight:700}
-.price-table td{padding:8px 12px;border-bottom:1px solid #f0f0f0}
-.price-table tr:last-child td{border:none}
-.price-table input{width:80px;border:1.5px solid #e0e0e0;border-radius:6px;padding:5px 8px;font-family:inherit;font-size:13px;font-weight:700;text-align:right;outline:none}
-.price-table input:focus{border-color:#f5a623}
-.spot-row{border:1.5px solid #e8edf3;border-radius:10px;overflow:hidden;margin-bottom:10px}
-.spot-hdr{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;background:#fafafa;transition:background .15s}
-.spot-hdr:hover{background:#f0f4ff}
-.spot-icon-big{font-size:20px}
-.spot-name-lbl{font-size:13px;font-weight:700;flex:1}
-.spot-type-badge{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700}
-.type-attraction{background:#e3f2fd;color:#1565c0}
-.type-meal{background:#e8f5e9;color:#2e7d32}
-.type-transport{background:#fce4ec;color:#c62828}
-.type-hotel{background:#f3e5f5;color:#6a1b9a}
-.type-activity{background:#fff8e1;color:#e65100}
-.type-show{background:#fce4ec;color:#880e4f}
-.spot-body{display:none;padding:16px;border-top:1px solid #e8edf3;background:#fff}
-.spot-row.open .spot-body{display:block}
-.spot-row.open .spot-hdr{background:#fffbf2}
-.photo-area{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.photo-thumb{position:relative;width:80px;height:65px}
-.photo-thumb img{width:100%;height:100%;object-fit:cover;border-radius:7px}
-.photo-del{position:absolute;top:-4px;right:-4px;background:#e53935;color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;line-height:1}
-.photo-add{width:80px;height:65px;border:2px dashed #ddd;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:10px;color:#bbb;gap:3px;transition:all .2s}
-.photo-add:hover{border-color:#f5a623;color:#e8940f}
-.photo-add-icon{font-size:20px;color:#ccc}
-.notice-item{border:1.5px solid #e8edf3;border-radius:10px;padding:12px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start}
-.notice-item textarea{flex:1;border:1.5px solid #e0e0e0;border-radius:7px;padding:8px 10px;font-family:inherit;font-size:12px;resize:none;outline:none;min-height:60px}
-.notice-item textarea:focus{border-color:#f5a623}
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a2a5e;color:#f5a623;padding:11px 22px;border-radius:20px;font-size:13px;font-weight:700;opacity:0;transition:all .3s;pointer-events:none;z-index:999}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-@media(max-width:600px){.fgrid{grid-template-columns:1fr}.fgrid.triple{grid-template-columns:1fr 1fr}.fgrid.quad{grid-template-columns:1fr 1fr}}
+:root{--navy:#1a2a5e;--gold:#f5a623;--bg:#f0f2f7;--white:#fff;--red:#e53935;--green:#2e7d32;--border:#e0e7f0}
+body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--navy);min-height:100vh}
+
+/* ── 로그인 ── */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.login-box{background:var(--white);border-radius:20px;padding:36px 32px;width:100%;max-width:400px;box-shadow:0 4px 24px rgba(26,42,94,.12)}
+.login-logo{text-align:center;margin-bottom:24px}
+.login-logo .emoji{font-size:48px}
+.login-logo h1{font-size:20px;font-weight:900;color:var(--navy);margin-top:8px}
+.login-logo p{font-size:12px;color:#888;margin-top:4px}
+.form-group{margin-bottom:16px}
+.form-label{font-size:12px;font-weight:700;color:#555;margin-bottom:6px;display:block}
+.form-input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s}
+.form-input:focus{border-color:var(--navy)}
+.btn-primary{width:100%;background:var(--navy);color:var(--gold);border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:900;cursor:pointer;font-family:inherit;margin-top:8px}
+.btn-primary:hover{background:#0f1a3d}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed}
+.login-err{background:#fff3f3;border-radius:8px;padding:10px 12px;font-size:12px;color:var(--red);margin-top:12px;display:none}
+
+/* ── 앱 레이아웃 ── */
+#app{display:none}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--navy);overflow-y:auto;z-index:100}
+.sb-logo{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sb-logo .emoji{font-size:28px}
+.sb-logo h2{color:var(--gold);font-size:14px;font-weight:900;margin-top:4px}
+.sb-logo p{color:rgba(255,255,255,.4);font-size:11px;margin-top:2px}
+.sb-nav{padding:12px 0}
+.sb-section{padding:8px 20px 4px;font-size:10px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:.5px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 20px;color:rgba(255,255,255,.6);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;border:none;background:none;width:100%;text-align:left;font-family:inherit}
+.sb-item:hover{background:rgba(255,255,255,.06);color:#fff}
+.sb-item.active{background:rgba(245,166,35,.15);color:var(--gold)}
+.sb-item .icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+.sb-badge{background:var(--red);color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:900;margin-left:auto}
+.sb-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.08)}
+.sb-user{color:rgba(255,255,255,.5);font-size:11px;margin-bottom:8px;word-break:break-all}
+.sb-logout{background:rgba(255,255,255,.08);border:none;color:rgba(255,255,255,.5);border-radius:8px;padding:7px 12px;font-size:12px;cursor:pointer;font-family:inherit;width:100%}
+.sb-logout:hover{background:rgba(255,255,255,.15);color:#fff}
+.main{margin-left:220px;padding:24px;min-height:100vh}
+.page-title{font-size:20px;font-weight:900;color:var(--navy);margin-bottom:4px}
+.page-sub{font-size:13px;color:#888;margin-bottom:20px}
+
+/* ── 통계 카드 ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:24px}
+.stat-card{background:var(--white);border-radius:14px;padding:16px 18px;box-shadow:0 2px 8px rgba(26,42,94,.06)}
+.stat-label{font-size:11px;color:#888;font-weight:700;margin-bottom:6px}
+.stat-value{font-size:28px;font-weight:900;color:var(--navy)}
+
+/* ── 테이블 ── */
+.table-wrap{background:var(--white);border-radius:14px;box-shadow:0 2px 8px rgba(26,42,94,.06);overflow:hidden;margin-bottom:20px}
+.table-head{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.table-head h3{font-size:14px;font-weight:900;color:var(--navy)}
+.btn-add{background:var(--navy);color:var(--gold);border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+table{width:100%;border-collapse:collapse}
+th{padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:#888;background:#fafbfc;border-bottom:1px solid var(--border)}
+td{padding:11px 14px;font-size:13px;border-bottom:1px solid #f5f7fa;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafbfe}
+.badge{display:inline-block;padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700}
+.badge-live{background:#e8f5e9;color:var(--green)}
+.badge-pending{background:#fff3e0;color:#e65100}
+.badge-draft{background:#f0f0f0;color:#666}
+.badge-archived{background:#f3f3f3;color:#999}
+.badge-day{background:#e8eaf6;color:#3949ab}
+.badge-pkg{background:#fce4ec;color:#c62828}
+.act-btns{display:flex;gap:6px}
+.btn-edit{background:#e8eaf6;color:#3949ab;border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-del{background:#ffebee;color:var(--red);border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-approve{background:#e8f5e9;color:var(--green);border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-reject{background:#ffebee;color:var(--red);border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+
+/* ── 모달 ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-bg.open{display:flex}
+.modal{background:var(--white);border-radius:16px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto}
+.modal-head{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-head h3{font-size:16px;font-weight:900;color:var(--navy)}
+.modal-close{background:#f0f0f0;border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.modal-body{padding:20px 24px}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end}
+.field-group{margin-bottom:16px}
+.field-label{font-size:12px;font-weight:700;color:#555;margin-bottom:6px;display:block}
+.field-input{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;transition:border-color .2s}
+.field-input:focus{border-color:var(--navy)}
+textarea.field-input{min-height:80px;resize:vertical}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field-hint{font-size:11px;color:#aaa;margin-top:4px}
+.btn-save{background:var(--navy);color:var(--gold);border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:900;cursor:pointer;font-family:inherit}
+.btn-cancel{background:#f0f0f0;color:#666;border:none;border-radius:8px;padding:10px 20px;font-size:13px;cursor:pointer;font-family:inherit}
+
+/* ── 토스트 ── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:#fff;border-radius:10px;padding:12px 18px;font-size:13px;font-weight:700;z-index:2000;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+.toast.success{background:var(--green)}
+.toast.error{background:var(--red)}
+
+.panel{display:none}
+.panel.active{display:block}
 </style>
 </head>
 <body>
 
-<div class="top-bar">
-  <div class="top-title">🛠️ 로투차 관리자</div>
-  <button onclick="saveToGitHub()" id="github-save-btn" style="background:#2ea44f;color:#fff;border:none;border-radius:6px;padding:7px 14px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;margin-right:6px">💾 GitHub 저장</button>
-  <button onclick="resetToken()" style="background:transparent;color:#8892c4;border:1px solid #2d3a7a;border-radius:6px;padding:7px 10px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;margin-right:8px">🔑 토큰 재설정</button>
-  <div class="top-badge">ADMIN</div>
-</div>
-<div class="tab-bar">
-  <button class="tab-btn on" onclick="switchTab(0)">📦 패키지/가격</button>
-  <button class="tab-btn" onclick="switchTab(1)">🏔️ 경관/일정</button>
-  <button class="tab-btn" onclick="switchTab(2)">⚙️ 옵션설정</button>
-  <button class="tab-btn" onclick="switchTab(3)">☀️ 1일 투어</button>
-  <button class="tab-btn" onclick="switchTab(4)">📋 유의사항</button>
-  <button class="tab-btn" onclick="switchTab(5)">🏷️ 브랜드</button>
-  <button class="tab-btn" onclick="switchTab(6)">📥 내보내기</button>
-</div>
-
-<div class="wrap">
-
-<!-- ═══ PANEL 0: 패키지/가격 ═══ -->
-<div class="panel on" id="panel-0">
-  <div class="info-box">💡 인원별 단가(만원/인)와 포함/불포함 사항을 수정하세요. 수정 후 <strong>내보내기</strong> 탭에서 저장하세요.</div>
-  <div id="pkg-panels"></div>
+<!-- 로그인 -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="emoji">🏔️</div>
+      <h1>로투차 관리자</h1>
+      <p>LocalTour China Admin</p>
+    </div>
+    <div class="form-group">
+      <label class="form-label">이메일</label>
+      <input type="email" id="login-email" class="form-input" placeholder="관리자 이메일">
+    </div>
+    <div class="form-group">
+      <label class="form-label">비밀번호</label>
+      <input type="password" id="login-pw" class="form-input" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="btn-primary" id="login-btn" onclick="doLogin()">로그인</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
 </div>
 
-<!-- ═══ PANEL 1: 경관/일정 ═══ -->
-<div class="panel" id="panel-1">
-  <div class="info-box">💡 각 경관을 클릭해서 내용을 수정하세요. 사진은 URL 추가 또는 파일 업로드가 가능합니다.</div>
-  <div id="spot-list"></div>
-</div>
+<!-- 앱 -->
+<div id="app">
+  <div class="sidebar" id="sidebar">
+    <div class="sb-logo">
+      <div class="emoji">🏔️</div>
+      <h2>로투차 Admin</h2>
+      <p id="sb-role">-</p>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">콘텐츠</div>
+      <button class="sb-item active" data-panel="dashboard" onclick="showPanel('dashboard',this)">
+        <span class="icon">📊</span>대시보드
+      </button>
+      <button class="sb-item" data-panel="tours" onclick="showPanel('tours',this)">
+        <span class="icon">🏔️</span>투어 상품
+      </button>
+      <button class="sb-item" data-panel="spots" onclick="showPanel('spots',this)">
+        <span class="icon">📍</span>가이드 스팟
+      </button>
+      <div class="sb-section">운영</div>
+      <button class="sb-item" data-panel="reviews" onclick="showPanel('reviews',this)">
+        <span class="icon">💬</span>리뷰 관리
+        <span class="sb-badge" id="review-badge" style="display:none">0</span>
+      </button>
+      <button class="sb-item" data-panel="stats" onclick="showPanel('stats',this)">
+        <span class="icon">📈</span>방문 통계
+      </button>
+      <div class="sb-section" id="sb-section-users" style="display:none">관리자</div>
+      <button class="sb-item" id="sb-users-btn" data-panel="users" onclick="showPanel('users',this)" style="display:none">
+        <span class="icon">👥</span>사용자 관리
+      </button>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user" id="sb-email"></div>
+      <button class="sb-logout" onclick="doLogout()">로그아웃</button>
+    </div>
+  </div>
 
-<!-- ═══ PANEL 2: 옵션설정 ═══ -->
-<div class="panel" id="panel-2">
-  <div class="info-box">💡 각 옵션의 가격과 설명을 수정하세요.</div>
+  <div class="main">
+    <!-- 대시보드 -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="page-title">📊 대시보드</div>
+      <div class="page-sub">로투차 운영 현황</div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">총 방문자</div><div class="stat-value" id="stat-visits">-</div></div>
+        <div class="stat-card"><div class="stat-label">투어 상품</div><div class="stat-value" id="stat-tours">-</div></div>
+        <div class="stat-card"><div class="stat-label">가이드 스팟</div><div class="stat-value" id="stat-spots">-</div></div>
+        <div class="stat-card"><div class="stat-label" style="color:var(--red)">미승인 리뷰</div><div class="stat-value" id="stat-reviews" style="color:var(--red)">-</div></div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-head"><h3>⏳ 미승인 리뷰</h3></div>
+        <table><thead><tr><th>경관지</th><th>닉네임</th><th>평점</th><th>내용</th><th>작성일</th><th>액션</th></tr></thead>
+        <tbody id="dash-reviews"></tbody></table>
+      </div>
+    </div>
 
-  <div class="card">
-    <div class="card-title">🏨 호텔 옵션</div>
-    <div id="hotel-editor"></div>
-  </div>
-  <div class="card">
-    <div class="card-title">🎭 공연 옵션</div>
-    <div id="show-editor"></div>
-  </div>
-  <div class="card">
-    <div class="card-title">💆 마사지 옵션</div>
-    <div id="massage-editor"></div>
-  </div>
-  <div class="card">
-    <div class="card-title">🚌 부용진 교통</div>
-    <div id="fuyong-editor"></div>
-  </div>
-  <div class="card">
-    <div class="card-title">🏯 봉황고성 대체</div>
-    <div class="divider">봉황고성 추가비용 (만원/인)</div>
-    <div class="fgrid quad" id="phoenix-price-editor"></div>
-    <div class="divider" style="margin-top:4px">봉황고성 교통 옵션</div>
-    <div id="phoenix-transport-editor"></div>
-  </div>
-  <div class="card">
-    <div class="card-title">🚁 헬기 옵션</div>
-    <div id="heli-editor"></div>
-  </div>
-  <div class="card">
-    <div class="card-title">➕ 추가 옵션</div>
-    <div id="extras-editor"></div>
-  </div>
-  <div class="card">
-    <div class="card-title">⭐ 스타 가이드</div>
-    <div class="fgrid">
-      <div class="fitem"><label>하루당 팁 (만원/일)</label><input type="number" id="star-guide-price" min="0" onchange="updateStarGuide(this.value)"></div>
+    <!-- 투어 상품 -->
+    <div class="panel" id="panel-tours">
+      <div class="page-title">🏔️ 투어 상품</div>
+      <div class="page-sub">1일투어 및 패키지 관리</div>
+      <div class="table-wrap">
+        <div class="table-head"><h3>전체 상품</h3><button class="btn-add" onclick="openTourModal()">+ 상품 추가</button></div>
+        <table><thead><tr><th>타입</th><th>상품명</th><th>가격</th><th>기간</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <tbody id="tours-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- 스팟 -->
+    <div class="panel" id="panel-spots">
+      <div class="page-title">📍 가이드 스팟</div>
+      <div class="page-sub">스팟 정보 관리</div>
+      <div class="table-wrap">
+        <div class="table-head"><h3>전체 스팟</h3><button class="btn-add" onclick="openSpotModal()">+ 스팟 추가</button></div>
+        <table><thead><tr><th>경관지</th><th>스팟명</th><th>타입</th><th>상태</th><th>액션</th></tr></thead>
+        <tbody id="spots-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- 리뷰 -->
+    <div class="panel" id="panel-reviews">
+      <div class="page-title">💬 리뷰 관리</div>
+      <div class="page-sub">방문자 리뷰 승인/삭제</div>
+      <div class="table-wrap">
+        <div class="table-head"><h3>미승인 리뷰</h3></div>
+        <table><thead><tr><th>경관지</th><th>닉네임</th><th>평점</th><th>내용</th><th>작성일</th><th>액션</th></tr></thead>
+        <tbody id="reviews-pending"></tbody></table>
+      </div>
+      <div class="table-wrap">
+        <div class="table-head"><h3>승인된 리뷰 (최근 20개)</h3></div>
+        <table><thead><tr><th>경관지</th><th>닉네임</th><th>평점</th><th>내용</th><th>작성일</th><th>액션</th></tr></thead>
+        <tbody id="reviews-approved"></tbody></table>
+      </div>
+    </div>
+
+    <!-- 통계 -->
+    <div class="panel" id="panel-stats">
+      <div class="page-title">📈 방문 통계</div>
+      <div class="page-sub">페이지별 방문 현황</div>
+      <div class="stats-grid" id="stats-detail"></div>
+    </div>
+
+    <!-- 사용자 관리 -->
+    <div class="panel" id="panel-users">
+      <div class="page-title">👥 사용자 관리</div>
+      <div class="page-sub">관리자 계정 승인 및 권한 관리</div>
+      <div class="table-wrap">
+        <div class="table-head"><h3>관리자 목록</h3></div>
+        <table><thead><tr><th>이메일</th><th>이름</th><th>역할</th><th>승인</th><th>가입일</th><th>액션</th></tr></thead>
+        <tbody id="users-tbody"></tbody></table>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ═══ PANEL 3: 1일 투어 ═══ -->
-<div class="panel" id="panel-3">
-  <div class="info-box">💡 1일 투어 상품의 내용과 가격을 수정하세요.</div>
-  <div id="day-tour-editor"></div>
-</div>
-
-<!-- ═══ PANEL 4: 유의사항 ═══ -->
-<div class="panel" id="panel-4">
-  <div class="card">
-    <div class="card-title">📋 유의사항</div>
-    <div id="notice-editor"></div>
-    <button class="btn btn-warning btn-sm" style="margin-top:8px" onclick="addNotice()">+ 항목 추가</button>
-  </div>
-  <div class="card">
-    <div class="card-title">⚠️ 취소 규정</div>
-    <div id="cancel-editor"></div>
-    <button class="btn btn-warning btn-sm" style="margin-top:8px" onclick="addCancel()">+ 규정 추가</button>
-  </div>
-</div>
-
-<!-- ═══ PANEL 5: 브랜드 ═══ -->
-<div class="panel" id="panel-5">
-  <div class="card">
-    <div class="card-title">🏷️ 브랜드 설정</div>
-    <div class="fgrid">
-      <div class="fitem"><label>브랜드명</label><input type="text" id="brand-name"></div>
-      <div class="fitem"><label>풀 네임</label><input type="text" id="brand-name-full"></div>
-      <div class="fitem full"><label>슬로건</label><input type="text" id="brand-slogan"></div>
-      <div class="fitem full"><label>카카오톡 채널 URL</label><input type="text" id="brand-kakao"></div>
-      <div class="fitem"><label>전화번호</label><input type="text" id="brand-phone"></div>
-      <div class="fitem"><label>이메일</label><input type="text" id="brand-email"></div>
-      <div class="fitem"><label>인스타그램</label><input type="text" id="brand-instagram"></div>
+<!-- 투어 모달 -->
+<div class="modal-bg" id="tour-modal-bg" onclick="closeTourModal(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="tour-modal-title">투어 상품 추가</h3>
+      <button class="modal-close" onclick="closeTourModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="t-id">
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">타입 *</label>
+          <select id="t-type" class="field-input"><option value="day_tour">1일투어</option><option value="package">패키지</option></select></div>
+        <div class="field-group"><label class="field-label">상태</label>
+          <select id="t-status" class="field-input"><option value="live">라이브</option><option value="draft">초안</option><option value="archived">보관</option></select></div>
+      </div>
+      <div class="field-group"><label class="field-label">상품명 (한국어) *</label><input type="text" id="t-title-ko" class="field-input"></div>
+      <div class="field-group"><label class="field-label">상품명 (중국어)</label><input type="text" id="t-title-cn" class="field-input"></div>
+      <div class="field-group"><label class="field-label">부제</label><input type="text" id="t-subtitle" class="field-input"></div>
+      <div class="field-group"><label class="field-label">설명</label><textarea id="t-desc" class="field-input"></textarea></div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">가격 (원)</label><input type="number" id="t-price-krw" class="field-input" placeholder="89000"></div>
+        <div class="field-group"><label class="field-label">가격 (위안)</label><input type="number" id="t-price-cny" class="field-input" placeholder="480"></div>
+      </div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">일수</label><input type="number" id="t-days" class="field-input" value="1"></div>
+        <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="t-order" class="field-input" value="0"></div>
+      </div>
+      <div class="field-group"><label class="field-label">하이라이트 (줄바꿈 구분)</label><textarea id="t-highlights" class="field-input" placeholder="원가계 기둥군&#10;천자산 케이블카"></textarea></div>
+      <div class="field-group"><label class="field-label">포함 사항 (줄바꿈 구분)</label><textarea id="t-includes" class="field-input"></textarea></div>
+      <div class="field-group"><label class="field-label">불포함 사항 (줄바꿈 구분)</label><textarea id="t-excludes" class="field-input"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeTourModal()">취소</button>
+      <button class="btn-save" onclick="saveTour()">저장</button>
     </div>
   </div>
 </div>
 
-<!-- ═══ PANEL 6: 내보내기 ═══ -->
-<div class="panel" id="panel-6">
-  <div class="warn-box">⚠️ 수정 후 반드시 <strong>내보내기</strong>를 해야 고객 페이지에 반영됩니다.<br>다운로드 후 <strong>index.html과 함께</strong> Netlify에 업로드하세요.</div>
-  <div class="card">
-    <div class="card-title">📥 데이터 내보내기</div>
-    <p style="font-size:13px;color:#555;line-height:1.7;margin-bottom:12px">수정된 내용이 <strong>lotocha_data.json</strong> 파일로 다운로드됩니다.</p>
-    <button class="btn-export" onclick="exportJSON()">📥 lotocha_data.json 내보내기</button>
-  </div>
-  <div class="card">
-    <div class="card-title">📤 데이터 불러오기</div>
-    <p style="font-size:13px;color:#555;line-height:1.7;margin-bottom:12px">기존 <strong>lotocha_data.json</strong> 파일을 불러와서 편집할 수 있습니다.</p>
-    <input type="file" id="import-file" accept=".json" style="display:none" onchange="importJSON(this)">
-    <button class="btn btn-import" onclick="document.getElementById('import-file').click()">📤 lotocha_data.json 불러오기</button>
+<!-- 스팟 모달 -->
+<div class="modal-bg" id="spot-modal-bg" onclick="closeSpotModal(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="spot-modal-title">스팟 추가</h3>
+      <button class="modal-close" onclick="closeSpotModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="s-id-orig">
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">스팟 ID *</label><input type="text" id="s-id" class="field-input" placeholder="forest_south_1"><div class="field-hint">영문_소문자</div></div>
+        <div class="field-group"><label class="field-label">경관지 *</label>
+          <select id="s-attr" class="field-input"><option value="forest">삼림공원</option><option value="tianmen">천문산</option><option value="canyon">협곡</option></select></div>
+      </div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">구역</label><input type="text" id="s-zone" class="field-input" placeholder="south"></div>
+        <div class="field-group"><label class="field-label">타입 *</label>
+          <select id="s-type" class="field-input">
+            <option value="landmark">랜드마크</option><option value="transport">교통/탑승</option><option value="viewpoint">전망대</option>
+            <option value="toilet">화장실</option><option value="food">음식</option><option value="rest">휴식</option>
+            <option value="ticket">티켓</option><option value="info">정보</option><option value="danger">주의</option>
+          </select></div>
+      </div>
+      <div class="field-group"><label class="field-label">스팟명 (한국어) *</label><input type="text" id="s-name-ko" class="field-input"></div>
+      <div class="field-group"><label class="field-label">스팟명 (중국어)</label><input type="text" id="s-name-cn" class="field-input"></div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">위도 (lat)</label><input type="number" id="s-lat" class="field-input" step="0.0000001"></div>
+        <div class="field-group"><label class="field-label">경도 (lon)</label><input type="number" id="s-lon" class="field-input" step="0.0000001"></div>
+      </div>
+      <div class="field-group"><label class="field-label">고덕지도 딥링크</label><input type="text" id="s-gaode" class="field-input" placeholder="androidamap://..."><div class="field-hint">고덕지도 앱 → 장소 공유 → 링크 복사</div></div>
+      <div class="field-group"><label class="field-label">이미지 URL (줄바꿈 구분)</label><textarea id="s-images" class="field-input" placeholder="https://...jpg"></textarea></div>
+      <div class="field-group"><label class="field-label">설명</label><textarea id="s-desc" class="field-input"></textarea></div>
+      <div class="field-group"><label class="field-label">팁</label><input type="text" id="s-tip" class="field-input"></div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">운영시간</label><input type="text" id="s-hours" class="field-input" placeholder="07:00–18:00"></div>
+        <div class="field-group"><label class="field-label">가격 정보</label><input type="text" id="s-price" class="field-input" placeholder="무료 / ¥245"></div>
+      </div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="s-order" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">상태</label>
+          <select id="s-status" class="field-input"><option value="live">라이브</option><option value="draft">초안</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeSpotModal()">취소</button>
+      <button class="btn-save" onclick="saveSpot()">저장</button>
+    </div>
   </div>
 </div>
 
-</div>
 <div class="toast" id="toast"></div>
 
 <script>
-// ── DATA ──
-var DB = null;
+const SUPA_URL = 'https://qbzoepglovwlarjssqjg.supabase.co';
+const SUPA_KEY = 'sb_publishable_oxeR92SfBDMzYAvcNitbPw_Vf0u1y0K';
+let sb, currentUser, userRole;
+try { sb = window.supabase.createClient(SUPA_URL, SUPA_KEY); } catch(e) {}
 
-// GitHub에서 JSON 로드
-var GITHUB_RAW = 'https://raw.githubusercontent.com/nanyingkui/lotocha/main/lotocha_data.json';
-fetch(GITHUB_RAW + '?t=' + Date.now())
-  .then(function(r){return r.json();})
-  .then(function(data){
-    DB = JSON.parse(JSON.stringify(data));
-    renderAll();
-  })
-  .catch(function(){
-    // GitHub 로드 실패 시 로컬 시도
-    fetch('lotocha_data.json')
-      .then(function(r){return r.json();})
-      .then(function(data){
-        DB = JSON.parse(JSON.stringify(data));
-        renderAll();
-      })
-      .catch(function(){
-        showToast('데이터를 불러올 수 없습니다. 내보내기 탭에서 파일을 불러오세요.');
-      });
-  });
+const ATTR_LABELS = {forest:'삼림공원', tianmen:'천문산', canyon:'협곡'};
+function toast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show ' + type;
+  setTimeout(() => t.className = 'toast', 2800);
+}
+function fmt(n) { return n ? n.toLocaleString('ko-KR')+'원' : '-'; }
+function dateStr(s) { return s ? s.slice(0,10) : '-'; }
+function linesToArr(s) { return s.split('\n').map(x=>x.trim()).filter(Boolean); }
+function arrToLines(a) { return (a||[]).join('\n'); }
 
-// ── TAB ──
-function switchTab(n){
-  document.querySelectorAll('.tab-btn').forEach(function(b,i){b.classList.toggle('on',i===n)});
-  document.querySelectorAll('.panel').forEach(function(p,i){p.classList.toggle('on',i===n)});
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pw = document.getElementById('login-pw').value;
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('login-err');
+  if (!email || !pw) { showErr('이메일과 비밀번호를 입력하세요'); return; }
+  btn.disabled = true; btn.textContent = '로그인 중...'; err.style.display='none';
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
+  if (error) {
+    showErr('로그인 실패: ' + (error.message.includes('Invalid') ? '이메일 또는 비밀번호 오류' : error.message));
+    btn.disabled = false; btn.textContent = '로그인'; return;
+  }
+  await initApp(data.user);
+}
+function showErr(msg) {
+  const e = document.getElementById('login-err');
+  e.textContent = msg; e.style.display = 'block';
+  document.getElementById('login-btn').disabled = false;
+  document.getElementById('login-btn').textContent = '로그인';
 }
 
-// ── RENDER ALL ──
-function renderAll(){
-  renderPkgPanels();
-  renderSpots();
-  renderOptions();
-  renderDayTours();
-  renderNotices();
-  renderBrand();
+async function doLogout() {
+  await sb.auth.signOut();
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
 }
 
-// ── 패키지/가격 ──
-function renderPkgPanels(){
-  var html = '';
-  DB.packages.forEach(function(pkg,pi){
-    html += '<div class="card"><div class="card-title">'+pkg.name+'</div>';
-    html += '<table class="price-table"><thead><tr>';
-    [2,3,4,5,6,7,8].forEach(function(n){html+='<th>'+n+'인</th>';});
-    html += '</tr></thead><tbody><tr>';
-    [2,3,4,5,6,7,8].forEach(function(n){
-      html += '<td><input type="number" id="p'+pi+'-'+n+'" value="'+(pkg.prices[String(n)]||0)+'" min="0" onchange="DB.packages['+pi+'].prices[\''+n+'\']=parseInt(this.value)||0"></td>';
+async function initApp(user) {
+  currentUser = user;
+  const { data: adm } = await sb.from('admin_users').select('role,approved,display_name').eq('id', user.id).single();
+  if (!adm || !adm.approved) { showErr('관리자 승인이 필요합니다. 슈퍼어드민에게 문의하세요.'); await sb.auth.signOut(); return; }
+  userRole = adm.role;
+  document.getElementById('sb-email').textContent = user.email;
+  document.getElementById('sb-role').textContent = {superadmin:'슈퍼어드민',admin:'어드민',editor:'에디터'}[userRole]||userRole;
+  if (userRole === 'superadmin' || userRole === 'admin') {
+    document.getElementById('sb-section-users').style.display = '';
+    document.getElementById('sb-users-btn').style.display = '';
+  }
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  loadDashboard();
+}
+
+function showPanel(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  const loaders = {dashboard:loadDashboard,tours:loadTours,spots:loadSpots,reviews:loadReviews,stats:loadStats,users:loadUsers};
+  if (loaders[id]) loaders[id]();
+}
+
+async function loadDashboard() {
+  const [v,t,s,r] = await Promise.all([
+    sb.from('guide_stats').select('id',{count:'exact',head:true}),
+    sb.from('tour_products').select('id',{count:'exact',head:true}).eq('status','live'),
+    sb.from('guide_spots').select('id',{count:'exact',head:true}).eq('status','live'),
+    sb.from('guide_reviews').select('id',{count:'exact',head:true}).eq('approved',false),
+  ]);
+  document.getElementById('stat-visits').textContent = v.count??'-';
+  document.getElementById('stat-tours').textContent = t.count??'-';
+  document.getElementById('stat-spots').textContent = s.count??'-';
+  document.getElementById('stat-reviews').textContent = r.count??'-';
+  if ((r.count||0) > 0) { document.getElementById('review-badge').textContent=r.count; document.getElementById('review-badge').style.display=''; }
+  const { data:rv } = await sb.from('guide_reviews').select('*').eq('approved',false).order('created_at',{ascending:false}).limit(5);
+  const tb = document.getElementById('dash-reviews');
+  tb.innerHTML = !rv||!rv.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">미승인 리뷰 없음</td></tr>'
+    : rv.map(r=>`<tr><td>${ATTR_LABELS[r.attr_id]||r.attr_id}</td><td>${r.nickname}</td><td>${'⭐'.repeat(r.rating)}</td>
+        <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.comment}</td>
+        <td>${dateStr(r.created_at)}</td>
+        <td><div class="act-btns"><button class="btn-approve" onclick="approveReview('${r.id}')">승인</button>
+        <button class="btn-reject" onclick="deleteReview('${r.id}')">삭제</button></div></td></tr>`).join('');
+}
+
+async function loadTours() {
+  const { data } = await sb.from('tour_products').select('*').order('sort_order');
+  document.getElementById('tours-tbody').innerHTML = !data ? '<tr><td colspan="7" style="color:var(--red)">로드 실패</td></tr>'
+    : data.map(p=>`<tr>
+        <td><span class="badge ${p.product_type==='day_tour'?'badge-day':'badge-pkg'}">${p.product_type==='day_tour'?'1일투어':'패키지'}</span></td>
+        <td style="font-weight:700">${p.title_ko}</td><td>${fmt(p.price_krw)}</td><td>${p.duration_days}일</td>
+        <td><span class="badge badge-${p.status}">${{live:'라이브',draft:'초안',pending:'검토중',archived:'보관'}[p.status]||p.status}</span></td>
+        <td>${p.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openTourModal('${p.id}')">편집</button>
+        <button class="btn-del" onclick="deleteTour('${p.id}')">삭제</button></div></td></tr>`).join('');
+}
+
+function openTourModal(id) {
+  document.getElementById('tour-modal-title').textContent = id ? '투어 상품 편집' : '투어 상품 추가';
+  const clear = () => ['t-id','t-title-ko','t-title-cn','t-subtitle','t-desc','t-price-krw','t-price-cny','t-highlights','t-includes','t-excludes'].forEach(f=>document.getElementById(f).value='');
+  if (!id) {
+    clear();
+    document.getElementById('t-type').value='day_tour'; document.getElementById('t-status').value='live';
+    document.getElementById('t-days').value='1'; document.getElementById('t-order').value='0';
+  } else {
+    sb.from('tour_products').select('*').eq('id',id).single().then(({data:p})=>{
+      if (!p) return;
+      document.getElementById('t-id').value=p.id;
+      document.getElementById('t-type').value=p.product_type;
+      document.getElementById('t-title-ko').value=p.title_ko||'';
+      document.getElementById('t-title-cn').value=p.title_cn||'';
+      document.getElementById('t-subtitle').value=p.subtitle_ko||'';
+      document.getElementById('t-desc').value=p.description_ko||'';
+      document.getElementById('t-price-krw').value=p.price_krw||'';
+      document.getElementById('t-price-cny').value=p.price_cny||'';
+      document.getElementById('t-days').value=p.duration_days||1;
+      document.getElementById('t-order').value=p.sort_order||0;
+      document.getElementById('t-status').value=p.status||'live';
+      document.getElementById('t-highlights').value=arrToLines(p.highlights);
+      document.getElementById('t-includes').value=arrToLines(p.includes);
+      document.getElementById('t-excludes').value=arrToLines(p.excludes);
     });
-    html += '</tr></tbody></table>';
-    html += '<div class="divider">✅ 포함 사항 (한 줄에 하나씩)</div>';
-    html += '<textarea id="inc-'+pi+'" onchange="DB.packages['+pi+'].includes=this.value.split(\'\\n\').filter(function(s){return s.trim();})" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:12px;resize:none;outline:none;min-height:100px">'+pkg.includes.join('\n')+'</textarea>';
-    html += '<div class="divider">⚠️ 불포함 사항 (한 줄에 하나씩)</div>';
-    html += '<textarea id="exc-'+pi+'" onchange="DB.packages['+pi+'].excludes=this.value.split(\'\\n\').filter(function(s){return s.trim();})" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:12px;resize:none;outline:none;min-height:60px">'+pkg.excludes.join('\n')+'</textarea>';
-    html += '</div>';
-  });
-  document.getElementById('pkg-panels').innerHTML = html;
+  }
+  document.getElementById('tour-modal-bg').classList.add('open');
 }
-
-// ── 경관 ──
-var typeLabels = {attraction:'관광지',meal:'식사',transport:'교통',hotel:'숙박',activity:'액티비티',show:'공연'};
-
-function renderSpots(){
-  var html = '';
-  Object.keys(DB.spots).forEach(function(sid){
-    var sp = DB.spots[sid];
-    var tclass = 'type-'+(sp.type||'activity');
-    var tlabel = typeLabels[sp.type]||sp.type;
-    html += '<div class="spot-row" id="srow-'+sid+'">';
-    html += '<div class="spot-hdr" onclick="toggleSpotRow(\''+sid+'\')">';
-    html += '<div class="spot-icon-big">'+sp.icon+'</div>';
-    html += '<div class="spot-name-lbl">'+sp.name+'</div>';
-    html += '<span class="spot-type-badge '+tclass+'">'+tlabel+'</span>';
-    html += '<span style="color:#ccc;font-size:12px;margin-left:6px">▼</span></div>';
-    html += '<div class="spot-body">';
-    html += '<div class="fgrid">';
-    html += sf('이름','text','sn-'+sid,sp.name,'updateSpot(\''+sid+'\',\'name\',this.value)');
-    html += sf('아이콘','text','si-'+sid,sp.icon,'updateSpot(\''+sid+'\',\'icon\',this.value)');
-    html += sf('시간','text','st-'+sid,sp.time,'updateSpot(\''+sid+'\',\'time\',this.value)');
-    html += sf('소요시간','text','sd-'+sid,sp.duration||'','updateSpot(\''+sid+'\',\'duration\',this.value)');
-    html += '</div>';
-    html += '<div class="fitem full" style="margin-bottom:10px"><label>설명</label><textarea onchange="updateSpot(\''+sid+'\',\'desc\',this.value)" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:12px;resize:none;outline:none;min-height:70px">'+esc(sp.desc||'')+'</textarea></div>';
-    html += '<div class="fitem full" style="margin-bottom:10px"><label>💡 팁</label><textarea onchange="updateSpot(\''+sid+'\',\'tip\',this.value)" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:12px;resize:none;outline:none;min-height:50px">'+esc(sp.tip||'')+'</textarea></div>';
-    html += '<div class="fitem full" style="margin-bottom:10px"><label>📍 고덕지도 링크</label><input type="text" value="'+esc(sp.gaode||'')+'" onchange="updateSpot(\''+sid+'\',\'gaode\',this.value)" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:12px;outline:none"></div>';
-    // 사진
-    html += '<div class="divider">📷 사진</div>';
-    html += '<div class="photo-area" id="photos-'+sid+'">';
-    (sp.images||[]).forEach(function(url,ii){
-      html += '<div class="photo-thumb" id="pt-'+sid+'-'+ii+'"><img src="'+url+'" onerror="this.style.display=\'none\'"><button class="photo-del" onclick="delPhoto(\''+sid+'\','+ii+')">✕</button></div>';
-    });
-    html += '<div class="photo-add" onclick="addPhotoUrl(\''+sid+'\')"><div class="photo-add-icon">+</div><div>URL</div></div>';
-    html += '<div class="photo-add" onclick="document.getElementById(\'pf-'+sid+'\').click()"><div class="photo-add-icon">📷</div><div>파일</div></div>';
-    html += '<input type="file" id="pf-'+sid+'" accept="image/*" multiple style="display:none" onchange="uploadPhotos(\''+sid+'\',this)">';
-    html += '</div></div></div>';
-  });
-  document.getElementById('spot-list').innerHTML = html;
+function closeTourModal(e) {
+  if (e && e.target !== document.getElementById('tour-modal-bg')) return;
+  document.getElementById('tour-modal-bg').classList.remove('open');
 }
-
-function sf(label, type, id, val, onchange){
-  return '<div class="fitem"><label>'+label+'</label><input type="'+type+'" id="'+id+'" value="'+esc(val)+'" onchange="'+onchange+'"></div>';
-}
-function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
-function toggleSpotRow(sid){document.getElementById('srow-'+sid).classList.toggle('open');}
-function updateSpot(sid,key,val){DB.spots[sid][key]=val;}
-
-function addPhotoUrl(sid){
-  var url=prompt('사진 URL을 입력하세요:');
-  if(!url||!url.trim())return;
-  if(!DB.spots[sid].images)DB.spots[sid].images=[];
-  DB.spots[sid].images.push(url.trim());
-  renderSpots();showToast('사진 추가됨');
-}
-var IMGBB_KEY = '88858fb6a8615a96823bc77823f01569';
-
-async function uploadToImgBB(file){
-  var formData = new FormData();
-  formData.append('image', file);
-  var res = await fetch('https://api.imgbb.com/1/upload?key='+IMGBB_KEY, {method:'POST',body:formData});
-  var json = await res.json();
-  if(json.success) return json.data.url;
-  throw new Error('ImgBB 업로드 실패');
-}
-
-function uploadPhotos(sid,input){
-  var files=Array.from(input.files);
-  if(!DB.spots[sid].images)DB.spots[sid].images=[];
-  var done=0;
-  showToast('⏳ 업로드 중... (0/'+files.length+')');
-  files.forEach(function(file){
-    uploadToImgBB(file).then(function(url){
-      DB.spots[sid].images.push(url);
-      done++;
-      if(done===files.length){renderSpots();showToast('✅ '+files.length+'장 업로드 완료!');}
-      else showToast('⏳ 업로드 중... ('+done+'/'+files.length+')');
-    }).catch(function(){
-      done++;
-      showToast('❌ 일부 업로드 실패');
-    });
-  });
-  input.value='';
-}
-function delPhoto(sid,idx){DB.spots[sid].images.splice(idx,1);renderSpots();}
-
-// ── 1일 투어 사진 ──
-function addTourPhotoUrl(ti){
-  var url=prompt('사진 URL을 입력하세요:');
-  if(!url||!url.trim())return;
-  if(!DB.day_tours[ti].images)DB.day_tours[ti].images=[];
-  DB.day_tours[ti].images.push({src:url.trim(),cap:''});
-  renderDayTours();showToast('사진 추가됨');
-}
-function uploadTourPhotos(ti,input){
-  var files=Array.from(input.files);
-  if(!DB.day_tours[ti].images)DB.day_tours[ti].images=[];
-  var done=0;
-  showToast('⏳ 업로드 중... (0/'+files.length+')');
-  files.forEach(function(file){
-    uploadToImgBB(file).then(function(url){
-      DB.day_tours[ti].images.push({src:url,cap:''});
-      done++;
-      if(done===files.length){renderDayTours();showToast('✅ '+files.length+'장 업로드 완료!');}
-      else showToast('⏳ 업로드 중... ('+done+'/'+files.length+')');
-    }).catch(function(){
-      done++;
-      showToast('❌ 일부 업로드 실패');
-    });
-  });
-  input.value='';
-}
-function delTourPhoto(ti,idx){DB.day_tours[ti].images.splice(idx,1);renderDayTours();}
-
-// ── 옵션 ──
-function renderOptions(){
-  renderOptGroup('hotel-editor',DB.options.hotel.items,'hotel',false);
-  renderOptGroup('show-editor',DB.options.show.items,'show',true);
-  renderOptGroup('massage-editor',DB.options.massage.items,'massage',true);
-  renderOptGroup('fuyong-editor',DB.options.transport_fuyong.items,'transport_fuyong',true);
-  renderOptGroup('phoenix-transport-editor',DB.options.transport_phoenix.items,'transport_phoenix',true);
-  renderPhoenixPrices();
-  renderHeli();
-  renderExtras();
-  var sg=DB.options.extras.find(function(e){return e.id==='star_guide';});
-  if(sg)document.getElementById('star-guide-price').value=sg.price_per_day||5;
-}
-
-function renderOptGroup(cid,items,gkey,showPrice){
-  var html='';
-  items.forEach(function(item,i){
-    html+='<div style="border:1.5px solid #e8edf3;border-radius:10px;padding:14px;margin-bottom:10px">';
-    html+='<div style="font-size:12px;font-weight:900;color:#555;margin-bottom:10px">'+item.name+'</div>';
-    html+='<div class="fgrid">';
-    html+='<div class="fitem"><label>이름</label><input type="text" value="'+esc(item.name)+'" onchange="DB.options[\''+gkey+'\'].items['+i+'].name=this.value"></div>';
-    if(showPrice)html+='<div class="fitem"><label>가격 (만원/인)</label><input type="number" value="'+(item.price||0)+'" min="-99" onchange="DB.options[\''+gkey+'\'].items['+i+'].price=parseInt(this.value)||0"></div>';
-    html+='<div class="fitem full"><label>설명</label><textarea onchange="DB.options[\''+gkey+'\'].items['+i+'].desc=this.value" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 10px;font-family:inherit;font-size:12px;resize:none;outline:none;min-height:55px">'+esc(item.desc||'')+'</textarea></div>';
-    html+='</div></div>';
-  });
-  document.getElementById(cid).innerHTML=html;
-}
-
-function renderPhoenixPrices(){
-  var prices=DB.options.replace.phoenix_prices;
-  var html='';
-  [2,3,4,5,6,7,8].forEach(function(n){
-    html+='<div class="fitem"><label>'+n+'인 (만원/인)</label><input type="number" value="'+(prices[n]||0)+'" min="0" onchange="DB.options.replace.phoenix_prices['+n+']=parseInt(this.value)||0"></div>';
-  });
-  document.getElementById('phoenix-price-editor').innerHTML=html;
-}
-
-function renderHeli(){
-  var items=DB.options.helicopter.items;
-  var html='';
-  items.forEach(function(item,i){
-    if(item.id==='none')return;
-    html+='<div style="border:1.5px solid #e8edf3;border-radius:10px;padding:12px;margin-bottom:8px">';
-    html+='<div style="font-size:12px;font-weight:900;color:#555;margin-bottom:8px">'+item.name+' '+(item.duration||'')+'</div>';
-    html+='<div class="fgrid">';
-    html+='<div class="fitem"><label>가격 (만원)</label><input type="number" step="0.5" value="'+(item.price||0)+'" onchange="DB.options.helicopter.items['+i+'].price=parseFloat(this.value)||0"></div>';
-    html+='<div class="fitem"><label>시간</label><input type="text" value="'+esc(item.duration||'')+'" onchange="DB.options.helicopter.items['+i+'].duration=this.value"></div>';
-    html+='</div></div>';
-  });
-  document.getElementById('heli-editor').innerHTML=html;
-}
-
-function renderExtras(){
-  var html='';
-  DB.options.extras.forEach(function(item,i){
-    if(item.id==='star_guide')return;
-    html+='<div style="border:1.5px solid #e8edf3;border-radius:10px;padding:12px;margin-bottom:8px">';
-    html+='<div style="font-size:12px;font-weight:900;color:#555;margin-bottom:8px">'+item.name+'</div>';
-    html+='<div class="fgrid">';
-    if(item.type==='per_person')html+='<div class="fitem"><label>가격 (만원/인)</label><input type="number" value="'+(item.price||0)+'" min="0" onchange="DB.options.extras['+i+'].price=parseInt(this.value)||0"></div>';
-    html+='<div class="fitem full"><label>설명</label><textarea onchange="DB.options.extras['+i+'].desc=this.value" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 10px;font-family:inherit;font-size:12px;resize:none;outline:none;min-height:55px">'+esc(item.desc||'')+'</textarea></div>';
-    html+='</div></div>';
-  });
-  document.getElementById('extras-editor').innerHTML=html;
-}
-
-function updateStarGuide(val){
-  var sg=DB.options.extras.find(function(e){return e.id==='star_guide';});
-  if(sg)sg.price_per_day=parseInt(val)||0;
-}
-
-// ── 1일 투어 ──
-function renderDayTours(){
-  var html='';
-  (DB.day_tours||[]).forEach(function(tour,ti){
-    html+='<div class="card"><div class="card-title">'+tour.icon+' '+tour.name+'</div>';
-    html+='<div class="divider">기본 정보</div>';
-    html+='<div class="fgrid">';
-    html+='<div class="fitem"><label>이름</label><input type="text" value="'+esc(tour.name)+'" onchange="DB.day_tours['+ti+'].name=this.value"></div>';
-    html+='<div class="fitem"><label>부제</label><input type="text" value="'+esc(tour.subtitle)+'" onchange="DB.day_tours['+ti+'].subtitle=this.value"></div>';
-    html+='<div class="fitem"><label>아이콘</label><input type="text" value="'+esc(tour.icon)+'" onchange="DB.day_tours['+ti+'].icon=this.value"></div>';
-    html+='<div class="fitem"><label>태그</label><input type="text" value="'+esc(tour.tag||'')+'" onchange="DB.day_tours['+ti+'].tag=this.value"></div>';
-    html+='<div class="fitem full"><label>설명</label><textarea onchange="DB.day_tours['+ti+'].desc=this.value" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:12px;resize:none;outline:none;min-height:70px">'+esc(tour.desc||'')+'</textarea></div>';
-    html+='<div class="fitem full"><label>최소 인원</label><input type="text" value="'+esc(tour.min_pax||'')+'" onchange="DB.day_tours['+ti+'].min_pax=this.value"></div>';
-    html+='</div>';
-    // 경관 사진
-    html+='<div class="divider">📷 경관 사진 <span style="font-size:11px;color:#888;font-weight:400">(index.html 투어 카드에 표시됨)</span></div>';
-    html+='<div class="photo-area" id="tour-photos-'+ti+'">';
-    (tour.images||[]).forEach(function(img,ii){
-      var src=typeof img==='object'?img.src:img;
-      var cap=typeof img==='object'?(img.cap||''):'';
-      html+='<div style="position:relative;display:inline-block">';
-      html+='<div class="photo-thumb"><img src="'+src+'" onerror="this.style.display=\'none\'"><button class="photo-del" onclick="delTourPhoto('+ti+','+ii+')">✕</button></div>';
-      html+='<input type="text" value="'+esc(cap)+'" placeholder="캡션" onchange="DB.day_tours['+ti+'].images['+ii+'].cap=this.value" style="width:80px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;padding:2px 5px;margin-top:2px;outline:none">';
-      html+='</div>';
-    });
-    html+='<div class="photo-add" onclick="addTourPhotoUrl('+ti+')"><div class="photo-add-icon">+</div><div>URL</div></div>';
-    html+='<div class="photo-add" onclick="document.getElementById(\'tpf-'+ti+'\').click()"><div class="photo-add-icon">📷</div><div>업로드</div></div>';
-    html+='<input type="file" id="tpf-'+ti+'" accept="image/*" multiple style="display:none" onchange="uploadTourPhotos('+ti+',this)">';
-    html+='</div>';
-    // 요금
-    html+='<div class="divider">💰 요금 (원 단위)</div>';
-    var priceHtml='';
-    Object.entries(tour.prices).forEach(function(e,pi){
-      priceHtml+='<div class="fitem"><label>'+e[0]+'</label><input type="number" value="'+e[1]+'" onchange="DB.day_tours['+ti+'].prices[\''+e[0]+'\']=parseInt(this.value)||0"></div>';
-    });
-    html+='<div class="fgrid">'+priceHtml+'</div>';
-    // 포함/불포함
-    html+='<div class="divider">포함/불포함 사항</div>';
-    html+='<div class="fgrid">';
-    html+='<div class="fitem"><label>✅ 포함 (한 줄에 하나)</label><textarea onchange="DB.day_tours['+ti+'].includes=this.value.split(\'\\n\').filter(function(s){return s.trim();})" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:12px;resize:none;outline:none;min-height:120px">'+esc((tour.includes||[]).join('\n'))+'</textarea></div>';
-    html+='<div class="fitem"><label>⚠️ 불포함 (한 줄에 하나)</label><textarea onchange="DB.day_tours['+ti+'].excludes=this.value.split(\'\\n\').filter(function(s){return s.trim();})" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:12px;resize:none;outline:none;min-height:120px">'+esc((tour.excludes||[]).join('\n'))+'</textarea></div>';
-    html+='</div>';
-    html+='</div>';
-  });
-  document.getElementById('day-tour-editor').innerHTML=html;
-}
-
-// ── 유의사항 ──
-function renderNotices(){
-  var html='';
-  DB.notices.forEach(function(n,i){
-    html+='<div class="notice-item"><textarea onchange="DB.notices['+i+'].text=this.value">'+esc(n.text)+'</textarea><button class="btn btn-danger btn-sm" onclick="delNotice('+i+')">삭제</button></div>';
-  });
-  document.getElementById('notice-editor').innerHTML=html;
-
-  var html2='';
-  DB.cancel_policy.forEach(function(row,i){
-    html2+='<div style="display:grid;grid-template-columns:1fr 2fr auto;gap:8px;margin-bottom:8px;align-items:start">';
-    html2+='<input type="text" value="'+esc(row.when)+'" onchange="DB.cancel_policy['+i+'].when=this.value" style="border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:12px;outline:none">';
-    html2+='<input type="text" value="'+esc(row.rule)+'" onchange="DB.cancel_policy['+i+'].rule=this.value" style="border:1.5px solid #e0e0e0;border-radius:8px;padding:8px 11px;font-family:inherit;font-size:12px;outline:none">';
-    html2+='<button class="btn btn-danger btn-sm" onclick="delCancel('+i+')">삭제</button>';
-    html2+='</div>';
-  });
-  document.getElementById('cancel-editor').innerHTML=html2;
-}
-
-function addNotice(){DB.notices.push({id:'new_'+Date.now(),text:'새 유의사항 입력'});renderNotices();}
-function delNotice(i){DB.notices.splice(i,1);renderNotices();}
-function addCancel(){DB.cancel_policy.push({when:'출발 X일 전',rule:'규정 내용'});renderNotices();}
-function delCancel(i){DB.cancel_policy.splice(i,1);renderNotices();}
-
-// ── 브랜드 ──
-function renderBrand(){
-  var b=DB.brand;
-  var fields=['name','name_full','slogan','kakao','phone','email','instagram'];
-  fields.forEach(function(k){
-    var el=document.getElementById('brand-'+k.replace('_','-'));
-    if(el){
-      el.value=b[k]||'';
-      el.onchange=function(){DB.brand[k]=this.value;};
-    }
-  });
-}
-
-// ── 내보내기/불러오기 ──
-function exportJSON(){
-  // 최신값 수집
-  DB.packages.forEach(function(pkg,pi){
-    [2,3,4,5,6,7,8].forEach(function(n){
-      var el=document.getElementById('p'+pi+'-'+n);
-      if(el)pkg.prices[String(n)]=parseInt(el.value)||0;
-    });
-  });
-  var json=JSON.stringify(DB,null,2);
-  var blob=new Blob([json],{type:'application/json'});
-  var a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='lotocha_data.json';
-  a.click();
-  URL.revokeObjectURL(a.href);
-  showToast('✅ lotocha_data.json 다운로드 완료！');
-}
-
-function importJSON(input){
-  var file=input.files[0];
-  if(!file)return;
-  var reader=new FileReader();
-  reader.onload=function(e){
-    try{
-      DB=JSON.parse(e.target.result);
-      renderAll();
-      showToast('✅ 데이터 불러오기 완료！');
-    }catch(err){
-      showToast('❌ 파일 형식이 올바르지 않습니다.');
-    }
+async function saveTour() {
+  const id = document.getElementById('t-id').value;
+  const payload = {
+    product_type: document.getElementById('t-type').value,
+    title_ko: document.getElementById('t-title-ko').value.trim(),
+    title_cn: document.getElementById('t-title-cn').value.trim()||null,
+    subtitle_ko: document.getElementById('t-subtitle').value.trim()||null,
+    description_ko: document.getElementById('t-desc').value.trim()||null,
+    price_krw: parseInt(document.getElementById('t-price-krw').value)||null,
+    price_cny: parseFloat(document.getElementById('t-price-cny').value)||null,
+    duration_days: parseInt(document.getElementById('t-days').value)||1,
+    sort_order: parseInt(document.getElementById('t-order').value)||0,
+    status: document.getElementById('t-status').value,
+    highlights: linesToArr(document.getElementById('t-highlights').value),
+    includes: linesToArr(document.getElementById('t-includes').value),
+    excludes: linesToArr(document.getElementById('t-excludes').value),
+    updated_at: new Date().toISOString(),
   };
-  reader.readAsText(file,'utf-8');
+  if (!payload.title_ko) { toast('상품명을 입력하세요','error'); return; }
+  const { error } = id ? await sb.from('tour_products').update(payload).eq('id',id) : await sb.from('tour_products').insert(payload);
+  if (error) { toast('저장 실패: '+error.message,'error'); return; }
+  toast(id?'수정되었습니다':'추가되었습니다','success'); closeTourModal(); loadTours();
+}
+async function deleteTour(id) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  const { error } = await sb.from('tour_products').delete().eq('id',id);
+  if (error) { toast('삭제 실패','error'); return; }
+  toast('삭제되었습니다'); loadTours();
 }
 
-// ── TOAST ──
-
-// ── GitHub 자동 저장 ──
-var GITHUB_TOKEN = localStorage.getItem('gh_token') || '';
-var GITHUB_OWNER = 'nanyingkui';
-var GITHUB_REPO = 'lotocha';
-var GITHUB_FILE = 'lotocha_data.json';
-
-
-function resetToken(){
-  localStorage.removeItem('gh_token');
-  showToast('토큰이 초기화되었습니다. 다음 저장 시 재입력해 주세요.');
+async function loadSpots() {
+  const { data } = await sb.from('guide_spots').select('*').order('attr_id').order('sort_order');
+  document.getElementById('spots-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">로드 실패</td></tr>'
+    : data.map(s=>`<tr>
+        <td>${ATTR_LABELS[s.attr_id]||s.attr_id}</td>
+        <td style="font-weight:700">${s.name_ko}</td><td>${s.type}</td>
+        <td><span class="badge badge-${s.status}">${{live:'라이브',draft:'초안',pending:'검토중'}[s.status]||s.status}</span></td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openSpotModal('${s.id}')">편집</button>
+        <button class="btn-del" onclick="deleteSpot('${s.id}')">삭제</button></div></td></tr>`).join('');
 }
-
-async function saveToGitHub() {
-  GITHUB_TOKEN = localStorage.getItem('gh_token') || '';
-  if(!GITHUB_TOKEN) {
-    var token = prompt('GitHub Personal Access Token을 입력하세요:');
-    if(!token) return;
-    localStorage.setItem('gh_token', token);
-    GITHUB_TOKEN = token;
+function openSpotModal(id) {
+  document.getElementById('spot-modal-title').textContent = id ? '스팟 편집' : '스팟 추가';
+  if (!id) {
+    ['s-id','s-id-orig','s-zone','s-name-ko','s-name-cn','s-lat','s-lon','s-gaode','s-images','s-desc','s-tip','s-hours','s-price'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('s-attr').value='forest'; document.getElementById('s-type').value='landmark';
+    document.getElementById('s-order').value='0'; document.getElementById('s-status').value='live';
+  } else {
+    sb.from('guide_spots').select('*').eq('id',id).single().then(({data:s})=>{
+      if (!s) return;
+      document.getElementById('s-id').value=s.id; document.getElementById('s-id-orig').value=s.id;
+      document.getElementById('s-attr').value=s.attr_id; document.getElementById('s-zone').value=s.zone_id||'';
+      document.getElementById('s-type').value=s.type; document.getElementById('s-name-ko').value=s.name_ko||'';
+      document.getElementById('s-name-cn').value=s.name_cn||''; document.getElementById('s-lat').value=s.lat||'';
+      document.getElementById('s-lon').value=s.lon||''; document.getElementById('s-gaode').value=s.gaode_uri||'';
+      document.getElementById('s-images').value=arrToLines(s.images); document.getElementById('s-desc').value=s.desc_ko||'';
+      document.getElementById('s-tip').value=s.tip_ko||''; document.getElementById('s-hours').value=s.hours||'';
+      document.getElementById('s-price').value=s.price||''; document.getElementById('s-order').value=s.sort_order||0;
+      document.getElementById('s-status').value=s.status||'live';
+    });
   }
-  var btn = document.getElementById('github-save-btn');
-  btn.textContent = '⏳ 저장 중...';
-  btn.disabled = true;
-
-  try {
-    // 1. 현재 파일의 SHA 가져오기
-    var getRes = await fetch(
-      'https://api.github.com/repos/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/contents/' + GITHUB_FILE,
-      { headers: { 'Authorization': 'token ' + GITHUB_TOKEN, 'Accept': 'application/vnd.github.v3+json' } }
-    );
-    var fileData = await getRes.json();
-    var sha = fileData.sha;
-
-    // 2. 데이터 준비
-    var jsonStr = JSON.stringify(DB, null, 2);
-    var encoded = btoa(unescape(encodeURIComponent(jsonStr)));
-
-    // 3. 파일 업데이트
-    var putRes = await fetch(
-      'https://api.github.com/repos/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/contents/' + GITHUB_FILE,
-      {
-        method: 'PUT',
-        headers: {
-          'Authorization': 'token ' + GITHUB_TOKEN,
-          'Accept': 'application/vnd.github.v3+json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          message: '관리자 페이지에서 데이터 업데이트',
-          content: encoded,
-          sha: sha
-        })
-      }
-    );
-
-    if(putRes.ok) {
-      btn.textContent = '✅ 저장 완료！';
-      btn.style.background = '#1a7a34';
-      setTimeout(function() {
-        btn.textContent = '💾 GitHub 저장';
-        btn.style.background = '#2ea44f';
-        btn.disabled = false;
-      }, 3000);
-      showToast('✅ GitHub에 저장 완료！ 약 1분 후 고객 페이지에 반영됩니다.');
-    } else {
-      throw new Error('저장 실패');
-    }
-  } catch(e) {
-    btn.textContent = '❌ 저장 실패';
-    btn.style.background = '#c62828';
-    setTimeout(function() {
-      btn.textContent = '💾 GitHub 저장';
-      btn.style.background = '#2ea44f';
-      btn.disabled = false;
-    }, 3000);
-    showToast('❌ 저장 실패: ' + e.message);
-  }
+  document.getElementById('spot-modal-bg').classList.add('open');
+}
+function closeSpotModal(e) {
+  if (e && e.target !== document.getElementById('spot-modal-bg')) return;
+  document.getElementById('spot-modal-bg').classList.remove('open');
+}
+async function saveSpot() {
+  const origId = document.getElementById('s-id-orig').value;
+  const newId = document.getElementById('s-id').value.trim();
+  if (!newId || !document.getElementById('s-name-ko').value.trim()) { toast('ID와 스팟명을 입력하세요','error'); return; }
+  const payload = {
+    id: newId, attr_id: document.getElementById('s-attr').value,
+    zone_id: document.getElementById('s-zone').value.trim()||null,
+    type: document.getElementById('s-type').value,
+    name_ko: document.getElementById('s-name-ko').value.trim(),
+    name_cn: document.getElementById('s-name-cn').value.trim()||null,
+    lat: parseFloat(document.getElementById('s-lat').value)||null,
+    lon: parseFloat(document.getElementById('s-lon').value)||null,
+    gaode_uri: document.getElementById('s-gaode').value.trim()||null,
+    images: linesToArr(document.getElementById('s-images').value),
+    desc_ko: document.getElementById('s-desc').value.trim()||null,
+    tip_ko: document.getElementById('s-tip').value.trim()||null,
+    hours: document.getElementById('s-hours').value.trim()||null,
+    price: document.getElementById('s-price').value.trim()||null,
+    sort_order: parseInt(document.getElementById('s-order').value)||0,
+    status: document.getElementById('s-status').value,
+    updated_at: new Date().toISOString(),
+  };
+  const { error } = origId ? await sb.from('guide_spots').update(payload).eq('id',origId) : await sb.from('guide_spots').insert(payload);
+  if (error) { toast('저장 실패: '+error.message,'error'); return; }
+  toast(origId?'수정되었습니다':'추가되었습니다','success'); closeSpotModal(); loadSpots();
+}
+async function deleteSpot(id) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  const { error } = await sb.from('guide_spots').delete().eq('id',id);
+  if (error) { toast('삭제 실패','error'); return; }
+  toast('삭제되었습니다'); loadSpots();
 }
 
-function showToast(msg){
-  var t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(function(){t.classList.remove('show');},3000);
+async function loadReviews() {
+  const [p, a] = await Promise.all([
+    sb.from('guide_reviews').select('*').eq('approved',false).order('created_at',{ascending:false}),
+    sb.from('guide_reviews').select('*').eq('approved',true).order('created_at',{ascending:false}).limit(20),
+  ]);
+  const rows = (data, approve) => !data||!data.length
+    ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:16px">없음</td></tr>'
+    : data.map(r=>`<tr><td>${ATTR_LABELS[r.attr_id]||r.attr_id}</td><td>${r.nickname}</td><td>${'⭐'.repeat(r.rating)}</td>
+        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.comment}</td>
+        <td>${dateStr(r.created_at)}</td>
+        <td><div class="act-btns">${approve?`<button class="btn-approve" onclick="approveReview('${r.id}')">승인</button>`:''}
+        <button class="btn-reject" onclick="deleteReview('${r.id}')">삭제</button></div></td></tr>`).join('');
+  document.getElementById('reviews-pending').innerHTML = rows(p.data, true);
+  document.getElementById('reviews-approved').innerHTML = rows(a.data, false);
 }
+async function approveReview(id) {
+  const { error } = await sb.from('guide_reviews').update({approved:true}).eq('id',id);
+  if (error) { toast('실패','error'); return; }
+  toast('승인되었습니다','success'); loadReviews(); loadDashboard();
+}
+async function deleteReview(id) {
+  if (!confirm('리뷰를 삭제하시겠습니까?')) return;
+  const { error } = await sb.from('guide_reviews').delete().eq('id',id);
+  if (error) { toast('실패','error'); return; }
+  toast('삭제되었습니다'); loadReviews(); loadDashboard();
+}
+
+async function loadStats() {
+  const { data } = await sb.from('guide_stats').select('page,attr_id');
+  const counts = {};
+  (data||[]).forEach(r => { const k=r.attr_id||r.page; counts[k]=(counts[k]||0)+1; });
+  document.getElementById('stats-detail').innerHTML = Object.entries(counts)
+    .map(([k,v])=>`<div class="stat-card"><div class="stat-label">${ATTR_LABELS[k]||k}</div><div class="stat-value">${v.toLocaleString()}</div></div>`).join('')
+    || '<div style="color:#aaa;padding:20px">데이터 없음</div>';
+}
+
+async function loadUsers() {
+  const { data } = await sb.from('admin_users').select('*').order('created_at');
+  document.getElementById('users-tbody').innerHTML = !data ? '<tr><td colspan="6">로드 실패</td></tr>'
+    : data.map(u=>`<tr><td>${u.email}</td><td>${u.display_name||'-'}</td>
+        <td><span class="badge badge-${u.role==='superadmin'?'live':u.role==='admin'?'pending':'draft'}">${{superadmin:'슈퍼어드민',admin:'어드민',editor:'에디터'}[u.role]||u.role}</span></td>
+        <td>${u.approved?'✅':'⏳ 미승인'}</td><td>${dateStr(u.created_at)}</td>
+        <td><div class="act-btns">
+          ${!u.approved?`<button class="btn-approve" onclick="approveUser('${u.id}')">승인</button>`:''}
+          ${u.role!=='superadmin'?`<button class="btn-del" onclick="deleteUser('${u.id}')">삭제</button>`:''}
+        </div></td></tr>`).join('');
+}
+async function approveUser(id) {
+  const { error } = await sb.from('admin_users').update({approved:true,approved_by:currentUser.id,approved_at:new Date().toISOString()}).eq('id',id);
+  if (error) { toast('실패','error'); return; }
+  toast('승인되었습니다','success'); loadUsers();
+}
+async function deleteUser(id) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  const { error } = await sb.from('admin_users').delete().eq('id',id);
+  if (error) { toast('실패','error'); return; }
+  toast('삭제되었습니다'); loadUsers();
+}
+
+// 세션 자동 복원
+(async () => {
+  const { data:{ session } } = await sb.auth.getSession();
+  if (session) await initApp(session.user);
+})();
 </script>
 </body>
 </html>
-
