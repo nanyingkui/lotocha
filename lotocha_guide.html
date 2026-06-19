@@ -87,6 +87,8 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .spot-tags{display:flex;gap:3px;flex-wrap:wrap;margin-top:4px}
 .spot-expand{padding:0 12px 12px;display:none;border-top:1px solid #f5f5f5}
 .spot-item.open .spot-expand{display:block}
+.spot-video{margin-top:10px;border-radius:10px;overflow:hidden;background:#000}
+.spot-video iframe,.spot-video video{width:100%;aspect-ratio:16/9;display:block;border:none}
 .spot-desc{font-size:12px;color:#555;line-height:1.7;padding-top:10px}
 .spot-tip{background:#fff8e1;border-left:3px solid var(--gold);padding:5px 9px;border-radius:0 5px 5px 0;font-size:10px;color:#856404;margin-top:7px;line-height:1.6}
 .spot-actions{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}
@@ -797,7 +799,44 @@ document.addEventListener('DOMContentLoaded',async()=>{
   fetchWeather(); setInterval(fetchWeather, 600000);
 });
 
-async function loadSpotsData(){try{const r=await fetch('lotocha_spots.json');const d=await r.json();spotsData=d.attractions||{};}catch(e){spotsData={};}}
+function videoEmbed(url){
+  if(!url)return'';
+  const yt=url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if(yt)return`<div class="spot-video"><iframe src="https://www.youtube.com/embed/${yt[1]}" allowfullscreen></iframe></div>`;
+  const bili=url.match(/bilibili\.com\/video\/([A-Za-z0-9]+)/);
+  if(bili)return`<div class="spot-video"><iframe src="https://player.bilibili.com/player.html?bvid=${bili[1]}&autoplay=0&high_quality=1" allowfullscreen></iframe></div>`;
+  return`<div class="spot-video"><video controls src="${url}" playsinline></video></div>`;
+}
+
+async function loadSpotsData(){
+  // 1. Supabase에서 로드 시도
+  try{
+    if(sb){
+      const{data,error}=await sb.from('guide_spots').select('*').eq('status','live').order('sort_order');
+      if(!error&&data&&data.length>0){
+        spotsData={};
+        data.forEach(s=>{
+          const attr=s.attr_id,zone=s.zone_id||'default';
+          if(!spotsData[attr])spotsData[attr]={zones:{}};
+          if(!spotsData[attr].zones[zone])spotsData[attr].zones[zone]={spots:[]};
+          spotsData[attr].zones[zone].spots.push({
+            id:s.id,name_ko:s.name_ko,name_cn:s.name_cn||'',type:s.type,
+            lat:s.lat,lon:s.lon,gaode:s.gaode_uri,
+            image:(s.images&&s.images[0])||'',
+            images:s.images||[],
+            desc_ko:s.desc_ko||'',tip_ko:s.tip_ko||'',
+            hours:s.hours||'',price:s.price||'',
+            video_url:s.video_url||null,
+            tags:[],
+          });
+        });
+        return;
+      }
+    }
+  }catch(e){}
+  // 2. JSON fallback
+  try{const r=await fetch('lotocha_spots.json');const d=await r.json();spotsData=d.attractions||{};}catch(e){spotsData={};}
+}
 function updateClock(){
   const n=new Date();
   const s=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
@@ -940,7 +979,11 @@ function renderZoneSpots(){
   const zone=currentAttr==='forest'?currentZone:(attrData?Object.keys(attrData.zones||{})[0]:'south');
   const spots=attrData?((attrData.zones||{})[zone]||{}).spots||[]:[];
   document.getElementById('spot-section-title').textContent=`📍 ${ATTRS[currentAttr].name} 스팟`;
-  document.getElementById('spot-list').innerHTML=spots.length?spots.map((s,i)=>`<div class="spot-item" id="si-${s.id}"><div class="spot-head" onclick="toggleSpot('${s.id}')"><div class="spot-img">${s.image?`<img src="${s.image}" style="width:100%;height:100%;object-fit:cover;border-radius:8px" onerror="this.parentNode.textContent='${TYPE_ICON[s.type]||'📍'}'">`:(TYPE_ICON[s.type]||'📍')}</div><div class="spot-body"><div class="spot-name">${s.name_ko}</div><div class="spot-cn">${s.name_cn}</div><div class="spot-tags">${(s.tags||[]).map(t=>`<span class="badge b-${t.c}">${t.t}</span>`).join('')}${s.hours?`<span class="badge b-blue">${s.hours}</span>`:''}</div></div></div><div class="spot-expand"><div class="spot-desc">${s.desc_ko||''}</div>${s.tip_ko?`<div class="spot-tip">💡 ${s.tip_ko}</div>`:''}<div class="spot-actions">${s.gaode?`<a href="${s.gaode}" target="_blank" class="spot-action-btn btn-gaode">🗺️ 고덕지도</a>`:''}<button class="spot-action-btn btn-review" onclick="openReviewSheet('${s.id}','${currentAttr}','${s.name_ko.replace(/'/g,"\\'")}')">💬 리뷰</button></div></div></div>`).join(''):'<div style="color:#aaa;font-size:12px;padding:14px 0;text-align:center">스팟 데이터 준비 중</div>';
+  document.getElementById('spot-list').innerHTML=spots.length?spots.map((s,i)=>{
+    const imgSrc=s.image||(s.images&&s.images[0])||'';
+    const gaodeUri=s.gaode||s.gaode_uri||'';
+    return`<div class="spot-item" id="si-${s.id}"><div class="spot-head" onclick="toggleSpot('${s.id}')"><div class="spot-img">${imgSrc?`<img src="${imgSrc}" style="width:100%;height:100%;object-fit:cover;border-radius:8px" onerror="this.parentNode.textContent='${TYPE_ICON[s.type]||'📍'}'">`:(TYPE_ICON[s.type]||'📍')}</div><div class="spot-body"><div class="spot-name">${s.name_ko}</div><div class="spot-cn">${s.name_cn}</div><div class="spot-tags">${(s.tags||[]).map(t=>`<span class="badge b-${t.c}">${t.t}</span>`).join('')}${s.hours?`<span class="badge b-blue">${s.hours}</span>`:''}</div></div></div><div class="spot-expand"><div class="spot-desc">${s.desc_ko||''}</div>${s.tip_ko?`<div class="spot-tip">💡 ${s.tip_ko}</div>`:''}<div class="spot-actions">${gaodeUri?`<a href="${gaodeUri}" target="_blank" class="spot-action-btn btn-gaode">🗺️ 고덕지도</a>`:''}<button class="spot-action-btn btn-review" onclick="openReviewSheet('${s.id}','${currentAttr}','${s.name_ko.replace(/'/g,"\\'")}')">💬 리뷰</button></div>${s.video_url?`<div style="margin-top:8px;font-size:11px;color:#888;font-weight:700">📹 경로 안내 영상</div>${videoEmbed(s.video_url)}`:''}${(s.images&&s.images.length>1)?`<div style="display:flex;gap:6px;margin-top:10px;overflow-x:auto">${s.images.map(u=>`<img src="${u}" style="height:70px;border-radius:6px;object-fit:cover;flex-shrink:0" loading="lazy">`).join('')}</div>`:''}</div></div>`;
+  }).join(''):'<div style="color:#aaa;font-size:12px;padding:14px 0;text-align:center">스팟 데이터 준비 중</div>';
 }
 function toggleSpot(id){const el=document.getElementById('si-'+id);if(el)el.classList.toggle('open');}
 function centerMap(){navigator.geolocation&&navigator.geolocation.getCurrentPosition(p=>map.setView([p.coords.latitude,p.coords.longitude],16));}

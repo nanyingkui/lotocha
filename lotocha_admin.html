@@ -104,6 +104,20 @@ textarea.field-input{min-height:80px;resize:vertical}
 
 .panel{display:none}
 .panel.active{display:block}
+
+/* ── 동적 row 에디터 ── */
+.dyn-section{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px}
+.dyn-section-title{font-size:11px;font-weight:700;color:#888;margin-bottom:8px}
+.dyn-row{display:flex;gap:6px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
+.dyn-row input[type=text]{flex:2;min-width:60px;padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;font-family:inherit;outline:none}
+.dyn-row input[type=number]{flex:1;min-width:60px;padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;font-family:inherit;outline:none}
+.dyn-row select{flex:1;min-width:60px;padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;font-family:inherit;outline:none}
+.dyn-row label.chk{display:flex;align-items:center;gap:4px;font-size:11px;color:#555;white-space:nowrap;flex-shrink:0}
+.dyn-row .btn-rm{background:#ffebee;color:var(--red);border:none;border-radius:6px;padding:5px 8px;font-size:13px;cursor:pointer;flex-shrink:0;font-weight:700}
+.btn-add-row{background:#e8eaf6;color:#3949ab;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px}
+.dyn-row-head{display:flex;gap:6px;font-size:10px;font-weight:700;color:#aaa;padding-bottom:4px;padding-left:2px}
+.dyn-row-head span{flex:2;min-width:60px}
+.dyn-row-head span.sm{flex:1;min-width:60px}
 </style>
 </head>
 <body>
@@ -147,6 +161,9 @@ textarea.field-input{min-height:80px;resize:vertical}
       </button>
       <button class="sb-item" data-panel="spots" onclick="showPanel('spots',this)">
         <span class="icon">📍</span>가이드 스팟
+      </button>
+      <button class="sb-item" data-panel="places" onclick="showPanel('places',this)">
+        <span class="icon">🏪</span>현지 업체
       </button>
       <div class="sb-section">운영</div>
       <button class="sb-item" data-panel="reviews" onclick="showPanel('reviews',this)">
@@ -230,6 +247,17 @@ textarea.field-input{min-height:80px;resize:vertical}
       <div class="stats-grid" id="stats-detail"></div>
     </div>
 
+    <!-- 현지 업체 -->
+    <div class="panel" id="panel-places">
+      <div class="page-title">🏪 현지 업체</div>
+      <div class="page-sub">식당·카페·호텔·쇼핑 등 현지 업체 관리</div>
+      <div class="table-wrap">
+        <div class="table-head"><h3>전체 업체</h3><button class="btn-add" onclick="openPlaceModal()">+ 업체 추가</button></div>
+        <table><thead><tr><th>카테고리</th><th>업체명</th><th>지역</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <tbody id="places-tbody"></tbody></table>
+      </div>
+    </div>
+
     <!-- 사용자 관리 -->
     <div class="panel" id="panel-users">
       <div class="page-title">👥 사용자 관리</div>
@@ -270,9 +298,36 @@ textarea.field-input{min-height:80px;resize:vertical}
         <div class="field-group"><label class="field-label">일수</label><input type="number" id="t-days" class="field-input" value="1"></div>
         <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="t-order" class="field-input" value="0"></div>
       </div>
+      <div class="field-group"><label class="field-label">대표 이미지 URL (줄바꿈 구분)</label>
+        <textarea id="t-images" class="field-input" placeholder="https://...jpg"></textarea>
+        <button type="button" class="btn-add-row" style="margin-top:6px" onclick="document.getElementById('t-img-file').click()">📎 이미지 업로드</button>
+        <input type="file" id="t-img-file" accept="*/*" multiple style="display:none" onchange="uploadMedia(this,'t-images')">
+        <div class="field-hint">파일 형식 무제한 | 여러 파일 동시 선택 가능</div>
+      </div>
       <div class="field-group"><label class="field-label">하이라이트 (줄바꿈 구분)</label><textarea id="t-highlights" class="field-input" placeholder="원가계 기둥군&#10;천자산 케이블카"></textarea></div>
       <div class="field-group"><label class="field-label">포함 사항 (줄바꿈 구분)</label><textarea id="t-includes" class="field-input"></textarea></div>
       <div class="field-group"><label class="field-label">불포함 사항 (줄바꿈 구분)</label><textarea id="t-excludes" class="field-input"></textarea></div>
+
+      <!-- 연령별 가격 -->
+      <div class="field-group">
+        <label class="field-label">연령별 가격 (price_tiers)</label>
+        <div class="dyn-section">
+          <div class="dyn-row-head"><span>key</span><span>라벨</span><span class="sm">가격(원)</span><span class="sm">최소인원</span><span class="sm"></span></div>
+          <div id="t-tiers-list"></div>
+          <button type="button" class="btn-add-row" onclick="addTier()">+ 연령 추가</button>
+        </div>
+        <div class="field-hint">key: adult/child/senior/teen/infant 등 영문 ID | 최소인원: 출발 기준 포함 여부</div>
+      </div>
+
+      <!-- 옵션 -->
+      <div class="field-group">
+        <label class="field-label">선택 옵션 (tour_options)</label>
+        <div class="dyn-section">
+          <div class="dyn-row-head"><span>key</span><span>라벨</span><span class="sm">가격(원)</span><span class="sm">단위</span><span class="sm"></span></div>
+          <div id="t-opts-list"></div>
+          <button type="button" class="btn-add-row" onclick="addOpt()">+ 옵션 추가</button>
+        </div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeTourModal()">취소</button>
@@ -311,7 +366,16 @@ textarea.field-input{min-height:80px;resize:vertical}
         <div class="field-group"><label class="field-label">경도 (lon)</label><input type="number" id="s-lon" class="field-input" step="0.0000001"></div>
       </div>
       <div class="field-group"><label class="field-label">고덕지도 딥링크</label><input type="text" id="s-gaode" class="field-input" placeholder="androidamap://..."><div class="field-hint">고덕지도 앱 → 장소 공유 → 링크 복사</div></div>
-      <div class="field-group"><label class="field-label">이미지 URL (줄바꿈 구분)</label><textarea id="s-images" class="field-input" placeholder="https://...jpg"></textarea></div>
+      <div class="field-group"><label class="field-label">이미지 URL (줄바꿈 구분)</label>
+        <textarea id="s-images" class="field-input" placeholder="https://...jpg"></textarea>
+        <button type="button" class="btn-add-row" style="margin-top:6px" onclick="document.getElementById('s-img-file').click()">📎 이미지 업로드</button>
+        <input type="file" id="s-img-file" accept="*/*" multiple style="display:none" onchange="uploadMedia(this,'s-images')">
+        <div class="field-hint">파일 형식 무제한 | 여러 파일 동시 선택 가능</div>
+      </div>
+      <div class="field-group"><label class="field-label">영상 URL (유튜브·빌리빌리·직접 링크)</label>
+        <input type="text" id="s-video-url" class="field-input" placeholder="https://youtu.be/xxxxx 또는 https://bilibili.com/video/BVxxxx">
+        <div class="field-hint">가이드 페이지에서 스팟 클릭 시 영상 펼쳐서 표시 (경로 안내용)</div>
+      </div>
       <div class="field-group"><label class="field-label">설명</label><textarea id="s-desc" class="field-input"></textarea></div>
       <div class="field-group"><label class="field-label">팁</label><input type="text" id="s-tip" class="field-input"></div>
       <div class="field-row">
@@ -331,6 +395,72 @@ textarea.field-input{min-height:80px;resize:vertical}
   </div>
 </div>
 
+<!-- 현지 업체 모달 -->
+<div class="modal-bg" id="place-modal-bg" onclick="closePlaceModal(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="place-modal-title">업체 추가</h3>
+      <button class="modal-close" onclick="closePlaceModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="pl-id">
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">카테고리 *</label>
+          <select id="pl-cat" class="field-input">
+            <option value="restaurant">식당</option>
+            <option value="cafe">카페</option>
+            <option value="hotel">호텔/숙소</option>
+            <option value="shop">쇼핑</option>
+            <option value="attraction">볼거리</option>
+            <option value="transport">교통</option>
+            <option value="etc">기타</option>
+          </select></div>
+        <div class="field-group"><label class="field-label">지역</label>
+          <select id="pl-area" class="field-input">
+            <option value="시내">시내</option>
+            <option value="무릉원">무릉원</option>
+            <option value="천문산">천문산</option>
+            <option value="황룡동">황룡동</option>
+            <option value="기타">기타</option>
+          </select></div>
+      </div>
+      <div class="field-group"><label class="field-label">업체명 (한국어) *</label><input type="text" id="pl-name-ko" class="field-input"></div>
+      <div class="field-group"><label class="field-label">업체명 (중국어)</label><input type="text" id="pl-name-cn" class="field-input"></div>
+      <div class="field-group"><label class="field-label">주소</label><input type="text" id="pl-address" class="field-input"></div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">전화번호</label><input type="text" id="pl-phone" class="field-input"></div>
+        <div class="field-group"><label class="field-label">위챗 ID</label><input type="text" id="pl-wechat" class="field-input"></div>
+      </div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">운영시간</label><input type="text" id="pl-hours" class="field-input" placeholder="09:00–22:00"></div>
+        <div class="field-group"><label class="field-label">가격대</label><input type="text" id="pl-price-range" class="field-input" placeholder="1인 30,000원~"></div>
+      </div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">위도</label><input type="number" id="pl-lat" class="field-input" step="0.0000001"></div>
+        <div class="field-group"><label class="field-label">경도</label><input type="number" id="pl-lon" class="field-input" step="0.0000001"></div>
+      </div>
+      <div class="field-group"><label class="field-label">고덕지도 딥링크</label><input type="text" id="pl-gaode" class="field-input" placeholder="androidamap://..."></div>
+      <div class="field-group"><label class="field-label">이미지 URL (줄바꿈 구분)</label>
+        <textarea id="pl-images" class="field-input" placeholder="https://...jpg"></textarea>
+        <button type="button" class="btn-add-row" style="margin-top:6px" onclick="document.getElementById('pl-img-file').click()">📎 이미지 업로드</button>
+        <input type="file" id="pl-img-file" accept="*/*" multiple style="display:none" onchange="uploadMedia(this,'pl-images')">
+        <div class="field-hint">파일 형식 무제한 | 여러 파일 동시 선택 가능</div>
+      </div>
+      <div class="field-group"><label class="field-label">설명</label><textarea id="pl-desc" class="field-input"></textarea></div>
+      <div class="field-group"><label class="field-label">태그 (쉼표 구분)</label><input type="text" id="pl-tags" class="field-input" placeholder="한국어메뉴, 카드가능, 주차가능"></div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="pl-order" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">상태</label>
+          <select id="pl-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closePlaceModal()">취소</button>
+      <button class="btn-save" onclick="savePlace()">저장</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -340,6 +470,27 @@ let sb, currentUser, userRole;
 try { sb = window.supabase.createClient(SUPA_URL, SUPA_KEY); } catch(e) {}
 
 const ATTR_LABELS = {forest:'삼림공원', tianmen:'천문산', canyon:'협곡'};
+const STORAGE_BUCKET = 'lotocha-media';
+
+async function uploadMedia(fileInput, targetId) {
+  const files = [...fileInput.files];
+  if (!files.length) return;
+  const ta = document.getElementById(targetId);
+  let uploaded = 0, failed = 0;
+  toast(`업로드 중... (${files.length}개)`, '');
+  for (const file of files) {
+    const ext = file.name.includes('.') ? file.name.split('.').pop() : 'bin';
+    const path = `${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+    const { error } = await sb.storage.from(STORAGE_BUCKET).upload(path, file, {cacheControl:'31536000', upsert:false});
+    if (error) { failed++; continue; }
+    const { data: urlData } = sb.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+    ta.value = ta.value ? ta.value.trimEnd() + '\n' + urlData.publicUrl : urlData.publicUrl;
+    uploaded++;
+  }
+  fileInput.value = '';
+  if (failed === 0) toast(`✅ ${uploaded}개 업로드 완료`, 'success');
+  else toast(`⚠️ ${uploaded}개 완료, ${failed}개 실패`, 'error');
+}
 function toast(msg, type='') {
   const t = document.getElementById('toast');
   t.textContent = msg; t.className = 'toast show ' + type;
@@ -398,7 +549,7 @@ function showPanel(id, btn) {
   document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
   document.getElementById('panel-' + id).classList.add('active');
   if (btn) btn.classList.add('active');
-  const loaders = {dashboard:loadDashboard,tours:loadTours,spots:loadSpots,reviews:loadReviews,stats:loadStats,users:loadUsers};
+  const loaders = {dashboard:loadDashboard,tours:loadTours,spots:loadSpots,places:loadPlaces,reviews:loadReviews,stats:loadStats,users:loadUsers};
   if (loaders[id]) loaders[id]();
 }
 
@@ -436,9 +587,50 @@ async function loadTours() {
         <button class="btn-del" onclick="deleteTour('${p.id}')">삭제</button></div></td></tr>`).join('');
 }
 
+function renderTierRow(t={}) {
+  const idx = Date.now() + Math.random();
+  const d = document.createElement('div');
+  d.className = 'dyn-row'; d.dataset.idx = idx;
+  d.innerHTML = `
+    <input type="text" placeholder="key" value="${t.key||''}" style="flex:1;max-width:80px">
+    <input type="text" placeholder="라벨" value="${t.label||''}" style="flex:2">
+    <input type="number" placeholder="가격" value="${t.price||''}" style="flex:1;max-width:90px">
+    <label class="chk"><input type="checkbox" ${t.counts_min?'checked':''}> 최소인원</label>
+    <button class="btn-rm" onclick="this.parentNode.remove()">✕</button>`;
+  return d;
+}
+function renderOptRow(o={}) {
+  const d = document.createElement('div');
+  d.className = 'dyn-row';
+  d.innerHTML = `
+    <input type="text" placeholder="key" value="${o.key||''}" style="flex:1;max-width:80px">
+    <input type="text" placeholder="라벨" value="${o.label||''}" style="flex:2">
+    <input type="number" placeholder="가격" value="${o.price||''}" style="flex:1;max-width:90px">
+    <select style="flex:1;max-width:70px"><option value="pax" ${o.per==='pax'?'selected':''}>인당</option><option value="group" ${o.per==='group'?'selected':''}>그룹</option></select>
+    <button class="btn-rm" onclick="this.parentNode.remove()">✕</button>`;
+  return d;
+}
+function addTier() { document.getElementById('t-tiers-list').appendChild(renderTierRow()); }
+function addOpt()  { document.getElementById('t-opts-list').appendChild(renderOptRow()); }
+function collectTiers() {
+  return [...document.querySelectorAll('#t-tiers-list .dyn-row')].map(r=>{
+    const ins = r.querySelectorAll('input');
+    return {key:ins[0].value.trim(),label:ins[1].value.trim(),price:parseInt(ins[2].value)||0,counts_min:ins[3].checked};
+  }).filter(t=>t.key&&t.label);
+}
+function collectOpts() {
+  return [...document.querySelectorAll('#t-opts-list .dyn-row')].map(r=>{
+    const ins = r.querySelectorAll('input');
+    const sel = r.querySelector('select');
+    return {key:ins[0].value.trim(),label:ins[1].value.trim(),price:parseInt(ins[2].value)||0,per:sel.value};
+  }).filter(o=>o.key&&o.label);
+}
+
 function openTourModal(id) {
   document.getElementById('tour-modal-title').textContent = id ? '투어 상품 편집' : '투어 상품 추가';
-  const clear = () => ['t-id','t-title-ko','t-title-cn','t-subtitle','t-desc','t-price-krw','t-price-cny','t-highlights','t-includes','t-excludes'].forEach(f=>document.getElementById(f).value='');
+  const clear = () => ['t-id','t-title-ko','t-title-cn','t-subtitle','t-desc','t-price-krw','t-price-cny','t-images','t-highlights','t-includes','t-excludes'].forEach(f=>document.getElementById(f).value='');
+  document.getElementById('t-tiers-list').innerHTML = '';
+  document.getElementById('t-opts-list').innerHTML = '';
   if (!id) {
     clear();
     document.getElementById('t-type').value='day_tour'; document.getElementById('t-status').value='live';
@@ -457,9 +649,14 @@ function openTourModal(id) {
       document.getElementById('t-days').value=p.duration_days||1;
       document.getElementById('t-order').value=p.sort_order||0;
       document.getElementById('t-status').value=p.status||'live';
+      document.getElementById('t-images').value=arrToLines(p.images);
       document.getElementById('t-highlights').value=arrToLines(p.highlights);
       document.getElementById('t-includes').value=arrToLines(p.includes);
       document.getElementById('t-excludes').value=arrToLines(p.excludes);
+      const tl = document.getElementById('t-tiers-list');
+      const ol = document.getElementById('t-opts-list');
+      (p.price_tiers||[]).forEach(t=>tl.appendChild(renderTierRow(t)));
+      (p.tour_options||[]).forEach(o=>ol.appendChild(renderOptRow(o)));
     });
   }
   document.getElementById('tour-modal-bg').classList.add('open');
@@ -481,9 +678,12 @@ async function saveTour() {
     duration_days: parseInt(document.getElementById('t-days').value)||1,
     sort_order: parseInt(document.getElementById('t-order').value)||0,
     status: document.getElementById('t-status').value,
+    images: linesToArr(document.getElementById('t-images').value),
     highlights: linesToArr(document.getElementById('t-highlights').value),
     includes: linesToArr(document.getElementById('t-includes').value),
     excludes: linesToArr(document.getElementById('t-excludes').value),
+    price_tiers: collectTiers(),
+    tour_options: collectOpts(),
     updated_at: new Date().toISOString(),
   };
   if (!payload.title_ko) { toast('상품명을 입력하세요','error'); return; }
@@ -511,7 +711,7 @@ async function loadSpots() {
 function openSpotModal(id) {
   document.getElementById('spot-modal-title').textContent = id ? '스팟 편집' : '스팟 추가';
   if (!id) {
-    ['s-id','s-id-orig','s-zone','s-name-ko','s-name-cn','s-lat','s-lon','s-gaode','s-images','s-desc','s-tip','s-hours','s-price'].forEach(f=>document.getElementById(f).value='');
+    ['s-id','s-id-orig','s-zone','s-name-ko','s-name-cn','s-lat','s-lon','s-gaode','s-images','s-video-url','s-desc','s-tip','s-hours','s-price'].forEach(f=>document.getElementById(f).value='');
     document.getElementById('s-attr').value='forest'; document.getElementById('s-type').value='landmark';
     document.getElementById('s-order').value='0'; document.getElementById('s-status').value='live';
   } else {
@@ -522,7 +722,7 @@ function openSpotModal(id) {
       document.getElementById('s-type').value=s.type; document.getElementById('s-name-ko').value=s.name_ko||'';
       document.getElementById('s-name-cn').value=s.name_cn||''; document.getElementById('s-lat').value=s.lat||'';
       document.getElementById('s-lon').value=s.lon||''; document.getElementById('s-gaode').value=s.gaode_uri||'';
-      document.getElementById('s-images').value=arrToLines(s.images); document.getElementById('s-desc').value=s.desc_ko||'';
+      document.getElementById('s-images').value=arrToLines(s.images); document.getElementById('s-video-url').value=s.video_url||''; document.getElementById('s-desc').value=s.desc_ko||'';
       document.getElementById('s-tip').value=s.tip_ko||''; document.getElementById('s-hours').value=s.hours||'';
       document.getElementById('s-price').value=s.price||''; document.getElementById('s-order').value=s.sort_order||0;
       document.getElementById('s-status').value=s.status||'live';
@@ -548,6 +748,7 @@ async function saveSpot() {
     lon: parseFloat(document.getElementById('s-lon').value)||null,
     gaode_uri: document.getElementById('s-gaode').value.trim()||null,
     images: linesToArr(document.getElementById('s-images').value),
+    video_url: document.getElementById('s-video-url').value.trim()||null,
     desc_ko: document.getElementById('s-desc').value.trim()||null,
     tip_ko: document.getElementById('s-tip').value.trim()||null,
     hours: document.getElementById('s-hours').value.trim()||null,
@@ -624,6 +825,98 @@ async function deleteUser(id) {
   const { error } = await sb.from('admin_users').delete().eq('id',id);
   if (error) { toast('실패','error'); return; }
   toast('삭제되었습니다'); loadUsers();
+}
+
+const CAT_LABELS = {restaurant:'식당',cafe:'카페',hotel:'호텔/숙소',shop:'쇼핑',attraction:'볼거리',transport:'교통',etc:'기타'};
+
+async function loadPlaces() {
+  const { data } = await sb.from('local_places').select('*').order('sort_order');
+  document.getElementById('places-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">로드 실패 (테이블이 없거나 오류)</td></tr>'
+    : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">등록된 업체 없음</td></tr>'
+    : data.map(p=>`<tr>
+        <td><span class="badge ${p.category==='restaurant'?'badge-day':p.category==='hotel'?'badge-pkg':'badge-draft'}">${CAT_LABELS[p.category]||p.category}</span></td>
+        <td style="font-weight:700">${p.name_ko}</td>
+        <td>${p.area||'-'}</td>
+        <td><span class="badge ${p.is_active?'badge-live':'badge-archived'}">${p.is_active?'활성':'비활성'}</span></td>
+        <td>${p.sort_order}</td>
+        <td><div class="act-btns">
+          <button class="btn-edit" onclick="openPlaceModal('${p.id}')">편집</button>
+          <button class="btn-del" onclick="deletePlace('${p.id}')">삭제</button>
+        </div></td></tr>`).join('');
+}
+
+function openPlaceModal(id) {
+  document.getElementById('place-modal-title').textContent = id ? '업체 편집' : '업체 추가';
+  const flds = ['pl-id','pl-name-ko','pl-name-cn','pl-address','pl-phone','pl-wechat','pl-hours','pl-price-range','pl-lat','pl-lon','pl-gaode','pl-images','pl-desc','pl-tags'];
+  if (!id) {
+    flds.forEach(f=>document.getElementById(f).value='');
+    document.getElementById('pl-cat').value='restaurant';
+    document.getElementById('pl-area').value='시내';
+    document.getElementById('pl-order').value='0';
+    document.getElementById('pl-active').value='1';
+  } else {
+    sb.from('local_places').select('*').eq('id',id).single().then(({data:p})=>{
+      if (!p) return;
+      document.getElementById('pl-id').value=p.id;
+      document.getElementById('pl-cat').value=p.category||'restaurant';
+      document.getElementById('pl-area').value=p.area||'시내';
+      document.getElementById('pl-name-ko').value=p.name_ko||'';
+      document.getElementById('pl-name-cn').value=p.name_cn||'';
+      document.getElementById('pl-address').value=p.address||'';
+      document.getElementById('pl-phone').value=p.phone||'';
+      document.getElementById('pl-wechat').value=p.wechat||'';
+      document.getElementById('pl-hours').value=p.hours||'';
+      document.getElementById('pl-price-range').value=p.price_range||'';
+      document.getElementById('pl-lat').value=p.lat||'';
+      document.getElementById('pl-lon').value=p.lon||'';
+      document.getElementById('pl-gaode').value=p.gaode_uri||'';
+      document.getElementById('pl-images').value=arrToLines(p.images);
+      document.getElementById('pl-desc').value=p.desc_ko||'';
+      document.getElementById('pl-tags').value=(p.tags||[]).join(', ');
+      document.getElementById('pl-order').value=p.sort_order||0;
+      document.getElementById('pl-active').value=p.is_active?'1':'0';
+    });
+  }
+  document.getElementById('place-modal-bg').classList.add('open');
+}
+function closePlaceModal(e) {
+  if (e && e.target !== document.getElementById('place-modal-bg')) return;
+  document.getElementById('place-modal-bg').classList.remove('open');
+}
+async function savePlace() {
+  const id = document.getElementById('pl-id').value;
+  const name = document.getElementById('pl-name-ko').value.trim();
+  if (!name) { toast('업체명을 입력하세요','error'); return; }
+  const tagsRaw = document.getElementById('pl-tags').value;
+  const payload = {
+    category: document.getElementById('pl-cat').value,
+    area: document.getElementById('pl-area').value,
+    name_ko: name,
+    name_cn: document.getElementById('pl-name-cn').value.trim()||null,
+    address: document.getElementById('pl-address').value.trim()||null,
+    phone: document.getElementById('pl-phone').value.trim()||null,
+    wechat: document.getElementById('pl-wechat').value.trim()||null,
+    hours: document.getElementById('pl-hours').value.trim()||null,
+    price_range: document.getElementById('pl-price-range').value.trim()||null,
+    lat: parseFloat(document.getElementById('pl-lat').value)||null,
+    lon: parseFloat(document.getElementById('pl-lon').value)||null,
+    gaode_uri: document.getElementById('pl-gaode').value.trim()||null,
+    images: linesToArr(document.getElementById('pl-images').value),
+    desc_ko: document.getElementById('pl-desc').value.trim()||null,
+    tags: tagsRaw ? tagsRaw.split(',').map(t=>t.trim()).filter(Boolean) : [],
+    sort_order: parseInt(document.getElementById('pl-order').value)||0,
+    is_active: document.getElementById('pl-active').value==='1',
+    updated_at: new Date().toISOString(),
+  };
+  const { error } = id ? await sb.from('local_places').update(payload).eq('id',id) : await sb.from('local_places').insert(payload);
+  if (error) { toast('저장 실패: '+error.message,'error'); return; }
+  toast(id?'수정되었습니다':'추가되었습니다','success'); closePlaceModal(); loadPlaces();
+}
+async function deletePlace(id) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  const { error } = await sb.from('local_places').delete().eq('id',id);
+  if (error) { toast('삭제 실패','error'); return; }
+  toast('삭제되었습니다'); loadPlaces();
 }
 
 // 세션 자동 복원
