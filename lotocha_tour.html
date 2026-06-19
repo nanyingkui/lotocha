@@ -4,1016 +4,346 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <meta name="theme-color" content="#1a2a5e">
-<title>투어 상품 — 로투차 장가계</title>
+<title>투어 상품 — 로투차</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--navy:#1a2a5e;--gold:#f5a623;--bg:#f0ede8;--red:#e53935;--green:#2e7d32;--white:#fff;--gray:#888}
-body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:var(--bg);color:var(--navy);min-height:100vh;max-width:480px;margin:0 auto;padding-bottom:80px}
-
-/* ── 헤더 ── */
-.header{background:var(--navy);position:sticky;top:0;z-index:500;box-shadow:0 2px 12px rgba(0,0,0,.35)}
+:root{--navy:#1a2a5e;--gold:#f5a623;--bg:#f0ede8;--red:#e53935;--green:#2e7d32;--blue:#1565c0}
+body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:var(--bg);color:var(--navy);min-height:100vh;max-width:480px;margin:0 auto;padding-bottom:60px}
+/* 헤더 */
+.header{background:var(--navy);position:sticky;top:0;z-index:500;box-shadow:0 2px 12px rgba(0,0,0,.3)}
 .header-inner{display:flex;align-items:center;gap:8px;padding:0 14px;height:52px}
-.back-btn{background:none;border:none;color:#8892c4;font-size:22px;cursor:pointer;padding:4px;line-height:1;text-decoration:none}
+.back-btn{background:none;border:none;color:#8892c4;font-size:12px;font-weight:700;cursor:pointer;padding:6px 0;text-decoration:none;flex-shrink:0}
 .header-title{color:var(--gold);font-size:15px;font-weight:900;flex:1}
-.header-sub{color:rgba(255,255,255,.4);font-size:11px}
-.tab-bar{background:var(--navy);border-top:1px solid rgba(255,255,255,.08);display:flex;padding:0 10px}
-.tab-btn{flex:1;padding:10px 0;font-size:12px;font-weight:700;color:rgba(255,255,255,.4);cursor:pointer;border:none;background:none;border-bottom:2.5px solid transparent;font-family:inherit;transition:all .2s}
-.tab-btn.on{color:var(--gold);border-bottom-color:var(--gold)}
-
-/* ── 가이드 CTA 배너 ── */
-.guide-cta{background:linear-gradient(90deg,#1a5276,#2471a3);color:#fff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;text-decoration:none}
-.guide-cta:active{opacity:.85}
-.guide-cta-text .t{font-size:11px;font-weight:700;margin-bottom:2px}
-.guide-cta-text .s{font-size:10px;opacity:.75}
-.guide-cta-arr{font-size:18px;opacity:.7}
-
-/* ── 상담 배너 ── */
-.contact-bar{display:flex;background:#fff;border-bottom:1px solid #e8e4df}
-.contact-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;font-size:12px;font-weight:700;text-decoration:none;border:none;background:none;font-family:inherit;cursor:pointer}
-.contact-btn.kakao{color:#3a1d1d;border-right:1px solid #e8e4df}
-.contact-btn.kakao .icon{background:#FEE500;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:14px}
-.contact-btn.wechat{color:#1a3d1a}
-.contact-btn.wechat .icon{background:#07C160;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:14px}
-
-/* ── 히어로 ── */
-.hero{background:linear-gradient(135deg,#1a2a5e 0%,#2d4080 60%,#1a5276 100%);padding:22px 16px 18px;text-align:center;border-bottom:3px solid var(--gold)}
-.hero-emoji{font-size:38px;margin-bottom:8px}
-.hero-title{color:#fff;font-size:19px;font-weight:900;line-height:1.3}
-.hero-sub{color:rgba(255,255,255,.7);font-size:12px;margin-top:5px;line-height:1.6}
-.hero-badges{display:flex;justify-content:center;gap:6px;margin-top:10px;flex-wrap:wrap}
-.hero-badge{background:rgba(245,166,35,.18);border:1px solid rgba(245,166,35,.45);color:var(--gold);border-radius:20px;padding:4px 11px;font-size:10px;font-weight:700}
-
-/* ══════════════════════
-   패키지 뷰
-══════════════════════ */
-
-/* 패키지 선택 탭 */
-.pkg-tabs{display:flex;gap:8px;padding:14px 14px 0}
-.pkg-tab{flex:1;background:#fff;border:2px solid #ddd;border-radius:12px;padding:10px 4px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
-.pkg-tab.active{border-color:var(--navy);background:var(--navy)}
-.pkg-tab-badge{position:absolute;top:-7px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--navy);border-radius:10px;padding:1px 7px;font-size:9px;font-weight:900;white-space:nowrap}
-.pkg-tab-name{font-size:13px;font-weight:900;color:var(--navy)}
-.pkg-tab.active .pkg-tab-name{color:var(--gold)}
-.pkg-tab-nights{font-size:10px;color:#888;margin-top:2px}
-.pkg-tab.active .pkg-tab-nights{color:rgba(255,255,255,.6)}
-
-/* 인원 선택 */
-.section-card{background:#fff;border-radius:14px;margin:12px 12px 0;padding:14px;box-shadow:0 1px 6px rgba(26,42,94,.06)}
-.sc-title{font-size:12px;font-weight:900;color:var(--navy);margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.sc-title::before{content:'';display:block;width:3px;height:14px;background:var(--gold);border-radius:2px}
-.pax-row{display:flex;align-items:center;justify-content:space-between}
-.pax-label{font-size:13px;color:#444}
-.pax-ctrl{display:flex;align-items:center;gap:0}
-.pax-btn{width:36px;height:36px;border:1.5px solid #ddd;background:#f8f8f8;border-radius:8px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--navy);transition:all .15s}
-.pax-btn:active{background:#e8e8e8}
-.pax-num{min-width:44px;text-align:center;font-size:18px;font-weight:900;color:var(--navy)}
-.pax-hint{font-size:10px;color:#aaa;margin-top:6px}
-
-/* 옵션 아코디언 */
-.opt-group{border:1px solid #eee;border-radius:10px;margin-top:10px;overflow:hidden}
-.opt-header{padding:11px 14px;font-size:12px;font-weight:700;color:var(--navy);cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:#fafafa}
-.opt-header-left{display:flex;align-items:center;gap:6px}
-.opt-header-right{font-size:10px;color:var(--gold);font-weight:700}
-.opt-body{padding:10px 12px;display:flex;flex-direction:column;gap:7px}
-.opt-item{display:flex;align-items:flex-start;gap:10px;padding:9px 11px;border-radius:9px;border:2px solid #eee;cursor:pointer;transition:all .15s;background:#fff}
-.opt-item.selected{border-color:var(--navy);background:#f0f3ff}
-.opt-item-radio{width:18px;height:18px;border:2px solid #ccc;border-radius:50%;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.opt-item.selected .opt-item-radio{border-color:var(--navy);background:var(--navy)}
-.opt-item.selected .opt-item-radio::after{content:'';width:8px;height:8px;background:#fff;border-radius:50%;display:block}
-.opt-check-radio{width:18px;height:18px;border:2px solid #ccc;border-radius:4px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.opt-item.checked .opt-check-radio{border-color:var(--navy);background:var(--navy)}
-.opt-item.checked .opt-check-radio::after{content:'✓';color:#fff;font-size:11px;font-weight:900;display:block}
-.opt-item-info{flex:1}
-.opt-item-name{font-size:12px;font-weight:700;color:var(--navy)}
-.opt-item-desc{font-size:10px;color:#888;margin-top:2px;line-height:1.4}
-.opt-item-price{font-size:11px;font-weight:900;color:var(--green);margin-top:3px}
-.opt-item-price.extra{color:#c0392b}
-.opt-item-price.free{color:var(--gray)}
-
-/* 가격 요약 박스 */
-.price-box{background:linear-gradient(135deg,var(--navy) 0%,#2d4080 100%);border-radius:14px;margin:12px 12px 0;padding:16px}
-.price-box-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.price-box-row:last-child{margin-bottom:0}
-.pb-label{color:rgba(255,255,255,.65);font-size:11px}
-.pb-val{color:#fff;font-size:13px;font-weight:700}
-.pb-divider{height:1px;background:rgba(255,255,255,.15);margin:10px 0}
-.pb-total-label{color:rgba(255,255,255,.8);font-size:13px;font-weight:700}
-.pb-total-val{color:var(--gold);font-size:22px;font-weight:900}
-.pb-pax-note{color:rgba(255,255,255,.5);font-size:10px;margin-top:4px;text-align:right}
-.pb-notice{background:rgba(255,255,255,.08);border-radius:8px;padding:7px 10px;margin-top:10px;font-size:10px;color:rgba(255,255,255,.65);line-height:1.5}
-
-/* 문의 버튼 */
-.inq-btns{display:flex;gap:8px;padding:12px}
-.inq-btn{flex:1;padding:13px;border-radius:12px;font-size:13px;font-weight:900;cursor:pointer;font-family:inherit;border:none;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px}
-.inq-kakao{background:#FEE500;color:#1a1a1a}
-.inq-wechat{background:#07C160;color:#fff}
-.inq-kakao:active{background:#e6cf00}
-.inq-wechat:active{background:#05a050}
-
-/* 포함/불포함 */
-.incl-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:4px}
-.incl-item{background:#f0ede8;border-radius:7px;padding:6px 9px;font-size:10px;color:#444;display:flex;align-items:flex-start;gap:4px}
-.incl-item .ic{flex-shrink:0;margin-top:1px}
-.incl-item.excl{background:#fff5f5}
-.incl-item.excl .ic{color:var(--red)}
-
-/* 일정 블록 */
-.day-block{border-left:3px solid var(--gold);border-radius:0 10px 10px 0;background:#fff;padding:10px 12px;margin-bottom:8px}
-.day-block-num{font-size:9px;font-weight:900;color:var(--gold);letter-spacing:.5px}
-.day-block-title{font-size:13px;font-weight:700;color:var(--navy);margin-top:2px}
-.day-block-spots{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
-.spot-chip{background:#f0f3ff;border-radius:6px;padding:3px 8px;font-size:10px;color:var(--navy);font-weight:600}
-
-/* 취소 정책 */
-.cancel-table{width:100%;border-collapse:collapse;font-size:12px}
-.cancel-table th{background:var(--navy);color:#fff;padding:8px 10px;text-align:left;font-size:11px}
-.cancel-table td{padding:8px 10px;border-bottom:1px solid #eee;color:#444}
-.cancel-table tr:last-child td{border-bottom:none}
-.cancel-table tr:nth-child(even) td{background:#f8f7f5}
-
-/* ══════════════════════
-   1일투어 뷰
-══════════════════════ */
-.tour-card{background:#fff;border-radius:16px;margin:12px;overflow:hidden;box-shadow:0 2px 10px rgba(26,42,94,.08)}
-.tour-card-head{padding:16px 14px 12px}
-.tour-card-tag{display:inline-block;background:var(--gold);color:var(--navy);border-radius:8px;padding:2px 8px;font-size:10px;font-weight:900;margin-bottom:6px}
-.tour-card-title{font-size:15px;font-weight:900;color:var(--navy);line-height:1.3}
-.tour-card-sub{font-size:11px;color:#888;margin-top:3px}
-.tour-price-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#eee;border-top:1px solid #eee}
-.tour-price-cell{background:#fff;padding:10px 12px}
-.tour-price-cell .age{font-size:10px;color:#999;margin-bottom:2px}
-.tour-price-cell .price{font-size:15px;font-weight:900;color:var(--navy)}
-.tour-schedule{padding:12px 14px 0;border-top:1px solid #f0ede8}
-.tour-sched-title{font-size:11px;font-weight:900;color:var(--navy);margin-bottom:8px}
-.tour-sched-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:7px}
-.tour-sched-time{font-size:10px;font-weight:700;color:var(--gold);min-width:44px;margin-top:2px}
-.tour-sched-desc{font-size:11px;color:#555;line-height:1.4}
-.tour-incl{padding:10px 14px;background:#f8f7f5}
-.tour-incl-title{font-size:10px;font-weight:900;color:var(--navy);margin-bottom:5px}
-.tour-incl-items{display:flex;flex-wrap:wrap;gap:4px}
-.tour-incl-chip{background:#e8f4f0;border-radius:5px;padding:3px 7px;font-size:10px;color:#2e7d32;font-weight:600}
-.tour-excl-chip{background:#fff0f0;border-radius:5px;padding:3px 7px;font-size:10px;color:#c62828;font-weight:600}
-.tour-opt-section{padding:10px 14px;border-top:1px solid #f0ede8}
-.tour-opt-title{font-size:10px;font-weight:900;color:var(--navy);margin-bottom:6px}
-.tour-opt-item{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f5f5f5;font-size:11px}
-.tour-opt-item:last-child{border-bottom:none}
-.tour-opt-name{color:#444}
-.tour-opt-price{color:var(--green);font-weight:700}
-.tour-ref-section{padding:8px 14px 12px;background:#fffbf0;border-top:1px solid #f5e8c0}
-.tour-ref-title{font-size:10px;font-weight:900;color:#8B6914;margin-bottom:5px}
-.tour-ref-item{display:flex;justify-content:space-between;font-size:10px;color:#666;padding:2px 0}
-.tour-ref-price{color:#8B6914;font-weight:700}
-.tour-inq-row{padding:10px 14px 14px}
-
-/* 안내사항 */
-.notice-card{background:#fff;border-radius:12px;margin:12px 12px 0;padding:12px 14px;box-shadow:0 1px 4px rgba(26,42,94,.05)}
-.notice-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f5;font-size:12px;line-height:1.6;color:#444}
-.notice-item:last-child{border-bottom:none}
-.notice-icon{font-size:16px;flex-shrink:0;margin-top:1px}
-
-/* 섹션 헤더 */
-.sec-head{padding:16px 14px 6px;font-size:14px;font-weight:900;color:var(--navy);display:flex;align-items:center;gap:8px}
-.sec-head::before{content:'';display:block;width:4px;height:18px;background:var(--gold);border-radius:2px}
-
-/* 공통 유틸 */
-.hidden{display:none}
-.tag-chip{display:inline-block;border-radius:8px;padding:2px 9px;font-size:10px;font-weight:900}
-.tag-popular{background:#fff3e0;color:#e65100}
-.tag-rec{background:#e8f5e9;color:#2e7d32}
-.tag-premium{background:#f3e5f5;color:#6a1b9a}
+/* 상담 배너 */
+.cta-banner{background:linear-gradient(90deg,#07C160,#05a050);color:#fff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between}
+.cta-text{font-size:12px;font-weight:700}
+.cta-sub{font-size:10px;opacity:.8;margin-top:1px}
+.cta-btn{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:8px;padding:7px 14px;font-size:11px;font-weight:900;text-decoration:none;white-space:nowrap;flex-shrink:0}
+/* 탭 */
+.tab-bar{background:#fff;border-bottom:1px solid #e0e7f0;display:flex}
+.tab-btn{flex:1;padding:12px 0;font-size:13px;font-weight:700;color:#aaa;cursor:pointer;border:none;background:none;border-bottom:2.5px solid transparent;font-family:inherit;transition:all .2s}
+.tab-btn.on{color:var(--navy);border-bottom-color:var(--gold)}
+/* 래퍼 */
+.wrap{padding:13px 13px 0}
+/* 상품 카드 */
+.product-card{background:#fff;border-radius:14px;overflow:hidden;margin-bottom:14px;box-shadow:0 2px 10px rgba(26,42,94,.08)}
+.card-badge-row{display:flex;gap:6px;margin-bottom:8px}
+.badge{display:inline-block;font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px}
+.badge-day{background:#e3f2fd;color:var(--blue)}
+.badge-pkg{background:#fff8e1;color:#e65100}
+.badge-live{background:#e8f5e9;color:var(--green)}
+.card-img{width:100%;height:160px;object-fit:cover;background:linear-gradient(135deg,#1a2a5e,#2a3f8a);display:flex;align-items:center;justify-content:center;font-size:48px}
+.card-body{padding:14px}
+.card-title{font-size:16px;font-weight:900;color:var(--navy);margin-bottom:3px}
+.card-subtitle{font-size:11px;color:#888;margin-bottom:12px;line-height:1.6}
+.price-row{display:flex;align-items:baseline;gap:8px;margin-bottom:4px}
+.price-krw{font-size:22px;font-weight:900;color:var(--navy)}
+.price-cny{font-size:13px;font-weight:700;color:#888}
+.price-label{font-size:10px;color:#aaa;margin-bottom:10px}
+.highlights{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.highlight-tag{background:#f4f6fb;border-radius:6px;padding:4px 9px;font-size:10px;font-weight:700;color:var(--navy)}
+.card-footer{display:flex;gap:8px;padding-top:12px;border-top:1px solid #f5f5f5}
+.btn-detail{flex:1;background:var(--navy);color:#fff;border:none;border-radius:9px;padding:11px;font-size:12px;font-weight:900;cursor:pointer;font-family:inherit}
+.btn-inquiry{flex:1;background:var(--gold);color:var(--navy);border:none;border-radius:9px;padding:11px;font-size:12px;font-weight:900;cursor:pointer;font-family:inherit}
+/* 로딩 */
+.loading{text-align:center;padding:40px 20px;color:#aaa;font-size:13px}
+.spinner{width:28px;height:28px;border:3px solid #e0e7f0;border-top-color:var(--navy);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error-box{background:#ffebee;border-radius:10px;padding:14px;font-size:12px;color:var(--red);text-align:center;margin-bottom:14px}
+/* 모달 */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:900;display:none;align-items:flex-end}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:20px 20px 0 0;width:100%;max-height:88vh;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom)}
+.modal-drag{width:40px;height:4px;background:#e0e0e0;border-radius:2px;margin:12px auto 0}
+.modal-header{padding:14px 18px 0;display:flex;justify-content:space-between;align-items:center}
+.modal-title{font-size:17px;font-weight:900;color:var(--navy)}
+.modal-close{background:none;border:none;font-size:22px;color:#aaa;cursor:pointer;line-height:1}
+.modal-content{padding:14px 18px 24px}
+.modal-subtitle{font-size:12px;color:#888;margin-bottom:16px;line-height:1.7}
+.modal-section{margin-bottom:16px}
+.modal-section-title{font-size:11px;font-weight:900;color:#aaa;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px}
+.modal-price-box{background:var(--navy);border-radius:12px;padding:14px 16px;margin-bottom:16px}
+.modal-price-krw{font-size:26px;font-weight:900;color:#fff}
+.modal-price-cny{font-size:13px;color:rgba(255,255,255,.6);margin-top:3px}
+.modal-price-label{font-size:10px;color:rgba(255,255,255,.4);margin-top:2px}
+.list-item{display:flex;gap:8px;font-size:12px;color:#444;padding:5px 0;line-height:1.6}
+.list-item::before{content:"✓";color:var(--green);font-weight:900;flex-shrink:0}
+.list-item.ex::before{content:"✗";color:var(--red)}
+.itinerary-item{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #f5f5f5;font-size:12px}
+.itinerary-item:last-child{border:none}
+.it-time{color:#aaa;font-weight:700;min-width:45px;flex-shrink:0}
+.it-name{font-weight:700;color:var(--navy);margin-bottom:2px}
+.it-desc{color:#777;line-height:1.6}
+.inquiry-btns{display:flex;gap:8px;margin-top:16px}
+.inquiry-btn{flex:1;padding:13px;border:none;border-radius:11px;font-size:13px;font-weight:900;cursor:pointer;font-family:inherit}
+.inquiry-kakao{background:#FEE500;color:#191919}
+.inquiry-wechat{background:var(--navy);color:#fff}
+/* 가이드 배너 */
+.guide-banner{display:flex;align-items:center;justify-content:space-between;background:#f4f6fb;border-radius:12px;padding:13px 15px;margin:0 13px 14px;text-decoration:none;border:1.5px solid #ddd8d0}
+.guide-banner-title{font-size:13px;font-weight:900;color:var(--navy)}
+.guide-banner-sub{font-size:11px;color:#888;margin-top:2px}
 </style>
 </head>
 <body>
 
-<!-- ── 헤더 ── -->
 <div class="header">
   <div class="header-inner">
-    <a class="back-btn" href="index.html">←</a>
+    <a href="lotocha_guide.html" class="back-btn">← 가이드</a>
     <div class="header-title">🏔️ 로투차 투어</div>
-    <div class="header-sub">장가계 전문</div>
-  </div>
-  <div class="tab-bar">
-    <button class="tab-btn on" id="tab-pkg" onclick="switchTab('pkg')">📦 패키지 투어</button>
-    <button class="tab-btn" id="tab-day" onclick="switchTab('day')">🌅 1일투어</button>
   </div>
 </div>
 
-<!-- ── 가이드 CTA ── -->
-<a class="guide-cta" href="lotocha_guide.html">
-  <div class="guide-cta-text">
-    <div class="t">📖 장가계 첫 방문이세요?</div>
-    <div class="s">교통·결제·긴급상황까지 — 현지 생존 가이드 무료로 보기 →</div>
+<div class="cta-banner">
+  <div>
+    <div class="cta-text">💬 투어 문의 · 맞춤 견적</div>
+    <div class="cta-sub">카카오톡 / WeChat으로 빠른 상담</div>
   </div>
-  <div class="guide-cta-arr">→</div>
+  <a class="cta-btn" href="http://pf.kakao.com/_hvrmn/chat" target="_blank">상담하기 →</a>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn on" id="tab-day" onclick="switchTab('day')">🌅 1일투어</button>
+  <button class="tab-btn" id="tab-pkg" onclick="switchTab('pkg')">📦 패키지</button>
+</div>
+
+<div class="wrap">
+  <div id="day-list"><div class="loading"><div class="spinner"></div>상품 불러오는 중...</div></div>
+  <div id="pkg-list" style="display:none"><div class="loading"><div class="spinner"></div>상품 불러오는 중...</div></div>
+</div>
+
+<a href="lotocha_guide.html" class="guide-banner">
+  <div>
+    <div class="guide-banner-title">📖 장가계 첫 방문이세요?</div>
+    <div class="guide-banner-sub">교통·결제·현지 맛집·긴급상황 — 무료 여행 가이드</div>
+  </div>
+  <div style="font-size:20px;color:var(--gold)">→</div>
 </a>
 
-<!-- ── 상담 배너 ── -->
-<div class="contact-bar">
-  <button class="contact-btn kakao" onclick="openKakao()">
-    <div class="icon">💬</div>카카오톡 상담
-  </button>
-  <button class="contact-btn wechat" onclick="openWechat()">
-    <div class="icon">💚</div>WeChat 상담
-  </button>
+<!-- 상세 모달 -->
+<div class="modal-bg" id="modal-bg" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-drag"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title"></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-content" id="modal-content"></div>
+  </div>
 </div>
 
-<!-- ════════════════════════════
-     패키지 투어 뷰
-════════════════════════════ -->
-<div id="view-pkg">
-
-  <!-- 히어로 -->
-  <div class="hero">
-    <div class="hero-emoji">🎒</div>
-    <div class="hero-title">장가계 패키지 투어</div>
-    <div class="hero-sub">숙박·교통·식사·가이드 All-in-one<br>여행을 통째로 맡기세요</div>
-    <div class="hero-badges">
-      <span class="hero-badge">✓ 호텔 포함</span>
-      <span class="hero-badge">✓ 전용차량</span>
-      <span class="hero-badge">✓ 모든 입장료</span>
-      <span class="hero-badge">✓ 한국어 가이드</span>
-    </div>
-  </div>
-
-  <!-- 패키지 선택 -->
-  <div style="padding:14px 12px 0">
-    <div style="font-size:12px;font-weight:900;color:var(--navy);margin-bottom:10px">📦 패키지 선택</div>
-    <div class="pkg-tabs" style="padding:0;gap:8px;display:flex">
-      <div class="pkg-tab active" id="ptab-3n4d" onclick="selectPkg('3n4d')">
-        <div class="pkg-tab-badge">가장 인기</div>
-        <div class="pkg-tab-name">3박4일</div>
-        <div class="pkg-tab-nights">93만원~</div>
-      </div>
-      <div class="pkg-tab" id="ptab-4n5d" onclick="selectPkg('4n5d')">
-        <div class="pkg-tab-badge" style="background:#e8f5e9;color:#2e7d32">추천</div>
-        <div class="pkg-tab-name">4박5일</div>
-        <div class="pkg-tab-nights">109만원~</div>
-      </div>
-      <div class="pkg-tab" id="ptab-5n6d" onclick="selectPkg('5n6d')">
-        <div class="pkg-tab-badge" style="background:#f3e5f5;color:#6a1b9a">프리미엄</div>
-        <div class="pkg-tab-name">5박6일</div>
-        <div class="pkg-tab-nights">132만원~</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 인원 선택 -->
-  <div class="section-card" style="margin-top:12px">
-    <div class="sc-title">👥 인원 선택</div>
-    <div class="pax-row">
-      <div class="pax-label">여행 인원</div>
-      <div class="pax-ctrl">
-        <button class="pax-btn" onclick="changePax(-1)">−</button>
-        <div class="pax-num" id="pax-display">2</div>
-        <button class="pax-btn" onclick="changePax(+1)">+</button>
-      </div>
-    </div>
-    <div class="pax-hint">※ 최소 2인 출발 · 최대 8인 (아동 제외)</div>
-  </div>
-
-  <!-- 옵션: 공연 -->
-  <div class="section-card">
-    <div class="sc-title">🎭 공연 선택</div>
-    <div id="opt-show">
-      <div class="opt-item selected" data-group="show" data-id="magic" onclick="selectOpt('show','magic',this)">
-        <div class="opt-item-radio"></div>
-        <div class="opt-item-info">
-          <div class="opt-item-name">🤹 매력상서쇼</div>
-          <div class="opt-item-desc">장가계 대표 전통공연 · 약 60분 · 한국어 자막</div>
-          <div class="opt-item-price free">✓ 기본 포함</div>
-        </div>
-      </div>
-      <div class="opt-item" data-group="show" data-id="tianmen" onclick="selectOpt('show','tianmen',this)">
-        <div class="opt-item-radio"></div>
-        <div class="opt-item-info">
-          <div class="opt-item-name">🦊 천문호선쇼</div>
-          <div class="opt-item-desc">천문산 전통 공연 · 20:00~21:30 · 세계 최대 규모</div>
-          <div class="opt-item-price extra">+1만원/인</div>
-        </div>
-      </div>
-      <div class="opt-item" data-group="show" data-id="none" onclick="selectOpt('show','none',this)">
-        <div class="opt-item-radio"></div>
-        <div class="opt-item-info">
-          <div class="opt-item-name">❌ 공연 취소</div>
-          <div class="opt-item-desc">공연 제외 시 일정 여유 시간으로 활용</div>
-          <div class="opt-item-price" style="color:#c0392b">−1만원/인 할인</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 옵션: 마사지 -->
-  <div class="section-card">
-    <div class="sc-title">💆 마사지 선택</div>
-    <div id="opt-massage">
-      <div class="opt-item selected" data-group="massage" data-id="basic" onclick="selectOpt('massage','basic',this)">
-        <div class="opt-item-radio"></div>
-        <div class="opt-item-info">
-          <div class="opt-item-name">👣 발 마사지 80분</div>
-          <div class="opt-item-desc">전문 마사지샵 · 장가계 스타일 발 마사지</div>
-          <div class="opt-item-price free">✓ 기본 포함</div>
-        </div>
-      </div>
-      <div class="opt-item" data-group="massage" data-id="premium" onclick="selectOpt('massage','premium',this)">
-        <div class="opt-item-radio"></div>
-        <div class="opt-item-info">
-          <div class="opt-item-name">✨ 발 + 전신 아로마 마사지 100분</div>
-          <div class="opt-item-desc">발 마사지 + 전신 아로마 + 얼굴 마사지 풀코스</div>
-          <div class="opt-item-price extra">+2만원/인</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 옵션: 헬기 투어 -->
-  <div class="section-card">
-    <div class="sc-title">🚁 헬기 투어 (선택)</div>
-    <div style="font-size:10px;color:#888;margin-bottom:8px;line-height:1.5">무릉원 전경을 하늘에서 감상 · 일반 항선은 인당 요금 · 전세(단독 탑승)는 대당 요금 (최대 3인)</div>
-    <div id="opt-heli">
-      <div class="opt-item selected" data-group="heli" data-id="none" onclick="selectOpt('heli','none',this)">
-        <div class="opt-item-radio"></div>
-        <div class="opt-item-info">
-          <div class="opt-item-name">이용 안함</div>
-          <div class="opt-item-price free">+0</div>
-        </div>
-      </div>
-      <div class="opt-item" data-group="heli" data-id="A" onclick="selectOpt('heli','A',this)">
-        <div class="opt-item-radio"></div>
-        <div class="opt-item-info">
-          <div class="opt-item-name">A선 <span style="color:#888;font-weight:400">5~6분</span></div>
-          <div class="opt-item-price extra">+11.5만원/인</div>
-        </div>
-      </div>
-      <div class="opt-item" data-group="heli" data-id="B" onclick="selectOpt('heli','B',this)">
-        <div class="opt-item-radio"></div>
-        <div class="opt-item-info">
-          <div class="opt-item-name">B선 <span style="color:#888;font-weight:400">10~12분</span></div>
-          <div class="opt-item-price extra">+22.5만원/인</div>
-        </div>
-      </div>
-      <div class="opt-item" data-group="heli" data-id="C" onclick="selectOpt('heli','C',this)">
-        <div class="opt-item-radio"></div>
-        <div class="opt-item-info">
-          <div class="opt-item-name">C선 <span style="color:#888;font-weight:400">16분</span></div>
-          <div class="opt-item-price extra">+34.5만원/인</div>
-        </div>
-      </div>
-      <div class="opt-item" data-group="heli" data-id="D" onclick="selectOpt('heli','D',this)">
-        <div class="opt-item-radio"></div>
-        <div class="opt-item-info">
-          <div class="opt-item-name">D선 <span style="color:#888;font-weight:400">20분</span></div>
-          <div class="opt-item-price extra">+45.5만원/인</div>
-        </div>
-      </div>
-      <div class="opt-item" data-group="heli" data-id="E" onclick="selectOpt('heli','E',this)">
-        <div class="opt-item-radio"></div>
-        <div class="opt-item-info">
-          <div class="opt-item-name">전세 E <span style="color:#888;font-weight:400">38분 · 단독 탑승 (최대 3인)</span></div>
-          <div class="opt-item-price extra">+202만원/대 (정액)</div>
-        </div>
-      </div>
-      <div class="opt-item" data-group="heli" data-id="F" onclick="selectOpt('heli','F',this)">
-        <div class="opt-item-radio"></div>
-        <div class="opt-item-info">
-          <div class="opt-item-name">전세 F <span style="color:#888;font-weight:400">1시간 · 단독 탑승 (최대 3인)</span></div>
-          <div class="opt-item-price extra">+345만원/대 (정액)</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 옵션: 추가 관광지 -->
-  <div class="section-card">
-    <div class="sc-title">🏔️ 추가 관광지 (선택)</div>
-    <div id="opt-extras" style="display:flex;flex-direction:column;gap:7px">
-      <div class="opt-item" data-extra="huangshi" onclick="toggleExtra('huangshi',this)">
-        <div class="opt-check-radio"></div>
-        <div class="opt-item-info">
-          <div class="opt-item-name">🏔️ 황석채</div>
-          <div class="opt-item-desc">국가삼림공원 내 대표 정상 전망대 · 반나절 소요</div>
-          <div class="opt-item-price extra">+3만원/인</div>
-        </div>
-      </div>
-      <div class="opt-item" data-extra="qixing" onclick="toggleExtra('qixing',this)">
-        <div class="opt-check-radio"></div>
-        <div class="opt-item-info">
-          <div class="opt-item-name">🏔️ 칠성산</div>
-          <div class="opt-item-desc">기암괴석 비경 · 반나절 소요 (국가삼림공원과 같은 날 불가)</div>
-          <div class="opt-item-price extra">+5만원/인</div>
-        </div>
-      </div>
-      <div class="opt-item" data-extra="bungee" onclick="toggleExtra('bungee',this)">
-        <div class="opt-check-radio"></div>
-        <div class="opt-item-info">
-          <div class="opt-item-name">🪂 대협곡 번지점프</div>
-          <div class="opt-item-desc">대협곡 방문 당일 진행 · 출발 7일 전까지 신청 필수</div>
-          <div class="opt-item-price extra">+46만원/인</div>
-        </div>
-      </div>
-      <div class="opt-item" data-extra="ferrata" onclick="toggleExtra('ferrata',this)">
-        <div class="opt-check-radio"></div>
-        <div class="opt-item-info">
-          <div class="opt-item-name">🧗 대협곡 암벽 등반 체험</div>
-          <div class="opt-item-desc">협곡 절벽 암벽 등반 · 반나절 소요 · 출발 7일 전까지 신청 필수</div>
-          <div class="opt-item-price extra">+6만원/인</div>
-        </div>
-      </div>
-      <div class="opt-item" data-extra="starguide" onclick="toggleExtra('starguide',this)">
-        <div class="opt-check-radio"></div>
-        <div class="opt-item-info">
-          <div class="opt-item-name">⭐ 스타 가이드 신청</div>
-          <div class="opt-item-desc">전문 사진 촬영 가이드 배정 요청 · 배정 가능 시에만 비용 발생 · 현장 팁으로 직접 지불</div>
-          <div class="opt-item-price" style="color:#e67e22">+5만원/일 (현장 팁)</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── 실시간 가격 요약 ── -->
-  <div class="price-box" id="price-box">
-    <div class="price-box-row">
-      <div class="pb-label" id="pb-pkg-label">기본 투어비 (3박4일 · 2인)</div>
-      <div class="pb-val" id="pb-base">93만원/인</div>
-    </div>
-    <div id="pb-add-rows"></div>
-    <div class="pb-divider"></div>
-    <div class="price-box-row">
-      <div class="pb-total-label">1인당 합계</div>
-      <div class="pb-total-val" id="pb-per-pax">93만원</div>
-    </div>
-    <div class="price-box-row" style="margin-top:4px">
-      <div class="pb-label" id="pb-total-label">전체 합계 (2인)</div>
-      <div class="pb-val" id="pb-total">186만원</div>
-    </div>
-    <div class="pb-pax-note" id="pb-flat-note" style="display:none"></div>
-    <div class="pb-notice">💡 견적은 참고용이며 항공비·개인비용은 별도입니다. 정확한 견적은 카카오톡으로 문의해 주세요.</div>
-  </div>
-
-  <!-- 문의 버튼 -->
-  <div class="inq-btns">
-    <button class="inq-btn inq-kakao" onclick="inquire('kakao')">💬 카카오톡 견적 문의</button>
-    <button class="inq-btn inq-wechat" onclick="inquire('wechat')">💚 WeChat 문의</button>
-  </div>
-
-  <!-- 포함/불포함 -->
-  <div class="sec-head">포함 · 불포함 사항</div>
-  <div class="section-card" style="margin-top:0">
-    <div class="sc-title">✓ 포함 사항</div>
-    <div class="incl-grid" id="pkg-includes"></div>
-    <div class="sc-title" style="margin-top:14px">✗ 불포함 사항</div>
-    <div class="incl-grid" id="pkg-excludes"></div>
-  </div>
-
-  <!-- 일정 -->
-  <div class="sec-head" id="iti-head">📅 일정 (3박4일)</div>
-  <div style="padding:0 12px" id="pkg-itinerary"></div>
-
-  <!-- 안내 사항 -->
-  <div class="sec-head">📋 안내사항</div>
-  <div class="notice-card">
-    <div class="notice-item"><div class="notice-icon">👨‍💼</div><div>로투차가 직접 교육·인증한 합법 정규 한국어 가이드가 배정됩니다. 가이드별 일정 배정이 다를 수 있으나 모든 가이드는 동일 기준을 적용합니다.</div></div>
-    <div class="notice-item"><div class="notice-icon">🏨</div><div>장가계 오렌지 호텔을 기본 제공합니다. 성수기 객실 상황에 따라 동급 호텔로 조정될 수 있으며, 머큐어·햄튼 업그레이드는 별도 문의하세요.</div></div>
-    <div class="notice-item"><div class="notice-icon">🚗</div><div>국내 1선 브랜드 차량으로 인원수에 맞게 배차합니다. 짐 걱정 없이 편하게 이동 가능합니다.</div></div>
-    <div class="notice-item"><div class="notice-icon">🍜</div><div>현지인도 즐겨 찾는 로컬 맛집으로 안내합니다. 주류·음료·추가 주문은 현장에서 별도 결제하시면 됩니다.</div></div>
-    <div class="notice-item"><div class="notice-icon">🛡️</div><div>관광지 내 기본 보험이 포함됩니다. 국제여행자 보험은 개인 가입을 권장드립니다.</div></div>
-  </div>
-
-  <!-- 취소 정책 -->
-  <div class="sec-head">취소 정책</div>
-  <div style="margin:0 12px 12px;overflow-x:auto">
-    <table class="cancel-table">
-      <thead><tr><th>취소 시점</th><th>환불 정책</th></tr></thead>
-      <tbody>
-        <tr><td>출발 15일 전~</td><td>10만원 수수료 + 발생비용 공제 후 환불</td></tr>
-        <tr><td>출발 8~14일 전</td><td>총 비용의 30% + 10만원 수수료 + 발생비용 공제</td></tr>
-        <tr><td>출발 4~7일 전</td><td>총 비용의 50% + 10만원 수수료 + 발생비용 공제</td></tr>
-        <tr><td>출발 1~3일 전</td><td>총 비용의 70% + 10만원 수수료 + 발생비용 공제</td></tr>
-        <tr><td>출발 당일·노쇼</td><td>환불 불가 (100% 공제)</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-</div><!-- /view-pkg -->
-
-<!-- ════════════════════════════
-     1일투어 뷰
-════════════════════════════ -->
-<div id="view-day" class="hidden">
-
-  <!-- 히어로 -->
-  <div class="hero">
-    <div class="hero-emoji">🌅</div>
-    <div class="hero-title">장가계 1일투어</div>
-    <div class="hero-sub">핵심 경관지를 하루에 완전 정복<br>한국어 가이드 동행 · 모든 입장권 포함</div>
-    <div class="hero-badges">
-      <span class="hero-badge">✓ 한국어 가이드</span>
-      <span class="hero-badge">✓ 입장권 포함</span>
-      <span class="hero-badge">✓ 소그룹 진행</span>
-    </div>
-  </div>
-
-  <!-- ── 무릉원 투어 ── -->
-  <div style="padding:12px 0 0">
-    <div class="tour-card">
-      <div class="tour-card-head">
-        <div class="tour-card-tag">🌳 무릉원 국가삼림공원</div>
-        <div class="tour-card-title">아바타 그 자체！무릉원 핵심 완전 정복</div>
-        <div class="tour-card-sub">국가삼림공원 · 원가계 · 양가계 · 금편계 · 마술쇼</div>
-      </div>
-      <div class="tour-price-grid">
-        <div class="tour-price-cell"><div class="age">성인 (만 18~65세)</div><div class="price">28만원</div></div>
-        <div class="tour-price-cell"><div class="age">청소년 (만 14~17세)</div><div class="price">27만원</div></div>
-        <div class="tour-price-cell"><div class="age">경로 (만 65세 이상)</div><div class="price">27만원</div></div>
-        <div class="tour-price-cell"><div class="age">어린이 (만 13세 이하)</div><div class="price">25만원</div></div>
-      </div>
-      <div class="tour-schedule">
-        <div class="tour-sched-title">📋 일정</div>
-        <div class="tour-sched-row"><div class="tour-sched-time">09:00</div><div class="tour-sched-desc">호텔 픽업 후 국가삼림공원 입장</div></div>
-        <div class="tour-sched-row"><div class="tour-sched-time">08:30</div><div class="tour-sched-desc">원가계 등반</div></div>
-        <div class="tour-sched-row"><div class="tour-sched-time">10:30</div><div class="tour-sched-desc">백룡 엘리베이터 탑승</div></div>
-        <div class="tour-sched-row"><div class="tour-sched-time">11:20</div><div class="tour-sched-desc">십리화랑 (모노레일/전기차/케이블카 탑승)</div></div>
-        <div class="tour-sched-row"><div class="tour-sched-time">12:30</div><div class="tour-sched-desc">산채요리 점심 (퀄리티 - 로투차 제공 식사)</div></div>
-        <div class="tour-sched-row"><div class="tour-sched-time">13:30</div><div class="tour-sched-desc">삼림공원 금편계 + 천자산 케이블카</div></div>
-        <div class="tour-sched-row"><div class="tour-sched-time">16:30</div><div class="tour-sched-desc">국가삼림공원 퇴장 후 돼지갈비 저녁</div></div>
-        <div class="tour-sched-row"><div class="tour-sched-time">19:20</div><div class="tour-sched-desc">매력상서쇼 관람 예정</div></div>
-        <div class="tour-sched-row"><div class="tour-sched-time">20:30</div><div class="tour-sched-desc">숙소 복귀 후 자유 시간</div></div>
-      </div>
-      <div class="tour-incl">
-        <div class="tour-incl-title">✓ 포함</div>
-        <div class="tour-incl-items">
-          <span class="tour-incl-chip">국가삼림공원 입장권 (4일)</span>
-          <span class="tour-incl-chip">백룡 엘리베이터 1회 &amp; 원가계 케이블카 1회</span>
-          <span class="tour-incl-chip">원가계 등반 로투차 가이드 동행</span>
-          <span class="tour-incl-chip">매력상서쇼 관람 입장권</span>
-          <span class="tour-incl-chip">점심 1끼 (산채요리)</span>
-          <span class="tour-incl-chip">교통·픽업&amp;센딩</span>
-        </div>
-        <div class="tour-incl-title" style="margin-top:8px">✗ 불포함</div>
-        <div class="tour-incl-items">
-          <span class="tour-excl-chip">항공비</span>
-          <span class="tour-excl-chip">저녁·주류</span>
-          <span class="tour-excl-chip">개인 경비</span>
-        </div>
-      </div>
-      <div class="tour-opt-section">
-        <div class="tour-opt-title">➕ 추가 선택 옵션</div>
-        <div class="tour-opt-item">
-          <div class="tour-opt-name">🚡 공중전원 (정동카 포함)</div>
-          <div class="tour-opt-price">+3만원/인</div>
-        </div>
-        <div class="tour-opt-item">
-          <div class="tour-opt-name">💆 80분 전신+발마사지</div>
-          <div class="tour-opt-price">+4만원</div>
-        </div>
-      </div>
-      <div class="tour-ref-section">
-        <div class="tour-ref-title">💡 개인 여행 시 비교</div>
-        <div class="tour-ref-item"><span>국가삼림공원 입장권</span><span class="tour-ref-price">236만원 (54,000원)</span></div>
-        <div class="tour-ref-item"><span>백룡 엘리베이터 1회 &amp; 십리화랑 케이블카 1회</span><span class="tour-ref-price">137만원 (33,000원)</span></div>
-        <div class="tour-ref-item"><span>원가계 등반 가이드</span><span class="tour-ref-price">76만원 (18,000원)</span></div>
-        <div class="tour-ref-item"><span>매력상서쇼 입장</span><span class="tour-ref-price">198만원 (46,000원)</span></div>
-      </div>
-      <div class="tour-inq-row">
-        <div class="inq-btns" style="padding:0">
-          <button class="inq-btn inq-kakao" onclick="inquireTour('kakao','무릉원 1일투어')">💬 예약 문의</button>
-          <button class="inq-btn inq-wechat" onclick="inquireTour('wechat','무릉원 1일투어')">💚 WeChat</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── 천문산 투어 ── -->
-  <div class="tour-card">
-    <div class="tour-card-head">
-      <div class="tour-card-tag">⛩️ 천문산</div>
-      <div class="tour-card-title">장가계 상징！천문산 완전 정복 클래식</div>
-      <div class="tour-card-sub">천문산 케이블카 · 유리잔도 · 천문동 · 공중버스</div>
-    </div>
-    <div class="tour-price-grid">
-      <div class="tour-price-cell"><div class="age">일반 (만 14~69세)</div><div class="price">21만원</div></div>
-      <div class="tour-price-cell"><div class="age">어린이 (만 14세 이하)</div><div class="price">17만원</div></div>
-      <div class="tour-price-cell"><div class="age">경로 (만 70세 이상)</div><div class="price">19만원</div></div>
-      <div class="tour-price-cell"><div class="age">최소 2인 출발</div><div class="price" style="font-size:12px;color:#888">개별 문의</div></div>
-    </div>
-    <div class="tour-schedule">
-      <div class="tour-sched-title">📋 일정</div>
-      <div class="tour-sched-row"><div class="tour-sched-time">08:40</div><div class="tour-sched-desc">숙소 픽업 후 이동</div></div>
-      <div class="tour-sched-row"><div class="tour-sched-time">09:00</div><div class="tour-sched-desc">전통시장 방문</div></div>
-      <div class="tour-sched-row"><div class="tour-sched-time">10:00</div><div class="tour-sched-desc">천문산 케이블카 탑승 (산 정상 ~ 관람)</div></div>
-      <div class="tour-sched-row"><div class="tour-sched-time">10:40</div><div class="tour-sched-desc">로투차 카페 방문 (커피/음료 포함)</div></div>
-      <div class="tour-sched-row"><div class="tour-sched-time">11:30</div><div class="tour-sched-desc">산채요리 점심 (퀄리티 - 로투차 제공)</div></div>
-      <div class="tour-sched-row"><div class="tour-sched-time">13:00</div><div class="tour-sched-desc">천문산 정상 관람</div></div>
-      <div class="tour-sched-row"><div class="tour-sched-time">13:30</div><div class="tour-sched-desc">천문동 관람 (유리잔도/공중버스/천문동 계단)</div></div>
-      <div class="tour-sched-row"><div class="tour-sched-time">17:00</div><div class="tour-sched-desc">숙소 복귀 후 자유 시간</div></div>
-    </div>
-    <div class="tour-incl">
-      <div class="tour-incl-title">✓ 포함</div>
-      <div class="tour-incl-items">
-        <span class="tour-incl-chip">천문산 입장권</span>
-        <span class="tour-incl-chip">천문산 케이블카 왕복</span>
-        <span class="tour-incl-chip">천문산 유리잔도 입장권</span>
-        <span class="tour-incl-chip">공중버스 탑승 (천문동 계단)</span>
-        <span class="tour-incl-chip">전통시장 방문 + 로컬 카페</span>
-        <span class="tour-incl-chip">점심 1끼 (산채요리)</span>
-        <span class="tour-incl-chip">교통·픽업&amp;센딩</span>
-      </div>
-      <div class="tour-incl-title" style="margin-top:8px">✗ 불포함</div>
-      <div class="tour-incl-items">
-        <span class="tour-excl-chip">항공비</span>
-        <span class="tour-excl-chip">저녁·주류</span>
-        <span class="tour-excl-chip">개인 경비</span>
-        <span class="tour-excl-chip">로투차 전용차량/무릉원 픽업 별도</span>
-      </div>
-    </div>
-    <div class="tour-opt-section">
-      <div class="tour-opt-title">➕ 추가 선택 옵션</div>
-      <div class="tour-opt-item">
-        <div class="tour-opt-name">💆 80분 전신+발마사지 (시내)</div>
-        <div class="tour-opt-price">+4만원</div>
-      </div>
-      <div class="tour-opt-item">
-        <div class="tour-opt-name">🚗 로투차 전용차량 (무릉원 픽업)</div>
-        <div class="tour-opt-price">+2만원/인</div>
-      </div>
-    </div>
-    <div class="tour-ref-section">
-      <div class="tour-ref-title">💡 개인 여행 시 비교</div>
-      <div class="tour-ref-item"><span>천문산 입장권</span><span class="tour-ref-price">72만원 (17,000원)</span></div>
-      <div class="tour-ref-item"><span>케이블카 왕복 + 12시간 유리잔도</span><span class="tour-ref-price">268만원 (62,000원)</span></div>
-      <div class="tour-ref-item"><span>공중버스/천문동 계단</span><span class="tour-ref-price">5만원 (1,200원)</span></div>
-    </div>
-    <div class="tour-inq-row">
-      <div class="inq-btns" style="padding:0">
-        <button class="inq-btn inq-kakao" onclick="inquireTour('kakao','천문산 1일투어')">💬 예약 문의</button>
-        <button class="inq-btn inq-wechat" onclick="inquireTour('wechat','천문산 1일투어')">💚 WeChat</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── 대협곡 투어 ── -->
-  <div class="tour-card">
-    <div class="tour-card-head">
-      <div class="tour-card-tag">🏞️ 대협곡 + 황룡동</div>
-      <div class="tour-card-title">장가계 최고 스릴！대협곡 + 황룡동</div>
-      <div class="tour-card-sub">대협곡 + 황룡동 조합 · 선택지 맞춤 탐방</div>
-    </div>
-    <div class="tour-price-grid">
-      <div class="tour-price-cell"><div class="age">성인 (만 14~64세)</div><div class="price">25만원</div></div>
-      <div class="tour-price-cell"><div class="age">어린이 (만 13세 이하)</div><div class="price">23만원</div></div>
-      <div class="tour-price-cell"><div class="age">경로 (만 65세 이상)</div><div class="price">23만원</div></div>
-      <div class="tour-price-cell"><div class="age">최소 2인 출발</div><div class="price" style="font-size:12px;color:#888">개별 문의</div></div>
-    </div>
-    <div class="tour-schedule">
-      <div class="tour-sched-title">📋 일정</div>
-      <div class="tour-sched-row"><div class="tour-sched-time">09:00</div><div class="tour-sched-desc">숙소 픽업 후 이동</div></div>
-      <div class="tour-sched-row"><div class="tour-sched-time">09:30</div><div class="tour-sched-desc">황룡동 입장 (종유석 동굴 탐방 · 유람선 탑승)</div></div>
-      <div class="tour-sched-row"><div class="tour-sched-time">11:00</div><div class="tour-sched-desc">점심 (퀄리티 - 로투차 제공)</div></div>
-      <div class="tour-sched-row"><div class="tour-sched-time">12:00</div><div class="tour-sched-desc">장가계 대협곡 입장</div></div>
-      <div class="tour-sched-row"><div class="tour-sched-time">12:30</div><div class="tour-sched-desc">대협곡 관람 (유리다리/대협곡 산책로/VR롤러코스터)</div></div>
-      <div class="tour-sched-row"><div class="tour-sched-time">17:00</div><div class="tour-sched-desc">숙소 복귀</div></div>
-    </div>
-    <div class="tour-incl">
-      <div class="tour-incl-title">✓ 포함</div>
-      <div class="tour-incl-items">
-        <span class="tour-incl-chip">황룡동 입장권</span>
-        <span class="tour-incl-chip">장가계 대협곡 입장권</span>
-        <span class="tour-incl-chip">대협곡 산책로 + 유리다리 + VR롤러코스터</span>
-        <span class="tour-incl-chip">황룡 조각상 이동 수단</span>
-        <span class="tour-incl-chip">점심 1끼</span>
-        <span class="tour-incl-chip">교통·픽업&amp;센딩 (시내/무릉원 기준)</span>
-      </div>
-      <div class="tour-incl-title" style="margin-top:8px">✗ 불포함</div>
-      <div class="tour-incl-items">
-        <span class="tour-excl-chip">항공비</span>
-        <span class="tour-excl-chip">저녁·주류</span>
-        <span class="tour-excl-chip">개인 경비</span>
-      </div>
-    </div>
-    <div class="tour-opt-section">
-      <div class="tour-opt-title">➕ 추가 선택 옵션</div>
-      <div class="tour-opt-item">
-        <div class="tour-opt-name">🚗 장거리 차량 이동 (시내 픽업&amp;센딩)</div>
-        <div class="tour-opt-price">+2만원/인</div>
-      </div>
-      <div class="tour-opt-item">
-        <div class="tour-opt-name">🪂 번지점프 (+출발 7일 전 신청 필수)</div>
-        <div class="tour-opt-price">+46만원/인</div>
-      </div>
-      <div class="tour-opt-item">
-        <div class="tour-opt-name">🧗 암벽 등반 체험 (+출발 7일 전 신청 필수)</div>
-        <div class="tour-opt-price">+6만원/인</div>
-      </div>
-    </div>
-    <div class="tour-ref-section">
-      <div class="tour-ref-title">💡 개인 여행 시 비교</div>
-      <div class="tour-ref-item"><span>황룡동 입장권</span><span class="tour-ref-price">121만원 (28,000원)</span></div>
-      <div class="tour-ref-item"><span>대협곡 입장권 + 유리다리 + VR롤러코스터</span><span class="tour-ref-price">216만원 (49,000원)</span></div>
-      <div class="tour-ref-item"><span>왕복 차량 이동 (시내→대협곡 130km)</span><span class="tour-ref-price">120만원 (27,000원)</span></div>
-    </div>
-    <div class="tour-inq-row">
-      <div class="inq-btns" style="padding:0">
-        <button class="inq-btn inq-kakao" onclick="inquireTour('kakao','대협곡+황룡동 1일투어')">💬 예약 문의</button>
-        <button class="inq-btn inq-wechat" onclick="inquireTour('wechat','대협곡+황룡동 1일투어')">💚 WeChat</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 안내 사항 -->
-  <div class="sec-head">📋 1일투어 안내</div>
-  <div class="notice-card">
-    <div class="notice-item"><div class="notice-icon">🚌</div><div>최소 2인 출발 · 소그룹 투어 (최대 10인 이내). 인원 미달 시 가이드가 사전 연락드립니다.</div></div>
-    <div class="notice-item"><div class="notice-icon">📍</div><div>지정 숙소 픽업 기준입니다. 다른 지역 픽업은 별도 차량 비용이 발생할 수 있습니다.</div></div>
-    <div class="notice-item"><div class="notice-icon">👶</div><div>아동 할인 기준은 투어마다 다릅니다. 정확한 인원·연령은 문의 시 알려주세요.</div></div>
-    <div class="notice-item"><div class="notice-icon">🌧️</div><div>기상 악화 시 일정이 변경될 수 있으며, 가이드가 최선의 대안 일정을 안내드립니다.</div></div>
-  </div>
-
-  <!-- 취소 정책 -->
-  <div class="sec-head">취소 정책</div>
-  <div style="margin:0 12px 12px;overflow-x:auto">
-    <table class="cancel-table">
-      <thead><tr><th>취소 시점</th><th>환불 정책</th></tr></thead>
-      <tbody>
-        <tr><td>출발 15일 전~</td><td>10만원 수수료 + 발생비용 공제 후 환불</td></tr>
-        <tr><td>출발 8~14일 전</td><td>총 비용의 30% + 수수료 공제</td></tr>
-        <tr><td>출발 4~7일 전</td><td>총 비용의 50% + 수수료 공제</td></tr>
-        <tr><td>출발 1~3일 전</td><td>총 비용의 70% + 수수료 공제</td></tr>
-        <tr><td>출발 당일·노쇼</td><td>환불 불가</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-</div><!-- /view-day -->
-
 <script>
-// ═══════════════════════════════════════
-// 데이터
-// ═══════════════════════════════════════
-var PKGS = {
-  '3n4d': {
-    name: '3박4일', nights: 3, days: 4, tag: '가장 인기',
-    prices: {2:93,3:93,4:83,5:83,6:80,7:80,8:80},
-    includes: ['호텔 3박','전용차량','관광지 입장료 전체','한국어 전문 가이드','픽업&센딩','발마사지&스파 포함','저녁 돼지갈비/BBQ','점심 산채요리 동행','매직쇼 동행','관광지 이동 차량'],
-    excludes: ['항공비','개인 경비','공연선택(천문호선쇼)','여행자 보험(관광지 외 구간)'],
-    itinerary: [
-      {day:1, title:'인천 → 장가계 도착', spots:['장사공항 도착 (KE163)','호텔 체크인']},
-      {day:2, title:'국가삼림공원(원가계·십리화랑) + 매직쇼', spots:['원가계 등반','십리화랑','점심 산채요리','천자산 케이블카','저녁 돼지갈비','매력상서쇼']},
-      {day:3, title:'전통시장 + 천문산 + 72번가', spots:['토가족 전통시장','로컬 카페','점심 후난식','천문산','저녁 돼지갈비BBQ','야간 72번가']},
-      {day:4, title:'황룡동 + 대협곡 + 인천 귀국', spots:['황룡동','점심 동태찌개','대협곡','장사공항 출발']}
-    ]
-  },
-  '4n5d': {
-    name: '4박5일', nights: 4, days: 5, tag: '추천',
-    prices: {2:109,3:109,4:93,5:93,6:91,7:91,8:91},
-    includes: ['호텔 4박','전용차량','관광지 입장료 전체','한국어 전문 가이드','픽업&센딩','발마사지&스파 포함','발 80분 마사지 포함','점심 동행','매직쇼 동행','관광지 이동 차량'],
-    excludes: ['항공비','개인 경비','공연선택(천문호선쇼)','여행자 보험(관광지 외 구간)'],
-    itinerary: [
-      {day:1, title:'인천 → 장가계 도착', spots:['장사공항 도착','호텔 체크인']},
-      {day:2, title:'국가삼림공원(원가계·십리화랑) + 매직쇼', spots:['원가계 등반','십리화랑','점심 산채요리','천자산 케이블카','저녁 돼지갈비','매력상서쇼']},
-      {day:3, title:'전통시장 + 천문산 + 72번가', spots:['토가족 전통시장','로컬 카페','점심 후난식','천문산','저녁 돼지갈비BBQ','야간 72번가']},
-      {day:4, title:'금편계 산책 + 보봉호 + 마사지', spots:['금편계','점심 불고기','보봉호','마사지 80분']},
-      {day:5, title:'황룡동 + 대협곡 + 인천 귀국', spots:['황룡동','점심 동태찌개','대협곡','장사공항 출발']}
-    ]
-  },
-  '5n6d': {
-    name: '5박6일', nights: 5, days: 6, tag: '프리미엄',
-    prices: {2:132,3:132,4:109,5:109,6:107,7:107,8:107},
-    includes: ['호텔 5박','전용차량','관광지 입장료 전체','한국어 전문 가이드','픽업&센딩','발마사지&스파 포함','발 80분 마사지 포함','점심 동행','매직쇼 동행','관광지 이동 차량'],
-    excludes: ['항공비','개인 경비','공연선택(천문호선쇼)','여행자 보험(관광지 외 구간)'],
-    itinerary: [
-      {day:1, title:'인천 → 장가계 도착', spots:['장사공항 도착','호텔 체크인']},
-      {day:2, title:'국가삼림공원(원가계·십리화랑) + 매직쇼', spots:['원가계 등반','십리화랑','점심 산채요리','천자산 케이블카','저녁 돼지갈비','매력상서쇼']},
-      {day:3, title:'전통시장 + 천문산 + 72번가', spots:['토가족 전통시장','로컬 카페','점심 후난식','천문산','저녁 돼지갈비BBQ','야간 72번가']},
-      {day:4, title:'금편계 산책 + 보봉호 + 마사지', spots:['금편계','점심 불고기','보봉호','마사지 80분']},
-      {day:5, title:'칠성산 + 부용진', spots:['칠성산','점심 불고기2','부용진']},
-      {day:6, title:'황룡동 + 대협곡 + 인천 귀국', spots:['황룡동','점심 동태찌개','대협곡','장사공항 출발']}
-    ]
-  }
-};
+const SUPA_URL = 'https://qbzoepglovwlarjssqjg.supabase.co';
+const SUPA_KEY = 'sb_publishable_oxeR92SfBDMzYAvcNitbPw_Vf0u1y0K';
+let sb = null;
+try { sb = window.supabase.createClient(SUPA_URL, SUPA_KEY); } catch(e) {}
 
-var HELI = {
-  none:{price:0,charter:false},
-  A:{price:11.5,charter:false},
-  B:{price:22.5,charter:false},
-  C:{price:34.5,charter:false},
-  D:{price:45.5,charter:false},
-  E:{price:202,charter:true},
-  F:{price:345,charter:true}
-};
+let allProducts = [];
+let currentTab = 'day';
 
-// ── 상태 ──
-var S = {
-  pkg: '3n4d',
-  pax: 2,
-  show: 'magic',     // magic | tianmen | none
-  massage: 'basic',  // basic | premium
-  heli: 'none',
-  huangshi: false,
-  qixing: false,
-  bungee: false,
-  ferrata: false,
-  starguide: false
-};
+function fmt(n) {
+  if (!n) return '문의';
+  return Math.round(n / 10000) + '만원';
+}
+function fmtFull(n) {
+  if (!n) return '—';
+  return n.toLocaleString() + '원';
+}
+function fmtCny(n) {
+  if (!n) return '';
+  return '¥' + Number(n).toLocaleString();
+}
 
-// ═══════════════════════════════════════
-// 탭 전환
-// ═══════════════════════════════════════
 function switchTab(tab) {
-  document.getElementById('tab-pkg').classList.toggle('on', tab === 'pkg');
+  currentTab = tab;
   document.getElementById('tab-day').classList.toggle('on', tab === 'day');
-  document.getElementById('view-pkg').classList.toggle('hidden', tab !== 'pkg');
-  document.getElementById('view-day').classList.toggle('hidden', tab !== 'day');
+  document.getElementById('tab-pkg').classList.toggle('on', tab === 'pkg');
+  document.getElementById('day-list').style.display = tab === 'day' ? '' : 'none';
+  document.getElementById('pkg-list').style.display = tab === 'pkg' ? '' : 'none';
 }
 
-// ═══════════════════════════════════════
-// 패키지 선택
-// ═══════════════════════════════════════
-function selectPkg(id) {
-  S.pkg = id;
-  ['3n4d','4n5d','5n6d'].forEach(function(k) {
-    document.getElementById('ptab-'+k).classList.toggle('active', k === id);
-  });
-  renderIncludes();
-  renderItinerary();
-  calcAndRender();
+function getEmoji(p) {
+  if (p.product_type === 'package') return '🏔️';
+  const t = (p.title_ko || '').toLowerCase();
+  if (t.includes('천문')) return '⛰️';
+  if (t.includes('삼림') || t.includes('원가')) return '🌲';
+  if (t.includes('대협') || t.includes('황룡')) return '🌉';
+  return '🗺️';
 }
 
-// ═══════════════════════════════════════
-// 인원 변경
-// ═══════════════════════════════════════
-function changePax(delta) {
-  S.pax = Math.max(2, Math.min(8, S.pax + delta));
-  document.getElementById('pax-display').textContent = S.pax;
-  calcAndRender();
+function cardHTML(p) {
+  const highlights = Array.isArray(p.highlights) ? p.highlights.slice(0, 3) : [];
+  const tagsHTML = highlights.map(h => `<span class="highlight-tag">${h}</span>`).join('');
+  const isPkg = p.product_type === 'package';
+  return `
+  <div class="product-card">
+    <div class="card-img">${getEmoji(p)}</div>
+    <div class="card-body">
+      <div class="card-badge-row">
+        <span class="badge ${isPkg ? 'badge-pkg' : 'badge-day'}">${isPkg ? '패키지 ' + p.duration_days + '일' : '1일투어'}</span>
+        <span class="badge badge-live">예약 가능</span>
+      </div>
+      <div class="card-title">${p.title_ko || '—'}</div>
+      <div class="card-subtitle">${p.subtitle_ko || ''}</div>
+      <div class="price-row">
+        <span class="price-krw">${fmt(p.price_krw)}</span>
+        ${p.price_cny ? `<span class="price-cny">${fmtCny(p.price_cny)}</span>` : ''}
+      </div>
+      <div class="price-label">성인 1인 기준${p.min_pax ? ' · 최소 ' + p.min_pax + '인' : ''}</div>
+      ${tagsHTML ? `<div class="highlights">${tagsHTML}</div>` : ''}
+      <div class="card-footer">
+        <button class="btn-detail" onclick="openModal('${p.id}')">상세 보기</button>
+        <button class="btn-inquiry" onclick="inquire('${p.title_ko}')">문의하기</button>
+      </div>
+    </div>
+  </div>`;
 }
 
-// ═══════════════════════════════════════
-// 옵션 선택 (라디오)
-// ═══════════════════════════════════════
-function selectOpt(group, id, el) {
-  S[group] = id;
-  var container = el.parentElement;
-  container.querySelectorAll('.opt-item').forEach(function(item) {
-    item.classList.toggle('selected', item === el);
-  });
-  calcAndRender();
+async function loadProducts() {
+  if (!sb) {
+    const err = '<div class="error-box">데이터베이스 연결 실패</div>';
+    document.getElementById('day-list').innerHTML = err;
+    document.getElementById('pkg-list').innerHTML = err;
+    return;
+  }
+  try {
+    const { data, error } = await sb
+      .from('tour_products')
+      .select('*')
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true });
+
+    if (error) throw error;
+    allProducts = data || [];
+
+    const dayProds = allProducts.filter(p => p.product_type === 'day_tour');
+    const pkgProds = allProducts.filter(p => p.product_type === 'package');
+
+    document.getElementById('day-list').innerHTML =
+      dayProds.length ? dayProds.map(cardHTML).join('') :
+      '<div class="error-box">등록된 1일투어가 없습니다</div>';
+
+    document.getElementById('pkg-list').innerHTML =
+      pkgProds.length ? pkgProds.map(cardHTML).join('') :
+      '<div class="error-box">등록된 패키지가 없습니다</div>';
+
+  } catch(e) {
+    const err = `<div class="error-box">상품을 불러오지 못했습니다<br><small>${e.message}</small></div>`;
+    document.getElementById('day-list').innerHTML = err;
+    document.getElementById('pkg-list').innerHTML = err;
+  }
 }
 
-// ═══════════════════════════════════════
-// 추가 옵션 토글 (체크박스)
-// ═══════════════════════════════════════
-function toggleExtra(key, el) {
-  S[key] = !S[key];
-  el.classList.toggle('checked', S[key]);
-  calcAndRender();
+function openModal(id) {
+  const p = allProducts.find(x => x.id === id);
+  if (!p) return;
+  const isPkg = p.product_type === 'package';
+
+  const includes = Array.isArray(p.includes) ? p.includes : [];
+  const excludes = Array.isArray(p.excludes) ? p.excludes : [];
+  const itinerary = Array.isArray(p.itinerary) ? p.itinerary : [];
+  const highlights = Array.isArray(p.highlights) ? p.highlights : [];
+
+  document.getElementById('modal-title').textContent = p.title_ko || '—';
+
+  let html = `
+    <div class="modal-subtitle">${p.subtitle_ko || ''}<br>${p.description_ko || ''}</div>
+    <div class="modal-price-box">
+      <div class="modal-price-krw">${fmtFull(p.price_krw)}</div>
+      ${p.price_cny ? `<div class="modal-price-cny">${fmtCny(p.price_cny)} (위안화 기준)</div>` : ''}
+      <div class="modal-price-label">성인 1인 기준${p.min_pax ? ' · 최소 ' + p.min_pax + '인 · 최대 ' + p.max_pax + '인' : ''}</div>
+    </div>`;
+
+  if (highlights.length) {
+    html += `<div class="modal-section">
+      <div class="modal-section-title">✨ 하이라이트</div>
+      ${highlights.map(h => `<div class="list-item">${h}</div>`).join('')}
+    </div>`;
+  }
+
+  if (itinerary.length) {
+    html += `<div class="modal-section">
+      <div class="modal-section-title">🗓️ 일정</div>
+      ${itinerary.map(it => `
+        <div class="itinerary-item">
+          <div class="it-time">${it.time || ''}</div>
+          <div><div class="it-name">${it.name || ''}</div><div class="it-desc">${it.desc || ''}</div></div>
+        </div>`).join('')}
+    </div>`;
+  }
+
+  if (includes.length) {
+    html += `<div class="modal-section">
+      <div class="modal-section-title">✅ 포함 사항</div>
+      ${includes.map(i => `<div class="list-item">${i}</div>`).join('')}
+    </div>`;
+  }
+
+  if (excludes.length) {
+    html += `<div class="modal-section">
+      <div class="modal-section-title">❌ 불포함 사항</div>
+      ${excludes.map(i => `<div class="list-item ex">${i}</div>`).join('')}
+    </div>`;
+  }
+
+  html += `
+    <div class="inquiry-btns">
+      <button class="inquiry-btn inquiry-kakao" onclick="inquireWithDetail('kakao','${p.id}')">💬 카카오톡 문의</button>
+      <button class="inquiry-btn inquiry-wechat" onclick="inquireWithDetail('wechat','${p.id}')">WeChat 문의</button>
+    </div>`;
+
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal-bg').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 
-// ═══════════════════════════════════════
-// 가격 계산
-// ═══════════════════════════════════════
-function calcPrice() {
-  var pkg = PKGS[S.pkg];
-  var base = pkg.prices[String(S.pax)] || pkg.prices['2'];
-  var addPax = 0;
-  var addFlat = 0;
-  var rows = [];
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modal-bg')) return;
+  document.getElementById('modal-bg').classList.remove('open');
+  document.body.style.overflow = '';
+}
 
-  // 공연
-  if (S.show === 'tianmen') { addPax += 1; rows.push(['천문호선쇼', '+1만원/인']); }
-  else if (S.show === 'none') { addPax -= 1; rows.push(['공연 취소 할인', '−1만원/인']); }
+function buildInquiryMsg(p) {
+  const isPkg = p.product_type === 'package';
+  let msg = `[로투차 투어 문의]\n`;
+  msg += `━━━━━━━━━━━━━━\n`;
+  msg += `📌 상품: ${p.title_ko}\n`;
+  msg += `🗓️ 유형: ${isPkg ? '패키지 ' + p.duration_days + '일' : '1일투어'}\n`;
+  if (p.price_krw) msg += `💰 가격: ${fmtFull(p.price_krw)}/인${p.price_cny ? ' (' + fmtCny(p.price_cny) + ')' : ''}\n`;
+  if (p.min_pax) msg += `👥 인원: 최소 ${p.min_pax}인 ~ 최대 ${p.max_pax}인\n`;
+  msg += `━━━━━━━━━━━━━━\n`;
+  msg += `여행 날짜: \n인원수: \n기타 요청사항: `;
+  return msg;
+}
 
-  // 마사지
-  if (S.massage === 'premium') { addPax += 2; rows.push(['프리미엄 마사지 100분', '+2만원/인']); }
-
-  // 헬기
-  var h = HELI[S.heli];
-  if (h && h.price > 0) {
-    if (h.charter) {
-      addFlat += h.price;
-      rows.push(['헬기 전세 ('+S.heli+'선)', '+'+h.price+'만원/대']);
+function inquireWithDetail(channel, id) {
+  const p = allProducts.find(x => x.id === id);
+  const msg = p ? buildInquiryMsg(p) : '[로투차] 투어 문의드립니다.';
+  if (channel === 'kakao') {
+    // 클립보드에 복사 후 카카오 오픈
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(msg).then(() => {
+        alert('문의 내용이 복사됐습니다!\n카카오톡 채팅창에 붙여넣기(길게 누르기)해서 보내주세요.');
+        window.open('http://pf.kakao.com/_hvrmn/chat', '_blank');
+      }).catch(() => {
+        window.open('http://pf.kakao.com/_hvrmn/chat', '_blank');
+      });
     } else {
-      addPax += h.price;
-      rows.push(['헬기 '+S.heli+'선', '+'+h.price+'만원/인']);
+      window.open('http://pf.kakao.com/_hvrmn/chat', '_blank');
     }
-  }
-
-  // 추가 관광지
-  if (S.huangshi) { addPax += 3; rows.push(['황석채', '+3만원/인']); }
-  if (S.qixing) { addPax += 5; rows.push(['칠성산', '+5만원/인']); }
-  if (S.bungee) { addPax += 46; rows.push(['번지점프', '+46만원/인']); }
-  if (S.ferrata) { addPax += 6; rows.push(['암벽 등반 체험', '+6만원/인']); }
-
-  var perPax = base + addPax;
-  var total = perPax * S.pax + addFlat;
-
-  return {base: base, addPax: addPax, addFlat: addFlat, perPax: perPax, total: total, rows: rows};
-}
-
-// ═══════════════════════════════════════
-// 가격 UI 업데이트
-// ═══════════════════════════════════════
-function calcAndRender() {
-  var c = calcPrice();
-  var pkg = PKGS[S.pkg];
-
-  document.getElementById('pb-pkg-label').textContent = '기본 투어비 ('+pkg.name+' · '+S.pax+'인)';
-  document.getElementById('pb-base').textContent = c.base+'만원/인';
-
-  // 추가 행
-  var addHtml = '';
-  c.rows.forEach(function(r) {
-    addHtml += '<div class="price-box-row"><div class="pb-label">'+r[0]+'</div><div class="pb-val">'+r[1]+'</div></div>';
-  });
-  document.getElementById('pb-add-rows').innerHTML = addHtml;
-
-  document.getElementById('pb-per-pax').textContent = c.perPax+'만원';
-  document.getElementById('pb-total-label').textContent = '전체 합계 ('+S.pax+'인)';
-  document.getElementById('pb-total').textContent = c.total+'만원';
-
-  // 전세 안내
-  var flatNote = document.getElementById('pb-flat-note');
-  if (c.addFlat > 0) {
-    flatNote.style.display = 'block';
-    flatNote.textContent = '* 헬기 전세 ' + c.addFlat + '만원은 대당 요금으로 별도 합산됩니다';
   } else {
-    flatNote.style.display = 'none';
-  }
-
-  // 스타 가이드 표시
-  if (S.starguide) {
-    var days = pkg.days - 1;
-    var sgCost = days * 5;
-    document.getElementById('pb-flat-note').style.display = 'block';
-    document.getElementById('pb-flat-note').textContent += (c.addFlat > 0 ? ' / ' : '') + '⭐ 스타 가이드 팁 약 '+sgCost+'만원 ('+days+'일 × 5만원, 현장 지불)';
+    alert('WeChat ID: nanyingkui\n\n아래 내용을 복사해서 보내주세요:\n\n' + msg);
   }
 }
 
-// ═══════════════════════════════════════
-// 포함/불포함 렌더링
-// ═══════════════════════════════════════
-function renderIncludes() {
-  var pkg = PKGS[S.pkg];
-  var inclEl = document.getElementById('pkg-includes');
-  var exclEl = document.getElementById('pkg-excludes');
-  inclEl.innerHTML = pkg.includes.map(function(i) {
-    return '<div class="incl-item"><span class="ic" style="color:var(--green)">✓</span>'+i+'</div>';
-  }).join('');
-  exclEl.innerHTML = pkg.excludes.map(function(e) {
-    return '<div class="incl-item excl"><span class="ic" style="color:var(--red)">✗</span>'+e+'</div>';
-  }).join('');
-}
-
-// ═══════════════════════════════════════
-// 일정 렌더링
-// ═══════════════════════════════════════
-function renderItinerary() {
-  var pkg = PKGS[S.pkg];
-  document.getElementById('iti-head').textContent = '📅 일정 ('+pkg.name+')';
-  var html = '';
-  pkg.itinerary.forEach(function(d) {
-    html += '<div class="day-block">';
-    html += '<div class="day-block-num">DAY ' + d.day + '</div>';
-    html += '<div class="day-block-title">' + d.title + '</div>';
-    html += '<div class="day-block-spots">';
-    d.spots.forEach(function(s) { html += '<span class="spot-chip">'+s+'</span>'; });
-    html += '</div></div>';
-  });
-  document.getElementById('pkg-itinerary').innerHTML = html;
-}
-
-// ═══════════════════════════════════════
-// 문의 함수
-// ═══════════════════════════════════════
-function openKakao() {
+function inquire(title) {
   window.open('http://pf.kakao.com/_hvrmn/chat', '_blank');
 }
-function openWechat() {
-  alert('WeChat으로 문의해 주세요!\nWeChat ID: lotocha\n또는 +86 185 8961 0702');
-}
-function inquire(ch) {
-  var pkg = PKGS[S.pkg];
-  var c = calcPrice();
-  var msg = '[로투차] ' + pkg.name + ' 패키지 투어 견적 문의\n인원: '+S.pax+'인\n예상 1인: '+c.perPax+'만원';
-  if (ch === 'kakao') {
-    window.open('http://pf.kakao.com/_hvrmn/chat', '_blank');
-  } else {
-    alert('WeChat ID: lotocha\n\n문의 내용:\n' + msg);
-  }
-}
-function inquireTour(ch, name) {
-  var msg = '[로투차] ' + name + ' 예약 문의드립니다.';
-  if (ch === 'kakao') {
-    window.open('http://pf.kakao.com/_hvrmn/chat', '_blank');
-  } else {
-    alert('WeChat ID: lotocha\n\n' + msg);
-  }
+function inquireWechat(title) {
+  alert('WeChat ID: nanyingkui\n\n상품: ' + title);
 }
 
-// ═══════════════════════════════════════
-// 초기화
-// ═══════════════════════════════════════
-renderIncludes();
-renderItinerary();
-calcAndRender();
+loadProducts();
 </script>
 </body>
 </html>
