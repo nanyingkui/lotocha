@@ -225,6 +225,33 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .nav-label{font-size:9px;font-weight:700;color:#aaa;margin-top:1px;transition:color .2s}
 .nav-item.on .nav-icon{opacity:1}
 .nav-item.on .nav-label{color:var(--gold)}
+
+/* ── 장소 카드 ── */
+.cat-filter{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;margin-bottom:13px;padding-bottom:2px}
+.cat-filter::-webkit-scrollbar{display:none}
+.cat-chip{flex-shrink:0;border:1.5px solid #e0e0e0;background:#fff;border-radius:20px;padding:6px 13px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;color:#555;transition:all .2s}
+.cat-chip.on{border-color:var(--navy);background:var(--navy);color:#fff}
+.place-card{background:#fff;border-radius:13px;overflow:hidden;margin-bottom:11px;box-shadow:0 2px 7px rgba(26,42,94,.07)}
+.place-thumb{width:100%;height:160px;object-fit:cover;background:#f0f0f0;display:block}
+.place-thumb-empty{width:100%;height:100px;background:linear-gradient(135deg,#f0ede8,#e8e5e0);display:flex;align-items:center;justify-content:center;font-size:32px}
+.place-body{padding:11px 13px 13px}
+.place-name{font-size:14px;font-weight:900;color:var(--navy);margin-bottom:5px}
+.place-cn-row{display:flex;align-items:center;gap:7px;margin-bottom:7px}
+.place-cn{font-size:12px;color:#888;flex:1}
+.copy-cn-btn{background:#f0f0f0;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;color:#555;flex-shrink:0;white-space:nowrap}
+.copy-cn-btn:active{background:#e0e0e0}
+.place-badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px}
+.place-desc{font-size:12px;color:#666;line-height:1.7;margin-bottom:10px}
+.place-actions{display:flex;gap:8px;flex-wrap:wrap}
+.place-gaode{background:#00b140;color:#fff;border:none;border-radius:8px;padding:9px 15px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:5px;font-family:inherit}
+.place-review-btn{background:#f4f6fb;border:1.5px solid var(--navy);color:var(--navy);border-radius:8px;padding:9px 15px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.place-empty{text-align:center;padding:50px 20px;color:#aaa}
+.place-empty-icon{font-size:40px;margin-bottom:10px}
+.place-empty-text{font-size:13px;line-height:1.7}
+
+/* ── 도우미 섹션 ── */
+.helper-section{margin-bottom:20px}
+.helper-section-title{font-size:11px;font-weight:900;color:#aaa;text-transform:uppercase;letter-spacing:.5px;margin:16px 0 9px;padding-left:2px}
 </style>
 </head>
 <body>
@@ -255,34 +282,12 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 </div>
 <div class="cdbar" id="cdbar"></div>
 <div class="tab-bar">
-  <button class="tab-btn on" onclick="selectTab('go')" id="tab-go">🚌 이동</button>
-  <button class="tab-btn" onclick="selectTab('map')" id="tab-map">🗺️ 지도</button>
-  <button class="tab-btn" onclick="selectTab('plan')" id="tab-plan">📅 플랜</button>
-  <button class="tab-btn" onclick="selectTab('pay')" id="tab-pay">💳 결제</button>
-  <button class="tab-btn" onclick="selectTab('local')" id="tab-local">🎭 현지</button>
-  <button class="tab-btn" onclick="selectTab('help')" id="tab-help">🛟 도움말</button>
+  <button class="tab-btn on" onclick="selectTab('map')" id="tab-map">🗺️ 스팟</button>
+  <button class="tab-btn" onclick="selectTab('places')" id="tab-places">📍 장소</button>
+  <button class="tab-btn" onclick="selectTab('helper')" id="tab-helper">🛟 도우미</button>
 </div>
 <div class="wrap">
-<div class="page on" id="page-go">
-  <div class="card">
-    <div class="ctitle">📍 숙소 위치</div>
-    <div class="hotel-row">
-      <button class="hotel-btn on" onclick="selectHotel('wulingyuan')" id="hotel-wulingyuan">🏨 무릉원구</button>
-      <button class="hotel-btn" onclick="selectHotel('city')" id="hotel-city">🏙️ 시내(영정구)</button>
-      <button class="hotel-btn" onclick="selectHotel('airport')" id="hotel-airport">✈️ 공항 근처</button>
-    </div>
-    <div id="transport-list"></div>
-  </div>
-  <div class="last-transport">
-    <div class="lt-title">⏰ 오늘 마지막 교통편</div>
-    <div id="lt-list"></div>
-  </div>
-  <div class="card">
-    <div class="ctitle">🧭 고덕지도 길 안내</div>
-    <div id="gaode-nav-btns"></div>
-  </div>
-</div>
-<div class="page" id="page-map">
+<div class="page on" id="page-map">
   <div id="zone-section" style="display:none">
     <div class="stitle">구역 선택 — 국가삼림공원</div>
     <div class="zone-bar">
@@ -304,7 +309,24 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
   <div class="stitle" id="spot-section-title">📍 스팟 목록</div>
   <div id="spot-list"></div>
 </div>
-<div class="page" id="page-plan">
+<div class="page" id="page-places">
+  <div class="cat-filter">
+    <button class="cat-chip on" onclick="filterPlaces('all')" data-cat="all">전체</button>
+    <button class="cat-chip" onclick="filterPlaces('restaurant')" data-cat="restaurant">🍜 식당</button>
+    <button class="cat-chip" onclick="filterPlaces('cafe')" data-cat="cafe">☕ 카페</button>
+    <button class="cat-chip" onclick="filterPlaces('hotel')" data-cat="hotel">🏨 숙소</button>
+    <button class="cat-chip" onclick="filterPlaces('shop')" data-cat="shop">🛍️ 쇼핑</button>
+    <button class="cat-chip" onclick="filterPlaces('attraction')" data-cat="attraction">🎭 볼거리</button>
+    <button class="cat-chip" onclick="filterPlaces('transport')" data-cat="transport">🚕 교통</button>
+    <button class="cat-chip" onclick="filterPlaces('etc')" data-cat="etc">✨ 기타</button>
+  </div>
+  <div id="places-list"></div>
+</div>
+<div class="page" id="page-helper">
+  <div class="last-transport">
+    <div class="lt-title">⏰ 오늘 마지막 교통편</div>
+    <div id="lt-list"></div>
+  </div>
   <div class="time-card">
     <div class="time-big" id="plan-time">--:--</div>
     <div class="time-sub" id="plan-date">현재 시각 기준으로 일정 계산</div>
@@ -343,8 +365,62 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
     <div class="card"><div class="ctitle">⚠️ 비 오는 날 피할 것</div><div id="rain-avoid"></div></div>
   </div>
   <div class="card"><div class="ctitle">💡 여행 팁</div><div id="plan-tips"></div></div>
-</div>
-<div class="page" id="page-pay">
+
+  <div class="helper-section-title">🎭 공연 · 입장권</div>
+  <div class="show-card">
+    <div class="show-title">매력상서 (魅力湘西)</div>
+    <div class="show-sub">후난 토가족·묘족 전통 민속 공연.</div>
+    <div class="show-info-row"><div class="show-label">시간</div><div class="show-val">매일 19:30 (약 80분)</div></div>
+    <div class="show-info-row"><div class="show-label">가격</div><div class="show-val">¥160~280</div></div>
+    <div class="local-btns" style="margin-top:12px">
+      <a href="https://kr.trip.com/attraction/buy/zhangjiajie-charming-xiangxi/" target="_blank" class="local-btn lb-gold">🎫 Trip.com</a>
+      <a href="https://experiences.myrealtrip.com/search?query=장가계+매력상서" target="_blank" class="local-btn lb-green">🎫 마이리얼트립</a>
+    </div>
+  </div>
+  <div class="show-card" style="margin-top:-5px">
+    <div class="show-title">천문호선 (天门狐仙)</div>
+    <div class="show-sub">천문산 절벽 야외 대형 공연.</div>
+    <div class="show-info-row"><div class="show-label">시간</div><div class="show-val">매일 20:00 (약 50분)</div></div>
+    <div class="show-info-row"><div class="show-label">가격</div><div class="show-val">¥180~380</div></div>
+    <div class="local-btns" style="margin-top:12px">
+      <a href="https://www.waug.com/ko/activities/143405" target="_blank" class="local-btn lb-gold">🎫 와그</a>
+      <a href="https://kr.trip.com/moments/theme/poi-tianmen-fox-fairy-93422-attraction-993137/" target="_blank" class="local-btn lb-green">🎫 Trip.com</a>
+    </div>
+  </div>
+  <div class="card">
+    <div class="local-item">
+      <div class="local-head"><div class="local-name">🌲 국가삼림공원</div><div class="local-price">¥236 (4일권)</div></div>
+      <div class="local-desc">여권 1개당 4일 재입장.</div>
+      <div class="local-btns"><a href="https://kr.trip.com/travel-guide/attraction/zhangjiajie/zhangjiajie-national-forest-park/" target="_blank" class="local-btn lb-gold">Trip.com</a></div>
+    </div>
+    <div class="local-item">
+      <div class="local-head"><div class="local-name">⛰️ 천문산 케이블카+입장</div><div class="local-price">¥268</div></div>
+      <div class="local-desc">온라인 예약 강력 추천.</div>
+      <div class="local-btns"><a href="https://experiences.myrealtrip.com/products/3887183" target="_blank" class="local-btn lb-gold">마이리얼트립</a></div>
+    </div>
+    <div class="local-item">
+      <div class="local-head"><div class="local-name">🌉 대협곡 유리다리</div><div class="local-price">¥216</div></div>
+      <div class="local-desc">1일 8,000명 제한. 사전 예약 필수.</div>
+      <div class="local-btns"><a href="https://kr.trip.com/travel-guide/attraction/zhangjiajie/zhangjiajie-grand-canyon/" target="_blank" class="local-btn lb-gold">Trip.com</a></div>
+    </div>
+  </div>
+
+  <div class="helper-section-title">🚄 고속철</div>
+  <div class="train-card">
+    <div class="train-route">
+      <div><div class="train-city">인천</div><div class="train-time">비행기</div></div>
+      <div class="train-arrow">→</div>
+      <div><div class="train-city">창사</div><div class="train-time">3.5시간</div></div>
+      <div class="train-arrow">→</div>
+      <div><div class="train-city">장가계</div><div class="train-time">고속철 2시간</div></div>
+    </div>
+    <div class="train-info-row"><b>창사→장가계</b> 2등석 ¥84~115</div>
+    <div class="local-btns" style="margin-top:10px">
+      <a href="https://kr.trip.com/trains/" target="_blank" class="local-btn lb-gold">🚄 Trip.com 예매</a>
+    </div>
+  </div>
+
+  <div class="helper-section-title">💳 결제 방법</div>
   <div class="card" style="background:linear-gradient(135deg,#fff3cd,#fff8e1)">
     <div style="font-size:12px;color:#856404;line-height:1.8"><b>💡 중국 결제 TIP</b><br>카카오페이 > 알리페이 순으로 준비하세요.</div>
   </div>
@@ -422,205 +498,8 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
       <div class="pay-note">💡 경관지 매표소는 카드 단말기 대부분 구비.</div>
     </div>
   </div>
-</div>
-<div class="page" id="page-local">
-  <div class="stitle">🎭 공연 티켓</div>
-  <div class="show-card">
-    <div class="show-title">매력상서 (魅力湘西)</div>
-    <div class="show-sub">후난 토가족·묘족 전통 민속 공연.</div>
-    <div class="show-info-row"><div class="show-label">시간</div><div class="show-val">매일 19:30 (약 80분)</div></div>
-    <div class="show-info-row"><div class="show-label">가격</div><div class="show-val">¥160~280</div></div>
-    <div class="local-btns" style="margin-top:12px">
-      <a href="https://kr.trip.com/attraction/buy/zhangjiajie-charming-xiangxi/" target="_blank" class="local-btn lb-gold">🎫 Trip.com</a>
-      <a href="https://experiences.myrealtrip.com/search?query=장가계+매력상서" target="_blank" class="local-btn lb-green">🎫 마이리얼트립</a>
-    </div>
-  </div>
-  <div class="show-card" style="margin-top:-5px">
-    <div class="show-title">천문호선 (天门狐仙)</div>
-    <div class="show-sub">천문산 절벽 야외 대형 공연.</div>
-    <div class="show-info-row"><div class="show-label">시간</div><div class="show-val">매일 20:00 (약 50분)</div></div>
-    <div class="show-info-row"><div class="show-label">가격</div><div class="show-val">¥180~380</div></div>
-    <div class="local-btns" style="margin-top:12px">
-      <a href="https://www.waug.com/ko/activities/143405" target="_blank" class="local-btn lb-gold">🎫 와그</a>
-      <a href="https://kr.trip.com/moments/theme/poi-tianmen-fox-fairy-93422-attraction-993137/" target="_blank" class="local-btn lb-green">🎫 Trip.com</a>
-    </div>
-  </div>
-  <div class="stitle">🎫 경관지 티켓</div>
-  <div class="card">
-    <div class="local-item">
-      <div class="local-head"><div class="local-name">🌲 국가삼림공원</div><div class="local-price">¥236 (4일권)</div></div>
-      <div class="local-desc">여권 1개당 4일 재입장.</div>
-      <div class="local-btns"><a href="https://kr.trip.com/travel-guide/attraction/zhangjiajie/zhangjiajie-national-forest-park/" target="_blank" class="local-btn lb-gold">Trip.com</a></div>
-    </div>
-    <div class="local-item">
-      <div class="local-head"><div class="local-name">⛰️ 천문산 케이블카+입장</div><div class="local-price">¥268</div></div>
-      <div class="local-desc">온라인 예약 강력 추천.</div>
-      <div class="local-btns"><a href="https://experiences.myrealtrip.com/products/3887183" target="_blank" class="local-btn lb-gold">마이리얼트립</a></div>
-    </div>
-    <div class="local-item">
-      <div class="local-head"><div class="local-name">🌉 대협곡 유리다리</div><div class="local-price">¥216</div></div>
-      <div class="local-desc">1일 8,000명 제한. 사전 예약 필수.</div>
-      <div class="local-btns"><a href="https://kr.trip.com/travel-guide/attraction/zhangjiajie/zhangjiajie-grand-canyon/" target="_blank" class="local-btn lb-gold">Trip.com</a></div>
-    </div>
-  </div>
-  <div class="stitle">🚄 고속철</div>
-  <div class="train-card">
-    <div class="train-route">
-      <div><div class="train-city">인천</div><div class="train-time">비행기</div></div>
-      <div class="train-arrow">→</div>
-      <div><div class="train-city">창사</div><div class="train-time">3.5시간</div></div>
-      <div class="train-arrow">→</div>
-      <div><div class="train-city">장가계</div><div class="train-time">고속철 2시간</div></div>
-    </div>
-    <div class="train-info-row"><b>창사→장가계</b> 2등석 ¥84~115</div>
-    <div class="local-btns" style="margin-top:10px">
-      <a href="https://kr.trip.com/trains/" target="_blank" class="local-btn lb-gold">🚄 Trip.com 예매</a>
-    </div>
-  </div>
-  <div class="stitle">🍜 추천 식당</div>
-  <div class="local-item">
-    <div class="local-head"><div class="local-name">🌶️ 토가족 훠궈</div><div class="local-price">¥30~60/인</div></div>
-    <div class="local-desc">현지 토가족 전통 방식의 얼얼한 훠궈. 무릉원 입구 주변 다수.</div>
-    <div class="local-btns"><a href="https://uri.amap.com/search?keyword=土家火锅&city=张家界" target="_blank" class="local-btn lb-blue">🗺️ 지도 검색</a></div>
-  </div>
-  <div class="local-item">
-    <div class="local-head"><div class="local-name">🐟 홍소어 (红烧鱼)</div><div class="local-price">¥40~80/인</div></div>
-    <div class="local-desc">장가계 스타일 민물고기 조림. 현지인 추천 No.1 메뉴.</div>
-    <div class="local-btns"><a href="https://uri.amap.com/search?keyword=红烧鱼&city=张家界" target="_blank" class="local-btn lb-blue">🗺️ 지도 검색</a></div>
-  </div>
-  <div class="local-item">
-    <div class="local-head"><div class="local-name">🥩 삼겹살 두부 (腊肉炒豆腐)</div><div class="local-price">¥25~40/인</div></div>
-    <div class="local-desc">훈제 돼지고기와 두부 볶음. 후난 가정식의 대표 메뉴.</div>
-    <div class="local-btns"><a href="https://uri.amap.com/search?keyword=腊肉炒豆腐&city=张家界" target="_blank" class="local-btn lb-blue">🗺️ 지도 검색</a></div>
-  </div>
-  <div class="stitle">🏨 호텔</div>
-  <div class="local-item">
-    <div class="local-head"><div class="local-name">🌲 무릉원 지구 숙소</div><div class="local-price">¥150~400/박</div></div>
-    <div class="local-desc">국가삼림공원 남문까지 도보 가능. 아침 일찍 입장 유리. 추천: 张家界森林公园附近酒店</div>
-    <div class="local-btns">
-      <a href="https://kr.trip.com/hotels/list?city=308&keyword=武陵源" target="_blank" class="local-btn lb-gold">🏨 Trip.com</a>
-      <a href="https://uri.amap.com/search?keyword=武陵源酒店&city=张家界" target="_blank" class="local-btn lb-blue">🗺️ 지도</a>
-    </div>
-  </div>
-  <div class="local-item">
-    <div class="local-head"><div class="local-name">🏙️ 시내 (장가계 역 근처)</div><div class="local-price">¥120~300/박</div></div>
-    <div class="local-desc">고속철역·공항 접근 편리. 편의시설 풍부. 무릉원까지 차로 40~60분.</div>
-    <div class="local-btns">
-      <a href="https://kr.trip.com/hotels/list?city=308&keyword=张家界火车站" target="_blank" class="local-btn lb-gold">🏨 Trip.com</a>
-      <a href="https://uri.amap.com/search?keyword=张家界火车站酒店" target="_blank" class="local-btn lb-blue">🗺️ 지도</a>
-    </div>
-  </div>
-  <div class="stitle">💆 마사지</div>
-  <div class="local-item">
-    <div class="local-head"><div class="local-name">🦶 발 마사지 (足浴)</div><div class="local-price">¥50~100/시간</div></div>
-    <div class="local-desc">하루 등산 후 필수. 무릉원 입구 상가 거리에 다수. 흥정 가능.</div>
-    <div class="local-btns"><a href="https://uri.amap.com/search?keyword=足浴&city=张家界" target="_blank" class="local-btn lb-blue">🗺️ 지도 검색</a></div>
-  </div>
-  <div class="local-item">
-    <div class="local-head"><div class="local-name">💆 전신 마사지 (全身按摩)</div><div class="local-price">¥80~150/시간</div></div>
-    <div class="local-desc">시내 마사지샵 이용. 사전 가격 확인 권장. 호텔 근처 업소 이용 추천.</div>
-    <div class="local-btns"><a href="https://uri.amap.com/search?keyword=按摩&city=张家界" target="_blank" class="local-btn lb-blue">🗺️ 지도 검색</a></div>
-  </div>
-  <div class="stitle">🛒 마트 · 슈퍼마켓</div>
-  <div class="local-item">
-    <div class="local-head"><div class="local-name">🏪 대형 마트</div><div class="local-price">시내</div></div>
-    <div class="local-desc">步步高 (부부고) 슈퍼마켓 — 현지 스낵·음료·기념품. 시내 중심부 위치.</div>
-    <div class="local-btns"><a href="https://uri.amap.com/search?keyword=步步高超市&city=张家界" target="_blank" class="local-btn lb-blue">🗺️ 지도 검색</a></div>
-  </div>
-  <div class="local-item">
-    <div class="local-head"><div class="local-name">🥢 무릉원 편의점</div><div class="local-price">무릉원 내</div></div>
-    <div class="local-desc">공원 내 편의점 물가는 시내보다 비쌈. 입장 전 물·간식 미리 준비 추천.</div>
-    <div class="local-btns"><a href="https://uri.amap.com/search?keyword=超市&city=武陵源" target="_blank" class="local-btn lb-blue">🗺️ 지도 검색</a></div>
-  </div>
-  <div class="stitle">🏥 병원</div>
-  <div class="local-item">
-    <div class="local-head"><div class="local-name">🏥 장가계시 인민병원</div><div class="local-price">시내</div></div>
-    <div class="local-desc">☎ +86-744-8222120 · 24시간 응급실 운영.</div>
-    <div class="local-btns"><a href="https://uri.amap.com/search?keyword=张家界市人民医院" target="_blank" class="local-btn lb-blue">🗺️ 지도</a></div>
-  </div>
-  <div class="local-item">
-    <div class="local-head"><div class="local-name">🏥 무릉원구 인민병원</div><div class="local-price">무릉원 지구</div></div>
-    <div class="local-desc">☎ +86-744-5610120 · 공원 근처 응급상황 시 이용.</div>
-    <div class="local-btns"><a href="https://uri.amap.com/search?keyword=武陵源区人民医院" target="_blank" class="local-btn lb-blue">🗺️ 지도</a></div>
-  </div>
-  <div class="stitle">🛍️ 기념품 · 쇼핑</div>
-  <div class="local-item">
-    <div class="local-head"><div class="local-name">🍵 장가계 차 (张家界茶)</div><div class="local-price">¥30~150</div></div>
-    <div class="local-desc">무릉원 특산 녹차·흑차. 진공포장으로 선물용으로도 적합. 남문 상가 거리에 다수.</div>
-    <div class="local-btns"><a href="https://uri.amap.com/search?keyword=张家界茶叶&city=张家界" target="_blank" class="local-btn lb-blue">🗺️ 지도 검색</a></div>
-  </div>
-  <div class="local-item">
-    <div class="local-head"><div class="local-name">🪵 토가족 공예품</div><div class="local-price">¥20~200</div></div>
-    <div class="local-desc">토가족 전통 직물·목공예·장식품. 무릉원 남문 기념품 거리 추천. 흥정 가능.</div>
-    <div class="local-btns"><a href="https://uri.amap.com/search?keyword=土家族工艺品&city=张家界" target="_blank" class="local-btn lb-blue">🗺️ 지도 검색</a></div>
-  </div>
-  <div class="local-item">
-    <div class="local-head"><div class="local-name">🌶️ 현지 특산 먹거리</div><div class="local-price">¥10~50</div></div>
-    <div class="local-desc">장가계 고추장(剁辣椒)·훈제 소시지·건두부. 진공포장 제품은 기내 반입 가능.</div>
-    <div class="local-btns"><a href="https://uri.amap.com/search?keyword=张家界特产&city=张家界" target="_blank" class="local-btn lb-blue">🗺️ 지도 검색</a></div>
-  </div>
-  <div class="stitle">☕ 카페 · 휴게</div>
-  <div class="local-item">
-    <div class="local-head"><div class="local-name">🏔️ 산 뷰 카페</div><div class="local-price">¥20~45/잔</div></div>
-    <div class="local-desc">무릉원 남문 주변 전망 카페. 등산 전·후 휴식 포인트. 인생샷도 가능.</div>
-    <div class="local-btns"><a href="https://uri.amap.com/search?keyword=咖啡&city=武陵源" target="_blank" class="local-btn lb-blue">🗺️ 지도 검색</a></div>
-  </div>
-  <div class="local-item">
-    <div class="local-head"><div class="local-name">🧋 밀크티·음료</div><div class="local-price">¥15~30</div></div>
-    <div class="local-desc">무릉원 상가 거리에 밀크티 체인점 다수. 더운 날 필수. 입장 전 구매 추천.</div>
-    <div class="local-btns"><a href="https://uri.amap.com/search?keyword=奶茶&city=武陵源" target="_blank" class="local-btn lb-blue">🗺️ 지도 검색</a></div>
-  </div>
-  <div class="stitle">📸 포토스팟</div>
-  <div class="local-item">
-    <div class="local-head"><div class="local-name">🌁 황스자이 일출</div><div class="local-price">국가삼림공원 내</div></div>
-    <div class="local-desc">새벽 5~6시 운무 낀 봉우리. 습도 높은 날 더 극적. 전날 케이블카 시간 꼭 확인.</div>
-    <div class="local-btns"><a href="https://uri.amap.com/search?keyword=黄石寨&city=张家界" target="_blank" class="local-btn lb-blue">🗺️ 지도</a></div>
-  </div>
-  <div class="local-item">
-    <div class="local-head"><div class="local-name">🌉 천문산 유리 전망대</div><div class="local-price">천문산 입장권 포함</div></div>
-    <div class="local-desc">절벽 유리 바닥 전망대. 맑은 날 필수 코스. 오전 10시 이전 방문 시 인파 적음.</div>
-    <div class="local-btns"><a href="https://uri.amap.com/search?keyword=天门山玻璃栈道" target="_blank" class="local-btn lb-blue">🗺️ 지도</a></div>
-  </div>
-  <div class="local-item">
-    <div class="local-head"><div class="local-name">🪨 아바타 할렐루야 산</div><div class="local-price">국가삼림공원 내</div></div>
-    <div class="local-desc">영화 아바타 배경 모델. 원래 이름 南天一柱. 위안자제 구역 내 위치.</div>
-    <div class="local-btns"><a href="https://uri.amap.com/search?keyword=南天一柱&city=张家界" target="_blank" class="local-btn lb-blue">🗺️ 지도</a></div>
-  </div>
-  <div class="stitle">🚕 교통 · 이동</div>
-  <div class="local-item">
-    <div class="local-head"><div class="local-name">🚕 디디 (滴滴出行)</div><div class="local-price">앱 설치 필요</div></div>
-    <div class="local-desc">중국판 우버. 알리페이·위챗페이 연동. 장가계 시내 이동에 유용. 출국 전 설치 권장.</div>
-    <div class="local-btns">
-      <a href="https://www.didiglobal.com" target="_blank" class="local-btn lb-gold">🌐 디디 공식</a>
-      <a href="https://uri.amap.com/" target="_blank" class="local-btn lb-blue">🗺️ 가오더 지도</a>
-    </div>
-  </div>
-  <div class="local-item">
-    <div class="local-head"><div class="local-name">🚌 무릉원 셔틀버스</div><div class="local-price">¥5~12</div></div>
-    <div class="local-desc">무릉원 구역 내 관광 셔틀. 남문·동문·하천 구역 간 이동. 입장권에 포함 여부 확인.</div>
-    <div class="local-btns"><a href="https://uri.amap.com/search?keyword=武陵源景区班车" target="_blank" class="local-btn lb-blue">🗺️ 지도 검색</a></div>
-  </div>
-  <div class="local-item">
-    <div class="local-head"><div class="local-name">✈️ 장가계 허화 공항</div><div class="local-price">시내에서 20분</div></div>
-    <div class="local-desc">국제선 운항. 공항 → 무릉원 택시 ¥130~160. 로투차 공항 픽업 서비스 이용 가능.</div>
-    <div class="local-btns"><a href="https://uri.amap.com/search?keyword=张家界荷花国际机场" target="_blank" class="local-btn lb-blue">🗺️ 지도</a></div>
-  </div>
-</div>
-<div class="page" id="page-help">
-  <a href="lotocha_tour.html" class="kakao-cta" style="background:linear-gradient(135deg,var(--navy),#2a3f8a)">
-    <div class="kakao-text">
-      <div class="kakao-title" style="color:var(--gold)">🗺️ 혼자 다니기 막막하신가요?</div>
-      <div class="kakao-sub" style="color:rgba(255,255,255,.75)">로투차 한국어 가이드 투어 — 교통·입장권·식사 All-in-one</div>
-    </div>
-    <div style="font-size:20px;color:var(--gold)">→</div>
-  </a>
-  <a href="http://pf.kakao.com/_hvrmn/chat" target="_blank" class="kakao-cta">
-    <div class="kakao-text">
-      <div class="kakao-title">💬 로투차 카카오톡 상담</div>
-      <div class="kakao-sub">교통·결제·긴급상황 — 뭐든 물어보세요</div>
-    </div>
-    <div style="font-size:20px">→</div>
-  </a>
+
+  <div class="helper-section-title">🛟 안전 · 응급</div>
   <div class="card">
     <div class="ctitle">🚨 긴급 전화</div>
     <div class="emg-grid">
@@ -641,19 +520,31 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
     <div class="info-row"><div class="info-lbl">VPN</div><div>출국 전 설치 필수. ExpressVPN·Surfshark</div></div>
     <div class="info-row"><div class="info-lbl">SIM</div><div>공항: 차이나유니콤 관광 SIM 30일 ¥100</div></div>
   </div>
-  <div class="card">
-    <div class="ctitle">💬 현지 회화</div>
-    <div id="phrase-list"></div>
-  </div>
+
+  <div class="helper-section-title">💬 현지 회화</div>
+  <div class="card"><div id="phrase-list"></div></div>
+
+  <div class="helper-section-title">🙋 더 도움이 필요하신가요?</div>
+  <a href="lotocha_tour.html" class="kakao-cta" style="background:linear-gradient(135deg,var(--navy),#2a3f8a)">
+    <div class="kakao-text">
+      <div class="kakao-title" style="color:var(--gold)">🗺️ 혼자 다니기 막막하신가요?</div>
+      <div class="kakao-sub" style="color:rgba(255,255,255,.75)">로투차 한국어 가이드 투어 — 교통·입장권·식사 All-in-one</div>
+    </div>
+    <div style="font-size:20px;color:var(--gold)">→</div>
+  </a>
+  <a href="http://pf.kakao.com/_hvrmn/chat" target="_blank" class="kakao-cta">
+    <div class="kakao-text">
+      <div class="kakao-title">💬 로투차 카카오톡 상담</div>
+      <div class="kakao-sub">교통·결제·긴급상황 — 뭐든 물어보세요</div>
+    </div>
+    <div style="font-size:20px">→</div>
+  </a>
 </div>
 </div>
 <div class="bottom-nav">
-  <button class="nav-item on" onclick="selectTab('go')" id="nav-go"><div class="nav-icon">🚌</div><div class="nav-label">이동</div></button>
-  <button class="nav-item" onclick="selectTab('map')" id="nav-map"><div class="nav-icon">🗺️</div><div class="nav-label">지도</div></button>
-  <button class="nav-item" onclick="selectTab('plan')" id="nav-plan"><div class="nav-icon">📅</div><div class="nav-label">플랜</div></button>
-  <button class="nav-item" onclick="selectTab('pay')" id="nav-pay"><div class="nav-icon">💳</div><div class="nav-label">결제</div></button>
-  <button class="nav-item" onclick="selectTab('local')" id="nav-local"><div class="nav-icon">🎭</div><div class="nav-label">현지</div></button>
-  <button class="nav-item" onclick="selectTab('help')" id="nav-help"><div class="nav-icon">🛟</div><div class="nav-label">도움말</div></button>
+  <button class="nav-item on" onclick="selectTab('map')" id="nav-map"><div class="nav-icon">🗺️</div><div class="nav-label">스팟</div></button>
+  <button class="nav-item" onclick="selectTab('places')" id="nav-places"><div class="nav-icon">📍</div><div class="nav-label">장소</div></button>
+  <button class="nav-item" onclick="selectTab('helper')" id="nav-helper"><div class="nav-icon">🛟</div><div class="nav-label">도우미</div></button>
 </div>
 <div class="sheet-overlay" id="sheet-overlay" onclick="closeSheet()"></div>
 <div class="sheet" id="review-sheet">
@@ -785,16 +676,20 @@ const PHRASES = [
   ]},
 ];
 
-let currentAttr='forest',currentTab='go',currentHotel='wulingyuan',currentZone='south',weatherMode='sunny';
+let currentAttr='forest',currentTab='map',currentZone='south',weatherMode='sunny';
 let map,userMarker,mapMarkers=[],cdTimer=null,spotsData={};
 let currentReviewSpotId=null,currentReviewAttrId=null,selectedRating=0;
+let placesData=[],currentPlaceCat='all';
 const TYPE_ICON={landmark:'🏔️',transport:'🚌',viewpoint:'🌅',toilet:'🚻',food:'🍜',rest:'☕',ticket:'🎫',info:'ℹ️',danger:'⚠️'};
+const PLACE_CAT_ICON={restaurant:'🍜',cafe:'☕',hotel:'🏨',shop:'🛍️',attraction:'🎭',transport:'🚕',etc:'✨'};
+const PLACE_CAT_LABEL={restaurant:'식당',cafe:'카페',hotel:'호텔/숙소',shop:'쇼핑',attraction:'볼거리',transport:'교통',etc:'기타'};
 
 document.addEventListener('DOMContentLoaded',async()=>{
   initMap(); updateClock(); setInterval(updateClock,15000);
   renderPhrases(); startGPS();
   await loadSpotsData();
-  selectAttr('forest'); selectTab('go');
+  selectAttr('forest'); selectTab('map');
+  loadPlaces();
   logVisit(); loadVisitorCount();
   fetchWeather(); setInterval(fetchWeather, 600000);
 });
@@ -836,6 +731,54 @@ async function loadSpotsData(){
   }catch(e){}
   // 2. JSON fallback
   try{const r=await fetch('lotocha_spots.json');const d=await r.json();spotsData=d.attractions||{};}catch(e){spotsData={};}
+}
+
+async function loadPlaces(){
+  try{
+    if(sb){
+      const{data,error}=await sb.from('local_places').select('*').eq('is_active',true).order('sort_order');
+      if(!error&&data){placesData=data;renderPlaces();return;}
+    }
+  }catch(e){console.warn('장소 로드 실패',e);}
+  placesData=[];renderPlaces();
+}
+
+function filterPlaces(cat){
+  currentPlaceCat=cat;
+  document.querySelectorAll('.cat-chip').forEach(b=>b.classList.toggle('on',b.dataset.cat===cat));
+  renderPlaces();
+}
+
+function renderPlaces(){
+  const list=document.getElementById('places-list');if(!list)return;
+  const items=currentPlaceCat==='all'?placesData:placesData.filter(p=>p.category===currentPlaceCat);
+  if(!items.length){
+    list.innerHTML='<div class="place-empty"><div class="place-empty-icon">📍</div><div class="place-empty-text">등록된 장소가 없습니다</div></div>';
+    return;
+  }
+  list.innerHTML=items.map(p=>{
+    const img=(p.images&&p.images[0])||'';
+    const icon=PLACE_CAT_ICON[p.category]||'📍';
+    const tags=(p.tags||[]).map(t=>`<span class="badge b-blue">${t}</span>`).join('');
+    return`<div class="place-card">
+      <div class="place-thumb">${img?`<img src="${img}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.classList.add('place-thumb-empty');this.remove()">`:`<div class="place-thumb-empty">${icon}</div>`}</div>
+      <div class="place-body">
+        <div class="place-name">${icon} ${p.name_ko}</div>
+        ${p.name_cn?`<div class="place-cn-row"><div class="place-cn">${p.name_cn}</div><button class="copy-cn-btn" onclick="copyText('${p.name_cn.replace(/'/g,"\\'")}')">📋 중문 복사</button></div>`:''}
+        <div class="place-badges">
+          <span class="badge b-gold">${PLACE_CAT_LABEL[p.category]||p.category}</span>
+          ${p.area?`<span class="badge b-blue">${p.area}</span>`:''}
+          ${p.price_range?`<span class="badge b-blue">${p.price_range}</span>`:''}
+          ${tags}
+        </div>
+        ${p.desc_ko?`<div class="place-desc">${p.desc_ko}</div>`:''}
+        <div class="place-actions">
+          ${p.gaode_uri?`<a href="${p.gaode_uri}" target="_blank" class="place-gaode">🗺️ 고덕지도</a>`:''}
+          <button class="place-review-btn" onclick="openReviewSheet('${p.id}','place','${(p.name_ko||'').replace(/'/g,"\\'")}')">💬 리뷰</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
 }
 function updateClock(){
   const n=new Date();
@@ -911,26 +854,19 @@ function selectAttr(id){
   if(map){const a=ATTRS[id];map.setView(a.center,a.zoom);renderMapSpots();}
   document.getElementById('zone-section').style.display=id==='forest'?'block':'none';
   if(id==='forest'){document.querySelectorAll('.zone-btn').forEach(b=>b.classList.remove('on'));const zb=document.getElementById('zone-south');if(zb)zb.classList.add('on');renderShuttleInfo('south');}
-  renderTransport();renderLastTransport();renderGaodeBtns();
+  renderLastTransport();
   renderZoneSpots();renderSmartPlan();renderRainPlan();renderPlanTips();
   startCountdown();
 }
 
 function selectTab(id){
   currentTab=id;
-  ['go','map','plan','pay','local','help'].forEach(t=>{
+  ['map','places','helper'].forEach(t=>{
     document.getElementById('tab-'+t).classList.toggle('on',t===id);
     document.getElementById('page-'+t).classList.toggle('on',t===id);
     document.getElementById('nav-'+t).classList.toggle('on',t===id);
   });
   if(id==='map'&&map)setTimeout(()=>map.invalidateSize(),100);
-}
-
-function selectHotel(id){currentHotel=id;document.querySelectorAll('.hotel-btn').forEach(b=>b.classList.remove('on'));document.getElementById('hotel-'+id).classList.add('on');renderTransport();}
-
-function renderTransport(){
-  const list=(TRANSPORT[currentHotel]||{})[currentAttr]||[];
-  document.getElementById('transport-list').innerHTML=list.map(t=>`<div class="trow"><div class="t-icon">${t.icon}</div><div class="t-info"><div class="t-name">${t.name}</div><div class="t-detail">${t.detail}</div>${t.price?`<div class="t-price">${t.price}</div>`:''}<span class="badge ${t.badge}">${t.badgeTxt}</span></div></div>`).join('');
 }
 
 function renderLastTransport(){
@@ -942,8 +878,6 @@ function renderLastTransport(){
     return`<div class="lt-row"><div class="lt-name">${t.name}</div><div style="display:flex;align-items:center;gap:7px"><div class="lt-time">${t.time}</div><div class="lt-st ${cls}">${txt}</div></div></div>`;
   }).join('');
 }
-
-function renderGaodeBtns(){const a=ATTRS[currentAttr];document.getElementById('gaode-nav-btns').innerHTML=`<a href="${a.gaodeNav}" target="_blank" class="gaode-btn">🧭 ${a.name} — 길 안내</a><a href="${a.gaode}" target="_blank" class="gaode-btn navy">🔍 ${a.name} — 지도 검색</a>`;}
 
 function startCountdown(){if(cdTimer)clearInterval(cdTimer);updateCountdown();cdTimer=setInterval(updateCountdown,60000);}
 function updateCountdown(){
