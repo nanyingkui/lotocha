@@ -225,7 +225,7 @@ async function loadProducts() {
 
     document.getElementById('pkg-list').innerHTML =
       pkgProds.length ? pkgProds.map(cardHTML).join('') :
-      '<div class="error-box">등록된 패키지가 없습니다</div>';
+      '<div style="text-align:center;padding:30px 20px;color:#aaa;font-size:13px">🔜 패키지 상품 준비 중입니다<br><small style="font-size:11px">곧 업데이트될 예정입니다</small></div>';
 
   } catch(e) {
     const err = `<div class="error-box">상품을 불러오지 못했습니다<br><small>${e.message}</small></div>`;
@@ -246,13 +246,15 @@ function openModal(id) {
 
   document.getElementById('modal-title').textContent = p.title_ko || '—';
 
+  const descHtml = (p.description_ko || '').replace(/\n/g, '<br>');
   let html = `
-    <div class="modal-subtitle">${p.subtitle_ko || ''}<br>${p.description_ko || ''}</div>
+    <div class="modal-subtitle">${p.subtitle_ko || ''}</div>
     <div class="modal-price-box">
       <div class="modal-price-krw">${fmtFull(p.price_krw)}</div>
       ${p.price_cny ? `<div class="modal-price-cny">${fmtCny(p.price_cny)} (위안화 기준)</div>` : ''}
-      <div class="modal-price-label">성인 1인 기준${p.min_pax ? ' · 최소 ' + p.min_pax + '인 · 최대 ' + p.max_pax + '인' : ''}</div>
-    </div>`;
+      <div class="modal-price-label">성인 1인 기준${p.min_pax ? ' · 최소 ' + p.min_pax + '인' : ''}</div>
+    </div>
+    ${descHtml ? `<div class="modal-section"><div style="font-size:12px;color:#555;line-height:1.9">${descHtml}</div></div>` : ''}`;
 
   if (highlights.length) {
     html += `<div class="modal-section">
@@ -267,7 +269,7 @@ function openModal(id) {
       ${itinerary.map(it => `
         <div class="itinerary-item">
           <div class="it-time">${it.time || ''}</div>
-          <div><div class="it-name">${it.name || ''}</div><div class="it-desc">${it.desc || ''}</div></div>
+          <div class="it-desc">${it.name || it.desc || ''}</div>
         </div>`).join('')}
     </div>`;
   }
