@@ -8,8 +8,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--navy:#1a2a5e;--gold:#f5a623;--bg:#f0ede8;--red:#e53935;--green:#2e7d32;--blue:#1565c0}
-body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:var(--bg);color:var(--navy);min-height:100vh;max-width:480px;margin:0 auto;padding-bottom:60px}
+:root{--navy:#1a2a5e;--gold:#f5a623;--bg:#f0ede8;--red:#e53935;--green:#2e7d32;--blue:#1565c0;--app-w:480px}
+html{background:var(--bg)}
+body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:var(--bg);color:var(--navy);min-height:100vh;max-width:var(--app-w);margin:0 auto;padding-bottom:60px}
 
 /* 헤더 */
 .header{background:var(--navy);position:sticky;top:0;z-index:500;box-shadow:0 2px 12px rgba(0,0,0,.3)}
@@ -32,7 +33,9 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .wrap{padding:13px 13px 0}
 
 /* 상품 카드 */
-.product-card{background:#fff;border-radius:14px;overflow:hidden;margin-bottom:14px;box-shadow:0 2px 10px rgba(26,42,94,.08)}
+.product-card{background:#fff;border-radius:14px;overflow:hidden;margin-bottom:14px;box-shadow:0 2px 10px rgba(26,42,94,.08);animation:cardIn .3s ease both}
+@keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pageIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .card-badge-row{display:flex;gap:6px;margin-bottom:8px}
 .badge{display:inline-block;font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px}
 .badge-day{background:#e3f2fd;color:var(--blue)}
@@ -49,8 +52,10 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .highlights{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
 .highlight-tag{background:#f4f6fb;border-radius:6px;padding:4px 9px;font-size:10px;font-weight:700;color:var(--navy)}
 .card-footer{display:flex;gap:8px;padding-top:12px;border-top:1px solid #f5f5f5}
-.btn-detail{flex:1;background:var(--navy);color:#fff;border:none;border-radius:9px;padding:11px;font-size:12px;font-weight:900;cursor:pointer;font-family:inherit}
-.btn-inquiry{flex:1;background:var(--gold);color:var(--navy);border:none;border-radius:9px;padding:11px;font-size:12px;font-weight:900;cursor:pointer;font-family:inherit}
+.btn-detail{flex:1;background:var(--navy);color:#fff;border:none;border-radius:9px;padding:11px;font-size:12px;font-weight:900;cursor:pointer;font-family:inherit;transition:transform .15s ease,opacity .15s ease}
+.btn-inquiry{flex:1;background:var(--gold);color:var(--navy);border:none;border-radius:9px;padding:11px;font-size:12px;font-weight:900;cursor:pointer;font-family:inherit;transition:transform .15s ease,opacity .15s ease}
+.btn-detail:active,.btn-inquiry:active,.back-btn:active,.cta-btn:active,.tab-btn:active,.modal-close:active,.inquiry-btn:active,.guide-banner:active{transform:scale(.95);opacity:.85}
+.back-btn,.cta-btn,.modal-close,.inquiry-btn,.guide-banner{transition:transform .15s ease,opacity .15s ease}
 
 /* 로딩 */
 .loading{text-align:center;padding:40px 20px;color:#aaa;font-size:13px}
@@ -59,9 +64,10 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .error-box{background:#ffebee;border-radius:10px;padding:14px;font-size:12px;color:var(--red);text-align:center;margin-bottom:14px}
 
 /* 모달 */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:900;display:none;align-items:flex-end}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:900;display:none;align-items:flex-end;justify-content:center}
 .modal-bg.open{display:flex}
-.modal{background:#fff;border-radius:20px 20px 0 0;width:100%;max-height:92vh;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom)}
+.modal{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:var(--app-w);max-height:92vh;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom);animation:modalUp .25s ease both}
+@keyframes modalUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 .modal-drag{width:40px;height:4px;background:#e0e0e0;border-radius:2px;margin:12px auto 0}
 .modal-header{padding:14px 18px 0;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;z-index:10;border-bottom:1px solid #f0f0f0;padding-bottom:12px}
 .modal-title{font-size:16px;font-weight:900;color:var(--navy)}
@@ -140,6 +146,20 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .guide-banner{display:flex;align-items:center;justify-content:space-between;background:#f4f6fb;border-radius:12px;padding:13px 15px;margin:0 13px 14px;text-decoration:none;border:1.5px solid #ddd8d0}
 .guide-banner-title{font-size:13px;font-weight:900;color:var(--navy)}
 .guide-banner-sub{font-size:11px;color:#888;margin-top:2px}
+
+.counter-btn,.accordion{transition:transform .15s ease,opacity .15s ease}
+.accordion:active{transform:scale(.98)}
+
+/* ── 데스크톱 적응 (모바일 카드 유지 + 가운데 확장) ── */
+@media (min-width:601px){
+  :root{--app-w:560px}
+  html{background:linear-gradient(160deg,#e9ecf3,#dfe3ec)}
+  body{box-shadow:0 0 50px rgba(20,30,70,.14);min-height:100vh}
+}
+@media (prefers-reduced-motion:reduce){
+  .product-card,.modal,#day-list,#pkg-list{animation:none!important}
+  *{transition-duration:.01ms!important}
+}
 </style>
 </head>
 <body>
@@ -218,8 +238,13 @@ function getTodayStr() {
 function switchTab(tab) {
   document.getElementById('tab-day').classList.toggle('on', tab === 'day');
   document.getElementById('tab-pkg').classList.toggle('on', tab === 'pkg');
-  document.getElementById('day-list').style.display = tab === 'day' ? '' : 'none';
-  document.getElementById('pkg-list').style.display = tab === 'pkg' ? '' : 'none';
+  const day = document.getElementById('day-list'), pkg = document.getElementById('pkg-list');
+  const show = tab === 'day' ? day : pkg, hide = tab === 'day' ? pkg : day;
+  hide.style.display = 'none';
+  show.style.display = '';
+  show.style.animation = 'none';
+  void show.offsetWidth;
+  show.style.animation = 'pageIn .25s ease';
 }
 
 /* ───── 이모지 ───── */

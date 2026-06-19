@@ -10,8 +10,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--navy:#1a2a5e;--gold:#f5a623;--bg:#f0ede8;--red:#e53935;--green:#2e7d32;--blue:#1565c0}
-body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:var(--bg);color:var(--navy);min-height:100vh;max-width:480px;margin:0 auto}
+:root{--navy:#1a2a5e;--gold:#f5a623;--bg:#f0ede8;--red:#e53935;--green:#2e7d32;--blue:#1565c0;--app-w:480px}
+html{background:var(--bg)}
+body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:var(--bg);color:var(--navy);min-height:100vh;max-width:var(--app-w);margin:0 auto;transition:max-width .2s}
 .install-banner{background:linear-gradient(135deg,#00b140,#007a2f);color:#fff;padding:11px 13px;display:flex;align-items:flex-start;gap:9px}
 .ib-icon{font-size:26px;flex-shrink:0;margin-top:2px}
 .ib-text{flex:1}
@@ -39,7 +40,11 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .tab-btn{flex-shrink:0;padding:10px 11px;font-size:11px;font-weight:700;color:#aaa;cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;border-top:none;border-left:none;border-right:none;background:none;font-family:inherit;transition:all .2s}
 .tab-btn.on{color:var(--navy);border-bottom-color:var(--gold)}
 .wrap{padding:13px 13px 80px}
-.page{display:none}.page.on{display:block}
+.page{display:none}.page.on{display:block;animation:pageIn .28s ease both}
+@keyframes pageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.tab-btn,.nav-item,.cat-chip,.attr-btn,.zone-btn,.local-btn,.gaode-btn,.place-gaode,.place-review-btn,.copy-cn-btn,.spot-action-btn,.w-btn,.map-btn,.back-btn{transition:transform .15s ease,opacity .15s ease,all .2s}
+.tab-btn:active,.nav-item:active,.cat-chip:active,.attr-btn:active,.zone-btn:active,.local-btn:active,.gaode-btn:active,.place-gaode:active,.place-review-btn:active,.copy-cn-btn:active,.spot-action-btn:active,.w-btn:active,.map-btn:active,.back-btn:active{transform:scale(.94);opacity:.85}
 .stitle{font-size:10px;font-weight:900;color:#aaa;text-transform:uppercase;letter-spacing:.5px;margin:14px 0 7px;padding-left:2px}
 .card{background:#fff;border-radius:13px;padding:14px;margin-bottom:11px;box-shadow:0 2px 7px rgba(26,42,94,.07)}
 .ctitle{font-size:14px;font-weight:900;color:var(--navy);margin-bottom:11px;display:flex;align-items:center;gap:7px}
@@ -77,7 +82,7 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .zone-btn{flex-shrink:0;border:1.5px solid #e0e0e0;background:#fff;border-radius:8px;padding:6px 11px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;color:#555}
 .zone-btn.on{border-color:var(--navy);background:var(--navy);color:#fff}
 .shuttle-box{background:#e3f2fd;border-radius:9px;padding:10px 12px;margin-bottom:9px;font-size:11px;color:var(--blue);line-height:1.8}
-.spot-item{border-radius:10px;border:1.5px solid #eee;overflow:hidden;margin-bottom:8px;cursor:pointer;transition:border-color .2s;background:#fff}
+.spot-item{border-radius:10px;border:1.5px solid #eee;overflow:hidden;margin-bottom:8px;cursor:pointer;transition:border-color .2s;background:#fff;animation:cardIn .3s ease both}
 .spot-item:active{border-color:var(--gold)}
 .spot-head{display:flex;gap:9px;padding:11px 12px;align-items:flex-start}
 .spot-img{width:56px;height:56px;border-radius:8px;object-fit:cover;flex-shrink:0;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:26px}
@@ -133,7 +138,7 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .rain-title{font-size:13px;font-weight:900;color:var(--blue);margin-bottom:9px}
 .rain-item{padding:6px 0;border-bottom:1px solid rgba(144,202,249,.3);font-size:12px;color:#333;line-height:1.7}
 .rain-item:last-child{border:none}
-.pay-method{background:#fff;border-radius:12px;overflow:hidden;margin-bottom:11px;box-shadow:0 2px 7px rgba(26,42,94,.07)}
+.pay-method{background:#fff;border-radius:12px;overflow:hidden;margin-bottom:11px;box-shadow:0 2px 7px rgba(26,42,94,.07);animation:cardIn .3s ease both}
 .pay-head{display:flex;align-items:center;gap:10px;padding:13px 14px;cursor:pointer}
 .pay-logo{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
 .pay-head-text{flex:1}
@@ -150,7 +155,7 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .pay-step-text b{font-weight:700;color:var(--navy)}
 .pay-note{background:#fff8e1;border-radius:8px;padding:9px 11px;font-size:11px;color:#856404;line-height:1.7;margin-top:8px}
 .pay-link{display:flex;align-items:center;justify-content:space-between;background:#f8f9fc;border-radius:8px;padding:9px 12px;font-size:12px;font-weight:700;color:var(--navy);text-decoration:none;margin-top:6px}
-.local-item{background:#fff;border-radius:11px;padding:13px 14px;margin-bottom:8px;box-shadow:0 2px 6px rgba(26,42,94,.06)}
+.local-item{background:#fff;border-radius:11px;padding:13px 14px;margin-bottom:8px;box-shadow:0 2px 6px rgba(26,42,94,.06);animation:cardIn .3s ease both}
 .local-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px}
 .local-name{font-size:13px;font-weight:900;color:var(--navy)}
 .local-price{font-size:12px;font-weight:700;color:var(--gold)}
@@ -158,13 +163,13 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .local-btns{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
 .local-btn{border-radius:7px;padding:7px 12px;font-size:11px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px}
 .lb-green{background:#e8f5e9;color:var(--green)}.lb-gold{background:#fff8e1;color:#e65100}.lb-blue{background:#e3f2fd;color:var(--blue)}.lb-navy{background:var(--navy);color:#fff}
-.show-card{background:linear-gradient(135deg,var(--navy),#2a3f8a);border-radius:13px;padding:15px;margin-bottom:11px;color:#fff}
+.show-card{background:linear-gradient(135deg,var(--navy),#2a3f8a);border-radius:13px;padding:15px;margin-bottom:11px;color:#fff;animation:cardIn .3s ease both}
 .show-title{font-size:16px;font-weight:900;color:var(--gold);margin-bottom:4px}
 .show-sub{font-size:11px;color:rgba(255,255,255,.7);line-height:1.7;margin-bottom:11px}
 .show-info-row{display:flex;gap:9px;margin-bottom:6px;font-size:11px}
 .show-label{color:rgba(255,255,255,.5);min-width:50px;flex-shrink:0}
 .show-val{color:#fff;font-weight:700}
-.train-card{background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 2px 7px rgba(26,42,94,.07)}
+.train-card{background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 2px 7px rgba(26,42,94,.07);animation:cardIn .3s ease both}
 .train-route{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .train-city{font-size:14px;font-weight:900;color:var(--navy)}
 .train-arrow{font-size:18px;color:#aaa}
@@ -192,7 +197,7 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .phrase-cat{font-size:10px;font-weight:900;color:#aaa;margin:13px 0 7px;letter-spacing:.5px}
 .sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:800;display:none;opacity:0;transition:opacity .25s}
 .sheet-overlay.show{display:block;opacity:1}
-.sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:480px;background:#fff;border-radius:18px 18px 0 0;z-index:900;transition:transform .3s;padding-bottom:env(safe-area-inset-bottom);max-height:85vh;display:flex;flex-direction:column}
+.sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:var(--app-w);background:#fff;border-radius:18px 18px 0 0;z-index:900;transition:transform .3s;padding-bottom:env(safe-area-inset-bottom);max-height:85vh;display:flex;flex-direction:column}
 .sheet.show{transform:translateX(-50%) translateY(0)}
 .sheet-handle{width:36px;height:4px;background:#e0e0e0;border-radius:2px;margin:12px auto 0}
 .sheet-head{padding:13px 16px 10px;border-bottom:1px solid #f0f0f0;flex-shrink:0}
@@ -219,7 +224,7 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .submit-btn:active{opacity:.85}
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--navy);color:var(--gold);padding:10px 20px;border-radius:20px;font-size:12px;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
 .toast.show{opacity:1}
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid #e8edf3;display:flex;z-index:600;box-shadow:0 -2px 9px rgba(0,0,0,.06)}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:var(--app-w);background:#fff;border-top:1px solid #e8edf3;display:flex;z-index:600;box-shadow:0 -2px 9px rgba(0,0,0,.06)}
 .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 0 7px;cursor:pointer;border:none;background:none;font-family:inherit}
 .nav-icon{font-size:19px;opacity:.3;transition:opacity .2s}
 .nav-label{font-size:9px;font-weight:700;color:#aaa;margin-top:1px;transition:color .2s}
@@ -231,7 +236,7 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .cat-filter::-webkit-scrollbar{display:none}
 .cat-chip{flex-shrink:0;border:1.5px solid #e0e0e0;background:#fff;border-radius:20px;padding:6px 13px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;color:#555;transition:all .2s}
 .cat-chip.on{border-color:var(--navy);background:var(--navy);color:#fff}
-.place-card{background:#fff;border-radius:13px;overflow:hidden;margin-bottom:11px;box-shadow:0 2px 7px rgba(26,42,94,.07)}
+.place-card{background:#fff;border-radius:13px;overflow:hidden;margin-bottom:11px;box-shadow:0 2px 7px rgba(26,42,94,.07);animation:cardIn .3s ease both}
 .place-thumb{width:100%;height:160px;object-fit:cover;background:#f0f0f0;display:block}
 .place-thumb-empty{width:100%;height:100px;background:linear-gradient(135deg,#f0ede8,#e8e5e0);display:flex;align-items:center;justify-content:center;font-size:32px}
 .place-body{padding:11px 13px 13px}
@@ -252,6 +257,18 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 /* ── 도우미 섹션 ── */
 .helper-section{margin-bottom:20px}
 .helper-section-title{font-size:11px;font-weight:900;color:#aaa;text-transform:uppercase;letter-spacing:.5px;margin:16px 0 9px;padding-left:2px}
+
+/* ── 데스크톱 적응 (모바일 카드 유지 + 가운데 확장) ── */
+@media (min-width:601px){
+  :root{--app-w:560px}
+  html{background:linear-gradient(160deg,#e9ecf3,#dfe3ec)}
+  body{box-shadow:0 0 50px rgba(20,30,70,.14);min-height:100vh}
+  .install-banner{border-radius:0}
+}
+@media (prefers-reduced-motion:reduce){
+  .page.on,.spot-item,.place-card,.pay-method,.local-item,.show-card,.train-card{animation:none}
+  *{transition-duration:.01ms!important}
+}
 </style>
 </head>
 <body>

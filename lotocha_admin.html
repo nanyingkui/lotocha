@@ -678,6 +678,7 @@ async function saveTour() {
     duration_days: parseInt(document.getElementById('t-days').value)||1,
     sort_order: parseInt(document.getElementById('t-order').value)||0,
     status: document.getElementById('t-status').value,
+    is_active: document.getElementById('t-status').value === 'live',
     images: linesToArr(document.getElementById('t-images').value),
     highlights: linesToArr(document.getElementById('t-highlights').value),
     includes: linesToArr(document.getElementById('t-includes').value),
