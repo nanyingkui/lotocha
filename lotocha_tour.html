@@ -10,22 +10,27 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{--navy:#1a2a5e;--gold:#f5a623;--bg:#f0ede8;--red:#e53935;--green:#2e7d32;--blue:#1565c0}
 body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:var(--bg);color:var(--navy);min-height:100vh;max-width:480px;margin:0 auto;padding-bottom:60px}
+
 /* 헤더 */
 .header{background:var(--navy);position:sticky;top:0;z-index:500;box-shadow:0 2px 12px rgba(0,0,0,.3)}
 .header-inner{display:flex;align-items:center;gap:8px;padding:0 14px;height:52px}
 .back-btn{background:none;border:none;color:#8892c4;font-size:12px;font-weight:700;cursor:pointer;padding:6px 0;text-decoration:none;flex-shrink:0}
 .header-title{color:var(--gold);font-size:15px;font-weight:900;flex:1}
+
 /* 상담 배너 */
 .cta-banner{background:linear-gradient(90deg,#07C160,#05a050);color:#fff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between}
 .cta-text{font-size:12px;font-weight:700}
 .cta-sub{font-size:10px;opacity:.8;margin-top:1px}
 .cta-btn{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:8px;padding:7px 14px;font-size:11px;font-weight:900;text-decoration:none;white-space:nowrap;flex-shrink:0}
+
 /* 탭 */
 .tab-bar{background:#fff;border-bottom:1px solid #e0e7f0;display:flex}
 .tab-btn{flex:1;padding:12px 0;font-size:13px;font-weight:700;color:#aaa;cursor:pointer;border:none;background:none;border-bottom:2.5px solid transparent;font-family:inherit;transition:all .2s}
 .tab-btn.on{color:var(--navy);border-bottom-color:var(--gold)}
+
 /* 래퍼 */
 .wrap{padding:13px 13px 0}
+
 /* 상품 카드 */
 .product-card{background:#fff;border-radius:14px;overflow:hidden;margin-bottom:14px;box-shadow:0 2px 10px rgba(26,42,94,.08)}
 .card-badge-row{display:flex;gap:6px;margin-bottom:8px}
@@ -39,46 +44,98 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .card-subtitle{font-size:11px;color:#888;margin-bottom:12px;line-height:1.6}
 .price-row{display:flex;align-items:baseline;gap:8px;margin-bottom:4px}
 .price-krw{font-size:22px;font-weight:900;color:var(--navy)}
-.price-cny{font-size:13px;font-weight:700;color:#888}
+.price-from{font-size:11px;color:#aaa}
 .price-label{font-size:10px;color:#aaa;margin-bottom:10px}
 .highlights{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
 .highlight-tag{background:#f4f6fb;border-radius:6px;padding:4px 9px;font-size:10px;font-weight:700;color:var(--navy)}
 .card-footer{display:flex;gap:8px;padding-top:12px;border-top:1px solid #f5f5f5}
 .btn-detail{flex:1;background:var(--navy);color:#fff;border:none;border-radius:9px;padding:11px;font-size:12px;font-weight:900;cursor:pointer;font-family:inherit}
 .btn-inquiry{flex:1;background:var(--gold);color:var(--navy);border:none;border-radius:9px;padding:11px;font-size:12px;font-weight:900;cursor:pointer;font-family:inherit}
+
 /* 로딩 */
 .loading{text-align:center;padding:40px 20px;color:#aaa;font-size:13px}
 .spinner{width:28px;height:28px;border:3px solid #e0e7f0;border-top-color:var(--navy);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .error-box{background:#ffebee;border-radius:10px;padding:14px;font-size:12px;color:var(--red);text-align:center;margin-bottom:14px}
+
 /* 모달 */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:900;display:none;align-items:flex-end}
 .modal-bg.open{display:flex}
-.modal{background:#fff;border-radius:20px 20px 0 0;width:100%;max-height:88vh;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom)}
+.modal{background:#fff;border-radius:20px 20px 0 0;width:100%;max-height:92vh;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom)}
 .modal-drag{width:40px;height:4px;background:#e0e0e0;border-radius:2px;margin:12px auto 0}
-.modal-header{padding:14px 18px 0;display:flex;justify-content:space-between;align-items:center}
-.modal-title{font-size:17px;font-weight:900;color:var(--navy)}
+.modal-header{padding:14px 18px 0;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;z-index:10;border-bottom:1px solid #f0f0f0;padding-bottom:12px}
+.modal-title{font-size:16px;font-weight:900;color:var(--navy)}
 .modal-close{background:none;border:none;font-size:22px;color:#aaa;cursor:pointer;line-height:1}
 .modal-content{padding:14px 18px 24px}
-.modal-subtitle{font-size:12px;color:#888;margin-bottom:16px;line-height:1.7}
-.modal-section{margin-bottom:16px}
-.modal-section-title{font-size:11px;font-weight:900;color:#aaa;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px}
-.modal-price-box{background:var(--navy);border-radius:12px;padding:14px 16px;margin-bottom:16px}
-.modal-price-krw{font-size:26px;font-weight:900;color:#fff}
-.modal-price-cny{font-size:13px;color:rgba(255,255,255,.6);margin-top:3px}
-.modal-price-label{font-size:10px;color:rgba(255,255,255,.4);margin-top:2px}
+.modal-subtitle{font-size:11px;color:#888;line-height:1.7;margin-bottom:12px}
+
+/* ── 예약 UI ── */
+.booking-section{background:#f8f9fe;border-radius:12px;padding:12px 14px;margin-bottom:12px}
+.booking-section-title{font-size:11px;font-weight:900;color:#999;letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px}
+
+/* 날짜 */
+.date-input{width:100%;border:1.5px solid #ddd;border-radius:9px;padding:10px 12px;font-size:15px;font-family:inherit;color:var(--navy);background:#fff;outline:none;-webkit-appearance:none}
+.date-input:focus{border-color:var(--navy)}
+
+/* 최소인원 안내 */
+.min-pax-note{font-size:11px;color:#e65100;font-weight:700;background:#fff3e0;padding:6px 10px;border-radius:7px;margin-bottom:10px}
+
+/* 인원 카운터 */
+.pax-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #eee}
+.pax-row:last-child{border:none;padding-bottom:0}
+.pax-info{flex:1}
+.pax-label{font-size:13px;font-weight:700;color:var(--navy)}
+.pax-price{font-size:11px;color:#888;margin-top:2px}
+.pax-counter{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.counter-btn{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--navy);background:#fff;color:var(--navy);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;padding:0;transition:all .15s}
+.counter-btn:active{background:var(--navy);color:#fff}
+.counter-val{font-size:17px;font-weight:900;color:var(--navy);min-width:22px;text-align:center}
+
+/* 선택 옵션 */
+.option-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #eee;cursor:pointer;user-select:none}
+.option-row:last-child{border:none;padding-bottom:0}
+.opt-check{width:24px;height:24px;border-radius:6px;border:2px solid #ccc;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.opt-check.checked{background:var(--navy);border-color:var(--navy)}
+.opt-check.checked::after{content:"✓";color:#fff;font-size:13px;font-weight:900}
+.option-info{flex:1}
+.option-label{font-size:13px;font-weight:700;color:var(--navy)}
+.option-price{font-size:11px;color:var(--gold);font-weight:700;margin-top:2px}
+
+/* 가격 요약 */
+.price-summary{background:var(--navy);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.price-line{display:flex;justify-content:space-between;font-size:12px;color:rgba(255,255,255,.7);padding:3px 0}
+.price-divider{height:1px;background:rgba(255,255,255,.2);margin:8px 0}
+.price-total-row{display:flex;justify-content:space-between;font-size:17px;font-weight:900;color:#fff;padding:2px 0}
+.price-empty{color:rgba(255,255,255,.5);font-size:12px;text-align:center;padding:4px 0}
+.min-warn{font-size:11px;color:#ffb74d;margin-top:8px;text-align:center;font-weight:700}
+
+/* 아코디언 */
+.accordion{background:#f8f9fe;border-radius:10px;padding:12px 14px;margin-bottom:6px;cursor:pointer}
+.accordion-title{font-size:13px;font-weight:900;color:var(--navy);display:flex;justify-content:space-between;align-items:center}
+.accordion-arrow{color:#bbb;font-size:12px;transition:transform .2s}
+.accordion-arrow.open{transform:rotate(180deg)}
+.accordion-body{background:#f8f9fe;border-radius:0 0 10px 10px;padding:4px 14px 14px;margin-top:-6px;margin-bottom:6px}
+
+/* 일정 */
+.itinerary-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #eee;font-size:12px}
+.itinerary-item:last-child{border:none}
+.it-time{color:#aaa;font-weight:700;min-width:46px;flex-shrink:0;padding-top:1px}
+.it-desc{font-weight:600;color:var(--navy);line-height:1.6;flex:1}
+
+/* 포함/불포함 */
 .list-item{display:flex;gap:8px;font-size:12px;color:#444;padding:5px 0;line-height:1.6}
 .list-item::before{content:"✓";color:var(--green);font-weight:900;flex-shrink:0}
 .list-item.ex::before{content:"✗";color:var(--red)}
-.itinerary-item{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #f5f5f5;font-size:12px}
-.itinerary-item:last-child{border:none}
-.it-time{color:#aaa;font-weight:700;min-width:45px;flex-shrink:0}
-.it-name{font-weight:700;color:var(--navy);margin-bottom:2px}
-.it-desc{color:#777;line-height:1.6}
-.inquiry-btns{display:flex;gap:8px;margin-top:16px}
-.inquiry-btn{flex:1;padding:13px;border:none;border-radius:11px;font-size:13px;font-weight:900;cursor:pointer;font-family:inherit}
+.section-label{font-size:11px;font-weight:900;margin:10px 0 6px}
+.section-label.inc{color:var(--green)}
+.section-label.exc{color:var(--red)}
+
+/* 문의 버튼 */
+.inquiry-btns{display:flex;gap:8px;margin-top:14px}
+.inquiry-btn{flex:1;padding:14px;border:none;border-radius:11px;font-size:13px;font-weight:900;cursor:pointer;font-family:inherit}
 .inquiry-kakao{background:#FEE500;color:#191919}
 .inquiry-wechat{background:var(--navy);color:#fff}
+
 /* 가이드 배너 */
 .guide-banner{display:flex;align-items:center;justify-content:space-between;background:#f4f6fb;border-radius:12px;padding:13px 15px;margin:0 13px 14px;text-decoration:none;border:1.5px solid #ddd8d0}
 .guide-banner-title{font-size:13px;font-weight:900;color:var(--navy)}
@@ -120,7 +177,7 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
   <div style="font-size:20px;color:var(--gold)">→</div>
 </a>
 
-<!-- 상세 모달 -->
+<!-- 상세·예약 모달 -->
 <div class="modal-bg" id="modal-bg" onclick="closeModal(event)">
   <div class="modal" id="modal">
     <div class="modal-drag"></div>
@@ -139,41 +196,47 @@ let sb = null;
 try { sb = window.supabase.createClient(SUPA_URL, SUPA_KEY); } catch(e) {}
 
 let allProducts = [];
-let currentTab = 'day';
 
+/* ───── 포맷 헬퍼 ───── */
 function fmt(n) {
   if (!n) return '문의';
   return Math.round(n / 10000) + '만원';
 }
 function fmtFull(n) {
-  if (!n) return '—';
+  if (!n && n !== 0) return '—';
   return n.toLocaleString() + '원';
 }
 function fmtCny(n) {
   if (!n) return '';
   return '¥' + Number(n).toLocaleString();
 }
+function getTodayStr() {
+  return new Date().toISOString().split('T')[0];
+}
 
+/* ───── 탭 전환 ───── */
 function switchTab(tab) {
-  currentTab = tab;
   document.getElementById('tab-day').classList.toggle('on', tab === 'day');
   document.getElementById('tab-pkg').classList.toggle('on', tab === 'pkg');
   document.getElementById('day-list').style.display = tab === 'day' ? '' : 'none';
   document.getElementById('pkg-list').style.display = tab === 'pkg' ? '' : 'none';
 }
 
+/* ───── 이모지 ───── */
 function getEmoji(p) {
   if (p.product_type === 'package') return '🏔️';
   const t = (p.title_ko || '').toLowerCase();
   if (t.includes('천문')) return '⛰️';
-  if (t.includes('삼림') || t.includes('원가')) return '🌲';
+  if (t.includes('삼림') || t.includes('무릉') || t.includes('원가')) return '🌲';
   if (t.includes('대협') || t.includes('황룡')) return '🌉';
   return '🗺️';
 }
 
+/* ───── 카드 렌더 ───── */
 function cardHTML(p) {
+  const tiers = Array.isArray(p.price_tiers) && p.price_tiers.length ? p.price_tiers : null;
+  const minPrice = tiers ? Math.min(...tiers.map(t => t.price)) : p.price_krw;
   const highlights = Array.isArray(p.highlights) ? p.highlights.slice(0, 3) : [];
-  const tagsHTML = highlights.map(h => `<span class="highlight-tag">${h}</span>`).join('');
   const isPkg = p.product_type === 'package';
   return `
   <div class="product-card">
@@ -186,19 +249,21 @@ function cardHTML(p) {
       <div class="card-title">${p.title_ko || '—'}</div>
       <div class="card-subtitle">${p.subtitle_ko || ''}</div>
       <div class="price-row">
+        <span class="price-from">성인 기준</span>
         <span class="price-krw">${fmt(p.price_krw)}</span>
-        ${p.price_cny ? `<span class="price-cny">${fmtCny(p.price_cny)}</span>` : ''}
+        ${p.price_cny ? `<span style="font-size:12px;color:#aaa">${fmtCny(p.price_cny)}</span>` : ''}
       </div>
-      <div class="price-label">성인 1인 기준${p.min_pax ? ' · 최소 ' + p.min_pax + '인' : ''}</div>
-      ${tagsHTML ? `<div class="highlights">${tagsHTML}</div>` : ''}
+      <div class="price-label">최소 ${p.min_pax || 2}인 출발</div>
+      ${highlights.length ? `<div class="highlights">${highlights.map(h=>`<span class="highlight-tag">${h}</span>`).join('')}</div>` : ''}
       <div class="card-footer">
-        <button class="btn-detail" onclick="openModal('${p.id}')">상세 보기</button>
-        <button class="btn-inquiry" onclick="inquire('${p.title_ko}')">문의하기</button>
+        <button class="btn-detail" onclick="openModal('${p.id}')">📋 날짜·인원 선택</button>
+        <button class="btn-inquiry" onclick="quickInquire('${p.id}')">💬 문의</button>
       </div>
     </div>
   </div>`;
 }
 
+/* ───── 상품 로드 ───── */
 async function loadProducts() {
   if (!sb) {
     const err = '<div class="error-box">데이터베이스 연결 실패</div>';
@@ -234,64 +299,124 @@ async function loadProducts() {
   }
 }
 
+/* ══════════════════════════════════════
+   예약 모달 상태
+══════════════════════════════════════ */
+let _modalProductId = null;
+let _pax = {};       // { adult:0, child:0, ... }
+let _opts = {};      // { massage:false, ... }
+let _date = '';
+
+/* ───── 모달 열기 ───── */
 function openModal(id) {
   const p = allProducts.find(x => x.id === id);
   if (!p) return;
-  const isPkg = p.product_type === 'package';
 
-  const includes = Array.isArray(p.includes) ? p.includes : [];
-  const excludes = Array.isArray(p.excludes) ? p.excludes : [];
-  const itinerary = Array.isArray(p.itinerary) ? p.itinerary : [];
-  const highlights = Array.isArray(p.highlights) ? p.highlights : [];
+  _modalProductId = id;
+  _pax = {};
+  _opts = {};
+  _date = '';
+
+  const tiers   = Array.isArray(p.price_tiers)  ? p.price_tiers  : [];
+  const options  = Array.isArray(p.tour_options) ? p.tour_options : [];
+  const itinerary= Array.isArray(p.itinerary)    ? p.itinerary    : [];
+  const includes = Array.isArray(p.includes)     ? p.includes     : [];
+  const excludes = Array.isArray(p.excludes)     ? p.excludes     : [];
+
+  tiers.forEach(t => _pax[t.key] = 0);
+  options.forEach(o => _opts[o.key] = false);
 
   document.getElementById('modal-title').textContent = p.title_ko || '—';
 
-  const descHtml = (p.description_ko || '').replace(/\n/g, '<br>');
+  /* ── 날짜 선택 ── */
   let html = `
     <div class="modal-subtitle">${p.subtitle_ko || ''}</div>
-    <div class="modal-price-box">
-      <div class="modal-price-krw">${fmtFull(p.price_krw)}</div>
-      ${p.price_cny ? `<div class="modal-price-cny">${fmtCny(p.price_cny)} (위안화 기준)</div>` : ''}
-      <div class="modal-price-label">성인 1인 기준${p.min_pax ? ' · 최소 ' + p.min_pax + '인' : ''}</div>
-    </div>
-    ${descHtml ? `<div class="modal-section"><div style="font-size:12px;color:#555;line-height:1.9">${descHtml}</div></div>` : ''}`;
 
-  if (highlights.length) {
-    html += `<div class="modal-section">
-      <div class="modal-section-title">✨ 하이라이트</div>
-      ${highlights.map(h => `<div class="list-item">${h}</div>`).join('')}
+    <div class="booking-section">
+      <div class="booking-section-title">📅 여행 날짜</div>
+      <input type="date" class="date-input" id="bk-date"
+        min="${getTodayStr()}"
+        onchange="_date=this.value">
     </div>`;
-  }
 
-  if (itinerary.length) {
-    html += `<div class="modal-section">
-      <div class="modal-section-title">🗓️ 일정</div>
-      ${itinerary.map(it => `
-        <div class="itinerary-item">
-          <div class="it-time">${it.time || ''}</div>
-          <div class="it-desc">${it.name || it.desc || ''}</div>
+  /* ── 인원 선택 ── */
+  if (tiers.length) {
+    html += `
+    <div class="booking-section">
+      <div class="booking-section-title">👥 인원 선택</div>
+      <div class="min-pax-note">⚠️ 최소 2인 이상 출발 (영유아 제외) · 영유아 만 3세미만 20,000원/인</div>
+      ${tiers.map(t => `
+        <div class="pax-row">
+          <div class="pax-info">
+            <div class="pax-label">${t.label}</div>
+            <div class="pax-price">${fmtFull(t.price)} / 인</div>
+          </div>
+          <div class="pax-counter">
+            <button class="counter-btn" onclick="changePax('${t.key}',-1,event)">−</button>
+            <span class="counter-val" id="cnt-${t.key}">0</span>
+            <button class="counter-btn" onclick="changePax('${t.key}',1,event)">+</button>
+          </div>
         </div>`).join('')}
     </div>`;
   }
 
-  if (includes.length) {
-    html += `<div class="modal-section">
-      <div class="modal-section-title">✅ 포함 사항</div>
-      ${includes.map(i => `<div class="list-item">${i}</div>`).join('')}
+  /* ── 선택 옵션 ── */
+  if (options.length) {
+    html += `
+    <div class="booking-section">
+      <div class="booking-section-title">✅ 선택 옵션 (추가금)</div>
+      ${options.map(o => `
+        <div class="option-row" onclick="toggleOpt('${o.key}')">
+          <div class="opt-check" id="oc-${o.key}"></div>
+          <div class="option-info">
+            <div class="option-label">${o.label}</div>
+            <div class="option-price">+ ${fmtFull(o.price)}${o.per==='pax' ? ' / 인' : ''}</div>
+          </div>
+        </div>`).join('')}
     </div>`;
   }
 
-  if (excludes.length) {
-    html += `<div class="modal-section">
-      <div class="modal-section-title">❌ 불포함 사항</div>
-      ${excludes.map(i => `<div class="list-item ex">${i}</div>`).join('')}
+  /* ── 가격 요약 ── */
+  html += `<div class="price-summary" id="price-summary">
+    <div class="price-empty">인원을 선택하면 금액이 계산됩니다</div>
+  </div>`;
+
+  /* ── 일정 아코디언 ── */
+  if (itinerary.length) {
+    html += `
+    <div class="accordion" onclick="toggleAcc('acc-itin')">
+      <div class="accordion-title">🗓️ 투어 일정
+        <span class="accordion-arrow" id="arr-acc-itin">▼</span>
+      </div>
+    </div>
+    <div class="accordion-body" id="acc-itin" style="display:none">
+      ${itinerary.map(it=>`
+        <div class="itinerary-item">
+          <div class="it-time">${it.time||''}</div>
+          <div class="it-desc">${it.name||it.desc||''}</div>
+        </div>`).join('')}
     </div>`;
   }
 
+  /* ── 포함/불포함 아코디언 ── */
+  if (includes.length || excludes.length) {
+    html += `
+    <div class="accordion" onclick="toggleAcc('acc-inc')">
+      <div class="accordion-title">✅ 포함 / 불포함 사항
+        <span class="accordion-arrow" id="arr-acc-inc">▼</span>
+      </div>
+    </div>
+    <div class="accordion-body" id="acc-inc" style="display:none">
+      ${includes.length ? `<div class="section-label inc">포함 사항</div>${includes.map(i=>`<div class="list-item">${i}</div>`).join('')}` : ''}
+      ${excludes.length ? `<div class="section-label exc" style="margin-top:10px">불포함 사항</div>${excludes.map(i=>`<div class="list-item ex">${i}</div>`).join('')}` : ''}
+    </div>`;
+  }
+
+  /* ── 예약 버튼 ── */
   html += `
     <div class="inquiry-btns">
-      <button class="inquiry-btn inquiry-kakao" onclick="inquireWithDetail('kakao','${p.id}')">💬 카카오톡 문의</button>
-      <button class="inquiry-btn inquiry-wechat" onclick="inquireWithDetail('wechat','${p.id}')">WeChat 문의</button>
+      <button class="inquiry-btn inquiry-kakao" onclick="doInquire('kakao')">💬 카카오톡 예약</button>
+      <button class="inquiry-btn inquiry-wechat" onclick="doInquire('wechat')">WeChat 예약</button>
     </div>`;
 
   document.getElementById('modal-content').innerHTML = html;
@@ -299,50 +424,163 @@ function openModal(id) {
   document.body.style.overflow = 'hidden';
 }
 
+/* ───── 모달 닫기 ───── */
 function closeModal(e) {
   if (e && e.target !== document.getElementById('modal-bg')) return;
   document.getElementById('modal-bg').classList.remove('open');
   document.body.style.overflow = '';
 }
 
-function buildInquiryMsg(p) {
+/* ───── 인원 변경 ───── */
+function changePax(key, delta, e) {
+  if (e) e.stopPropagation();
+  _pax[key] = Math.max(0, (_pax[key] || 0) + delta);
+  const el = document.getElementById('cnt-' + key);
+  if (el) el.textContent = _pax[key];
+  updatePriceSummary();
+}
+
+/* ───── 옵션 토글 ───── */
+function toggleOpt(key) {
+  _opts[key] = !_opts[key];
+  const el = document.getElementById('oc-' + key);
+  if (el) el.classList.toggle('checked', _opts[key]);
+  updatePriceSummary();
+}
+
+/* ───── 가격 요약 업데이트 ───── */
+function updatePriceSummary() {
+  const p = allProducts.find(x => x.id === _modalProductId);
+  if (!p) return;
+  const tiers  = Array.isArray(p.price_tiers)  ? p.price_tiers  : [];
+  const options = Array.isArray(p.tour_options) ? p.tour_options : [];
+
+  let total = 0;
+  let totalPax = 0;
+  let minPax = 0;
+  let lines = [];
+
+  tiers.forEach(t => {
+    const cnt = _pax[t.key] || 0;
+    if (cnt > 0) {
+      const sub = cnt * t.price;
+      total += sub;
+      totalPax += cnt;
+      if (t.counts_min) minPax += cnt;
+      lines.push(`<div class="price-line"><span>${t.label} × ${cnt}인</span><span>${fmtFull(sub)}</span></div>`);
+    }
+  });
+
+  if (totalPax === 0) {
+    document.getElementById('price-summary').innerHTML =
+      '<div class="price-empty">인원을 선택하면 금액이 계산됩니다</div>';
+    return;
+  }
+
+  options.forEach(o => {
+    if (_opts[o.key]) {
+      const cnt = o.per === 'pax' ? totalPax : 1;
+      const sub = o.price * cnt;
+      total += sub;
+      lines.push(`<div class="price-line"><span>${o.label}${o.per==='pax' ? ' × '+cnt+'인' : ''}</span><span>+ ${fmtFull(sub)}</span></div>`);
+    }
+  });
+
+  const warn = minPax < 2
+    ? '<div class="min-warn">⚠️ 최소 2인 이상 출발 (영유아 제외)</div>'
+    : '';
+
+  document.getElementById('price-summary').innerHTML = `
+    ${lines.join('')}
+    <div class="price-divider"></div>
+    <div class="price-total-row"><span>예상 총 금액</span><span>${fmtFull(total)}</span></div>
+    ${warn}`;
+}
+
+/* ───── 아코디언 ───── */
+function toggleAcc(id) {
+  const body  = document.getElementById(id);
+  const arrow = document.getElementById('arr-' + id);
+  if (!body) return;
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  if (arrow) arrow.classList.toggle('open', !open);
+}
+
+/* ───── 예약 메시지 빌드 ───── */
+function buildMsg(p) {
+  const tiers  = Array.isArray(p.price_tiers)  ? p.price_tiers  : [];
+  const options = Array.isArray(p.tour_options) ? p.tour_options : [];
   const isPkg = p.product_type === 'package';
-  let msg = `[로투차 투어 문의]\n`;
-  msg += `━━━━━━━━━━━━━━\n`;
+
+  let msg = `[로투차 투어 예약 문의]\n━━━━━━━━━━━━━━\n`;
   msg += `📌 상품: ${p.title_ko}\n`;
   msg += `🗓️ 유형: ${isPkg ? '패키지 ' + p.duration_days + '일' : '1일투어'}\n`;
-  if (p.price_krw) msg += `💰 가격: ${fmtFull(p.price_krw)}/인${p.price_cny ? ' (' + fmtCny(p.price_cny) + ')' : ''}\n`;
-  if (p.min_pax) msg += `👥 인원: 최소 ${p.min_pax}인 ~ 최대 ${p.max_pax}인\n`;
+  msg += `📅 여행 날짜: ${_date || '(미선택)'}\n`;
+  msg += `━━━━━━━━━━━━━━\n👥 인원:\n`;
+
+  let total = 0;
+  let totalPax = 0;
+  let hasPax = false;
+
+  tiers.forEach(t => {
+    const cnt = _pax[t.key] || 0;
+    if (cnt > 0) {
+      hasPax = true;
+      const sub = cnt * t.price;
+      total += sub;
+      totalPax += cnt;
+      msg += `  ${t.label} × ${cnt}인 = ${fmtFull(sub)}\n`;
+    }
+  });
+
+  if (!hasPax) msg += `  (미선택)\n`;
+
+  const selOpts = options.filter(o => _opts[o.key]);
+  if (selOpts.length) {
+    msg += `✅ 선택 옵션:\n`;
+    selOpts.forEach(o => {
+      const cnt = o.per === 'pax' ? totalPax : 1;
+      const sub = o.price * cnt;
+      total += sub;
+      msg += `  ${o.label}${o.per==='pax' ? ' × '+cnt+'인' : ''}: + ${fmtFull(sub)}\n`;
+    });
+  }
+
   msg += `━━━━━━━━━━━━━━\n`;
-  msg += `여행 날짜: \n인원수: \n기타 요청사항: `;
+  msg += `💰 예상 총 금액: ${hasPax ? fmtFull(total) : '미선택'}\n`;
+  msg += `━━━━━━━━━━━━━━\n기타 요청사항: `;
   return msg;
 }
 
-function inquireWithDetail(channel, id) {
+/* ───── 예약 문의 실행 ───── */
+function doInquire(channel) {
+  const p = allProducts.find(x => x.id === _modalProductId);
+  const msg = p ? buildMsg(p) : '[로투차] 투어 문의드립니다.';
+  sendInquiry(channel, msg);
+}
+
+function quickInquire(id) {
   const p = allProducts.find(x => x.id === id);
-  const msg = p ? buildInquiryMsg(p) : '[로투차] 투어 문의드립니다.';
+  if (!p) return;
+  _modalProductId = id;
+  _pax = {}; _opts = {}; _date = '';
+  sendInquiry('kakao', buildMsg(p));
+}
+
+function sendInquiry(channel, msg) {
   if (channel === 'kakao') {
-    // 클립보드에 복사 후 카카오 오픈
     if (navigator.clipboard) {
       navigator.clipboard.writeText(msg).then(() => {
-        alert('문의 내용이 복사됐습니다!\n카카오톡 채팅창에 붙여넣기(길게 누르기)해서 보내주세요.');
+        alert('📋 예약 내용이 복사됐습니다!\n카카오톡 채팅창에 붙여넣기(길게 누르기)해서 보내주세요.');
         window.open('http://pf.kakao.com/_hvrmn/chat', '_blank');
-      }).catch(() => {
-        window.open('http://pf.kakao.com/_hvrmn/chat', '_blank');
-      });
+      }).catch(() => window.open('http://pf.kakao.com/_hvrmn/chat', '_blank'));
     } else {
       window.open('http://pf.kakao.com/_hvrmn/chat', '_blank');
     }
   } else {
-    alert('WeChat ID: nanyingkui\n\n아래 내용을 복사해서 보내주세요:\n\n' + msg);
+    alert('WeChat ID: nanyingkui\n\n아래 내용을 복사해서 보내주세요 👇\n\n' + msg);
   }
-}
-
-function inquire(title) {
-  window.open('http://pf.kakao.com/_hvrmn/chat', '_blank');
-}
-function inquireWechat(title) {
-  alert('WeChat ID: nanyingkui\n\n상품: ' + title);
 }
 
 loadProducts();
