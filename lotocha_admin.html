@@ -118,6 +118,14 @@ textarea.field-input{min-height:80px;resize:vertical}
 .dyn-row-head{display:flex;gap:6px;font-size:10px;font-weight:700;color:#aaa;padding-bottom:4px;padding-left:2px}
 .dyn-row-head span{flex:2;min-width:60px}
 .dyn-row-head span.sm{flex:1;min-width:60px}
+
+/* 항공편 row (필드가 많아 줄바꿈에 의존하지 않는 고정 3줄 레이아웃) */
+.flight-row{background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px;margin-bottom:8px}
+.flight-row-line{display:flex;gap:6px;margin-bottom:6px}
+.flight-row-line:last-child{margin-bottom:0}
+.flight-row input[type=text]{flex:1;min-width:0;padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;font-family:inherit;outline:none}
+.flight-row .btn-rm{background:#ffebee;color:var(--red);border:none;border-radius:6px;padding:5px 8px;font-size:13px;cursor:pointer;flex-shrink:0;font-weight:700}
+.flight-row .btn-add-row{margin-top:0;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -345,7 +353,6 @@ textarea.field-input{min-height:80px;resize:vertical}
       <div class="field-group">
         <label class="field-label">한국→장가계 항공편 (flight_options, 맞춤투어용)</label>
         <div class="dyn-section">
-          <div class="dyn-row-head"><span>key</span><span>노선명</span><span class="sm">출발지역</span><span class="sm">시간</span><span>설명</span><span>이미지</span></div>
           <div id="t-flights-list"></div>
           <button type="button" class="btn-add-row" onclick="addFlight()">+ 항공편 추가</button>
         </div>
@@ -685,17 +692,23 @@ function renderHotelRow(h={}) {
 }
 function renderFlightRow(f={}) {
   const d = document.createElement('div');
-  d.className = 'dyn-row';
+  d.className = 'flight-row';
   d.innerHTML = `
-    <input type="text" placeholder="key" value="${f.key||''}" style="flex:1;max-width:70px">
-    <input type="text" placeholder="노선명 (예: 인천→장가계 대한항공)" value="${f.name||''}" style="flex:2;min-width:160px">
-    <input type="text" placeholder="출발지역 (예: 인천)" value="${f.location||''}" style="flex:1;max-width:90px">
-    <input type="text" placeholder="시간 (예: 오전 출발·약 3시간30분)" value="${f.time||''}" style="flex:1;min-width:150px">
-    <input type="text" placeholder="설명" value="${f.desc||''}" style="flex:2;min-width:140px">
-    <input type="text" placeholder="이미지 URL" value="${f.image||''}" class="flight-img-url" style="flex:2;min-width:140px">
-    <button type="button" class="btn-add-row" onclick="this.nextElementSibling.click()" title="이미지 업로드">📎</button>
-    <input type="file" accept="image/*" style="display:none" onchange="uploadFlightImg(this)">
-    <button class="btn-rm" onclick="this.parentNode.remove()">✕</button>`;
+    <div class="flight-row-line">
+      <input type="text" placeholder="key" value="${f.key||''}" style="flex:1;max-width:80px">
+      <input type="text" placeholder="노선명 (예: 인천→장가계 대한항공)" value="${f.name||''}" style="flex:3">
+      <button class="btn-rm" onclick="this.closest('.flight-row').remove()">✕</button>
+    </div>
+    <div class="flight-row-line">
+      <input type="text" placeholder="출발지역 (예: 인천)" value="${f.location||''}" style="flex:1">
+      <input type="text" placeholder="시간 (예: 오전 출발·약 3시간30분)" value="${f.time||''}" style="flex:2">
+    </div>
+    <div class="flight-row-line">
+      <input type="text" placeholder="설명" value="${f.desc||''}" style="flex:2">
+      <input type="text" placeholder="이미지 URL" value="${f.image||''}" class="flight-img-url" style="flex:2">
+      <button type="button" class="btn-add-row" onclick="this.nextElementSibling.click()" title="이미지 업로드">📎</button>
+      <input type="file" accept="image/*" style="display:none" onchange="uploadFlightImg(this)">
+    </div>`;
   return d;
 }
 function addTier()   { document.getElementById('t-tiers-list').appendChild(renderTierRow()); }
@@ -705,7 +718,7 @@ function addFlight() { document.getElementById('t-flights-list').appendChild(ren
 async function uploadFlightImg(fileInput) {
   const files = [...fileInput.files];
   if (!files.length) return;
-  const row = fileInput.closest('.dyn-row');
+  const row = fileInput.closest('.flight-row');
   const urlInput = row.querySelector('.flight-img-url');
   const file = files[0];
   const ext = file.name.includes('.') ? file.name.split('.').pop() : 'jpg';
@@ -742,7 +755,7 @@ function collectHotels() {
   }).filter(h=>h.key&&h.name);
 }
 function collectFlights() {
-  return [...document.querySelectorAll('#t-flights-list .dyn-row')].map(r=>{
+  return [...document.querySelectorAll('#t-flights-list .flight-row')].map(r=>{
     const ins = r.querySelectorAll('input');
     return {key:ins[0].value.trim(),name:ins[1].value.trim(),location:ins[2].value.trim(),time:ins[3].value.trim(),desc:ins[4].value.trim(),image:ins[5].value.trim()};
   }).filter(f=>f.key&&f.name);
