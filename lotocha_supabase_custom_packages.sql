@@ -10,15 +10,20 @@
 -- Supabase SQL Editor에서 1회만 실행하세요
 -- ============================================================
 
--- 0. hotel_options 컬럼이 아직 없다면 추가 (없어서 에러난 경우 이 줄 때문에 해결됨)
+-- 0. hotel_options / flight_options 컬럼이 아직 없다면 추가 (없어서 에러난 경우 이 줄 때문에 해결됨)
 ALTER TABLE tour_products ADD COLUMN IF NOT EXISTS hotel_options jsonb DEFAULT '[]'::jsonb;
+ALTER TABLE tour_products ADD COLUMN IF NOT EXISTS flight_options jsonb DEFAULT '[]'::jsonb;
+
+-- 한국 → 장가계(허화공항) 직항 노선 placeholder (인천/부산/대구/청주 출발 — 2026년 기준 실제 운항 중인 출발지역)
+-- ⚠️ 정확한 항공사/시간표/요금은 시즌에 따라 바뀌므로 admin 페이지에서 최신 정보로 업데이트해 주세요
+-- (참고: 인천-장가계 직항 약 3시간 30분 소요, 운항 항공사는 대한항공/중국동방항공/쓰촨항공 등)
 
 -- ① 맞춤투어 3박4일
 INSERT INTO tour_products (
   product_type, title_ko, title_cn, subtitle_ko, description_ko,
   price_krw, price_cny, duration_days,
   highlights, includes, excludes, itinerary,
-  price_tiers, tour_options, hotel_options,
+  price_tiers, tour_options, hotel_options, flight_options,
   images, max_pax, min_pax, is_active, status, sort_order
 ) VALUES (
   'package',
@@ -39,6 +44,7 @@ INSERT INTO tour_products (
   '[{"key":"adult","label":"성인","price":0,"counts_min":true},{"key":"senior","label":"경로","price":0,"counts_min":true},{"key":"child","label":"어린이","price":0,"counts_min":false},{"key":"infant","label":"영유아","price":0,"counts_min":false}]'::jsonb,
   '[{"key":"massage","label":"전신 마사지","price":0,"per":"pax"},{"key":"private_car","label":"전용차량","price":0,"per":"pax"}]'::jsonb,
   '[{"key":"standard","name":"일반 숙소 (3성급 추천)","price":0,"per":"pax","desc":"시내 또는 무릉원 인근 3성급 호텔"},{"key":"deluxe","name":"고급 숙소 업그레이드 (4~5성급)","price":0,"per":"pax","desc":"4~5성급 호텔로 업그레이드"}]'::jsonb,
+  '[{"key":"incheon","name":"인천 ↔ 장가계(허화공항)","location":"인천","time":"직항 약 3시간 30분 (정확한 시간표는 상담 시 안내)","desc":"","image":""},{"key":"busan","name":"부산(김해) ↔ 장가계(허화공항)","location":"부산","time":"직항 (정확한 시간표는 상담 시 안내)","desc":"","image":""},{"key":"daegu","name":"대구 ↔ 장가계(허화공항)","location":"대구","time":"직항 (정확한 시간표는 상담 시 안내)","desc":"","image":""},{"key":"cheongju","name":"청주 ↔ 장가계(허화공항)","location":"청주","time":"직항 (정확한 시간표는 상담 시 안내)","desc":"","image":""}]'::jsonb,
   '[]'::jsonb, 20, 2, false, 'draft', 4
 );
 
@@ -47,7 +53,7 @@ INSERT INTO tour_products (
   product_type, title_ko, title_cn, subtitle_ko, description_ko,
   price_krw, price_cny, duration_days,
   highlights, includes, excludes, itinerary,
-  price_tiers, tour_options, hotel_options,
+  price_tiers, tour_options, hotel_options, flight_options,
   images, max_pax, min_pax, is_active, status, sort_order
 ) VALUES (
   'package',
@@ -69,6 +75,7 @@ INSERT INTO tour_products (
   '[{"key":"adult","label":"성인","price":0,"counts_min":true},{"key":"senior","label":"경로","price":0,"counts_min":true},{"key":"child","label":"어린이","price":0,"counts_min":false},{"key":"infant","label":"영유아","price":0,"counts_min":false}]'::jsonb,
   '[{"key":"massage","label":"전신 마사지","price":0,"per":"pax"},{"key":"private_car","label":"전용차량","price":0,"per":"pax"}]'::jsonb,
   '[{"key":"standard","name":"일반 숙소 (3성급 추천)","price":0,"per":"pax","desc":"시내 또는 무릉원 인근 3성급 호텔"},{"key":"deluxe","name":"고급 숙소 업그레이드 (4~5성급)","price":0,"per":"pax","desc":"4~5성급 호텔로 업그레이드"}]'::jsonb,
+  '[{"key":"incheon","name":"인천 ↔ 장가계(허화공항)","location":"인천","time":"직항 약 3시간 30분 (정확한 시간표는 상담 시 안내)","desc":"","image":""},{"key":"busan","name":"부산(김해) ↔ 장가계(허화공항)","location":"부산","time":"직항 (정확한 시간표는 상담 시 안내)","desc":"","image":""},{"key":"daegu","name":"대구 ↔ 장가계(허화공항)","location":"대구","time":"직항 (정확한 시간표는 상담 시 안내)","desc":"","image":""},{"key":"cheongju","name":"청주 ↔ 장가계(허화공항)","location":"청주","time":"직항 (정확한 시간표는 상담 시 안내)","desc":"","image":""}]'::jsonb,
   '[]'::jsonb, 20, 2, false, 'draft', 5
 );
 
@@ -77,7 +84,7 @@ INSERT INTO tour_products (
   product_type, title_ko, title_cn, subtitle_ko, description_ko,
   price_krw, price_cny, duration_days,
   highlights, includes, excludes, itinerary,
-  price_tiers, tour_options, hotel_options,
+  price_tiers, tour_options, hotel_options, flight_options,
   images, max_pax, min_pax, is_active, status, sort_order
 ) VALUES (
   'package',
@@ -100,5 +107,6 @@ INSERT INTO tour_products (
   '[{"key":"adult","label":"성인","price":0,"counts_min":true},{"key":"senior","label":"경로","price":0,"counts_min":true},{"key":"child","label":"어린이","price":0,"counts_min":false},{"key":"infant","label":"영유아","price":0,"counts_min":false}]'::jsonb,
   '[{"key":"massage","label":"전신 마사지","price":0,"per":"pax"},{"key":"private_car","label":"전용차량","price":0,"per":"pax"}]'::jsonb,
   '[{"key":"standard","name":"일반 숙소 (3성급 추천)","price":0,"per":"pax","desc":"시내 또는 무릉원 인근 3성급 호텔"},{"key":"deluxe","name":"고급 숙소 업그레이드 (4~5성급)","price":0,"per":"pax","desc":"4~5성급 호텔로 업그레이드"}]'::jsonb,
+  '[{"key":"incheon","name":"인천 ↔ 장가계(허화공항)","location":"인천","time":"직항 약 3시간 30분 (정확한 시간표는 상담 시 안내)","desc":"","image":""},{"key":"busan","name":"부산(김해) ↔ 장가계(허화공항)","location":"부산","time":"직항 (정확한 시간표는 상담 시 안내)","desc":"","image":""},{"key":"daegu","name":"대구 ↔ 장가계(허화공항)","location":"대구","time":"직항 (정확한 시간표는 상담 시 안내)","desc":"","image":""},{"key":"cheongju","name":"청주 ↔ 장가계(허화공항)","location":"청주","time":"직항 (정확한 시간표는 상담 시 안내)","desc":"","image":""}]'::jsonb,
   '[]'::jsonb, 20, 2, false, 'draft', 6
 );

@@ -108,6 +108,7 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .option-info{flex:1}
 .option-label{font-size:13px;font-weight:700;color:var(--navy)}
 .option-price{font-size:11px;color:var(--gold);font-weight:700;margin-top:2px}
+.option-thumb{width:44px;height:44px;border-radius:8px;object-fit:cover;flex-shrink:0;background:#f0f0f0}
 
 /* 일자별 일정 빌더 */
 .day-plan-card{background:#f8f9fe;border-radius:10px;padding:10px 12px;margin-bottom:8px}
@@ -348,6 +349,8 @@ let _pax = {};       // { adult:0, child:0, ... }
 let _opts = {};      // { massage:false, ... }
 let _date = '';
 let _hotel = null;     // 선택된 hotel_options key
+let _arrFlight = null; // 선택된 도착 항공편(flight_options) key
+let _depFlight = null; // 선택된 출발 항공편(flight_options) key
 let _mealNote = '';    // 식사 요구사항 텍스트
 let _pkgDays = [];     // [{day:1, am:{key}|null, pm:{key}|null, evening:[{key},...]}, ...]
 let _pickerOpen = null; // {day, slot} 현재 펼쳐진 선택 패널
@@ -383,6 +386,8 @@ function openModal(id) {
   _opts = {};
   _date = '';
   _hotel = null;
+  _arrFlight = null;
+  _depFlight = null;
   _mealNote = '';
   _pickerOpen = null;
 
@@ -392,11 +397,13 @@ function openModal(id) {
   const includes = Array.isArray(p.includes)     ? p.includes     : [];
   const excludes = Array.isArray(p.excludes)     ? p.excludes     : [];
   const hotelOpts = Array.isArray(p.hotel_options) ? p.hotel_options : [];
+  const flightOpts = Array.isArray(p.flight_options) ? p.flight_options : [];
   const isPkg = p.product_type === 'package';
 
   tiers.forEach(t => _pax[t.key] = 0);
   options.forEach(o => _opts[o.key] = false);
   if (hotelOpts.length) _hotel = hotelOpts[0].key;
+  if (flightOpts.length && isPkg) { _arrFlight = flightOpts[0].key; _depFlight = flightOpts[0].key; }
 
   /* 패키지: 일정 템플릿 → 일자별 작업본(_pkgDays) 구성 */
   if (isPkg) {
@@ -467,6 +474,26 @@ function openModal(id) {
         </div>`).join('')}
       <div class="min-pax-note">📌 중국 명절 기간(국경절·춘절 등)에는 호텔 가격이 변동될 수 있습니다. 정확한 가격은 상담을 통해 확인해 주세요.</div>
     </div>`;
+  }
+
+  /* ── 항공편 선택 (도착 / 출발, 패키지만) ── */
+  if (isPkg && flightOpts.length) {
+    const renderFlightSection = (type, title) => `
+    <div class="booking-section">
+      <div class="booking-section-title">${title}</div>
+      ${flightOpts.map(f => `
+        <div class="option-row" onclick="selectFlight('${type}','${f.key}')">
+          <div class="opt-check radio" id="o${type}-${f.key}"></div>
+          ${f.image ? `<img class="option-thumb" src="${f.image}" alt="">` : ''}
+          <div class="option-info">
+            <div class="option-label">${f.name || ''}${f.location ? ` · ${f.location}` : ''}</div>
+            <div class="option-price">${f.time ? f.time + (f.desc ? ' · ' : '') : ''}${f.desc || ''}</div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+    html += renderFlightSection('arr', '✈️ 도착 항공편 선택 (한국 → 장가계)');
+    html += renderFlightSection('dep', '🛫 출발 항공편 선택 (장가계 → 한국)');
+    html += `<div class="min-pax-note">📌 항공권은 포함 사항이 아니며, 선택하신 항공편 정보는 공항 픽업·센딩 시간을 맞추기 위한 참고용입니다. 정확한 스케줄은 상담을 통해 확인해 주세요.</div>`;
   }
 
   /* ── 그룹(라디오, 단일선택) 옵션 + 일반(체크박스, 다중선택) 옵션 ── */
@@ -566,6 +593,8 @@ function openModal(id) {
     if (_opts[k]) { const el = document.getElementById('oc-' + k); if (el) el.classList.add('checked'); }
   });
   if (_hotel) { const el = document.getElementById('oh-' + _hotel); if (el) el.classList.add('checked'); }
+  if (_arrFlight) { const el = document.getElementById('oarr-' + _arrFlight); if (el) el.classList.add('checked'); }
+  if (_depFlight) { const el = document.getElementById('odep-' + _depFlight); if (el) el.classList.add('checked'); }
   if (isPkg) renderDayPlan();
   document.getElementById('modal-bg').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -619,6 +648,19 @@ function selectHotel(key) {
     if (el) el.classList.toggle('checked', h.key === key);
   });
   updatePriceSummary();
+}
+
+/* ───── 항공편 선택 (도착/출발 각각 라디오, 단일선택) ───── */
+function selectFlight(type, key) {
+  const p = allProducts.find(x => x.id === _modalProductId);
+  if (!p) return;
+  const flightOpts = Array.isArray(p.flight_options) ? p.flight_options : [];
+  if (type === 'arr') _arrFlight = key; else _depFlight = key;
+  const prefix = type === 'arr' ? 'oarr-' : 'odep-';
+  flightOpts.forEach(f => {
+    const el = document.getElementById(prefix + f.key);
+    if (el) el.classList.toggle('checked', f.key === key);
+  });
 }
 
 /* ───── 맞춤투어 일자별 일정 빌더 ─────
@@ -769,12 +811,19 @@ function buildMsg(p) {
   const tiers  = Array.isArray(p.price_tiers)  ? p.price_tiers  : [];
   const options = Array.isArray(p.tour_options) ? p.tour_options : [];
   const hotelOpts = Array.isArray(p.hotel_options) ? p.hotel_options : [];
+  const flightOpts = Array.isArray(p.flight_options) ? p.flight_options : [];
   const isPkg = p.product_type === 'package';
 
   let msg = `[로투차 투어 예약 문의]\n━━━━━━━━━━━━━━\n`;
   msg += `📌 상품: ${p.title_ko}\n`;
   msg += `🗓️ 유형: ${isPkg ? '맞춤투어 ' + p.duration_days + '일' : '1일투어'}\n`;
   msg += `📅 여행 날짜: ${_date || '(미선택)'}\n`;
+  if (isPkg && flightOpts.length) {
+    const arr = flightOpts.find(f => f.key === _arrFlight);
+    const dep = flightOpts.find(f => f.key === _depFlight);
+    msg += `✈️ 도착 항공편: ${arr ? `${arr.name}${arr.time ? ' ('+arr.time+')' : ''}` : '(미선택)'}\n`;
+    msg += `🛫 출발 항공편: ${dep ? `${dep.name}${dep.time ? ' ('+dep.time+')' : ''}` : '(미선택)'}\n`;
+  }
   msg += `━━━━━━━━━━━━━━\n👥 인원:\n`;
 
   let total = 0;
@@ -844,7 +893,7 @@ function quickInquire(id) {
   const p = allProducts.find(x => x.id === id);
   if (!p) return;
   _modalProductId = id;
-  _pax = {}; _opts = {}; _date = ''; _hotel = null; _mealNote = ''; _pkgDays = [];
+  _pax = {}; _opts = {}; _date = ''; _hotel = null; _arrFlight = null; _depFlight = null; _mealNote = ''; _pkgDays = [];
   sendInquiry('kakao', buildMsg(p));
 }
 

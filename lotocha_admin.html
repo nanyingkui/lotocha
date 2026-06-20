@@ -341,6 +341,17 @@ textarea.field-input{min-height:80px;resize:vertical}
         <div class="field-hint">고객 화면에 라디오(단일선택)로 표시됩니다. 첫 항목이 기본 선택됨. "중국 명절 기간 가격 변동 안내"는 고객 화면에 자동으로 함께 표시됩니다</div>
       </div>
 
+      <!-- 항공편 (맞춤투어용) -->
+      <div class="field-group">
+        <label class="field-label">한국→장가계 항공편 (flight_options, 맞춤투어용)</label>
+        <div class="dyn-section">
+          <div class="dyn-row-head"><span>key</span><span>노선명</span><span class="sm">출발지역</span><span class="sm">시간</span><span>설명</span><span>이미지</span></div>
+          <div id="t-flights-list"></div>
+          <button type="button" class="btn-add-row" onclick="addFlight()">+ 항공편 추가</button>
+        </div>
+        <div class="field-hint">고객 화면에 "도착 항공편"과 "출발 항공편"으로 각각 따로 선택할 수 있게 표시됩니다 (같은 목록을 양쪽에 사용). 이미지는 URL 직접 입력 또는 📎 버튼으로 업로드 가능. 항공권 자체는 포함 사항이 아니라 픽업·센딩 시간 조율용 정보입니다</div>
+      </div>
+
       <!-- 일정 (참고용) -->
       <div class="field-group">
         <label class="field-label" id="t-itin-label">일정 (itinerary, 참고용)</label>
@@ -672,9 +683,41 @@ function renderHotelRow(h={}) {
     <button class="btn-rm" onclick="this.parentNode.remove()">✕</button>`;
   return d;
 }
-function addTier()  { document.getElementById('t-tiers-list').appendChild(renderTierRow()); }
-function addOpt()   { document.getElementById('t-opts-list').appendChild(renderOptRow()); }
-function addHotel() { document.getElementById('t-hotels-list').appendChild(renderHotelRow()); }
+function renderFlightRow(f={}) {
+  const d = document.createElement('div');
+  d.className = 'dyn-row';
+  d.innerHTML = `
+    <input type="text" placeholder="key" value="${f.key||''}" style="flex:1;max-width:70px">
+    <input type="text" placeholder="노선명 (예: 인천→장가계 대한항공)" value="${f.name||''}" style="flex:2;min-width:160px">
+    <input type="text" placeholder="출발지역 (예: 인천)" value="${f.location||''}" style="flex:1;max-width:90px">
+    <input type="text" placeholder="시간 (예: 오전 출발·약 3시간30분)" value="${f.time||''}" style="flex:1;min-width:150px">
+    <input type="text" placeholder="설명" value="${f.desc||''}" style="flex:2;min-width:140px">
+    <input type="text" placeholder="이미지 URL" value="${f.image||''}" class="flight-img-url" style="flex:2;min-width:140px">
+    <button type="button" class="btn-add-row" onclick="this.nextElementSibling.click()" title="이미지 업로드">📎</button>
+    <input type="file" accept="image/*" style="display:none" onchange="uploadFlightImg(this)">
+    <button class="btn-rm" onclick="this.parentNode.remove()">✕</button>`;
+  return d;
+}
+function addTier()   { document.getElementById('t-tiers-list').appendChild(renderTierRow()); }
+function addOpt()    { document.getElementById('t-opts-list').appendChild(renderOptRow()); }
+function addHotel()  { document.getElementById('t-hotels-list').appendChild(renderHotelRow()); }
+function addFlight() { document.getElementById('t-flights-list').appendChild(renderFlightRow()); }
+async function uploadFlightImg(fileInput) {
+  const files = [...fileInput.files];
+  if (!files.length) return;
+  const row = fileInput.closest('.dyn-row');
+  const urlInput = row.querySelector('.flight-img-url');
+  const file = files[0];
+  const ext = file.name.includes('.') ? file.name.split('.').pop() : 'jpg';
+  const path = `${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+  toast('이미지 업로드 중...', '');
+  const { error } = await sb.storage.from(STORAGE_BUCKET).upload(path, file, {cacheControl:'31536000', upsert:false});
+  if (error) { toast('업로드 실패','error'); return; }
+  const { data: urlData } = sb.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+  if (urlInput) urlInput.value = urlData.publicUrl;
+  fileInput.value = '';
+  toast('✅ 이미지 업로드 완료','success');
+}
 function collectTiers() {
   return [...document.querySelectorAll('#t-tiers-list .dyn-row')].map(r=>{
     const ins = r.querySelectorAll('input');
@@ -697,6 +740,12 @@ function collectHotels() {
     const sel = r.querySelector('select');
     return {key:ins[0].value.trim(),name:ins[1].value.trim(),price:parseInt(ins[2].value)||0,per:sel.value,desc:ins[3].value.trim()};
   }).filter(h=>h.key&&h.name);
+}
+function collectFlights() {
+  return [...document.querySelectorAll('#t-flights-list .dyn-row')].map(r=>{
+    const ins = r.querySelectorAll('input');
+    return {key:ins[0].value.trim(),name:ins[1].value.trim(),location:ins[2].value.trim(),time:ins[3].value.trim(),desc:ins[4].value.trim(),image:ins[5].value.trim()};
+  }).filter(f=>f.key&&f.name);
 }
 
 /* 맞춤투어 명소 풀 (tour.html의 ATTRACTION_POOL과 동일 — 일정 입력 시 참고용) */
@@ -722,6 +771,7 @@ function openTourModal(id) {
   document.getElementById('t-tiers-list').innerHTML = '';
   document.getElementById('t-opts-list').innerHTML = '';
   document.getElementById('t-hotels-list').innerHTML = '';
+  document.getElementById('t-flights-list').innerHTML = '';
   if (!id) {
     clear();
     document.getElementById('t-type').value='day_tour'; document.getElementById('t-status').value='live';
@@ -750,9 +800,11 @@ function openTourModal(id) {
       const tl = document.getElementById('t-tiers-list');
       const ol = document.getElementById('t-opts-list');
       const hl = document.getElementById('t-hotels-list');
+      const fl = document.getElementById('t-flights-list');
       (p.price_tiers||[]).forEach(t=>tl.appendChild(renderTierRow(t)));
       (p.tour_options||[]).forEach(o=>ol.appendChild(renderOptRow(o)));
       (p.hotel_options||[]).forEach(h=>hl.appendChild(renderHotelRow(h)));
+      (p.flight_options||[]).forEach(f=>fl.appendChild(renderFlightRow(f)));
     });
   }
   document.getElementById('tour-modal-bg').classList.add('open');
@@ -785,6 +837,7 @@ async function saveTour() {
     price_tiers: collectTiers(),
     tour_options: collectOpts(),
     hotel_options: collectHotels(),
+    flight_options: collectFlights(),
     updated_at: new Date().toISOString(),
   };
   if (!payload.title_ko) { toast('상품명을 입력하세요','error'); return; }
