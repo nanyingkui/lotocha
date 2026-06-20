@@ -103,6 +103,8 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .opt-check{width:24px;height:24px;border-radius:6px;border:2px solid #ccc;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
 .opt-check.checked{background:var(--navy);border-color:var(--navy)}
 .opt-check.checked::after{content:"✓";color:#fff;font-size:13px;font-weight:900}
+.opt-check.radio{border-radius:50%}
+.opt-check.radio.checked::after{content:"";width:8px;height:8px;border-radius:50%;background:#fff}
 .option-info{flex:1}
 .option-label{font-size:13px;font-weight:700;color:var(--navy)}
 .option-price{font-size:11px;color:var(--gold);font-weight:700;margin-top:2px}
@@ -181,7 +183,7 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 
 <div class="tab-bar">
   <button class="tab-btn on" id="tab-day" onclick="switchTab('day')">🌅 1일투어</button>
-  <button class="tab-btn" id="tab-pkg" onclick="switchTab('pkg')">📦 패키지</button>
+  <button class="tab-btn" id="tab-pkg" onclick="switchTab('pkg')">🧭 맞춤투어</button>
 </div>
 
 <div class="wrap">
@@ -260,7 +262,8 @@ function getEmoji(p) {
 /* ───── 카드 렌더 ───── */
 function cardHTML(p) {
   const tiers = Array.isArray(p.price_tiers) && p.price_tiers.length ? p.price_tiers : null;
-  const minPrice = tiers ? Math.min(...tiers.map(t => t.price)) : p.price_krw;
+  const adultTier = tiers ? tiers.find(t => t.key === 'adult') : null;
+  const displayPrice = adultTier ? adultTier.price : p.price_krw;
   const highlights = Array.isArray(p.highlights) ? p.highlights.slice(0, 3) : [];
   const isPkg = p.product_type === 'package';
   return `
@@ -268,14 +271,14 @@ function cardHTML(p) {
     <div class="card-img">${getEmoji(p)}</div>
     <div class="card-body">
       <div class="card-badge-row">
-        <span class="badge ${isPkg ? 'badge-pkg' : 'badge-day'}">${isPkg ? '패키지 ' + p.duration_days + '일' : '1일투어'}</span>
+        <span class="badge ${isPkg ? 'badge-pkg' : 'badge-day'}">${isPkg ? '맞춤투어 ' + p.duration_days + '일' : '1일투어'}</span>
         <span class="badge badge-live">예약 가능</span>
       </div>
       <div class="card-title">${p.title_ko || '—'}</div>
       <div class="card-subtitle">${p.subtitle_ko || ''}</div>
       <div class="price-row">
         <span class="price-from">성인 기준</span>
-        <span class="price-krw">${fmt(p.price_krw)}</span>
+        <span class="price-krw">${fmt(displayPrice)}</span>
         ${p.price_cny ? `<span style="font-size:12px;color:#aaa">${fmtCny(p.price_cny)}</span>` : ''}
       </div>
       <div class="price-label">최소 ${p.min_pax || 2}인 출발</div>
@@ -315,7 +318,7 @@ async function loadProducts() {
 
     document.getElementById('pkg-list').innerHTML =
       pkgProds.length ? pkgProds.map(cardHTML).join('') :
-      '<div style="text-align:center;padding:30px 20px;color:#aaa;font-size:13px">🔜 패키지 상품 준비 중입니다<br><small style="font-size:11px">곧 업데이트될 예정입니다</small></div>';
+      '<div style="text-align:center;padding:30px 20px;color:#aaa;font-size:13px">🔜 맞춤투어 상품 준비 중입니다<br><small style="font-size:11px">곧 업데이트될 예정입니다</small></div>';
 
   } catch(e) {
     const err = `<div class="error-box">상품을 불러오지 못했습니다<br><small>${e.message}</small></div>`;
@@ -350,6 +353,10 @@ function openModal(id) {
 
   tiers.forEach(t => _pax[t.key] = 0);
   options.forEach(o => _opts[o.key] = false);
+  /* 그룹(라디오) 옵션은 그룹 내 첫번째 항목을 기본 선택 */
+  const _groupMap = {};
+  options.forEach(o => { if (o.group) (_groupMap[o.group] = _groupMap[o.group] || []).push(o); });
+  Object.values(_groupMap).forEach(arr => { if (arr.length) _opts[arr[0].key] = true; });
 
   document.getElementById('modal-title').textContent = p.title_ko || '—';
 
@@ -385,12 +392,33 @@ function openModal(id) {
     </div>`;
   }
 
-  /* ── 선택 옵션 ── */
-  if (options.length) {
+  /* ── 그룹(라디오, 단일선택) 옵션 + 일반(체크박스, 다중선택) 옵션 ── */
+  const groupMap = {};
+  const plainOpts = [];
+  options.forEach(o => {
+    if (o.group) { (groupMap[o.group] = groupMap[o.group] || []).push(o); }
+    else plainOpts.push(o);
+  });
+  const GROUP_LABEL = { lodging: '🛏️ 숙박 등급 선택' };
+  Object.keys(groupMap).forEach(g => {
+    html += `
+    <div class="booking-section">
+      <div class="booking-section-title">${GROUP_LABEL[g] || '✅ ' + g + ' 선택'}</div>
+      ${groupMap[g].map(o => `
+        <div class="option-row" onclick="selectGroupOpt('${g}','${o.key}')">
+          <div class="opt-check radio" id="oc-${o.key}"></div>
+          <div class="option-info">
+            <div class="option-label">${o.label}</div>
+            <div class="option-price">${o.price ? '+ ' + fmtFull(o.price) + (o.per==='pax' ? ' / 인' : '') : '기본 포함'}</div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+  });
+  if (plainOpts.length) {
     html += `
     <div class="booking-section">
       <div class="booking-section-title">✅ 선택 옵션 (추가금)</div>
-      ${options.map(o => `
+      ${plainOpts.map(o => `
         <div class="option-row" onclick="toggleOpt('${o.key}')">
           <div class="opt-check" id="oc-${o.key}"></div>
           <div class="option-info">
@@ -407,10 +435,14 @@ function openModal(id) {
   </div>`;
 
   /* ── 일정 아코디언 ── */
+  const isPkg = p.product_type === 'package';
+  if (isPkg) {
+    html += `<div class="min-pax-note">📌 아래 일정은 참고용 예시이며, 실제 세부 일정은 카카오톡/WeChat 상담을 통해 맞춤 조정됩니다.</div>`;
+  }
   if (itinerary.length) {
     html += `
     <div class="accordion" onclick="toggleAcc('acc-itin')">
-      <div class="accordion-title">🗓️ 투어 일정
+      <div class="accordion-title">🗓️ ${isPkg ? '참고 일정 (상담 후 확정)' : '투어 일정'}
         <span class="accordion-arrow" id="arr-acc-itin">▼</span>
       </div>
     </div>
@@ -445,6 +477,10 @@ function openModal(id) {
     </div>`;
 
   document.getElementById('modal-content').innerHTML = html;
+  /* 그룹 옵션 기본 선택 상태를 화면에 반영 */
+  Object.keys(_opts).forEach(k => {
+    if (_opts[k]) { const el = document.getElementById('oc-' + k); if (el) el.classList.add('checked'); }
+  });
   document.getElementById('modal-bg').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -470,6 +506,19 @@ function toggleOpt(key) {
   _opts[key] = !_opts[key];
   const el = document.getElementById('oc-' + key);
   if (el) el.classList.toggle('checked', _opts[key]);
+  updatePriceSummary();
+}
+
+/* ───── 그룹 옵션 선택 (라디오, 단일선택) ───── */
+function selectGroupOpt(group, key) {
+  const p = allProducts.find(x => x.id === _modalProductId);
+  if (!p) return;
+  const options = Array.isArray(p.tour_options) ? p.tour_options : [];
+  options.filter(o => o.group === group).forEach(o => {
+    _opts[o.key] = (o.key === key);
+    const el = document.getElementById('oc-' + o.key);
+    if (el) el.classList.toggle('checked', _opts[o.key]);
+  });
   updatePriceSummary();
 }
 
@@ -540,7 +589,7 @@ function buildMsg(p) {
 
   let msg = `[로투차 투어 예약 문의]\n━━━━━━━━━━━━━━\n`;
   msg += `📌 상품: ${p.title_ko}\n`;
-  msg += `🗓️ 유형: ${isPkg ? '패키지 ' + p.duration_days + '일' : '1일투어'}\n`;
+  msg += `🗓️ 유형: ${isPkg ? '맞춤투어 ' + p.duration_days + '일' : '1일투어'}\n`;
   msg += `📅 여행 날짜: ${_date || '(미선택)'}\n`;
   msg += `━━━━━━━━━━━━━━\n👥 인원:\n`;
 

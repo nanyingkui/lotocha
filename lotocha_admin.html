@@ -205,7 +205,7 @@ textarea.field-input{min-height:80px;resize:vertical}
     <!-- 투어 상품 -->
     <div class="panel" id="panel-tours">
       <div class="page-title">🏔️ 투어 상품</div>
-      <div class="page-sub">1일투어 및 패키지 관리</div>
+      <div class="page-sub">1일투어 및 맞춤투어 관리</div>
       <div class="table-wrap">
         <div class="table-head"><h3>전체 상품</h3><button class="btn-add" onclick="openTourModal()">+ 상품 추가</button></div>
         <table><thead><tr><th>타입</th><th>상품명</th><th>가격</th><th>기간</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
@@ -282,7 +282,7 @@ textarea.field-input{min-height:80px;resize:vertical}
       <input type="hidden" id="t-id">
       <div class="field-row">
         <div class="field-group"><label class="field-label">타입 *</label>
-          <select id="t-type" class="field-input"><option value="day_tour">1일투어</option><option value="package">패키지</option></select></div>
+          <select id="t-type" class="field-input"><option value="day_tour">1일투어</option><option value="package">맞춤투어</option></select></div>
         <div class="field-group"><label class="field-label">상태</label>
           <select id="t-status" class="field-input"><option value="live">라이브</option><option value="draft">초안</option><option value="archived">보관</option></select></div>
       </div>
@@ -323,10 +323,18 @@ textarea.field-input{min-height:80px;resize:vertical}
       <div class="field-group">
         <label class="field-label">선택 옵션 (tour_options)</label>
         <div class="dyn-section">
-          <div class="dyn-row-head"><span>key</span><span>라벨</span><span class="sm">가격(원)</span><span class="sm">단위</span><span class="sm"></span></div>
+          <div class="dyn-row-head"><span>key</span><span>라벨</span><span class="sm">가격(원)</span><span class="sm">단위</span><span class="sm">선택그룹</span></div>
           <div id="t-opts-list"></div>
           <button type="button" class="btn-add-row" onclick="addOpt()">+ 옵션 추가</button>
         </div>
+        <div class="field-hint">선택그룹: 같은 값을 입력한 옵션끼리는 라디오(단일선택)로 묶임 (예: 숙박 등급은 모두 group=lodging). 비워두면 기존처럼 체크박스 다중선택. 같은 그룹의 첫 항목이 고객 화면에서 기본 선택됨</div>
+      </div>
+
+      <!-- 일정 (참고용) -->
+      <div class="field-group">
+        <label class="field-label">일정 (itinerary, 참고용)</label>
+        <textarea id="t-itinerary" class="field-input" placeholder="09:00|호텔 픽업 후 출발&#10;09:30|황룡동 입장 및 유람선 체험&#10;11:00|점심 식사"></textarea>
+        <div class="field-hint">한 줄에 "시간|내용" 형식으로 입력 (줄바꿈 구분). 맞춤투어(패키지)의 경우 고객 화면에 "참고 일정이며 실제 세부 일정은 상담 후 확정됩니다" 안내가 자동으로 함께 표시됩니다</div>
       </div>
     </div>
     <div class="modal-footer">
@@ -500,6 +508,13 @@ function fmt(n) { return n ? n.toLocaleString('ko-KR')+'원' : '-'; }
 function dateStr(s) { return s ? s.slice(0,10) : '-'; }
 function linesToArr(s) { return s.split('\n').map(x=>x.trim()).filter(Boolean); }
 function arrToLines(a) { return (a||[]).join('\n'); }
+function linesToItin(s) {
+  return s.split('\n').map(x=>x.trim()).filter(Boolean).map(line=>{
+    const idx = line.indexOf('|');
+    return idx === -1 ? {time:'',desc:line} : {time:line.slice(0,idx).trim(),desc:line.slice(idx+1).trim()};
+  });
+}
+function itinToLines(a) { return (a||[]).map(it=>`${it.time||''}|${it.desc||it.name||''}`).join('\n'); }
 
 async function doLogin() {
   const email = document.getElementById('login-email').value.trim();
@@ -579,7 +594,7 @@ async function loadTours() {
   const { data } = await sb.from('tour_products').select('*').order('sort_order');
   document.getElementById('tours-tbody').innerHTML = !data ? '<tr><td colspan="7" style="color:var(--red)">로드 실패</td></tr>'
     : data.map(p=>`<tr>
-        <td><span class="badge ${p.product_type==='day_tour'?'badge-day':'badge-pkg'}">${p.product_type==='day_tour'?'1일투어':'패키지'}</span></td>
+        <td><span class="badge ${p.product_type==='day_tour'?'badge-day':'badge-pkg'}">${p.product_type==='day_tour'?'1일투어':'맞춤투어'}</span></td>
         <td style="font-weight:700">${p.title_ko}</td><td>${fmt(p.price_krw)}</td><td>${p.duration_days}일</td>
         <td><span class="badge badge-${p.status}">${{live:'라이브',draft:'초안',pending:'검토중',archived:'보관'}[p.status]||p.status}</span></td>
         <td>${p.sort_order}</td>
@@ -607,6 +622,7 @@ function renderOptRow(o={}) {
     <input type="text" placeholder="라벨" value="${o.label||''}" style="flex:2">
     <input type="number" placeholder="가격" value="${o.price||''}" style="flex:1;max-width:90px">
     <select style="flex:1;max-width:70px"><option value="pax" ${o.per==='pax'?'selected':''}>인당</option><option value="group" ${o.per==='group'?'selected':''}>그룹</option></select>
+    <input type="text" placeholder="선택그룹(예:lodging)" value="${o.group||''}" style="flex:1;max-width:120px" title="같은 값을 입력한 옵션끼리는 라디오(단일선택)로 묶입니다. 비워두면 기존처럼 다중선택(체크박스)">
     <button class="btn-rm" onclick="this.parentNode.remove()">✕</button>`;
   return d;
 }
@@ -622,13 +638,16 @@ function collectOpts() {
   return [...document.querySelectorAll('#t-opts-list .dyn-row')].map(r=>{
     const ins = r.querySelectorAll('input');
     const sel = r.querySelector('select');
-    return {key:ins[0].value.trim(),label:ins[1].value.trim(),price:parseInt(ins[2].value)||0,per:sel.value};
+    const group = ins[3].value.trim();
+    const o = {key:ins[0].value.trim(),label:ins[1].value.trim(),price:parseInt(ins[2].value)||0,per:sel.value};
+    if (group) o.group = group;
+    return o;
   }).filter(o=>o.key&&o.label);
 }
 
 function openTourModal(id) {
   document.getElementById('tour-modal-title').textContent = id ? '투어 상품 편집' : '투어 상품 추가';
-  const clear = () => ['t-id','t-title-ko','t-title-cn','t-subtitle','t-desc','t-price-krw','t-price-cny','t-images','t-highlights','t-includes','t-excludes'].forEach(f=>document.getElementById(f).value='');
+  const clear = () => ['t-id','t-title-ko','t-title-cn','t-subtitle','t-desc','t-price-krw','t-price-cny','t-images','t-highlights','t-includes','t-excludes','t-itinerary'].forEach(f=>document.getElementById(f).value='');
   document.getElementById('t-tiers-list').innerHTML = '';
   document.getElementById('t-opts-list').innerHTML = '';
   if (!id) {
@@ -653,6 +672,7 @@ function openTourModal(id) {
       document.getElementById('t-highlights').value=arrToLines(p.highlights);
       document.getElementById('t-includes').value=arrToLines(p.includes);
       document.getElementById('t-excludes').value=arrToLines(p.excludes);
+      document.getElementById('t-itinerary').value=itinToLines(p.itinerary);
       const tl = document.getElementById('t-tiers-list');
       const ol = document.getElementById('t-opts-list');
       (p.price_tiers||[]).forEach(t=>tl.appendChild(renderTierRow(t)));
@@ -683,6 +703,7 @@ async function saveTour() {
     highlights: linesToArr(document.getElementById('t-highlights').value),
     includes: linesToArr(document.getElementById('t-includes').value),
     excludes: linesToArr(document.getElementById('t-excludes').value),
+    itinerary: linesToItin(document.getElementById('t-itinerary').value),
     price_tiers: collectTiers(),
     tour_options: collectOpts(),
     updated_at: new Date().toISOString(),
