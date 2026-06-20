@@ -282,7 +282,7 @@ textarea.field-input{min-height:80px;resize:vertical}
       <input type="hidden" id="t-id">
       <div class="field-row">
         <div class="field-group"><label class="field-label">타입 *</label>
-          <select id="t-type" class="field-input"><option value="day_tour">1일투어</option><option value="package">맞춤투어</option></select></div>
+          <select id="t-type" class="field-input" onchange="updateItinHint()"><option value="day_tour">1일투어</option><option value="package">맞춤투어</option></select></div>
         <div class="field-group"><label class="field-label">상태</label>
           <select id="t-status" class="field-input"><option value="live">라이브</option><option value="draft">초안</option><option value="archived">보관</option></select></div>
       </div>
@@ -327,14 +327,25 @@ textarea.field-input{min-height:80px;resize:vertical}
           <div id="t-opts-list"></div>
           <button type="button" class="btn-add-row" onclick="addOpt()">+ 옵션 추가</button>
         </div>
-        <div class="field-hint">선택그룹: 같은 값을 입력한 옵션끼리는 라디오(단일선택)로 묶임 (예: 숙박 등급은 모두 group=lodging). 비워두면 기존처럼 체크박스 다중선택. 같은 그룹의 첫 항목이 고객 화면에서 기본 선택됨</div>
+        <div class="field-hint">선택그룹: 같은 값을 입력한 옵션끼리는 라디오(단일선택)로 묶임 (예: 식사 업그레이드는 group=meal). 비워두면 기존처럼 체크박스 다중선택. 같은 그룹의 첫 항목이 고객 화면에서 기본 선택됨. ※ 숙박은 아래 "추천 호텔" 항목을 사용하세요</div>
+      </div>
+
+      <!-- 추천 호텔 (맞춤투어용) -->
+      <div class="field-group">
+        <label class="field-label">추천 호텔 (hotel_options, 맞춤투어용)</label>
+        <div class="dyn-section">
+          <div class="dyn-row-head"><span>key</span><span>호텔명/등급</span><span class="sm">추가요금(원)</span><span class="sm">단위</span><span class="sm">설명</span></div>
+          <div id="t-hotels-list"></div>
+          <button type="button" class="btn-add-row" onclick="addHotel()">+ 호텔 추가</button>
+        </div>
+        <div class="field-hint">고객 화면에 라디오(단일선택)로 표시됩니다. 첫 항목이 기본 선택됨. "중국 명절 기간 가격 변동 안내"는 고객 화면에 자동으로 함께 표시됩니다</div>
       </div>
 
       <!-- 일정 (참고용) -->
       <div class="field-group">
-        <label class="field-label">일정 (itinerary, 참고용)</label>
+        <label class="field-label" id="t-itin-label">일정 (itinerary, 참고용)</label>
         <textarea id="t-itinerary" class="field-input" placeholder="09:00|호텔 픽업 후 출발&#10;09:30|황룡동 입장 및 유람선 체험&#10;11:00|점심 식사"></textarea>
-        <div class="field-hint">한 줄에 "시간|내용" 형식으로 입력 (줄바꿈 구분). 맞춤투어(패키지)의 경우 고객 화면에 "참고 일정이며 실제 세부 일정은 상담 후 확정됩니다" 안내가 자동으로 함께 표시됩니다</div>
+        <div class="field-hint" id="t-itin-hint">한 줄에 "시간|내용" 형식으로 입력 (줄바꿈 구분)</div>
       </div>
     </div>
     <div class="modal-footer">
@@ -516,6 +527,29 @@ function linesToItin(s) {
 }
 function itinToLines(a) { return (a||[]).map(it=>`${it.time||''}|${it.desc||it.name||''}`).join('\n'); }
 
+/* 맞춤투어(패키지)용 일자별 일정: "일차|시간대|명소key" 줄 형식 ↔ {day,am,pm,evening[]} 구조 */
+function linesToPkgItin(s) {
+  const days = {};
+  s.split('\n').map(x=>x.trim()).filter(Boolean).forEach(line=>{
+    const [dayStr, slot, key] = line.split('|').map(x=>(x||'').trim());
+    const day = parseInt(dayStr);
+    if (!day || !slot || !key) return;
+    if (!days[day]) days[day] = {day, am:null, pm:null, evening:[]};
+    if (slot === 'evening') days[day].evening.push({key});
+    else if (slot === 'am' || slot === 'pm') days[day][slot] = {key};
+  });
+  return Object.values(days).sort((a,b)=>a.day-b.day);
+}
+function pkgItinToLines(arr) {
+  const lines = [];
+  (arr||[]).forEach(d=>{
+    if (d.am) lines.push(`${d.day}|am|${d.am.key}`);
+    if (d.pm) lines.push(`${d.day}|pm|${d.pm.key}`);
+    (d.evening||[]).forEach(e=>lines.push(`${d.day}|evening|${e.key}`));
+  });
+  return lines.join('\n');
+}
+
 async function doLogin() {
   const email = document.getElementById('login-email').value.trim();
   const pw = document.getElementById('login-pw').value;
@@ -622,12 +656,25 @@ function renderOptRow(o={}) {
     <input type="text" placeholder="라벨" value="${o.label||''}" style="flex:2">
     <input type="number" placeholder="가격" value="${o.price||''}" style="flex:1;max-width:90px">
     <select style="flex:1;max-width:70px"><option value="pax" ${o.per==='pax'?'selected':''}>인당</option><option value="group" ${o.per==='group'?'selected':''}>그룹</option></select>
-    <input type="text" placeholder="선택그룹(예:lodging)" value="${o.group||''}" style="flex:1;max-width:120px" title="같은 값을 입력한 옵션끼리는 라디오(단일선택)로 묶입니다. 비워두면 기존처럼 다중선택(체크박스)">
+    <input type="text" placeholder="선택그룹(예:meal)" value="${o.group||''}" style="flex:1;max-width:120px" title="같은 값을 입력한 옵션끼리는 라디오(단일선택)로 묶입니다. 비워두면 기존처럼 다중선택(체크박스)">
     <button class="btn-rm" onclick="this.parentNode.remove()">✕</button>`;
   return d;
 }
-function addTier() { document.getElementById('t-tiers-list').appendChild(renderTierRow()); }
-function addOpt()  { document.getElementById('t-opts-list').appendChild(renderOptRow()); }
+function renderHotelRow(h={}) {
+  const d = document.createElement('div');
+  d.className = 'dyn-row';
+  d.innerHTML = `
+    <input type="text" placeholder="key" value="${h.key||''}" style="flex:1;max-width:80px">
+    <input type="text" placeholder="호텔명/등급" value="${h.name||''}" style="flex:2">
+    <input type="number" placeholder="추가요금" value="${h.price||''}" style="flex:1;max-width:90px">
+    <select style="flex:1;max-width:70px"><option value="pax" ${h.per==='pax'?'selected':''}>인당</option><option value="group" ${h.per==='group'?'selected':''}>그룹</option></select>
+    <input type="text" placeholder="설명(등급/위치 등)" value="${h.desc||''}" style="flex:2">
+    <button class="btn-rm" onclick="this.parentNode.remove()">✕</button>`;
+  return d;
+}
+function addTier()  { document.getElementById('t-tiers-list').appendChild(renderTierRow()); }
+function addOpt()   { document.getElementById('t-opts-list').appendChild(renderOptRow()); }
+function addHotel() { document.getElementById('t-hotels-list').appendChild(renderHotelRow()); }
 function collectTiers() {
   return [...document.querySelectorAll('#t-tiers-list .dyn-row')].map(r=>{
     const ins = r.querySelectorAll('input');
@@ -644,16 +691,42 @@ function collectOpts() {
     return o;
   }).filter(o=>o.key&&o.label);
 }
+function collectHotels() {
+  return [...document.querySelectorAll('#t-hotels-list .dyn-row')].map(r=>{
+    const ins = r.querySelectorAll('input');
+    const sel = r.querySelector('select');
+    return {key:ins[0].value.trim(),name:ins[1].value.trim(),price:parseInt(ins[2].value)||0,per:sel.value,desc:ins[3].value.trim()};
+  }).filter(h=>h.key&&h.name);
+}
+
+/* 맞춤투어 명소 풀 (tour.html의 ATTRACTION_POOL과 동일 — 일정 입력 시 참고용) */
+const ATTRACTION_POOL_KEYS = {
+  large: ['tianmen(천문산)','forest_east(국가삼림공원 동문A·B선)','grand_canyon(장가계대협곡)','furong(부용진)','fenghuang(봉황고성)'],
+  feature: ['baofeng(보봉호)','huanglong(황룡동)','qixing(칠성산)','tujia(토가족풍정원)','forest_south(국가삼림공원 남문-황석채)','jinbianxi(금편계트레킹)'],
+  local: ['qiqilou(72기루)','supermarket(현지대형마트)','cafe(현지특색카페)'],
+};
+function updateItinHint() {
+  const isPkg = document.getElementById('t-type').value === 'package';
+  document.getElementById('t-itin-label').textContent = isPkg ? '일정 (itinerary, 참고용 추천 일정)' : '일정 (itinerary, 참고용)';
+  document.getElementById('t-itinerary').placeholder = isPkg
+    ? '1|am|tianmen\n1|evening|qiqilou\n2|am|grand_canyon\n2|pm|huanglong\n3|evening|supermarket\n3|evening|cafe'
+    : '09:00|호텔 픽업 후 출발\n09:30|황룡동 입장 및 유람선 체험\n11:00|점심 식사';
+  document.getElementById('t-itin-hint').innerHTML = isPkg
+    ? `한 줄에 "일차|시간대|명소key" 형식 (시간대: am/pm/evening). 대형은 am 또는 pm 중 1개만, 같은 날 대형 중복 불가 / 특색은 am·pm 자유 / 인문은 시간대 무관·중복 가능.<br>대형: ${ATTRACTION_POOL_KEYS.large.join(', ')}<br>특색: ${ATTRACTION_POOL_KEYS.feature.join(', ')}<br>인문: ${ATTRACTION_POOL_KEYS.local.join(', ')}`
+    : '한 줄에 "시간|내용" 형식으로 입력 (줄바꿈 구분)';
+}
 
 function openTourModal(id) {
   document.getElementById('tour-modal-title').textContent = id ? '투어 상품 편집' : '투어 상품 추가';
   const clear = () => ['t-id','t-title-ko','t-title-cn','t-subtitle','t-desc','t-price-krw','t-price-cny','t-images','t-highlights','t-includes','t-excludes','t-itinerary'].forEach(f=>document.getElementById(f).value='');
   document.getElementById('t-tiers-list').innerHTML = '';
   document.getElementById('t-opts-list').innerHTML = '';
+  document.getElementById('t-hotels-list').innerHTML = '';
   if (!id) {
     clear();
     document.getElementById('t-type').value='day_tour'; document.getElementById('t-status').value='live';
     document.getElementById('t-days').value='1'; document.getElementById('t-order').value='0';
+    updateItinHint();
   } else {
     sb.from('tour_products').select('*').eq('id',id).single().then(({data:p})=>{
       if (!p) return;
@@ -672,11 +745,14 @@ function openTourModal(id) {
       document.getElementById('t-highlights').value=arrToLines(p.highlights);
       document.getElementById('t-includes').value=arrToLines(p.includes);
       document.getElementById('t-excludes').value=arrToLines(p.excludes);
-      document.getElementById('t-itinerary').value=itinToLines(p.itinerary);
+      document.getElementById('t-itinerary').value = p.product_type === 'package' ? pkgItinToLines(p.itinerary) : itinToLines(p.itinerary);
+      updateItinHint();
       const tl = document.getElementById('t-tiers-list');
       const ol = document.getElementById('t-opts-list');
+      const hl = document.getElementById('t-hotels-list');
       (p.price_tiers||[]).forEach(t=>tl.appendChild(renderTierRow(t)));
       (p.tour_options||[]).forEach(o=>ol.appendChild(renderOptRow(o)));
+      (p.hotel_options||[]).forEach(h=>hl.appendChild(renderHotelRow(h)));
     });
   }
   document.getElementById('tour-modal-bg').classList.add('open');
@@ -703,9 +779,12 @@ async function saveTour() {
     highlights: linesToArr(document.getElementById('t-highlights').value),
     includes: linesToArr(document.getElementById('t-includes').value),
     excludes: linesToArr(document.getElementById('t-excludes').value),
-    itinerary: linesToItin(document.getElementById('t-itinerary').value),
+    itinerary: document.getElementById('t-type').value === 'package'
+      ? linesToPkgItin(document.getElementById('t-itinerary').value)
+      : linesToItin(document.getElementById('t-itinerary').value),
     price_tiers: collectTiers(),
     tour_options: collectOpts(),
+    hotel_options: collectHotels(),
     updated_at: new Date().toISOString(),
   };
   if (!payload.title_ko) { toast('상품명을 입력하세요','error'); return; }
