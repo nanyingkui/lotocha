@@ -348,16 +348,16 @@ const LOTOCHA_DB = {
       ],
       eveningOpts:[],
     },
-    { id:'B6', name:'황석채+봉황고성 2일 코스', emoji:'🏯', days:2, mustFirst:false, minNights:4,
+    { id:'B6', name:'황석채+봉황고성 2일 코스', emoji:'🏯', days:2, mustFirst:false, lastBlock:true, minNights:4,
       desc:'1일차: 황석채 → 봉황고성 야간 타강 / 2일차: 09시 귀환 → 오후 대협곡. 2일 연속 고정.',
       image:'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=600&q=75',
       ticketCNY:500, ticketNote:'봉황고성 500 포함',
       schedule:[
-        {t:'1일 오전','a':'황석채 관람'},
-        {t:'1일 오후','a':'봉황고성 이동 (약 3시간)'},
-        {t:'1일 저녁','a':'봉황고성 탐방 + 타강 야간 유람'},
-        {t:'2일 오전','a':'봉황 자유 후 09시 귀환'},
-        {t:'2일 오후','a':'대협곡 유리다리'},
+        {t:'오전', d:0, 'a':'황석채 관람'},
+        {t:'오후', d:0, 'a':'봉황고성 이동 (약 3시간)'},
+        {t:'저녁', d:0, 'a':'봉황고성 탐방 + 타강 야간 유람'},
+        {t:'오전', d:1, 'a':'봉황 자유 후 09시 귀환'},
+        {t:'오후', d:1, 'a':'대협곡 유리다리'},
       ],
       spots:[
         {name:'봉황고성',desc:'2000년 묘족 고성',img:'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=300&q=60'},
@@ -652,7 +652,19 @@ function updateBlocks() {
 
   LOTOCHA_DB.blocks.forEach(b => {
     const isSelected = STATE.selectedBlocks.includes(b.id);
-    const wouldExceed = !isSelected && (usedSlots + b.days) > totalSlots;
+    // lastBlock(봉황)은 마지막 2슬롯을 차지 → 일반 슬롯과 별도 계산
+    const normalUsed = STATE.selectedBlocks.filter(id => {
+      const bl = LOTOCHA_DB.blocks.find(x => x.id === id);
+      return bl && !bl.lastBlock;
+    }).reduce((s, id) => { const bl = LOTOCHA_DB.blocks.find(x => x.id === id); return s + (bl?.days||0); }, 0);
+    const lastBlockSelected = STATE.selectedBlocks.some(id => {
+      const bl = LOTOCHA_DB.blocks.find(x => x.id === id);
+      return bl?.lastBlock;
+    });
+    const effectiveSlots = lastBlockSelected || b.lastBlock ? totalSlots - 2 : totalSlots;
+    const wouldExceed = !isSelected && (
+      b.lastBlock ? lastBlockSelected : (normalUsed + b.days) > effectiveSlots
+    );
     const tooShort = b.minNights > STATE.nights;
     // 부용진은 마지막날 배치 불가 — C타입에서 마지막 슬롯이 될 경우 차단
     const isLastDayBlock = STATE.arrivalType === 'C' && !isSelected &&
@@ -895,27 +907,65 @@ function buildItinerary() {
   // C타입: 마지막날도 블록 배치 가능 → 마지막날 인덱스까지 허용
   const blockEndDay = at === 'C' ? days : days - 1;
 
+  // B6(봉황)은 마지막 배치, 나머지는 mustFirst 우선
   const sortedBlocks = [...STATE.selectedBlocks].sort((a, b) => {
     const ba = LOTOCHA_DB.blocks.find(x => x.id === a);
     const bb = LOTOCHA_DB.blocks.find(x => x.id === b);
-    return (bb?.mustFirst ? 1 : 0) - (ba?.mustFirst ? 1 : 0);
+    if (bb?.mustFirst && !ba?.mustFirst) return 1;
+    if (ba?.mustFirst && !bb?.mustFirst) return -1;
+    if (ba?.lastBlock && !bb?.lastBlock) return 1;
+    if (bb?.lastBlock && !ba?.lastBlock) return -1;
+    return 0;
   });
 
-  sortedBlocks.forEach(bid => {
+  // B6(lastBlock)는 마지막 관광일 기준 역산해서 배치
+  const lastBlockBid = sortedBlocks.find(bid => {
     const b = LOTOCHA_DB.blocks.find(x => x.id === bid);
-    if (!b) return;
+    return b?.lastBlock;
+  });
+
+  // lastBlock 제외한 일반 블록 먼저 배치
+  const normalBlocks = sortedBlocks.filter(bid => {
+    const b = LOTOCHA_DB.blocks.find(x => x.id === bid);
+    return !b?.lastBlock;
+  });
+
+  // 마지막 관광 가능일 계산 (타입별)
+  const lastActivityDay = at === 'C' ? days - 1 : days - 2;
+
+  // lastBlock이 있으면 마지막 2일을 예약해둠
+  const reservedDays = lastBlockBid ? 2 : 0;
+  const normalEndDay = lastActivityDay - reservedDays;
+
+  function placeBlock(bid, startDay) {
+    const b = LOTOCHA_DB.blocks.find(x => x.id === bid);
+    if (!b) return startDay;
     for (let d = 0; d < b.days; d++) {
-      const dayIdx = blockDayStart + d;
-      if (dayIdx >= days) return;
-      b.schedule.forEach(s => { plan[dayIdx].slots.push({ time: s.t, content: s.a }); });
+      const dayIdx = startDay + d;
+      if (dayIdx >= days) break;
+      b.schedule.forEach(s => {
+        const slotDay = s.d !== undefined ? s.d : 0;
+        if (slotDay === d) plan[dayIdx].slots.push({ time: s.t, content: s.a });
+      });
     }
     const ev = STATE.blockEvenings[bid];
     if (ev) {
       const evData = LOTOCHA_DB.eveningEvents[ev];
-      if (evData) plan[blockDayStart].slots.push({ time: '저녁 공연', content: `${evData.name} (+${(evData.price/10000).toFixed(0)}만원)` });
+      if (evData) plan[startDay].slots.push({ time: '저녁 공연', content: `${evData.name} (+${(evData.price/10000).toFixed(0)}만원)` });
     }
-    blockDayStart += b.days;
+    return startDay + b.days;
+  }
+
+  // 일반 블록 배치
+  normalBlocks.forEach(bid => {
+    blockDayStart = placeBlock(bid, blockDayStart);
   });
+
+  // lastBlock(봉황) 배치 — 마지막 관광일 2일 전
+  if (lastBlockBid) {
+    const fenghuangStart = lastActivityDay - 1; // 마지막 관광일 - 1 (2일 코스이므로)
+    placeBlock(lastBlockBid, fenghuangStart);
+  }
 
   // ── 마지막날 슬롯 ────────────────────────────────────────
   const lastDay = plan[days - 1];
