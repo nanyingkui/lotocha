@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로투차 패키지 관리자</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans-serif;background:#f5f4f0;color:#1a1a18;font-size:15px;line-height:1.6;}
+
+/* 로그인 */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;}
+.login-box{background:#fff;border-radius:16px;border:0.5px solid rgba(0,0,0,0.1);padding:2rem;width:100%;max-width:360px;}
+.login-box h1{font-size:18px;font-weight:500;margin-bottom:1.5rem;text-align:center;}
+.login-box input{width:100%;padding:10px 14px;font-size:14px;border:0.5px solid rgba(0,0,0,0.2);border-radius:8px;background:#f5f4f0;color:#1a1a18;outline:none;margin-bottom:10px;}
+.login-box input:focus{border-color:rgba(0,0,0,0.4);background:#fff;}
+.login-box button{width:100%;padding:11px;background:#1a1a18;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;}
+.login-err{font-size:12px;color:#a32d2d;margin-top:6px;display:none;}
+
+/* 레이아웃 */
+.app{display:none;min-height:100vh;}
+.sidebar{position:fixed;left:0;top:0;width:220px;height:100vh;background:#1a1a18;color:#fff;padding:1.5rem 0;overflow-y:auto;}
+.sidebar .logo{font-size:15px;font-weight:500;padding:0 1.25rem 1.25rem;border-bottom:0.5px solid rgba(255,255,255,0.1);}
+.sidebar .logo span{font-size:11px;opacity:.5;display:block;margin-top:2px;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:10px 1.25rem;font-size:13px;cursor:pointer;color:rgba(255,255,255,0.6);transition:all .12s;}
+.nav-item:hover{background:rgba(255,255,255,0.07);color:#fff;}
+.nav-item.active{background:rgba(255,255,255,0.12);color:#fff;}
+.nav-item .ni{font-size:16px;}
+.nav-section{font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:.08em;padding:1rem 1.25rem .4rem;text-transform:uppercase;}
+.main{margin-left:220px;padding:2rem;}
+.page{display:none;}
+.page.active{display:block;}
+.page-title{font-size:20px;font-weight:500;margin-bottom:1.5rem;}
+
+/* 카드 */
+.card{background:#fff;border:0.5px solid rgba(0,0,0,0.1);border-radius:14px;padding:1.25rem;margin-bottom:1rem;}
+.card-title{font-size:13px;font-weight:500;color:#888780;letter-spacing:.06em;text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;}
+.row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:0.5px solid rgba(0,0,0,0.07);font-size:13px;}
+.row:last-child{border-bottom:none;}
+.row label{color:#1a1a18;}
+.row .ri{display:flex;align-items:center;gap:4px;}
+.row input{width:100px;padding:5px 8px;font-size:13px;text-align:right;border:0.5px solid rgba(0,0,0,0.2);border-radius:6px;background:#f5f4f0;color:#1a1a18;outline:none;}
+.row input:focus{border-color:rgba(0,0,0,0.4);background:#fff;}
+.row input.wide{width:200px;text-align:left;}
+.row .unit{font-size:11px;color:#888780;min-width:60px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:700px){.grid2{grid-template-columns:1fr;}}
+
+/* 버튼 */
+.btn{padding:8px 18px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:opacity .15s;}
+.btn-dark{background:#1a1a18;color:#fff;}
+.btn-dark:hover{opacity:.82;}
+.btn-outline{background:#fff;color:#1a1a18;border:0.5px solid rgba(0,0,0,0.25);}
+.btn-outline:hover{background:#f5f4f0;}
+.btn-danger{background:#a32d2d;color:#fff;}
+.btn-danger:hover{opacity:.82;}
+.btn-sm{padding:5px 12px;font-size:12px;}
+.btn-row{display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap;}
+
+/* 이미지 업로더 */
+.block-editor{border:0.5px solid rgba(0,0,0,0.1);border-radius:12px;overflow:hidden;margin-bottom:10px;}
+.be-header{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;background:#fff;transition:background .12s;}
+.be-header:hover{background:#f5f4f0;}
+.be-emoji{font-size:18px;}
+.be-name{font-size:14px;font-weight:500;flex:1;}
+.be-toggle{font-size:12px;color:#888780;}
+.be-body{display:none;padding:14px;border-top:0.5px solid rgba(0,0,0,0.07);background:#fff;}
+.be-body.open{display:block;}
+.img-upload-area{border:1.5px dashed rgba(0,0,0,0.2);border-radius:10px;padding:1rem;text-align:center;cursor:pointer;margin-bottom:10px;transition:border-color .15s;position:relative;}
+.img-upload-area:hover{border-color:rgba(0,0,0,0.4);}
+.img-upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.img-preview{width:100%;height:140px;object-fit:cover;border-radius:8px;display:block;margin-bottom:8px;}
+.img-url-row{display:flex;gap:6px;align-items:center;}
+.img-url-row input{flex:1;padding:6px 10px;font-size:12px;border:0.5px solid rgba(0,0,0,0.2);border-radius:6px;background:#f5f4f0;color:#1a1a18;outline:none;}
+.spot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-top:8px;}
+.spot-card{border:0.5px solid rgba(0,0,0,0.1);border-radius:8px;overflow:hidden;}
+.spot-card img{width:100%;height:80px;object-fit:cover;}
+.spot-card .sc-body{padding:6px 8px;}
+.spot-card .sc-name{font-size:12px;font-weight:500;}
+.spot-card .sc-desc{font-size:11px;color:#888780;}
+.spot-upload{border:1.5px dashed rgba(0,0,0,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;height:80px;cursor:pointer;font-size:11px;color:#888780;position:relative;}
+.spot-upload input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+
+/* 상태 배지 */
+.badge{font-size:11px;padding:2px 8px;border-radius:99px;}
+.badge-ok{background:#eaf3de;color:#3b6d11;}
+.badge-warn{background:#faeeda;color:#854f0b;}
+.badge-err{background:#fcebeb;color:#a32d2d;}
+
+/* 알림 토스트 */
+.toast{position:fixed;bottom:24px;right:24px;background:#1a1a18;color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;z-index:9999;opacity:0;transition:opacity .2s;pointer-events:none;}
+.toast.show{opacity:1;}
+
+/* GitHub 설정 */
+.gh-status{display:flex;align-items:center;gap:6px;font-size:12px;margin-top:6px;}
+.token-input{font-family:monospace;font-size:12px;}
+
+/* 업로드 진행 */
+.upload-progress{display:none;margin-top:8px;}
+.progress-bar{height:4px;background:#f5f4f0;border-radius:2px;overflow:hidden;}
+.progress-fill{height:100%;background:#1a1a18;width:0%;transition:width .3s;}
+.progress-label{font-size:11px;color:#888780;margin-top:4px;}
+</style>
+</head>
+<body>
+
+<!-- 로그인 -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <h1>🔐 로투차 관리자</h1>
+    <input type="password" id="pwInput" placeholder="비밀번호" onkeydown="if(event.key==='Enter')login()">
+    <button onclick="login()">로그인</button>
+    <div class="login-err" id="loginErr">비밀번호가 틀렸습니다.</div>
+  </div>
+</div>
+
+<!-- 앱 -->
+<div class="app" id="app">
+  <div class="sidebar">
+    <div class="logo">로투차 관리자<span>Lotocha Admin</span></div>
+    <div class="nav-section">설정</div>
+    <div class="nav-item active" onclick="showPage('cost')" id="nav_cost"><span class="ni">💰</span>원가 설정</div>
+    <div class="nav-item" onclick="showPage('images')" id="nav_images"><span class="ni">🖼️</span>이미지 관리</div>
+    <div class="nav-item" onclick="showPage('hotels')" id="nav_hotels"><span class="ni">🏨</span>호텔 관리</div>
+    <div class="nav-item" onclick="showPage('blocks')" id="nav_blocks"><span class="ni">🗺️</span>블록 설명 수정</div>
+    <div class="nav-section">시스템</div>
+    <div class="nav-item" onclick="showPage('github')" id="nav_github"><span class="ni">⚙️</span>GitHub 설정</div>
+    <div class="nav-item" onclick="logout()" style="margin-top:auto;"><span class="ni">🚪</span>로그아웃</div>
+  </div>
+
+  <div class="main">
+
+    <!-- 원가 설정 -->
+    <div class="page active" id="page_cost">
+      <div class="page-title">💰 원가 설정</div>
+      <div class="grid2">
+        <div class="card">
+          <div class="card-title">기본 설정</div>
+          <div class="row"><label>환율</label><div class="ri"><input type="number" id="c_exchangeRate"><span class="unit">KRW/CNY</span></div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">가이드비</div>
+          <div class="row"><label>가이드 일당</label><div class="ri"><input type="number" id="c_guidePerNight"><span class="unit">CNY/박</span></div></div>
+          <div class="row"><label>남영규 지명 팁</label><div class="ri"><input type="number" id="c_nykTip"><span class="unit">KRW/인/박</span></div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">식사 원가 (조식 제외)</div>
+          <div class="row"><label>식사 단가</label><div class="ri"><input type="number" id="c_mealPerPax"><span class="unit">CNY/인/끼</span></div></div>
+          <div class="row"><label>커피 1회</label><div class="ri"><input type="number" id="c_coffeePerPax"><span class="unit">CNY/인</span></div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">마사지 원가</div>
+          <div class="row"><label>50분 발 지압</label><div class="ri"><input type="number" id="c_massage50CNY"><span class="unit">CNY/인</span></div></div>
+          <div class="row"><label>80분 발+전신</label><div class="ri"><input type="number" id="c_massage80CNY"><span class="unit">CNY/인</span></div></div>
+        </div>
+      </div>
+
+      <!-- 구간별 차량비 + 이익률 -->
+      <div class="card">
+        <div class="card-title">구간별 차량비 & 이익률</div>
+        <div style="font-size:12px;color:#888780;margin-bottom:12px;">인원 구간에 따라 차량과 이익률이 자동 결정됩니다.</div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead>
+            <tr style="border-bottom:1px solid rgba(0,0,0,0.1);">
+              <th style="text-align:left;padding:6px 8px;color:#888780;font-size:12px;">구간</th>
+              <th style="text-align:left;padding:6px 8px;color:#888780;font-size:12px;">차량</th>
+              <th style="text-align:right;padding:6px 8px;color:#888780;font-size:12px;">차량비 (CNY/박)</th>
+              <th style="text-align:right;padding:6px 8px;color:#888780;font-size:12px;">이익률 (%)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:0.5px solid rgba(0,0,0,0.07);">
+              <td style="padding:8px;">1~5인</td>
+              <td style="padding:8px;color:#888780;">7인승</td>
+              <td style="padding:8px;text-align:right;"><input type="number" id="c_car_1_5" style="width:80px;padding:4px 8px;font-size:13px;text-align:right;border:0.5px solid rgba(0,0,0,0.2);border-radius:6px;background:#f5f4f0;"></td>
+              <td style="padding:8px;text-align:right;"><input type="number" id="c_profitRate_1_5" style="width:60px;padding:4px 8px;font-size:13px;text-align:right;border:0.5px solid rgba(0,0,0,0.2);border-radius:6px;background:#f5f4f0;"></td>
+            </tr>
+            <tr style="border-bottom:0.5px solid rgba(0,0,0,0.07);">
+              <td style="padding:8px;">6인</td>
+              <td style="padding:8px;color:#888780;">9인승</td>
+              <td style="padding:8px;text-align:right;"><input type="number" id="c_car_6" style="width:80px;padding:4px 8px;font-size:13px;text-align:right;border:0.5px solid rgba(0,0,0,0.2);border-radius:6px;background:#f5f4f0;"></td>
+              <td style="padding:8px;text-align:right;"><input type="number" id="c_profitRate_6" style="width:60px;padding:4px 8px;font-size:13px;text-align:right;border:0.5px solid rgba(0,0,0,0.2);border-radius:6px;background:#f5f4f0;"></td>
+            </tr>
+            <tr style="border-bottom:0.5px solid rgba(0,0,0,0.07);">
+              <td style="padding:8px;">7~9인</td>
+              <td style="padding:8px;color:#888780;">14인승</td>
+              <td style="padding:8px;text-align:right;"><input type="number" id="c_car_7_9" style="width:80px;padding:4px 8px;font-size:13px;text-align:right;border:0.5px solid rgba(0,0,0,0.2);border-radius:6px;background:#f5f4f0;"></td>
+              <td style="padding:8px;text-align:right;"><input type="number" id="c_profitRate_7_9" style="width:60px;padding:4px 8px;font-size:13px;text-align:right;border:0.5px solid rgba(0,0,0,0.2);border-radius:6px;background:#f5f4f0;"></td>
+            </tr>
+            <tr>
+              <td style="padding:8px;">10~22인</td>
+              <td style="padding:8px;color:#888780;">26인승</td>
+              <td style="padding:8px;text-align:right;"><input type="number" id="c_car_10_22" style="width:80px;padding:4px 8px;font-size:13px;text-align:right;border:0.5px solid rgba(0,0,0,0.2);border-radius:6px;background:#f5f4f0;"></td>
+              <td style="padding:8px;text-align:right;"><input type="number" id="c_profitRate_10_22" style="width:60px;padding:4px 8px;font-size:13px;text-align:right;border:0.5px solid rgba(0,0,0,0.2);border-radius:6px;background:#f5f4f0;"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title">호텔 단가 (방당/박)</div>
+        <div class="row"><label>오렌지/홈인플러스</label><div class="ri"><input type="number" id="c_hotel_orange_city"><span class="unit">CNY/방</span></div></div>
+        <div class="row"><label>햄튼 힐튼 시내</label><div class="ri"><input type="number" id="c_hotel_hilton_city"><span class="unit">CNY/방</span></div></div>
+        <div class="row"><label>햄튼 힐튼 우링위안</label><div class="ri"><input type="number" id="c_hotel_hilton_wly"><span class="unit">CNY/방</span></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">입장권 단가 (1인)</div>
+        <div class="row"><label>삼림공원 3일권 (B1)</label><div class="ri"><input type="number" id="c_ticket_B1"><span class="unit">CNY/인</span></div></div>
+        <div class="row"><label>천문산+백양고찰 (B2)</label><div class="ri"><input type="number" id="c_ticket_B2"><span class="unit">CNY/인</span></div></div>
+        <div class="row"><label>황룡동굴+대협곡 (B3)</label><div class="ri"><input type="number" id="c_ticket_B3"><span class="unit">CNY/인</span></div></div>
+        <div class="row"><label>황석채+금편계곡 (B4)</label><div class="ri"><input type="number" id="c_ticket_B4"><span class="unit">CNY/인</span></div></div>
+        <div class="row"><label>자유+황석채+부용진 (B5)</label><div class="ri"><input type="number" id="c_ticket_B5"><span class="unit">CNY/인</span></div></div>
+        <div class="row"><label>황석채+봉황고성 2일 (B6)</label><div class="ri"><input type="number" id="c_ticket_B6"><span class="unit">CNY/인</span></div></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-dark" onclick="saveCost()">저장 적용</button>
+        <button class="btn btn-outline" onclick="resetCost()">기본값 초기화</button>
+      </div>
+    </div>
+
+    <!-- 이미지 관리 -->
+    <div class="page" id="page_images">
+      <div class="page-title">🖼️ 이미지 관리</div>
+      <div class="card" style="margin-bottom:1rem;">
+        <div class="card-title">GitHub 저장소 상태 <span id="ghStatusBadge" class="badge badge-warn">미연결</span></div>
+        <div style="font-size:13px;color:#888780;">이미지는 GitHub 저장소에 저장됩니다. GitHub 설정 탭에서 토큰을 입력해 주세요.</div>
+      </div>
+      <div id="blockEditors"></div>
+    </div>
+
+    <!-- 호텔 관리 -->
+    <div class="page" id="page_hotels">
+      <div class="page-title">🏨 호텔 관리</div>
+      <div id="hotelList"></div>
+      <div class="btn-row">
+        <button class="btn btn-dark" onclick="addHotel()">+ 호텔 추가</button>
+      </div>
+    </div>
+
+    <!-- 블록 설명 수정 -->
+    <div class="page" id="page_blocks">
+      <div class="page-title">🗺️ 블록 설명 수정</div>
+      <div id="blockDescEditors"></div>
+      <div class="btn-row">
+        <button class="btn btn-dark" onclick="saveBlockDescs()">저장</button>
+      </div>
+    </div>
+
+    <!-- GitHub 설정 -->
+    <div class="page" id="page_github">
+      <div class="page-title">⚙️ GitHub 설정</div>
+      <div class="card">
+        <div class="card-title">GitHub 연결</div>
+        <div class="row"><label>저장소</label><span style="font-size:13px;color:#888780;">nanyingkui/lotocha</span></div>
+        <div class="row"><label>이미지 경로</label><span style="font-size:13px;color:#888780;">images/</span></div>
+        <div class="row" style="flex-direction:column;align-items:flex-start;gap:6px;">
+          <label>GitHub Personal Access Token</label>
+          <div style="display:flex;gap:6px;width:100%;">
+            <input type="password" id="ghTokenInput" class="token-input" placeholder="ghp_xxxxxxxxxxxx" style="flex:1;padding:7px 10px;font-size:13px;border:0.5px solid rgba(0,0,0,0.2);border-radius:6px;background:#f5f4f0;color:#1a1a18;outline:none;">
+            <button class="btn btn-dark btn-sm" onclick="saveGhToken()">저장</button>
+            <button class="btn btn-outline btn-sm" onclick="testGhToken()">연결 테스트</button>
+          </div>
+          <div class="gh-status" id="ghStatusMsg"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">토큰 발급 방법</div>
+        <div style="font-size:13px;color:#5f5e5a;line-height:1.8;">
+          1. GitHub → Settings → Developer Settings<br>
+          2. Personal access tokens → Tokens (classic)<br>
+          3. Generate new token → repo 권한 체크<br>
+          4. 생성된 토큰을 위에 붙여넣기
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ADMIN_PW = '로투차2025';
+const REPO = 'nanyingkui/lotocha';
+const IMAGES_PATH = 'images';
+
+const DEFAULT_CONFIG = {
+  exchangeRate: 230,
+  profitRate_1_5: 18, profitRate_6: 24, profitRate_7_9: 30, profitRate_10_22: 35,
+  car_1_5: 500, car_6: 500, car_7_9: 600, car_10_22: 1100,
+  guidePerNight: 600, mealPerPax: 60, coffeePerPax: 30,
+  hotel_orange_city: 280, hotel_hilton_city: 380, hotel_hilton_wly: 420,
+  ticket_B1: 400, ticket_B2: 285, ticket_B3: 300,
+  ticket_B4: 0, ticket_B5: 200, ticket_B6: 500,
+  nykTip: 30000,
+  massage50CNY: 79, massage80CNY: 99,
+};
+
+const BLOCKS_META = [
+  { id:'B1', name:'삼림공원 하루 코스', emoji:'🏔️',
+    spots:['십리화랑','백룡천제','원가계','천자산'] },
+  { id:'B2', name:'시내+천문산 코스', emoji:'⛩️',
+    spots:['백양고찰','천문산 케이블카','유리잔도'] },
+  { id:'B3', name:'황룡동굴+대협곡 코스', emoji:'🦕',
+    spots:['황룡동굴','보봉호','대협곡 유리다리'] },
+  { id:'B4', name:'황석채+금편계곡 코스', emoji:'🥾',
+    spots:['황석채','금편계곡'] },
+  { id:'B5', name:'자유+황석채+부용진 코스', emoji:'🌊',
+    spots:['부용진 고성'] },
+  { id:'B6', name:'황석채+봉황고성 2일 코스', emoji:'🏯',
+    spots:['봉황고성','타강 야간 유람'] },
+];
+
+// ── 인증 ────────────────────────────────────────────────────
+function login() {
+  const pw = document.getElementById('pwInput').value;
+  if (pw === ADMIN_PW) {
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    initApp();
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+  }
+}
+document.getElementById('pwInput').addEventListener('keydown', e => { if(e.key==='Enter') login(); });
+
+function logout() {
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loginWrap').style.display = 'flex';
+  document.getElementById('pwInput').value = '';
+}
+
+// ── 앱 초기화 ────────────────────────────────────────────────
+function initApp() {
+  loadCostForm();
+  buildBlockEditors();
+  buildBlockDescEditors();
+  buildHotelList();
+  checkGhStatus();
+  const saved = localStorage.getItem('gh_token');
+  if (saved) document.getElementById('ghTokenInput').value = saved;
+}
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page_' + id).classList.add('active');
+  document.getElementById('nav_' + id).classList.add('active');
+}
+
+// ── 원가 설정 ────────────────────────────────────────────────
+function loadCostForm() {
+  const cfg = getConfig();
+  Object.keys(DEFAULT_CONFIG).forEach(k => {
+    const el = document.getElementById('c_' + k);
+    if (el) el.value = cfg[k];
+  });
+}
+function getConfig() {
+  try {
+    const s = localStorage.getItem('lotocha_config');
+    return s ? { ...DEFAULT_CONFIG, ...JSON.parse(s) } : { ...DEFAULT_CONFIG };
+  } catch { return { ...DEFAULT_CONFIG }; }
+}
+async function saveCost() {
+  const cfg = {};
+  Object.keys(DEFAULT_CONFIG).forEach(k => {
+    const el = document.getElementById('c_' + k);
+    if (el) cfg[k] = parseFloat(el.value) || 0;
+  });
+  // 1. localStorage 저장
+  localStorage.setItem('lotocha_config', JSON.stringify(cfg));
+
+  // 2. GitHub에 config 파일 업로드
+  const token = getGhToken();
+  if (!token) {
+    toast('⚠️ 저장됐지만 GitHub 미연결 — 이 기기에서만 적용됩니다.');
+    return;
+  }
+  try {
+    const path = 'config/lotocha_config.json';
+    const body = JSON.stringify(cfg, null, 2);
+    const base64 = btoa(unescape(encodeURIComponent(body)));
+
+    // 기존 파일 SHA 확인
+    let sha = null;
+    try {
+      const check = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+        headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+      });
+      if (check.ok) { const j = await check.json(); sha = j.sha; }
+    } catch {}
+
+    const payload = { message: 'update lotocha config', content: base64 };
+    if (sha) payload.sha = sha;
+
+    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+      method: 'PUT',
+      headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (res.ok) {
+      toast('✅ 저장 완료! GitHub에 반영됐어요.');
+    } else {
+      const err = await res.json();
+      toast('⚠️ localStorage 저장됨. GitHub 오류: ' + (err.message || res.status));
+    }
+  } catch(e) {
+    toast('⚠️ localStorage 저장됨. GitHub 오류: ' + e.message);
+  }
+}
+async function resetCost() {
+  if (!confirm('기본값으로 초기화할까요?')) return;
+  localStorage.removeItem('lotocha_config');
+  // 폼을 기본값으로 채우고 저장
+  fillAdminForm(DEFAULT_CONFIG);
+  await saveCost();
+}
+
+// ── 이미지 관리 ──────────────────────────────────────────────
+function buildBlockEditors() {
+  const wrap = document.getElementById('blockEditors');
+  wrap.innerHTML = '';
+  const imgData = getImgData();
+
+  BLOCKS_META.forEach(b => {
+    const div = document.createElement('div');
+    div.className = 'block-editor';
+    const mainImg = imgData[b.id + '_main'] || '';
+
+    let spotsHTML = b.spots.map(s => {
+      const sKey = b.id + '_spot_' + s.replace(/\s/g,'_');
+      const sImg = imgData[sKey] || '';
+      return `
+        <div class="spot-card">
+          ${sImg
+            ? `<img src="${sImg}" alt="${s}" id="prev_${sKey}">`
+            : `<div class="spot-upload" style="height:80px;">
+                <input type="file" accept="image/*" onchange="uploadSpotImg(this,'${sKey}','prev_${sKey}')">
+                <span>+ 사진 추가</span>
+               </div>`
+          }
+          <div class="sc-body">
+            <div class="sc-name">${s}</div>
+            ${sImg ? `<div style="display:flex;gap:4px;margin-top:4px;">
+              <label style="font-size:11px;color:#185fa5;cursor:pointer;">
+                변경<input type="file" accept="image/*" style="display:none;" onchange="uploadSpotImg(this,'${sKey}','prev_${sKey}')">
+              </label>
+            </div>` : ''}
+          </div>
+        </div>`;
+    }).join('');
+
+    div.innerHTML = `
+      <div class="be-header" onclick="toggleBE('be_${b.id}')">
+        <span class="be-emoji">${b.emoji}</span>
+        <span class="be-name">${b.name}</span>
+        <span class="be-toggle" id="betog_${b.id}">▼</span>
+      </div>
+      <div class="be-body" id="be_${b.id}">
+        <div style="margin-bottom:10px;">
+          <div style="font-size:12px;color:#5f5e5a;margin-bottom:6px;">메인 이미지</div>
+          <div class="img-upload-area" id="mainUpArea_${b.id}">
+            ${mainImg
+              ? `<img src="${mainImg}" class="img-preview" id="prev_${b.id}_main" alt="${b.name}">`
+              : `<div style="font-size:13px;color:#888780;padding:1rem 0;">📷 클릭해서 사진 업로드</div>`
+            }
+            <input type="file" accept="image/*" onchange="uploadMainImg(this,'${b.id}')">
+          </div>
+          <div class="img-url-row">
+            <input type="text" id="urlInput_${b.id}" placeholder="또는 이미지 URL 직접 입력" value="${mainImg}">
+            <button class="btn btn-outline btn-sm" onclick="applyUrl('${b.id}')">적용</button>
+          </div>
+          <div class="upload-progress" id="prog_${b.id}">
+            <div class="progress-bar"><div class="progress-fill" id="progFill_${b.id}"></div></div>
+            <div class="progress-label" id="progLabel_${b.id}">업로드 중...</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px;color:#5f5e5a;margin-bottom:6px;">스팟 이미지</div>
+          <div class="spot-grid">${spotsHTML}</div>
+        </div>
+      </div>`;
+    wrap.appendChild(div);
+  });
+}
+
+function toggleBE(id) {
+  const body = document.getElementById(id);
+  const bid = id.replace('be_','');
+  const tog = document.getElementById('betog_' + bid);
+  const isOpen = body.classList.toggle('open');
+  tog.textContent = isOpen ? '▲' : '▼';
+}
+
+function getImgData() {
+  try { return JSON.parse(localStorage.getItem('lotocha_images') || '{}'); } catch { return {}; }
+}
+function saveImgData(data) {
+  localStorage.setItem('lotocha_images', JSON.stringify(data));
+}
+
+function applyUrl(bid) {
+  const url = document.getElementById('urlInput_' + bid).value.trim();
+  if (!url) return;
+  const data = getImgData();
+  data[bid + '_main'] = url;
+  saveImgData(data);
+  buildBlockEditors();
+  toast('URL 저장됐어요!');
+}
+
+async function uploadMainImg(input, bid) {
+  const file = input.files[0];
+  if (!file) return;
+  const path = `${IMAGES_PATH}/blocks/${bid}_main.jpg`;
+  const url = await uploadToGithub(file, path, `prog_${bid}`, `progFill_${bid}`, `progLabel_${bid}`);
+  if (url) {
+    const data = getImgData();
+    data[bid + '_main'] = url;
+    saveImgData(data);
+    document.getElementById('urlInput_' + bid).value = url;
+    buildBlockEditors();
+    toast('✅ 업로드 완료!');
+  }
+}
+
+async function uploadSpotImg(input, sKey, prevId) {
+  const file = input.files[0];
+  if (!file) return;
+  const path = `${IMAGES_PATH}/spots/${sKey}.jpg`;
+  const url = await uploadToGithub(file, path, null, null, null);
+  if (url) {
+    const data = getImgData();
+    data[sKey] = url;
+    saveImgData(data);
+    buildBlockEditors();
+    toast('✅ 스팟 이미지 업로드 완료!');
+  }
+}
+
+// ── GitHub 업로드 ────────────────────────────────────────────
+function getGhToken() { return localStorage.getItem('gh_token') || ''; }
+
+async function uploadToGithub(file, path, progWrapId, progFillId, progLabelId) {
+  const token = getGhToken();
+  if (!token) { toast('❌ GitHub 토큰이 없어요. GitHub 설정 탭에서 입력해 주세요.'); return null; }
+
+  if (progWrapId) document.getElementById(progWrapId).style.display = 'block';
+  if (progFillId) document.getElementById(progFillId).style.width = '30%';
+  if (progLabelId) document.getElementById(progLabelId).textContent = '파일 변환 중...';
+
+  try {
+    // base64 변환 + 리사이즈
+    const base64 = await resizeAndEncode(file, 800, 72);
+    if (progFillId) document.getElementById(progFillId).style.width = '60%';
+    if (progLabelId) document.getElementById(progLabelId).textContent = 'GitHub에 업로드 중...';
+
+    // 기존 파일 SHA 확인
+    let sha = null;
+    try {
+      const check = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+        headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+      });
+      if (check.ok) { const j = await check.json(); sha = j.sha; }
+    } catch {}
+
+    const body = { message: `upload ${path}`, content: base64 };
+    if (sha) body.sha = sha;
+
+    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+      method: 'PUT',
+      headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    if (progFillId) document.getElementById(progFillId).style.width = '100%';
+    if (progLabelId) document.getElementById(progLabelId).textContent = '완료!';
+    setTimeout(() => { if (progWrapId) document.getElementById(progWrapId).style.display = 'none'; }, 1500);
+    return data.content.download_url;
+  } catch(e) {
+    if (progLabelId) document.getElementById(progLabelId).textContent = '오류: ' + e.message;
+    toast('❌ 업로드 실패: ' + e.message);
+    return null;
+  }
+}
+
+async function resizeAndEncode(file, maxWidth, quality) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ratio = Math.min(1, maxWidth / img.width);
+        canvas.width = Math.round(img.width * ratio);
+        canvas.height = Math.round(img.height * ratio);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg', quality / 100);
+        resolve(dataUrl.split(',')[1]);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ── GitHub 토큰 ──────────────────────────────────────────────
+function saveGhToken() {
+  const t = document.getElementById('ghTokenInput').value.trim();
+  if (!t) return;
+  localStorage.setItem('gh_token', t);
+  toast('토큰 저장됐어요!');
+  checkGhStatus();
+}
+
+async function testGhToken() {
+  const t = document.getElementById('ghTokenInput').value.trim() || getGhToken();
+  if (!t) { toast('토큰을 입력해 주세요.'); return; }
+  const el = document.getElementById('ghStatusMsg');
+  el.innerHTML = '연결 확인 중...';
+  try {
+    const res = await fetch(`https://api.github.com/repos/${REPO}`, {
+      headers: { Authorization: `token ${t}` }
+    });
+    if (res.ok) {
+      el.innerHTML = '<span class="badge badge-ok">✅ 연결됨</span> nanyingkui/lotocha';
+      checkGhStatus();
+    } else {
+      el.innerHTML = '<span class="badge badge-err">❌ 인증 실패</span> 토큰을 확인해 주세요.';
+    }
+  } catch {
+    el.innerHTML = '<span class="badge badge-err">❌ 오류</span> 네트워크 오류';
+  }
+}
+
+function checkGhStatus() {
+  const badge = document.getElementById('ghStatusBadge');
+  if (!badge) return;
+  if (getGhToken()) {
+    badge.className = 'badge badge-ok';
+    badge.textContent = '연결됨';
+  } else {
+    badge.className = 'badge badge-warn';
+    badge.textContent = '미연결';
+  }
+}
+
+// ── 호텔 관리 ────────────────────────────────────────────────
+function getHotels() {
+  try {
+    const s = localStorage.getItem('lotocha_hotels');
+    return s ? JSON.parse(s) : [
+      { id:'orange_city', name:'오렌지/홈인플러스 호텔', location:'city', pricePerRoom:280, grade:'standard', desc:'장가계 시내 위치, 깔끔한 비즈니스 호텔' },
+      { id:'hilton_city', name:'햄튼 바이 힐튼 (시내)', location:'city', pricePerRoom:380, grade:'premium', desc:'힐튼 브랜드, 시내 중심 프리미엄' },
+      { id:'hilton_wly', name:'햄튼 바이 힐튼 (우링위안)', location:'wulingyuan', pricePerRoom:420, grade:'premium', desc:'삼림공원 바로 앞, 자연 속 프리미엄 스테이' },
+    ];
+  } catch { return []; }
+}
+
+function buildHotelList() {
+  const hotels = getHotels();
+  const wrap = document.getElementById('hotelList');
+  wrap.innerHTML = '';
+  hotels.forEach((h, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="card-title">${h.name} <button class="btn btn-danger btn-sm" onclick="deleteHotel(${i})">삭제</button></div>
+      <div class="row"><label>호텔명</label><input class="wide" value="${h.name}" onchange="updateHotel(${i},'name',this.value)"></div>
+      <div class="row"><label>위치</label>
+        <select style="padding:5px 8px;font-size:13px;border:0.5px solid rgba(0,0,0,0.2);border-radius:6px;background:#f5f4f0;" onchange="updateHotel(${i},'location',this.value)">
+          <option value="city" ${h.location==='city'?'selected':''}>시내 (city)</option>
+          <option value="wulingyuan" ${h.location==='wulingyuan'?'selected':''}>우링위안 (wulingyuan)</option>
+        </select>
+      </div>
+      <div class="row"><label>등급</label>
+        <select style="padding:5px 8px;font-size:13px;border:0.5px solid rgba(0,0,0,0.2);border-radius:6px;background:#f5f4f0;" onchange="updateHotel(${i},'grade',this.value)">
+          <option value="standard" ${h.grade==='standard'?'selected':''}>스탠다드</option>
+          <option value="premium" ${h.grade==='premium'?'selected':''}>프리미엄</option>
+        </select>
+      </div>
+      <div class="row"><label>방당 단가</label><div class="ri"><input type="number" value="${h.pricePerRoom}" onchange="updateHotel(${i},'pricePerRoom',parseFloat(this.value))"><span class="unit">CNY/방</span></div></div>
+      <div class="row"><label>설명</label><input class="wide" value="${h.desc}" onchange="updateHotel(${i},'desc',this.value)"></div>`;
+    wrap.appendChild(card);
+  });
+}
+
+function updateHotel(i, key, val) {
+  const hotels = getHotels();
+  hotels[i][key] = val;
+  localStorage.setItem('lotocha_hotels', JSON.stringify(hotels));
+}
+
+function deleteHotel(i) {
+  if (!confirm('삭제할까요?')) return;
+  const hotels = getHotels();
+  hotels.splice(i, 1);
+  localStorage.setItem('lotocha_hotels', JSON.stringify(hotels));
+  buildHotelList();
+  toast('삭제됐어요.');
+}
+
+function addHotel() {
+  const hotels = getHotels();
+  hotels.push({ id:'hotel_' + Date.now(), name:'새 호텔', location:'city', pricePerRoom:300, grade:'standard', desc:'' });
+  localStorage.setItem('lotocha_hotels', JSON.stringify(hotels));
+  buildHotelList();
+}
+
+// ── 블록 설명 수정 ───────────────────────────────────────────
+function buildBlockDescEditors() {
+  const wrap = document.getElementById('blockDescEditors');
+  wrap.innerHTML = '';
+  const descs = getBlockDescs();
+  BLOCKS_META.forEach(b => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="card-title">${b.emoji} ${b.name}</div>
+      <div class="row" style="flex-direction:column;align-items:flex-start;gap:4px;">
+        <label style="font-size:12px;color:#5f5e5a;">짧은 설명 (카드에 표시)</label>
+        <textarea id="desc_${b.id}" style="width:100%;padding:8px;font-size:13px;border:0.5px solid rgba(0,0,0,0.2);border-radius:6px;background:#f5f4f0;color:#1a1a18;resize:vertical;min-height:60px;outline:none;">${descs[b.id] || ''}</textarea>
+      </div>`;
+    wrap.appendChild(card);
+  });
+}
+
+function getBlockDescs() {
+  try { return JSON.parse(localStorage.getItem('lotocha_blockdescs') || '{}'); } catch { return {}; }
+}
+
+function saveBlockDescs() {
+  const descs = {};
+  BLOCKS_META.forEach(b => {
+    const el = document.getElementById('desc_' + b.id);
+    if (el) descs[b.id] = el.value;
+  });
+  localStorage.setItem('lotocha_blockdescs', JSON.stringify(descs));
+  toast('✅ 설명 저장됐어요!');
+}
+
+// ── 토스트 ───────────────────────────────────────────────────
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로투차 — 나만의 장가계 패키지 만들기</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans-serif;background:#f5f4f0;color:#1a1a18;font-size:15px;line-height:1.6;}
+.container{max-width:900px;margin:0 auto;padding:2rem 1rem 5rem;}
+
+/* 헤더 */
+.hero{text-align:center;padding:2.5rem 0 2rem;}
+.hero h1{font-size:26px;font-weight:500;margin-bottom:8px;}
+.hero p{color:#888780;font-size:14px;}
+.step-bar{display:flex;align-items:center;justify-content:center;gap:0;margin:2rem 0 1.5rem;flex-wrap:wrap;gap:4px;}
+.step-dot{display:flex;align-items:center;gap:6px;font-size:13px;color:#b4b2a9;padding:4px 10px;border-radius:99px;}
+.step-dot.active{background:#1a1a18;color:#fff;}
+.step-dot.done{background:#eaf3de;color:#3b6d11;}
+.step-dot span{font-size:11px;font-weight:500;}
+
+/* 섹션 */
+.section{background:#fff;border:0.5px solid rgba(0,0,0,0.1);border-radius:14px;padding:1.5rem;margin-bottom:1.25rem;}
+.section-title{font-size:13px;font-weight:500;color:#888780;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:1.25rem;display:flex;align-items:center;gap:8px;}
+.section-title i{font-size:16px;}
+
+/* 선택 카드 그리드 */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;}
+.card-grid.wide{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));}
+@media(max-width:600px){.card-grid,.card-grid.wide{grid-template-columns:1fr;}}
+
+/* 선택 카드 */
+.sel-card{border:1.5px solid rgba(0,0,0,0.1);border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color .15s,box-shadow .15s;background:#fff;position:relative;}
+.sel-card:hover{border-color:rgba(0,0,0,0.25);}
+.sel-card.selected{border-color:#1a1a18;box-shadow:0 0 0 2px #1a1a18;}
+.sel-card.disabled{opacity:0.38;cursor:not-allowed;pointer-events:none;}
+.sel-card img{width:100%;height:130px;object-fit:cover;display:block;}
+.sel-card .card-body{padding:10px 12px 12px;}
+.sel-card .card-title{font-size:14px;font-weight:500;margin-bottom:3px;}
+.sel-card .card-desc{font-size:12px;color:#888780;line-height:1.5;}
+.sel-card .card-badge{position:absolute;top:8px;left:8px;background:#1a1a18;color:#fff;font-size:10px;padding:2px 8px;border-radius:99px;}
+.sel-card .card-badge.green{background:#3b6d11;}
+.sel-card .card-price{font-size:12px;color:#185fa5;margin-top:4px;font-weight:500;}
+.sel-card .check-icon{position:absolute;top:8px;right:8px;width:22px;height:22px;background:#1a1a18;border-radius:50%;display:none;align-items:center;justify-content:center;}
+.sel-card.selected .check-icon{display:flex;}
+.check-icon::after{content:'✓';color:#fff;font-size:12px;}
+
+/* 블록 확장 카드 */
+.block-card{border:1.5px solid rgba(0,0,0,0.1);border-radius:14px;overflow:hidden;background:#fff;transition:border-color .15s;cursor:pointer;}
+.block-card:hover{border-color:rgba(0,0,0,0.25);}
+.block-card.selected{border-color:#1a1a18;box-shadow:0 0 0 2px #1a1a18;}
+.block-card.disabled{opacity:0.38;cursor:not-allowed;pointer-events:none;}
+.block-card .bc-header{display:flex;align-items:center;gap:12px;padding:12px 14px;}
+.block-card .bc-img{width:72px;height:60px;object-fit:cover;border-radius:8px;flex-shrink:0;}
+.block-card .bc-info{flex:1;min-width:0;}
+.block-card .bc-name{font-size:14px;font-weight:500;display:flex;align-items:center;gap:6px;}
+.block-card .bc-sub{font-size:12px;color:#888780;margin-top:2px;line-height:1.4;}
+.block-card .bc-check{width:22px;height:22px;background:#1a1a18;border-radius:50%;display:none;align-items:center;justify-content:center;flex-shrink:0;}
+.block-card.selected .bc-check{display:flex;}
+.bc-check::after{content:'✓';color:#fff;font-size:12px;}
+.block-card .bc-expand{padding:0 14px 14px;display:none;border-top:0.5px solid rgba(0,0,0,0.07);margin-top:0;padding-top:12px;}
+.block-card.selected .bc-expand{display:block;}
+
+/* 일정 타임라인 */
+.timeline{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;}
+.tl-row{display:flex;gap:10px;align-items:flex-start;}
+.tl-dot{width:8px;height:8px;background:#1a1a18;border-radius:50%;margin-top:6px;flex-shrink:0;}
+.tl-time{font-size:11px;color:#888780;width:100px;flex-shrink:0;padding-top:2px;}
+.tl-act{font-size:13px;}
+
+/* 스팟 */
+.spots-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-top:10px;}
+.spot-item img{width:100%;height:80px;object-fit:cover;border-radius:8px;}
+.spot-item .spot-name{font-size:11px;font-weight:500;margin-top:4px;}
+.spot-item .spot-desc{font-size:11px;color:#888780;line-height:1.4;}
+
+/* 저녁 옵션 */
+.evening-opt{display:flex;align-items:center;gap:10px;padding:8px 10px;border:0.5px solid rgba(0,0,0,0.1);border-radius:8px;cursor:pointer;margin-top:8px;transition:border-color .15s;}
+.evening-opt:hover{border-color:rgba(0,0,0,0.25);}
+.evening-opt.selected{border-color:#1a1a18;background:#f5f4f0;}
+.evening-opt img{width:48px;height:38px;object-fit:cover;border-radius:6px;}
+.evening-opt .eo-info{flex:1;}
+.evening-opt .eo-name{font-size:13px;font-weight:500;}
+.evening-opt .eo-price{font-size:12px;color:#185fa5;}
+
+/* 변형 선택 */
+.variant-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+.variant-btn{padding:5px 12px;border:0.5px solid rgba(0,0,0,0.2);border-radius:99px;font-size:12px;cursor:pointer;background:#f5f4f0;color:#1a1a18;transition:background .12s;}
+.variant-btn.selected{background:#1a1a18;color:#fff;border-color:#1a1a18;}
+
+/* 업그레이드 */
+.upg-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid rgba(0,0,0,0.07);font-size:13px;}
+.upg-row:last-child{border-bottom:none;}
+.upg-qty{display:flex;align-items:center;gap:6px;}
+.qty-btn{width:26px;height:26px;border:0.5px solid rgba(0,0,0,0.2);border-radius:50%;background:#f5f4f0;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;line-height:1;color:#1a1a18;}
+.qty-num{font-size:14px;font-weight:500;min-width:20px;text-align:center;}
+
+/* 일정표 미리보기 */
+.itinerary{display:flex;flex-direction:column;gap:10px;}
+.itin-day{border:0.5px solid rgba(0,0,0,0.1);border-radius:10px;overflow:hidden;}
+.itin-day-header{background:#1a1a18;color:#fff;padding:8px 14px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;}
+.itin-day-header .day-num{font-size:11px;opacity:.7;}
+.itin-slots{padding:10px 14px;display:flex;flex-direction:column;gap:6px;}
+.itin-slot{display:flex;gap:10px;align-items:flex-start;}
+.itin-slot .slot-time{font-size:11px;color:#888780;width:90px;flex-shrink:0;padding-top:2px;}
+.itin-slot .slot-content{font-size:13px;}
+.itin-slot .slot-meal{font-size:11px;color:#3b6d11;margin-top:2px;}
+.itin-empty{font-size:13px;color:#b4b2a9;padding:6px 0;}
+
+/* 가격 공개 */
+.price-reveal{text-align:center;padding:2rem 1rem;}
+.price-reveal .pr-label{font-size:13px;color:#888780;margin-bottom:6px;}
+.price-reveal .pr-price{font-size:36px;font-weight:500;color:#1a1a18;margin-bottom:4px;}
+.price-reveal .pr-sub{font-size:13px;color:#888780;}
+.price-box{background:#f5f4f0;border-radius:12px;padding:1.25rem;margin-top:1rem;text-align:left;}
+.price-row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px;border-bottom:0.5px solid rgba(0,0,0,0.07);}
+.price-row:last-child{border-bottom:none;}
+.price-row.total{font-weight:500;font-size:14px;border-top:1px solid rgba(0,0,0,0.15);padding-top:8px;margin-top:4px;}
+
+/* 버튼 */
+.btn{padding:12px 28px;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;border:none;transition:background .15s,opacity .15s;}
+.btn-primary{background:#1a1a18;color:#fff;}
+.btn-primary:hover{opacity:.85;}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;}
+.btn-outline{background:#fff;color:#1a1a18;border:1.5px solid #1a1a18;}
+.btn-outline:hover{background:#f5f4f0;}
+.btn-green{background:#3b6d11;color:#fff;}
+.btn-green:hover{opacity:.85;}
+.btn-row{display:flex;gap:10px;justify-content:flex-end;margin-top:1rem;flex-wrap:wrap;}
+
+/* 알림 배지 */
+.notice{background:#e6f1fb;color:#185fa5;border-radius:8px;padding:8px 12px;font-size:12px;margin-top:8px;line-height:1.5;}
+.notice.warn{background:#faeeda;color:#854f0b;}
+.notice.ok{background:#eaf3de;color:#3b6d11;}
+
+/* 숙박 선택 */
+.nights-row{display:flex;gap:8px;flex-wrap:wrap;}
+.nights-btn{padding:8px 20px;border:1.5px solid rgba(0,0,0,0.15);border-radius:99px;font-size:14px;cursor:pointer;background:#fff;color:#1a1a18;transition:all .12s;}
+.nights-btn.selected{background:#1a1a18;color:#fff;border-color:#1a1a18;}
+.pax-row{display:flex;align-items:center;gap:10px;margin-top:1rem;}
+.pax-row label{font-size:13px;color:#5f5e5a;}
+.pax-row .qty-btn{width:32px;height:32px;font-size:18px;}
+.pax-row .qty-num{font-size:18px;font-weight:500;min-width:32px;}
+
+/* 가이드 지명 */
+.nyk-card{display:flex;align-items:center;gap:12px;padding:10px 14px;border:1.5px solid rgba(0,0,0,0.1);border-radius:10px;cursor:pointer;transition:border-color .15s;margin-top:8px;}
+.nyk-card:hover{border-color:rgba(0,0,0,0.25);}
+.nyk-card.selected{border-color:#1a1a18;background:#f5f4f0;}
+.nyk-avatar{width:44px;height:44px;border-radius:50%;background:#1a1a18;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;flex-shrink:0;}
+.nyk-info .nyk-name{font-size:14px;font-weight:500;}
+.nyk-info .nyk-sub{font-size:12px;color:#888780;}
+.nyk-price{font-size:12px;color:#185fa5;font-weight:500;margin-left:auto;}
+
+
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="hero">
+  <h1>🗺️ 나만의 장가계 여행 만들기</h1>
+  <p>원하는 일정을 직접 골라보세요. 로투차가 최적의 동선으로 배치해 드릴게요.</p>
+</div>
+
+<div class="step-bar" id="stepBar"></div>
+
+<!-- STEP 1: 기본 정보 -->
+<div class="section" id="step1">
+  <div class="section-title">✈️ 여행 기본 정보</div>
+
+  <div style="margin-bottom:1.25rem;">
+    <div style="font-size:13px;color:#5f5e5a;margin-bottom:8px;">숙박 일수</div>
+    <div class="nights-row" id="nightsBtns"></div>
+  </div>
+
+  <div style="margin-bottom:1.25rem;">
+    <div style="font-size:13px;color:#5f5e5a;margin-bottom:8px;">항공편 타입 (도착 + 귀국 출발)</div>
+    <div class="card-grid" id="arrivalCards"></div>
+  </div>
+
+  <div>
+    <div style="font-size:13px;color:#5f5e5a;margin-bottom:8px;">인원 구성</div>
+    <div style="display:flex;flex-direction:column;gap:8px;" id="ageGroupRows"></div>
+    <div style="font-size:12px;color:#888780;margin-top:8px;" id="paxSummary">총 2명</div>
+  </div>
+</div>
+
+<!-- STEP 2: 호텔 선택 -->
+<div class="section" id="step2">
+  <div class="section-title">🏨 호텔 선택</div>
+  <div class="card-grid wide" id="hotelCards"></div>
+</div>
+
+<!-- STEP 3: 1일차 옵션 -->
+<div class="section" id="step3">
+  <div class="section-title">🌅 도착 당일 일정</div>
+  <div id="firstDayContent"></div>
+</div>
+
+<!-- STEP 4: 관광 블록 선택 -->
+<div class="section" id="step4">
+  <div class="section-title">🗺️ 관광 코스 선택</div>
+  <div id="slotsInfo" class="notice" style="margin-bottom:12px;"></div>
+  <div style="display:flex;flex-direction:column;gap:10px;" id="blockCards"></div>
+</div>
+
+<!-- STEP 5: 업그레이드 옵션 -->
+<div class="section" id="step5">
+  <div class="section-title">✨ 추가 옵션</div>
+
+  <div style="font-size:13px;color:#5f5e5a;margin-bottom:8px;">가이드 지명</div>
+  <div class="nyk-card" id="nykCard" onclick="toggleNyk()">
+    <div class="nyk-avatar">남</div>
+    <div class="nyk-info">
+      <div class="nyk-name">남영규 가이드 지명</div>
+      <div class="nyk-sub">선착순 확정 · 블로거 직접 가이드</div>
+    </div>
+    <div class="nyk-price">+3만원/인/박</div>
+  </div>
+
+  <div style="font-size:13px;color:#5f5e5a;margin-bottom:8px;margin-top:1rem;">식사 업그레이드</div>
+  <div id="upgradeRows"></div>
+</div>
+
+<!-- STEP 5.5: 마지막날 일정 (B타입만) -->
+<div class="section" id="stepLastDay" style="display:none;">
+  <div class="section-title">🛫 귀국 당일 오전 일정</div>
+  <div id="lastDayContent"></div>
+</div>
+
+<!-- STEP 6: 일정 확인 + 가격 공개 -->
+<div class="section" id="step6">
+  <div class="section-title">📋 내 여행 일정</div>
+  <div class="itinerary" id="itineraryView"></div>
+
+  <div id="priceSection" style="display:none;margin-top:1.5rem;">
+    <div class="price-reveal">
+      <div class="pr-label">1인 여행 비용</div>
+      <div class="pr-price" id="priceDisplay">—</div>
+      <div class="pr-sub" id="priceSub"></div>
+    </div>
+    <div class="price-box" id="priceBreakdown"></div>
+    <div style="margin-top:1.5rem;">
+      <div style="font-size:13px;color:#5f5e5a;margin-bottom:10px;">아래 버튼을 누르면 카카오톡 채널이 열리고 선택 내용이 자동으로 입력돼요.</div>
+      <button class="btn btn-green" style="width:100%;padding:14px;font-size:15px;border-radius:12px;" onclick="submitKakao()">
+        💬 카카오채널로 예약 문의하기
+      </button>
+      <div style="font-size:11px;color:#888780;text-align:center;margin-top:8px;">카카오가 열리면 전송 버튼만 누르시면 돼요</div>
+    </div>
+  </div>
+
+  <div id="confirmBtnWrap" style="margin-top:1rem;">
+    <button class="btn btn-primary" id="confirmBtn" onclick="revealPrice()" style="width:100%;padding:14px;font-size:15px;border-radius:12px;">
+      ✅ 일정 확정 · 가격 확인하기
+    </button>
+    <div style="font-size:11px;color:#888780;text-align:center;margin-top:6px;">가격은 이 버튼을 누른 후 공개돼요</div>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ── 데이터 (blocks_data.js 내용 인라인) ─────────────────────
+const LOTOCHA_DB = {
+  hotels: [
+    { id: 'orange_city', name: '오렌지/홈인플러스 호텔', location: 'city', pricePerRoom: 280, grade: 'standard', image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=70', desc: '장가계 시내 위치, 깔끔한 비즈니스 호텔' },
+    { id: 'hilton_city', name: '햄튼 바이 힐튼 (시내)', location: 'city', pricePerRoom: 380, grade: 'premium', image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=400&q=70', desc: '힐튼 브랜드, 시내 중심 프리미엄' },
+    { id: 'hilton_wly', name: '햄튼 바이 힐튼 (우링위안)', location: 'wulingyuan', pricePerRoom: 420, grade: 'premium', image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&q=70', desc: '삼림공원 바로 앞, 자연 속 프리미엄 스테이' },
+  ],
+  arrivalTypes: {
+    A: { label: 'A타입', emoji: '🌤️', timeLabel: '오전 10시~오후 1시', departLabel: '~오후 3시 출발', meals: ['중식', '석식'],
+      options: [
+        { id: 'A_tianmen', label: '천문산 오후 코스', desc: '도착 후 체크인 → 오후 천문산 케이블카', image: 'https://images.unsplash.com/photo-1537519644014-29f1a5a30f0b?w=400&q=70', eveningOpts: ['E2'] },
+        { id: 'A_fenghuang', label: '봉황고성 출발', desc: '도착 직후 봉황고성 이동 → 야간 타강 유람 → 익일 09시 귀환', image: 'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=400&q=70', note: '익일 오전 귀환 → 오후 천문산 추천', eveningOpts: [] },
+      ]
+    },
+    B: { label: 'B타입', emoji: '🌇', timeLabel: '오후 1시~4시', departLabel: '오후 3~8시 출발', meals: ['석식'],
+      options: [
+        { id: 'B_cheonmun', label: '천문호선 공연', desc: '시내 호텔 전용. 저녁 천문호선 야외 공연', image: 'https://images.unsplash.com/photo-1518929458119-e5bf444c30f4?w=400&q=70', hotelLoc: 'city', price: 50000 },
+        { id: 'B_qilou', label: '72기루 내부 관광', desc: '시내 호텔 전용. 도착 당일 문화 체험', image: 'https://images.unsplash.com/photo-1528702748617-c64d49f918af?w=400&q=70', hotelLoc: 'city', price: 20000 },
+        { id: 'B_maeryeok', label: '매력상서 공연', desc: '우링위안 호텔 전용. 대형 민속 공연 VIP석', image: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=400&q=70', hotelLoc: 'wulingyuan', price: 50000 },
+        { id: 'B_fuyong', label: '부용진 저녁 코스', desc: '호텔 무관. 폭포 아래 고성 저녁 산책', image: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=400&q=70', hotelLoc: 'any', price: 0 },
+      ]
+    },
+    C: { label: 'C타입', emoji: '🌙', timeLabel: '오후 5시~자정', departLabel: '오후 8시 이후 출발', meals: [],
+      options: [
+        { id: 'C_none', label: '체크인 후 휴식', desc: '가이드 야식 명소 추천 (자비). 당일 식사 미포함.', image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=70', price: 0 },
+      ]
+    },
+  },
+  blocks: [
+    { id:'B1', name:'삼림공원 하루 코스', emoji:'🏔️', days:1, mustFirst:true, minNights:0,
+      desc:'십리화랑 → 백룡천제 → 원가계 → 천자산. 아바타 촬영지를 내 눈으로!',
+      image:'https://images.unsplash.com/photo-1537519644014-29f1a5a30f0b?w=600&q=75',
+      ticketCNY:400, ticketNote:'3일권 포함',
+      schedule:[{t:'오전','a':'동문 입장 → 십리화랑 → 백룡천제'},{t:'오후','a':'원가계 → 천자산 → 하산'}],
+      spots:[
+        {name:'십리화랑',desc:'10리 기암 협곡',img:'https://images.unsplash.com/photo-1537519644014-29f1a5a30f0b?w=300&q=60'},
+        {name:'백룡천제',desc:'세계 최고 야외 엘리베이터',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&q=60'},
+        {name:'원가계',desc:'아바타 할렐루야 산',img:'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=300&q=60'},
+        {name:'천자산',desc:'파노라마 전망대',img:'https://images.unsplash.com/photo-1528702748617-c64d49f918af?w=300&q=60'},
+      ],
+      eveningOpts:['E1'],
+    },
+    { id:'B2', name:'시내+천문산 코스', emoji:'⛩️', days:1, mustFirst:false, minNights:0,
+      desc:'백양고찰 → 로투차 카페 → 천문산 케이블카+유리잔도+999계단',
+      image:'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=600&q=75',
+      ticketCNY:285, ticketNote:'천문산 255 + 백양고찰 30',
+      schedule:[{t:'오전','a':'백양고찰 + 로투차 카페 타임'},{t:'오후','a':'천문산 케이블카 → 유리잔도 → 천문동 → 999계단'}],
+      spots:[
+        {name:'백양고찰',desc:'장가계 유일 사찰',img:'https://images.unsplash.com/photo-1518929458119-e5bf444c30f4?w=300&q=60'},
+        {name:'천문산 케이블카',desc:'세계 최장 7.5km 곤돌라',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&q=60'},
+        {name:'유리잔도',desc:'절벽 투명 보행로',img:'https://images.unsplash.com/photo-1537519644014-29f1a5a30f0b?w=300&q=60'},
+      ],
+      eveningOpts:['E2'],
+    },
+    { id:'B3', name:'황룡동굴+대협곡 코스', emoji:'🦕', days:1, mustFirst:false, minNights:0,
+      desc:'황룡동굴(또는 보봉호 교체) + 대협곡 유리다리. 순서 변경 가능.',
+      image:'https://images.unsplash.com/photo-1528702748617-c64d49f918af?w=600&q=75',
+      ticketCNY:300, ticketNote:'황룡동굴 100 + 대협곡 200',
+      variants:[{id:'B3a',label:'황룡동굴 + 대협곡'},{id:'B3b',label:'보봉호 + 대협곡'}],
+      schedule:[{t:'오전','a':'황룡동굴 (또는 보봉호) 탐방'},{t:'오후','a':'대협곡 유리다리 + 협곡 트레킹'}],
+      spots:[
+        {name:'황룡동굴',desc:'아시아 최대 석회암 동굴',img:'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=300&q=60'},
+        {name:'보봉호',desc:'에메랄드빛 산정 호수',img:'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=300&q=60'},
+        {name:'대협곡 유리다리',desc:'길이 430m 세계 최장',img:'https://images.unsplash.com/photo-1537519644014-29f1a5a30f0b?w=300&q=60'},
+      ],
+      eveningOpts:[],
+    },
+    { id:'B4', name:'황석채+금편계곡 코스', emoji:'🥾', days:1, mustFirst:false, minNights:0,
+      desc:'황석채 정상 전망 + 금편계곡 트레킹(전체 7.5km, 체력에 따라 현장 조정).',
+      image:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=75',
+      ticketCNY:0, ticketNote:'삼림공원 3일권 포함',
+      schedule:[{t:'오전','a':'황석채 케이블카 → 정상 6개 전망대'},{t:'오후','a':'금편계곡 트레킹 (7.5km, 현장 조정)'}],
+      spots:[
+        {name:'황석채',desc:'정상 6개 전망대',img:'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=300&q=60'},
+        {name:'금편계곡',desc:'7.5km 계곡 트레킹',img:'https://images.unsplash.com/photo-1528702748617-c64d49f918af?w=300&q=60'},
+      ],
+      eveningOpts:[],
+    },
+    { id:'B5', name:'자유+황석채+부용진 코스', emoji:'🌊', days:1, mustFirst:false, minNights:0, noLastDay:true,
+      desc:'오전 자유시간 → 오후 황석채 → 저녁 부용진. 당일 장가계 귀환.',
+      image:'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=600&q=75',
+      ticketCNY:200, ticketNote:'부용진 200 포함',
+      schedule:[{t:'오전','a':'자유시간 (쇼핑·휴식·카페)'},{t:'오후','a':'황석채 관람'},{t:'저녁','a':'부용진 고성 + 폭포 야경'}],
+      spots:[
+        {name:'부용진 고성',desc:'폭포 위 2000년 고성',img:'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=300&q=60'},
+      ],
+      eveningOpts:[],
+    },
+    { id:'B6', name:'황석채+봉황고성 2일 코스', emoji:'🏯', days:2, mustFirst:false, minNights:4,
+      desc:'1일차: 황석채 → 봉황고성 야간 타강 / 2일차: 09시 귀환 → 오후 대협곡. 2일 연속 고정.',
+      image:'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=600&q=75',
+      ticketCNY:500, ticketNote:'봉황고성 500 포함',
+      schedule:[
+        {t:'1일 오전','a':'황석채 관람'},
+        {t:'1일 오후','a':'봉황고성 이동 (약 3시간)'},
+        {t:'1일 저녁','a':'봉황고성 탐방 + 타강 야간 유람'},
+        {t:'2일 오전','a':'봉황 자유 후 09시 귀환'},
+        {t:'2일 오후','a':'대협곡 유리다리'},
+      ],
+      spots:[
+        {name:'봉황고성',desc:'2000년 묘족 고성',img:'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=300&q=60'},
+        {name:'타강 야간 유람',desc:'봉황 야경 뱃길 감상',img:'https://images.unsplash.com/photo-1518929458119-e5bf444c30f4?w=300&q=60'},
+      ],
+      eveningOpts:[],
+    },
+  ],
+  eveningEvents: {
+    E1: { name:'매력상서 공연', price:50000, image:'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=300&q=60' },
+    E2: { name:'천문호선 공연', price:50000, image:'https://images.unsplash.com/photo-1518929458119-e5bf444c30f4?w=300&q=60' },
+  },
+  upgrades: [
+    { id:'haidilao', name:'하이디라오 샤브샤브', krw:20000, unit:'인/회' },
+    { id:'massage50', name:'50분 발 지압 마사지', krw:20000, unit:'인/회' },
+    { id:'massage80', name:'80분 발+전신 마사지', krw:32000, unit:'인/회' },
+  ],
+  cost: {
+    exchangeRate: 230,
+    // 구간별 이익률 (차량 기준)
+    profitTiers: [
+      { maxPax:  5, carCNY:  500, profitRate: 0.18, label: '1~5인 (7인승)'  },
+      { maxPax:  6, carCNY:  500, profitRate: 0.24, label: '6인 (9인승)'    },
+      { maxPax:  9, carCNY:  600, profitRate: 0.30, label: '7~9인 (14인승)' },
+      { maxPax: 22, carCNY: 1100, profitRate: 0.35, label: '10~22인 (26인승)' },
+    ],
+    guidePerNight: 600,
+    mealPerPax: 60,
+    coffeePerPax: 30,
+    nykPerPaxPerNight: 30000,
+    // 마사지 원가
+    massage50CNY: 79,
+    massage80CNY: 99,
+  },
+  discounts: {
+    senior60: { label: '60세 이상 (만나이)', amount: 50000 },
+    senior70: { label: '70세 이상 (만나이)', amount: 80000 },
+    child:    { label: '12세 이하 (만나이)', amount: 80000 },
+  },
+};
+
+// ── 상태 ────────────────────────────────────────────────────
+const STATE = {
+  nights: 3,
+  pax: 2,
+  arrivalType: null,
+  hotel: null,
+  firstDayOption: null,
+  firstDayEvening: null,
+  lastDayOption: null,
+  selectedBlocks: [],
+  blockVariants: {},
+  blockEvenings: {},
+  nyk: false,
+  upgrades: { haidilao:0, massage50:0, massage80:0 },
+  ageGroups: { adult:2, senior60:0, senior70:0, child:0 },
+  priceRevealed: false,
+};
+
+
+// ── 식사/출발 헬퍼 ───────────────────────────────────────────
+function getMealCount() {
+  // 조식은 호텔비에 포함 → 식사 원가는 중식+석식만 계산
+  // 1일차: A=중식+석식(2), B=석식(1), C=없음(0)
+  // 중간: 중식+석식 = 2끼/일
+  // 마지막날: A=없음(0), B=중식(1), C=중식+석식(2)
+  const days = STATE.nights + 1;
+  const t = STATE.arrivalType;
+  const firstMeals = t === 'A' ? 2 : t === 'B' ? 1 : 0;
+  const lastMeals  = t === 'A' ? 0 : t === 'B' ? 1 : 2;
+  const midMeals   = Math.max(0, days - 2) * 2;
+  return firstMeals + midMeals + lastMeals;
+}
+function getLastDayMeals(type) {
+  if (type === 'A') return ['조식(호텔)'];
+  if (type === 'B') return ['조식(호텔)', '중식'];
+  if (type === 'C') return ['조식(호텔)', '중식', '석식'];
+  return ['조식(호텔)'];
+}
+function getLastDaySlotCount(type) {
+  // A: 없음, B: 오전1, C: 오전+오후=2
+  if (type === 'A') return 0;
+  if (type === 'B') return 0.5;
+  if (type === 'C') return 1;
+  return 0;
+}
+// X2(B타입) 마지막날 옵션
+const LAST_DAY_OPTIONS = {
+  B: [
+    { id:'LD_B_cafe',  label:'백양고찰 + 카페',    desc:'고찰 산책 후 감성 카페 타임', slots:['morning'] },
+    { id:'LD_B_mart',  label:'백양고찰 + 현지 마트', desc:'고찰 관람 후 현지 대형마트 쇼핑', slots:['morning'] },
+  ],
+  C: null, // 자유 선택 → 블록 선택에서 처리
+};
+
+// ── 초기화 ──────────────────────────────────────────────────
+function init() {
+  buildNightsBtns();
+  buildArrivalCards();
+  buildHotelCards();
+  buildLastDay();
+  buildAgeGroups();
+  buildUpgradeRows();
+  updateStepBar();
+}
+
+function buildNightsBtns() {
+  const el = document.getElementById('nightsBtns');
+  el.innerHTML = '';
+  [3,4,5].forEach(n => {
+    const b = document.createElement('button');
+    b.className = 'nights-btn' + (STATE.nights === n ? ' selected' : '');
+    b.textContent = `${n}박${n+1}일`;
+    b.onclick = () => { STATE.nights = n; buildNightsBtns(); updateBlocks(); updateItinerary(); };
+    el.appendChild(b);
+  });
+}
+
+function buildArrivalCards() {
+  const el = document.getElementById('arrivalCards');
+  el.innerHTML = '';
+  Object.entries(LOTOCHA_DB.arrivalTypes).forEach(([key, t]) => {
+    const d = document.createElement('div');
+    d.className = 'sel-card' + (STATE.arrivalType === key ? ' selected' : '');
+    d.innerHTML = `
+      <div style="padding:14px 14px 12px;">
+        <div style="font-size:20px;margin-bottom:6px;">${t.emoji}</div>
+        <div class="card-title" style="margin-bottom:6px;">${t.label}</div>
+        <div style="display:flex;flex-direction:column;gap:3px;margin-bottom:6px;">
+          <div style="display:flex;align-items:center;gap:5px;font-size:12px;">
+            <span style="background:#e6f1fb;color:#185fa5;padding:1px 7px;border-radius:99px;font-size:11px;">도착</span>
+            <span style="color:#1a1a18;">${t.timeLabel}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:5px;font-size:12px;">
+            <span style="background:#faeeda;color:#854f0b;padding:1px 7px;border-radius:99px;font-size:11px;">출발</span>
+            <span style="color:#1a1a18;">${t.departLabel}</span>
+          </div>
+        </div>
+        <div style="font-size:11px;color:#888780;">${t.meals.length ? '1일차 포함: ' + t.meals.join('+') : '1일차 식사 미포함'}</div>
+      </div>
+      <div class="check-icon"></div>`;
+    d.onclick = () => { STATE.arrivalType = key; STATE.firstDayOption = null; STATE.firstDayEvening = null; STATE.lastDayOption = null; buildArrivalCards(); buildFirstDay(); buildLastDay(); updateBlocks(); updateItinerary(); };
+    el.appendChild(d);
+  });
+}
+
+function buildLastDay() {
+  const wrap = document.getElementById('stepLastDay');
+  const el = document.getElementById('lastDayContent');
+  if (STATE.arrivalType !== 'B') { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  el.innerHTML = '';
+  const opts = LAST_DAY_OPTIONS.B;
+  opts.forEach(opt => {
+    const card = document.createElement('div');
+    const isSelected = STATE.lastDayOption === opt.id;
+    card.className = 'sel-card' + (isSelected ? ' selected' : '');
+    card.style.cssText = 'display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:12px;margin-bottom:8px;';
+    card.innerHTML = `
+      <div style="flex:1;">
+        <div class="card-title">${opt.label}</div>
+        <div class="card-desc">${opt.desc}</div>
+        <div style="font-size:11px;color:#888780;margin-top:3px;">소요: 오전 반나절 · 15~20시 귀국 출발</div>
+      </div>
+      <div class="check-icon"></div>`;
+    card.onclick = () => { STATE.lastDayOption = opt.id; buildLastDay(); updateItinerary(); };
+    el.appendChild(card);
+  });
+}
+
+function buildHotelCards() {
+  const el = document.getElementById('hotelCards');
+  el.innerHTML = '';
+  LOTOCHA_DB.hotels.forEach(h => {
+    const d = document.createElement('div');
+    d.className = 'sel-card' + (STATE.hotel === h.id ? ' selected' : '');
+    d.innerHTML = `
+      <img src="${h.image}" alt="${h.name}" loading="lazy">
+      <div class="card-body">
+        <div class="card-title">${h.name}</div>
+        <div class="card-desc">${h.desc}</div>
+        ${h.grade === 'premium' ? '<div class="card-price">프리미엄</div>' : '<div class="card-price">스탠다드</div>'}
+      </div>
+      <div class="check-icon"></div>`;
+    d.onclick = () => { STATE.hotel = h.id; STATE.firstDayOption = null; buildHotelCards(); buildFirstDay(); updateItinerary(); };
+    el.appendChild(d);
+  });
+}
+
+function buildFirstDay() {
+  const el = document.getElementById('firstDayContent');
+  el.innerHTML = '';
+  if (!STATE.arrivalType) { el.innerHTML = '<div class="notice">도착 시간대를 먼저 선택해 주세요.</div>'; return; }
+  const t = LOTOCHA_DB.arrivalTypes[STATE.arrivalType];
+
+  if (STATE.arrivalType === 'C') {
+    const opt = t.options[0];
+    el.innerHTML = `
+      <div class="notice">${opt.desc}</div>
+      <div style="margin-top:10px;display:flex;gap:10px;align-items:center;">
+        <img src="${opt.image}" style="width:80px;height:60px;object-fit:cover;border-radius:8px;">
+        <div>
+          <div style="font-size:14px;font-weight:500;">${opt.label}</div>
+          <div style="font-size:12px;color:#888780;margin-top:2px;">도착 당일은 관광 일정 없음</div>
+        </div>
+      </div>`;
+    STATE.firstDayOption = opt.id;
+    return;
+  }
+
+  // B타입: 호텔 위치 필터
+  let opts = t.options;
+  if (STATE.arrivalType === 'B' && STATE.hotel) {
+    const hotelLoc = LOTOCHA_DB.hotels.find(h => h.id === STATE.hotel)?.location;
+    opts = opts.filter(o => o.hotelLoc === 'any' || !hotelLoc || o.hotelLoc === hotelLoc);
+  }
+
+  if (!STATE.hotel && STATE.arrivalType === 'B') {
+    el.innerHTML = '<div class="notice">호텔을 먼저 선택하면 맞춤 옵션이 표시됩니다.</div>';
+    return;
+  }
+
+  opts.forEach(opt => {
+    const card = document.createElement('div');
+    const isSelected = STATE.firstDayOption === opt.id;
+    card.className = 'sel-card' + (isSelected ? ' selected' : '');
+    card.style.cssText = 'display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:12px;margin-bottom:8px;';
+    card.innerHTML = `
+      <img src="${opt.image}" style="width:80px;height:64px;object-fit:cover;border-radius:8px;flex-shrink:0;">
+      <div style="flex:1;">
+        <div class="card-title">${opt.label}</div>
+        <div class="card-desc">${opt.desc}</div>
+        ${opt.price ? `<div class="card-price">+${(opt.price/10000).toFixed(0)}만원/인</div>` : ''}
+        ${opt.note ? `<div class="notice" style="margin-top:6px;">${opt.note}</div>` : ''}
+      </div>
+      <div class="check-icon"></div>`;
+    card.onclick = () => {
+      STATE.firstDayOption = opt.id;
+      STATE.firstDayEvening = null;
+      buildFirstDay();
+      updateItinerary();
+    };
+    el.appendChild(card);
+
+    // 저녁 옵션 (A타입)
+    if (isSelected && opt.eveningOpts && opt.eveningOpts.length > 0) {
+      const eWrap = document.createElement('div');
+      eWrap.innerHTML = '<div style="font-size:12px;color:#5f5e5a;margin:8px 0 4px;margin-left:92px;">저녁 공연 추가 (선택)</div>';
+      opt.eveningOpts.forEach(eid => {
+        const ev = LOTOCHA_DB.eveningEvents[eid];
+        const eCard = document.createElement('div');
+        eCard.className = 'evening-opt' + (STATE.firstDayEvening === eid ? ' selected' : '');
+        eCard.style.marginLeft = '92px';
+        eCard.innerHTML = `
+          <img src="${ev.image}" alt="${ev.name}">
+          <div class="eo-info">
+            <div class="eo-name">${ev.name}</div>
+            <div class="eo-price">+${(ev.price/10000).toFixed(0)}만원/인</div>
+          </div>`;
+        eCard.onclick = (e) => {
+          e.stopPropagation();
+          STATE.firstDayEvening = STATE.firstDayEvening === eid ? null : eid;
+          buildFirstDay();
+          updateItinerary();
+        };
+        eWrap.appendChild(eCard);
+      });
+      el.appendChild(eWrap);
+    }
+  });
+}
+
+function updateBlocks() {
+  const el = document.getElementById('blockCards');
+  el.innerHTML = '';
+
+  // 사용 가능 슬롯 계산
+  const pax = getTotalPax();
+  const usedByFirst = STATE.arrivalType === 'A' && STATE.firstDayOption === 'A_fenghuang' ? 1 : 0;
+  // C타입은 마지막날도 관광 가능 → 슬롯 1 추가
+  const lastDayBonus = STATE.arrivalType === 'C' ? 1 : 0;
+  const totalSlots = STATE.nights + lastDayBonus;
+  const usedSlots = STATE.selectedBlocks.reduce((s, bid) => {
+    const b = LOTOCHA_DB.blocks.find(x => x.id === bid);
+    return s + (b ? b.days : 0);
+  }, 0);
+  const freeSlots = totalSlots - usedSlots - usedByFirst;
+
+  document.getElementById('slotsInfo').textContent =
+    `${STATE.nights}박 기준 총 ${totalSlots}일 · 선택됨 ${usedSlots}일 · 남은 슬롯 ${freeSlots}일`;
+  document.getElementById('slotsInfo').className = 'notice' + (freeSlots < 0 ? ' warn' : freeSlots === 0 ? ' ok' : '');
+
+  LOTOCHA_DB.blocks.forEach(b => {
+    const isSelected = STATE.selectedBlocks.includes(b.id);
+    const wouldExceed = !isSelected && (usedSlots + b.days) > totalSlots;
+    const tooShort = b.minNights > STATE.nights;
+    // 부용진은 마지막날 배치 불가 — C타입에서 마지막 슬롯이 될 경우 차단
+    const isLastDayBlock = STATE.arrivalType === 'C' && !isSelected &&
+      (usedSlots + b.days) === totalSlots && b.noLastDay;
+    const isDisabled = ((wouldExceed || tooShort) && !isSelected) || isLastDayBlock;
+
+    const card = document.createElement('div');
+    card.className = 'block-card' + (isSelected ? ' selected' : '') + (isDisabled ? ' disabled' : '');
+
+    let scheduleHTML = b.schedule.map(s =>
+      `<div class="tl-row"><div class="tl-dot"></div><div class="tl-time">${s.t}</div><div class="tl-act">${s.a}</div></div>`
+    ).join('');
+
+    let spotsHTML = b.spots.map(s =>
+      `<div class="spot-item"><img src="${s.img}" alt="${s.name}" loading="lazy"><div class="spot-name">${s.name}</div><div class="spot-desc">${s.desc}</div></div>`
+    ).join('');
+
+    let variantHTML = '';
+    if (b.variants && isSelected) {
+      const curVar = STATE.blockVariants[b.id] || b.variants[0].id;
+      variantHTML = `<div style="font-size:12px;color:#5f5e5a;margin-bottom:4px;">오전 코스 선택</div>
+        <div class="variant-row">${b.variants.map(v =>
+          `<div class="variant-btn${curVar === v.id ? ' selected' : ''}" onclick="event.stopPropagation();setVariant('${b.id}','${v.id}')">${v.label}</div>`
+        ).join('')}</div>`;
+    }
+
+    let eveningHTML = '';
+    if (b.eveningOpts.length > 0 && isSelected) {
+      const curEv = STATE.blockEvenings[b.id];
+      eveningHTML = `<div style="font-size:12px;color:#5f5e5a;margin-top:10px;margin-bottom:4px;">저녁 공연 추가 (선택)</div>
+        ${b.eveningOpts.map(eid => {
+          const ev = LOTOCHA_DB.eveningEvents[eid];
+          return `<div class="evening-opt${curEv === eid ? ' selected' : ''}" onclick="event.stopPropagation();setBlockEvening('${b.id}','${eid}')">
+            <img src="${ev.image}" alt="${ev.name}">
+            <div class="eo-info"><div class="eo-name">${ev.name}</div><div class="eo-price">+${(ev.price/10000).toFixed(0)}만원/인</div></div>
+          </div>`;
+        }).join('')}`;
+    }
+
+    card.innerHTML = `
+      <div class="bc-header">
+        <img class="bc-img" src="${b.image}" alt="${b.name}" loading="lazy">
+        <div class="bc-info">
+          <div class="bc-name">${b.emoji} ${b.name}
+            ${b.days > 1 ? `<span style="font-size:11px;background:#faeeda;color:#854f0b;padding:2px 7px;border-radius:99px;">${b.days}일 코스</span>` : ''}
+            ${b.mustFirst ? `<span style="font-size:11px;background:#e6f1fb;color:#185fa5;padding:2px 7px;border-radius:99px;">첫 관광일 고정</span>` : ''}
+          </div>
+          <div class="bc-sub">${b.desc}</div>
+          ${isLastDayBlock ? '<div style="font-size:11px;color:#a32d2d;margin-top:3px;">⚠️ 마지막날 배치 불가 (귀국 시간 부족)</div>' : ''}
+          ${b.ticketCNY > 0 ? `<div style="font-size:11px;color:#185fa5;margin-top:2px;">입장료 포함 (${b.ticketNote})</div>` : `<div style="font-size:11px;color:#3b6d11;margin-top:2px;">${b.ticketNote}</div>`}
+        </div>
+        <div class="bc-check">✓</div>
+      </div>
+      <div class="bc-expand">
+        ${variantHTML}
+        <div class="timeline" style="margin-top:${variantHTML ? '10px' : '0'}">${scheduleHTML}</div>
+        <div class="spots-grid">${spotsHTML}</div>
+        ${eveningHTML}
+      </div>`;
+
+    card.onclick = () => toggleBlock(b.id);
+    el.appendChild(card);
+  });
+}
+
+function toggleBlock(bid) {
+  const b = LOTOCHA_DB.blocks.find(x => x.id === bid);
+  if (!b) return;
+  if (STATE.selectedBlocks.includes(bid)) {
+    STATE.selectedBlocks = STATE.selectedBlocks.filter(x => x !== bid);
+    delete STATE.blockVariants[bid];
+    delete STATE.blockEvenings[bid];
+  } else {
+    const used = STATE.selectedBlocks.reduce((s, id) => {
+      const bl = LOTOCHA_DB.blocks.find(x => x.id === id);
+      return s + (bl ? bl.days : 0);
+    }, 0);
+    if (used + b.days > STATE.nights) return;
+    STATE.selectedBlocks.push(bid);
+    if (b.variants) STATE.blockVariants[bid] = b.variants[0].id;
+  }
+  updateBlocks();
+  updateItinerary();
+}
+
+function setVariant(bid, vid) {
+  STATE.blockVariants[bid] = vid;
+  updateBlocks();
+  updateItinerary();
+}
+
+function setBlockEvening(bid, eid) {
+  STATE.blockEvenings[bid] = STATE.blockEvenings[bid] === eid ? null : eid;
+  updateBlocks();
+  updateItinerary();
+}
+
+function toggleNyk() {
+  STATE.nyk = !STATE.nyk;
+  document.getElementById('nykCard').classList.toggle('selected', STATE.nyk);
+  updateItinerary();
+}
+
+function buildUpgradeRows() {
+  const el = document.getElementById('upgradeRows');
+  el.innerHTML = '';
+  LOTOCHA_DB.upgrades.forEach(u => {
+    const row = document.createElement('div');
+    row.className = 'upg-row';
+    row.innerHTML = `
+      <div>
+        <div style="font-size:13px;">${u.name}</div>
+        <div style="font-size:11px;color:#888780;">+${(u.krw/10000).toFixed(1)}만원/${u.unit}</div>
+      </div>
+      <div class="upg-qty">
+        <button class="qty-btn" onclick="changeUpg('${u.id}',-1)">−</button>
+        <span class="qty-num" id="upgNum_${u.id}">0</span>
+        <button class="qty-btn" onclick="changeUpg('${u.id}',1)">+</button>
+      </div>`;
+    el.appendChild(row);
+  });
+}
+
+function changeUpg(id, delta) {
+  STATE.upgrades[id] = Math.max(0, (STATE.upgrades[id] || 0) + delta);
+  document.getElementById('upgNum_' + id).textContent = STATE.upgrades[id];
+  updateItinerary();
+}
+
+function buildAgeGroups() {
+  const wrap = document.getElementById('ageGroupRows');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  const groups = [
+    { key:'adult',    label:'일반 성인',       sub:'13~59세' },
+    { key:'senior60', label:'경로 할인 (-5만원)', sub:'만 60~69세', discount:50000 },
+    { key:'senior70', label:'경로 할인 (-8만원)', sub:'만 70세 이상', discount:80000 },
+    { key:'child',    label:'아동 할인 (-8만원)', sub:'만 12세 이하', discount:80000 },
+  ];
+  groups.forEach(g => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:0.5px solid rgba(0,0,0,0.07);';
+    row.innerHTML = `
+      <div>
+        <div style="font-size:13px;">${g.label}</div>
+        <div style="font-size:11px;color:#888780;">${g.sub}${g.discount ? ` · 1인당 ₩${(g.discount/10000).toFixed(0)}만원 할인` : ''}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="qty-btn" onclick="changeAge('${g.key}',-1)">−</button>
+        <span style="font-size:16px;font-weight:500;min-width:24px;text-align:center;" id="age_${g.key}">${STATE.ageGroups[g.key]}</span>
+        <button class="qty-btn" onclick="changeAge('${g.key}',1)">+</button>
+      </div>`;
+    wrap.appendChild(row);
+  });
+  updatePaxSummary();
+}
+
+function changeAge(key, delta) {
+  STATE.ageGroups[key] = Math.max(0, (STATE.ageGroups[key] || 0) + delta);
+  // 최소 총 1명
+  const total = getTotalPax();
+  if (total < 1 && delta < 0) { STATE.ageGroups[key] = 1; }
+  buildAgeGroups();
+  updateBlocks();
+  updateItinerary();
+}
+
+function getTotalPax() {
+  return Object.values(STATE.ageGroups).reduce((s, n) => s + n, 0);
+}
+
+function updatePaxSummary() {
+  const total = getTotalPax();
+  const discountTotal = calcDiscountKRW();
+  const el = document.getElementById('paxSummary');
+  if (!el) return;
+  const parts = [];
+  if (STATE.ageGroups.adult > 0) parts.push(`성인 ${STATE.ageGroups.adult}명`);
+  if (STATE.ageGroups.senior60 > 0) parts.push(`60세이상 ${STATE.ageGroups.senior60}명`);
+  if (STATE.ageGroups.senior70 > 0) parts.push(`70세이상 ${STATE.ageGroups.senior70}명`);
+  if (STATE.ageGroups.child > 0) parts.push(`아동 ${STATE.ageGroups.child}명`);
+  el.innerHTML = `총 ${total}명 (${parts.join(' + ')})` +
+    (discountTotal > 0 ? ` · <span style="color:#3b6d11;font-weight:500;">경로/아동 할인 -₩${discountTotal.toLocaleString('ko-KR')}</span>` : '');
+}
+
+function calcDiscountKRW() {
+  return (STATE.ageGroups.senior60 || 0) * 50000 +
+         (STATE.ageGroups.senior70 || 0) * 80000 +
+         (STATE.ageGroups.child    || 0) * 80000;
+}
+
+// ── 일정 생성 ────────────────────────────────────────────────
+function buildItinerary() {
+  const days = STATE.nights + 1;
+  const at = STATE.arrivalType;
+  const plan = [];
+  for (let i = 1; i <= days; i++) {
+    plan.push({ day: i, label: `${i}일차`, slots: [], meals: [] });
+  }
+
+  // ── 식사 (타입별 정확히) ─────────────────────────────────
+  // 1일차
+  if (at === 'A') plan[0].meals = ['중식', '석식'];
+  else if (at === 'B') plan[0].meals = ['석식'];
+  else plan[0].meals = [];
+  // 중간 풀데이
+  for (let i = 1; i < days - 1; i++) {
+    plan[i].meals = ['조식(호텔)', '중식', '석식'];
+  }
+  // 마지막날
+  if (days > 1) plan[days - 1].meals = getLastDayMeals(at);
+
+  // ── 1일차 슬롯 ──────────────────────────────────────────
+  const t = at ? LOTOCHA_DB.arrivalTypes[at] : null;
+  if (STATE.firstDayOption && t) {
+    const opt = t.options.find(o => o.id === STATE.firstDayOption);
+    if (opt) {
+      if (at === 'A') {
+        if (STATE.firstDayOption === 'A_tianmen') {
+          plan[0].slots.push({ time: '오후', content: '천문산 케이블카 + 유리잔도' });
+        } else if (STATE.firstDayOption === 'A_fenghuang') {
+          plan[0].slots.push({ time: '오후', content: '봉황고성 출발 → 야간 타강 유람' });
+          if (days > 1) plan[1].slots.unshift({ time: '오전', content: '봉황고성 자유 → 09시 귀환' });
+        }
+      } else if (at === 'B') {
+        plan[0].slots.push({ time: '저녁', content: opt.label + (opt.price ? ` (+${(opt.price/10000).toFixed(0)}만원)` : '') });
+      } else {
+        plan[0].slots.push({ time: '저녁', content: '가이드 야식 추천 (자비)' });
+      }
+      if (STATE.firstDayEvening) {
+        const ev = LOTOCHA_DB.eveningEvents[STATE.firstDayEvening];
+        if (ev) plan[0].slots.push({ time: '저녁 공연', content: `${ev.name} (+${(ev.price/10000).toFixed(0)}만원)` });
+      }
+    }
+  }
+
+  // ── 블록 배치 (중간 풀데이) ──────────────────────────────
+  // 봉황 출발이면 2일차 오전이 이미 채워짐 → blockDayStart = 2
+  let blockDayStart = (at === 'A' && STATE.firstDayOption === 'A_fenghuang') ? 2 : 1;
+  // C타입: 마지막날도 블록 배치 가능 → 마지막날 인덱스까지 허용
+  const blockEndDay = at === 'C' ? days : days - 1;
+
+  const sortedBlocks = [...STATE.selectedBlocks].sort((a, b) => {
+    const ba = LOTOCHA_DB.blocks.find(x => x.id === a);
+    const bb = LOTOCHA_DB.blocks.find(x => x.id === b);
+    return (bb?.mustFirst ? 1 : 0) - (ba?.mustFirst ? 1 : 0);
+  });
+
+  sortedBlocks.forEach(bid => {
+    const b = LOTOCHA_DB.blocks.find(x => x.id === bid);
+    if (!b) return;
+    for (let d = 0; d < b.days; d++) {
+      const dayIdx = blockDayStart + d;
+      if (dayIdx >= days) return;
+      b.schedule.forEach(s => { plan[dayIdx].slots.push({ time: s.t, content: s.a }); });
+    }
+    const ev = STATE.blockEvenings[bid];
+    if (ev) {
+      const evData = LOTOCHA_DB.eveningEvents[ev];
+      if (evData) plan[blockDayStart].slots.push({ time: '저녁 공연', content: `${evData.name} (+${(evData.price/10000).toFixed(0)}만원)` });
+    }
+    blockDayStart += b.days;
+  });
+
+  // ── 마지막날 슬롯 ────────────────────────────────────────
+  const lastDay = plan[days - 1];
+  if (at === 'A') {
+    // X1: 관광 없음
+    lastDay.slots.push({ time: '오전', content: '체크아웃 후 공항 이동' });
+    lastDay.slots.push({ time: '~15시', content: '귀국 출발' });
+  } else if (at === 'B') {
+    // X2: 오전 백양고찰 선택
+    if (STATE.lastDayOption === 'LD_B_cafe') {
+      lastDay.slots.push({ time: '오전', content: '백양고찰 + 감성 카페 타임' });
+    } else if (STATE.lastDayOption === 'LD_B_mart') {
+      lastDay.slots.push({ time: '오전', content: '백양고찰 + 현지 대형마트 쇼핑' });
+    } else {
+      lastDay.slots.push({ time: '오전', content: '백양고찰 + 카페 또는 마트 (선택 필요)' });
+    }
+    lastDay.slots.push({ time: '15~20시', content: '공항 이동 → 귀국 출발' });
+  } else if (at === 'C') {
+    // X3: 블록으로 채워짐, 마지막에 출발 표시
+    if (lastDay.slots.length === 0) lastDay.slots.push({ time: '일정', content: '관광 코스에서 선택하세요' });
+    lastDay.slots.push({ time: '20시 이후', content: '공항 이동 → 귀국 출발' });
+  }
+
+  return plan;
+}
+
+function updateItinerary() {
+  STATE.priceRevealed = false;
+  document.getElementById('priceSection').style.display = 'none';
+  document.getElementById('confirmBtnWrap').style.display = 'flex';
+
+  const plan = buildItinerary();
+  const el = document.getElementById('itineraryView');
+  el.innerHTML = '';
+
+  plan.forEach(day => {
+    const div = document.createElement('div');
+    div.className = 'itin-day';
+    const allSlots = [...day.slots];
+    div.innerHTML = `
+      <div class="itin-day-header">
+        <span>${day.label}</span>
+        ${day.meals.length ? `<span class="day-num">${day.meals.join(' · ')}</span>` : '<span class="day-num">식사 미포함</span>'}
+      </div>
+      <div class="itin-slots">
+        ${allSlots.length > 0 ? allSlots.map(s => `
+          <div class="itin-slot">
+            <div class="slot-time">${s.time}</div>
+            <div class="slot-content">${s.content}</div>
+          </div>`).join('') : '<div class="itin-empty">아직 일정이 없습니다.</div>'}
+      </div>`;
+    el.appendChild(div);
+  });
+  updateStepBar();
+}
+
+// ── 가격 계산 ────────────────────────────────────────────────
+function getPriceTier(pax) {
+  const tiers = LOTOCHA_DB.cost.profitTiers;
+  for (let i = 0; i < tiers.length; i++) {
+    if (pax <= tiers[i].maxPax) return tiers[i];
+  }
+  return tiers[tiers.length - 1];
+}
+
+function calcPrice() {
+  const c = LOTOCHA_DB.cost;
+  const nights = STATE.nights;
+  const pax = getTotalPax();
+  const rooms = Math.ceil(pax / 2);
+
+  // 차량 구간 + 이익률 자동 결정
+  const tier = getPriceTier(pax);
+  const carCostCNY   = tier.carCNY * nights;
+  const guideCostCNY = c.guidePerNight * nights;
+
+  const hotel = LOTOCHA_DB.hotels.find(h => h.id === STATE.hotel);
+  const hotelCostCNY = hotel ? hotel.pricePerRoom * rooms * nights : 0;
+
+  const totalMeals = getMealCount();
+  const mealCostCNY = c.mealPerPax * totalMeals * pax;
+  const coffeeCostCNY = c.coffeePerPax * pax;
+
+  let ticketCostCNY = 0;
+  STATE.selectedBlocks.forEach(bid => {
+    const b = LOTOCHA_DB.blocks.find(x => x.id === bid);
+    if (b) ticketCostCNY += b.ticketCNY * pax;
+  });
+
+  const totalCostCNY = hotelCostCNY + carCostCNY + guideCostCNY + mealCostCNY + coffeeCostCNY + ticketCostCNY;
+  const totalCostKRW = totalCostCNY * c.exchangeRate;
+  const priceTier = getPriceTier(pax);
+  const baseKRW = totalCostKRW / (1 - priceTier.profitRate);
+  const perPaxBase = baseKRW / pax;
+
+  // 옵션 추가
+  let optionKRW = 0;
+  // 1일차 저녁 이벤트
+  if (STATE.firstDayEvening) {
+    optionKRW += (LOTOCHA_DB.eveningEvents[STATE.firstDayEvening]?.price || 0) * pax;
+  }
+  // B타입 유료 옵션
+  if (STATE.arrivalType === 'B' && STATE.firstDayOption) {
+    const t = LOTOCHA_DB.arrivalTypes['B'];
+    const opt = t.options.find(o => o.id === STATE.firstDayOption);
+    if (opt && opt.price) optionKRW += opt.price * pax;
+  }
+  // 블록 저녁 이벤트
+  Object.entries(STATE.blockEvenings).forEach(([bid, eid]) => {
+    if (eid) optionKRW += (LOTOCHA_DB.eveningEvents[eid]?.price || 0) * pax;
+  });
+  // 업그레이드 (마사지는 판매가 - 원가 = 순이익만 반영)
+  LOTOCHA_DB.upgrades.forEach(u => {
+    const qty = STATE.upgrades[u.id] || 0;
+    if (qty <= 0) return;
+    let sellKRW = u.krw * qty * pax;
+    // 마사지 원가 차감
+    if (u.id === 'massage50') sellKRW -= (c.massage50CNY || 79) * qty * pax * c.exchangeRate;
+    if (u.id === 'massage80') sellKRW -= (c.massage80CNY || 99) * qty * pax * c.exchangeRate;
+    optionKRW += sellKRW;
+  });
+  // 남영규
+  const nykKRW = STATE.nyk ? c.nykPerPaxPerNight * nights * pax : 0;
+
+  const discountKRW = calcDiscountKRW();
+  const totalKRW = baseKRW + optionKRW + nykKRW - discountKRW;
+  const perPaxFinal = Math.round(totalKRW / pax);
+
+  return { perPaxFinal, totalKRW, baseKRW, optionKRW, nykKRW, discountKRW, pax, nights };
+}
+
+function revealPrice() {
+  const r = calcPrice();
+  STATE.priceRevealed = true;
+  document.getElementById('confirmBtnWrap').style.display = 'none';
+  document.getElementById('priceSection').style.display = 'block';
+
+  const fmt = n => Math.round(n).toLocaleString('ko-KR');
+
+  document.getElementById('priceDisplay').textContent = '₩' + fmt(r.perPaxFinal);
+  document.getElementById('priceSub').textContent = `${r.pax}인 기준 · 총 ₩${fmt(r.totalKRW)}`;
+
+  const bkd = document.getElementById('priceBreakdown');
+  let discountLines = '';
+  if (STATE.ageGroups.senior60 > 0)
+    discountLines += `<div class="price-row" style="color:#3b6d11;"><span>경로할인 60세이상 ${STATE.ageGroups.senior60}명</span><span>-₩${fmt(STATE.ageGroups.senior60 * 50000)}</span></div>`;
+  if (STATE.ageGroups.senior70 > 0)
+    discountLines += `<div class="price-row" style="color:#3b6d11;"><span>경로할인 70세이상 ${STATE.ageGroups.senior70}명</span><span>-₩${fmt(STATE.ageGroups.senior70 * 80000)}</span></div>`;
+  if (STATE.ageGroups.child > 0)
+    discountLines += `<div class="price-row" style="color:#3b6d11;"><span>아동할인 12세이하 ${STATE.ageGroups.child}명</span><span>-₩${fmt(STATE.ageGroups.child * 80000)}</span></div>`;
+
+  bkd.innerHTML = `
+    <div class="price-row"><span>기본 패키지 (${r.pax}인)</span><span>₩${fmt(r.baseKRW)}</span></div>
+    ${r.optionKRW > 0 ? `<div class="price-row"><span>추가 옵션</span><span>₩${fmt(r.optionKRW)}</span></div>` : ''}
+    ${r.nykKRW > 0 ? `<div class="price-row"><span>남영규 가이드 지명 팁</span><span>₩${fmt(r.nykKRW)}</span></div>` : ''}
+    ${discountLines}
+    <div class="price-row total"><span>합계 (${r.pax}인)</span><span>₩${fmt(r.totalKRW)}</span></div>
+    <div class="price-row total"><span>1인 평균</span><span style="color:#185fa5;font-size:16px;">₩${fmt(r.perPaxFinal)}</span></div>
+  `;
+  document.getElementById('priceSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function buildKakaoMsg() {
+  const r = calcPrice();
+  const fmt = n => Math.round(n).toLocaleString('ko-KR');
+  const at = STATE.arrivalType;
+  const atLabel = at === 'A' ? 'A타입 (오전 10~13시 도착 / ~15시 출발)' :
+                  at === 'B' ? 'B타입 (오후 13~16시 도착 / 15~20시 출발)' :
+                  at === 'C' ? 'C타입 (오후 17시~자정 도착 / 20시 이후 출발)' : '미선택';
+  const hotelName = LOTOCHA_DB.hotels.find(h => h.id === STATE.hotel)?.name || '미선택';
+
+  // 1일차 옵션
+  let firstDayText = '미선택';
+  if (STATE.firstDayOption && at) {
+    const t = LOTOCHA_DB.arrivalTypes[at];
+    const opt = t?.options.find(o => o.id === STATE.firstDayOption);
+    if (opt) firstDayText = opt.label;
+    if (STATE.firstDayEvening) {
+      const ev = LOTOCHA_DB.eveningEvents[STATE.firstDayEvening];
+      if (ev) firstDayText += ` + ${ev.name}`;
+    }
+  }
+
+  // 마지막날 옵션 (B타입)
+  let lastDayText = '';
+  if (at === 'B' && STATE.lastDayOption) {
+    const ldOpts = LAST_DAY_OPTIONS.B;
+    const opt = ldOpts.find(o => o.id === STATE.lastDayOption);
+    if (opt) lastDayText = `\n• 귀국 당일 오전: ${opt.label}`;
+  }
+
+  // 관광 블록
+  const blockLines = STATE.selectedBlocks.map(bid => {
+    const b = LOTOCHA_DB.blocks.find(x => x.id === bid);
+    if (!b) return '';
+    let line = `  - ${b.name}`;
+    const variant = STATE.blockVariants[bid];
+    if (variant && b.variants) {
+      const v = b.variants.find(x => x.id === variant);
+      if (v) line += ` (${v.label})`;
+    }
+    const ev = STATE.blockEvenings[bid];
+    if (ev) {
+      const evData = LOTOCHA_DB.eveningEvents[ev];
+      if (evData) line += ` + ${evData.name}`;
+    }
+    return line;
+  }).filter(Boolean).join('\n');
+
+  // 업그레이드
+  const upgLines = LOTOCHA_DB.upgrades
+    .filter(u => STATE.upgrades[u.id] > 0)
+    .map(u => `  - ${u.name} ${STATE.upgrades[u.id]}회`)
+    .join('\n');
+
+  const nykLine = STATE.nyk ? '\n• 남영규 가이드 지명: 예' : '';
+
+  const msg =
+    `[로투차 여행 문의] 🗺️` +
+    `\n━━━━━━━━━━━━━━━━━━━` +
+    `\n• 일정: ${STATE.nights}박${STATE.nights+1}일` +
+    `\n• 항공편: ${atLabel}` +
+    `\n• 인원: ${STATE.pax}명` +
+    `\n• 호텔: ${hotelName}` +
+    `\n• 도착 당일: ${firstDayText}` +
+    lastDayText +
+    `\n• 선택 코스:\n${blockLines || '  미선택'}` +
+    (upgLines ? `\n• 추가 옵션:\n${upgLines}` : '') +
+    nykLine +
+    `\n• 예상 금액: 1인 ₩${fmt(r.perPaxFinal)} / 총 ₩${fmt(r.totalKRW)}` +
+    `\n━━━━━━━━━━━━━━━━━━━` +
+    `\n위 일정으로 예약 문의드립니다. 확인 부탁드려요!`;
+
+  return msg;
+}
+
+function submitKakao() {
+  const msg = buildKakaoMsg();
+  const encoded = encodeURIComponent(msg);
+  const kakaoUrl = `http://pf.kakao.com/_hvrmn/chat?text=${encoded}`;
+  window.open(kakaoUrl, '_blank');
+}
+
+function copyAndKakao() {
+  const msg = buildKakaoMsg();
+  navigator.clipboard.writeText(msg).then(() => {
+    const kakaoUrl = 'http://pf.kakao.com/_hvrmn/chat';
+    window.open(kakaoUrl, '_blank');
+  }).catch(() => {
+    // 클립보드 실패 시 URL 방식으로 fallback
+    const encoded = encodeURIComponent(msg);
+    window.open(`http://pf.kakao.com/_hvrmn/chat?text=${encoded}`, '_blank');
+  });
+}
+
+function updateStepBar() {
+  const steps = [
+    { label: '기본 정보', done: !!STATE.arrivalType },
+    { label: '호텔', done: !!STATE.hotel },
+    { label: '1일차', done: !!STATE.firstDayOption },
+    { label: '관광 코스', done: STATE.selectedBlocks.length > 0 },
+    { label: '옵션', done: true },
+    { label: '확인', done: STATE.priceRevealed },
+  ];
+  const el = document.getElementById('stepBar');
+  el.innerHTML = steps.map((s, i) =>
+    `<div class="step-dot ${s.done ? 'done' : ''} ${i === steps.findIndex(x => !x.done) ? 'active' : ''}">
+      <span>${i + 1}</span>${s.label}
+    </div>`
+  ).join('');
+}
+
+
+
+// ── 설정 로드 (lotocha_admin.html에서 저장한 값 적용) ────────
+const _DEFAULT_COST = {
+  exchangeRate: 230,
+  profitRate_1_5: 18, profitRate_6: 24, profitRate_7_9: 30, profitRate_10_22: 35,
+  car_1_5: 500, car_6: 500, car_7_9: 600, car_10_22: 1100,
+  guidePerNight: 600, mealPerPax: 60, coffeePerPax: 30,
+  nykTip: 30000, massage50CNY: 79, massage80CNY: 99,
+};
+
+function loadConfig() {
+  // localStorage에서 즉시 로드 (동기)
+  try {
+    const saved = localStorage.getItem('lotocha_config');
+    return saved ? { ..._DEFAULT_COST, ...JSON.parse(saved) } : { ..._DEFAULT_COST };
+  } catch { return { ..._DEFAULT_COST }; }
+}
+
+async function loadConfigFromGitHub() {
+  // GitHub raw URL에서 최신 config 로드 (비동기)
+  const CONFIG_URL = 'https://raw.githubusercontent.com/nanyingkui/lotocha/main/config/lotocha_config.json';
+  try {
+    const res = await fetch(CONFIG_URL + '?t=' + Date.now()); // 캐시 방지
+    if (!res.ok) return;
+    const cfg = await res.json();
+    // localStorage 업데이트
+    localStorage.setItem('lotocha_config', JSON.stringify(cfg));
+    // DB에 적용
+    applyConfigToDB({ ..._DEFAULT_COST, ...cfg });
+    console.log('✅ GitHub에서 최신 설정 로드됨');
+  } catch(e) {
+    console.log('GitHub config 로드 실패, localStorage 사용:', e.message);
+  }
+}
+
+function applyConfigToDB(cfg) {
+  LOTOCHA_DB.cost.exchangeRate = cfg.exchangeRate;
+  LOTOCHA_DB.cost.profitTiers = [
+    { maxPax:  5, carCNY: cfg.car_1_5,   profitRate: cfg.profitRate_1_5   / 100, label: '1~5인 (7인승)'    },
+    { maxPax:  6, carCNY: cfg.car_6,     profitRate: cfg.profitRate_6     / 100, label: '6인 (9인승)'      },
+    { maxPax:  9, carCNY: cfg.car_7_9,   profitRate: cfg.profitRate_7_9   / 100, label: '7~9인 (14인승)'   },
+    { maxPax: 22, carCNY: cfg.car_10_22, profitRate: cfg.profitRate_10_22 / 100, label: '10~22인 (26인승)' },
+  ];
+  LOTOCHA_DB.cost.guidePerNight     = cfg.guidePerNight;
+  LOTOCHA_DB.cost.mealPerPax        = cfg.mealPerPax;
+  LOTOCHA_DB.cost.coffeePerPax      = cfg.coffeePerPax;
+  LOTOCHA_DB.cost.nykPerPaxPerNight = cfg.nykTip;
+  LOTOCHA_DB.cost.massage50CNY      = cfg.massage50CNY;
+  LOTOCHA_DB.cost.massage80CNY      = cfg.massage80CNY;
+  // 호텔 단가
+  const hotelMap = {
+    orange_city: cfg.hotel_orange_city || 280,
+    hilton_city: cfg.hotel_hilton_city || 380,
+    hilton_wly:  cfg.hotel_hilton_wly  || 420,
+  };
+  LOTOCHA_DB.hotels.forEach(h => { if (hotelMap[h.id] !== undefined) h.pricePerRoom = hotelMap[h.id]; });
+  // 입장권
+  const ticketMap = { B1: cfg.ticket_B1, B2: cfg.ticket_B2, B3: cfg.ticket_B3, B4: cfg.ticket_B4, B5: cfg.ticket_B5, B6: cfg.ticket_B6 };
+  LOTOCHA_DB.blocks.forEach(b => { if (ticketMap[b.id] !== undefined) b.ticketCNY = ticketMap[b.id]; });
+}
+
+// 1. localStorage에서 즉시 적용 (동기)
+applyConfigToDB(loadConfig());
+
+init();
+updateItinerary();
+
+// 2. GitHub에서 최신 설정 비동기 로드 (완료되면 자동 재적용)
+loadConfigFromGitHub().then(() => {
+  // GitHub 로드 완료 후 가격이 표시된 상태면 재계산
+  if (STATE.priceRevealed) revealPrice();
+});
+</script>
+
+    <!-- 설정 폼 (잠김) -->
+    <div id="adminForm" style="display:none;">
+
+      <div class="admin-section">
+        <div class="admin-section-label">기본 설정</div>
+        <div class="admin-row"><label>환율</label><div style="display:flex;align-items:center;"><input type="number" id="cfg_exchangeRate"><span class="aunit">KRW/CNY</span></div></div>
+        <div class="admin-row"><label>목표 이익률</label><div style="display:flex;align-items:center;"><input type="number" id="cfg_profitRate" min="0" max="100"><span class="aunit">%</span></div></div>
+      </div>
+
+      <div class="admin-section">
+        <div class="admin-section-label">차량비 (박수 기준)</div>
+        <div class="admin-row"><label>소형 2~3인</label><div style="display:flex;align-items:center;"><input type="number" id="cfg_carSmall"><span class="aunit">CNY/박</span></div></div>
+        <div class="admin-row"><label>중형 4~5인</label><div style="display:flex;align-items:center;"><input type="number" id="cfg_carMedium"><span class="aunit">CNY/박</span></div></div>
+        <div class="admin-row"><label>대형 6인 이상</label><div style="display:flex;align-items:center;"><input type="number" id="cfg_carLarge"><span class="aunit">CNY/박</span></div></div>
+      </div>
+
+      <div class="admin-section">
+        <div class="admin-section-label">가이드비 (박수 기준)</div>
+        <div class="admin-row"><label>가이드 일당</label><div style="display:flex;align-items:center;"><input type="number" id="cfg_guidePerNight"><span class="aunit">CNY/박</span></div></div>
+      </div>
+
+      <div class="admin-section">
+        <div class="admin-section-label">식사 원가</div>
+        <div class="admin-row"><label>식사 단가</label><div style="display:flex;align-items:center;"><input type="number" id="cfg_mealPerPax"><span class="aunit">CNY/인/끼</span></div></div>
+        <div class="admin-row"><label>커피 1회</label><div style="display:flex;align-items:center;"><input type="number" id="cfg_coffeePerPax"><span class="aunit">CNY/인</span></div></div>
+      </div>
+
+      <div class="admin-section">
+        <div class="admin-section-label">호텔 단가 (방당/박)</div>
+        <div class="admin-row"><label>오렌지/홈인플러스</label><div style="display:flex;align-items:center;"><input type="number" id="cfg_hotel_orange_city"><span class="aunit">CNY/방</span></div></div>
+        <div class="admin-row"><label>햄튼 힐튼 시내</label><div style="display:flex;align-items:center;"><input type="number" id="cfg_hotel_hilton_city"><span class="aunit">CNY/방</span></div></div>
+        <div class="admin-row"><label>햄튼 힐튼 우링위안</label><div style="display:flex;align-items:center;"><input type="number" id="cfg_hotel_hilton_wly"><span class="aunit">CNY/방</span></div></div>
+      </div>
+
+      <div class="admin-section">
+        <div class="admin-section-label">입장권 단가 (1인)</div>
+        <div class="admin-row"><label>삼림공원 (3일권)</label><div style="display:flex;align-items:center;"><input type="number" id="cfg_ticket_B1"><span class="aunit">CNY/인</span></div></div>
+        <div class="admin-row"><label>천문산+백양고찰</label><div style="display:flex;align-items:center;"><input type="number" id="cfg_ticket_B2"><span class="aunit">CNY/인</span></div></div>
+        <div class="admin-row"><label>황룡동굴+대협곡</label><div style="display:flex;align-items:center;"><input type="number" id="cfg_ticket_B3"><span class="aunit">CNY/인</span></div></div>
+        <div class="admin-row"><label>황석채+금편계곡</label><div style="display:flex;align-items:center;"><input type="number" id="cfg_ticket_B4"><span class="aunit">CNY/인</span></div></div>
+        <div class="admin-row"><label>자유+황석채+부용진</label><div style="display:flex;align-items:center;"><input type="number" id="cfg_ticket_B5"><span class="aunit">CNY/인</span></div></div>
+        <div class="admin-row"><label>황석채+봉황고성 2일</label><div style="display:flex;align-items:center;"><input type="number" id="cfg_ticket_B6"><span class="aunit">CNY/인</span></div></div>
+      </div>
+
+      <div class="admin-section">
+        <div class="admin-section-label">남영규 가이드 지명</div>
+        <div class="admin-row"><label>지명 팁</label><div style="display:flex;align-items:center;"><input type="number" id="cfg_nykTip"><span class="aunit">KRW/인/박</span></div></div>
+      </div>
+
+      <div style="font-size:11px;color:#888780;margin-top:8px;">※ 저장 시 이 기기 브라우저에 보관됩니다.</div>
+      <button class="admin-save" onclick="saveAdminConfig()">저장 적용</button>
+      <button class="admin-reset" onclick="resetAdminConfig()">기본값으로 초기화</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
