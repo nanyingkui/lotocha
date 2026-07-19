@@ -118,14 +118,6 @@ textarea.field-input{min-height:80px;resize:vertical}
 .dyn-row-head{display:flex;gap:6px;font-size:10px;font-weight:700;color:#aaa;padding-bottom:4px;padding-left:2px}
 .dyn-row-head span{flex:2;min-width:60px}
 .dyn-row-head span.sm{flex:1;min-width:60px}
-
-/* 항공편 row (필드가 많아 줄바꿈에 의존하지 않는 고정 3줄 레이아웃) */
-.flight-row{background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px;margin-bottom:8px}
-.flight-row-line{display:flex;gap:6px;margin-bottom:6px}
-.flight-row-line:last-child{margin-bottom:0}
-.flight-row input[type=text]{flex:1;min-width:0;padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;font-family:inherit;outline:none}
-.flight-row .btn-rm{background:#ffebee;color:var(--red);border:none;border-radius:6px;padding:5px 8px;font-size:13px;cursor:pointer;flex-shrink:0;font-weight:700}
-.flight-row .btn-add-row{margin-top:0;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -172,6 +164,15 @@ textarea.field-input{min-height:80px;resize:vertical}
       </button>
       <button class="sb-item" data-panel="places" onclick="showPanel('places',this)">
         <span class="icon">🏪</span>현지 업체
+      </button>
+      <button class="sb-item" data-panel="hotels" onclick="showPanel('hotels',this)">
+        <span class="icon">🏨</span>호텔 관리
+      </button>
+      <button class="sb-item" data-panel="flights" onclick="showPanel('flights',this)">
+        <span class="icon">✈️</span>항공편 관리
+      </button>
+      <button class="sb-item" data-panel="attractions" onclick="showPanel('attractions',this)">
+        <span class="icon">🗺️</span>명소 관리
       </button>
       <div class="sb-section">운영</div>
       <button class="sb-item" data-panel="reviews" onclick="showPanel('reviews',this)">
@@ -266,6 +267,39 @@ textarea.field-input{min-height:80px;resize:vertical}
       </div>
     </div>
 
+    <!-- 호텔 관리 (전역 공용) -->
+    <div class="panel" id="panel-hotels">
+      <div class="page-title">🏨 호텔 관리</div>
+      <div class="page-sub">맞춤투어 전체 상품에 공통으로 표시되는 추천 호텔 목록</div>
+      <div class="table-wrap">
+        <div class="table-head"><h3>전체 호텔</h3><button class="btn-add" onclick="openHotelPoolModal()">+ 호텔 추가</button></div>
+        <table><thead><tr><th>호텔명/등급</th><th>추가요금</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <tbody id="hotels-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- 항공편 관리 (전역 공용) -->
+    <div class="panel" id="panel-flights">
+      <div class="page-title">✈️ 항공편 관리</div>
+      <div class="page-sub">맞춤투어 전체 상품에 공통으로 표시되는 한국→장가계 항공편 목록</div>
+      <div class="table-wrap">
+        <div class="table-head"><h3>전체 항공편</h3><button class="btn-add" onclick="openFlightPoolModal()">+ 항공편 추가</button></div>
+        <table><thead><tr><th>노선명</th><th>출발지역</th><th>시간</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <tbody id="flights-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- 명소 관리 (전역 공용) -->
+    <div class="panel" id="panel-attractions">
+      <div class="page-title">🗺️ 명소 관리</div>
+      <div class="page-sub">맞춤투어 "일정 직접 짜기"에서 쓰이는 명소 풀 (대형/특색/인문)</div>
+      <div class="table-wrap">
+        <div class="table-head"><h3>전체 명소</h3><button class="btn-add" onclick="openAttractionPoolModal()">+ 명소 추가</button></div>
+        <table><thead><tr><th>key</th><th>라벨</th><th>분류</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <tbody id="attractions-tbody"></tbody></table>
+      </div>
+    </div>
+
     <!-- 사용자 관리 -->
     <div class="panel" id="panel-users">
       <div class="page-title">👥 사용자 관리</div>
@@ -333,27 +367,7 @@ textarea.field-input{min-height:80px;resize:vertical}
           <div id="t-opts-list"></div>
           <button type="button" class="btn-add-row" onclick="addOpt()">+ 옵션 추가</button>
         </div>
-        <div class="field-hint">선택그룹: 같은 값을 입력한 옵션끼리는 라디오(단일선택)로 묶임 (예: 식사 업그레이드는 group=meal). 비워두면 기존처럼 체크박스 다중선택. 같은 그룹의 첫 항목이 고객 화면에서 기본 선택됨. ※ 숙박은 아래 "추천 호텔" 항목을 사용하세요</div>
-      </div>
-
-      <!-- 추천 호텔 (맞춤투어용) -->
-      <div class="field-group">
-        <label class="field-label">추천 호텔 (hotel_options, 맞춤투어용)</label>
-        <div class="dyn-section">
-          <div id="t-hotels-list"></div>
-          <button type="button" class="btn-add-row" onclick="addHotel()">+ 호텔 추가</button>
-        </div>
-        <div class="field-hint">고객 화면에 라디오(단일선택)로 표시됩니다. 첫 항목이 기본 선택됨. "중국 명절 기간 가격 변동 안내"는 고객 화면에 자동으로 함께 표시됩니다</div>
-      </div>
-
-      <!-- 항공편 (맞춤투어용) -->
-      <div class="field-group">
-        <label class="field-label">한국→장가계 항공편 (flight_options, 맞춤투어용)</label>
-        <div class="dyn-section">
-          <div id="t-flights-list"></div>
-          <button type="button" class="btn-add-row" onclick="addFlight()">+ 항공편 추가</button>
-        </div>
-        <div class="field-hint">고객 화면에 "도착 항공편"과 "출발 항공편"으로 각각 따로 선택할 수 있게 표시됩니다 (같은 목록을 양쪽에 사용). 이미지는 URL 직접 입력 또는 📎 버튼으로 업로드 가능. 항공권 자체는 포함 사항이 아니라 픽업·센딩 시간 조율용 정보입니다</div>
+        <div class="field-hint">선택그룹: 같은 값을 입력한 옵션끼리는 라디오(단일선택)로 묶임 (예: 식사 업그레이드는 group=meal). 비워두면 기존처럼 체크박스 다중선택. 같은 그룹의 첫 항목이 고객 화면에서 기본 선택됨. ※ 숙박/항공편은 모든 맞춤투어 상품에 공통 적용되며 좌측 메뉴의 "호텔 관리"/"항공편 관리"에서 한번만 관리하면 됩니다</div>
       </div>
 
       <!-- 일정 (참고용) -->
@@ -495,6 +509,116 @@ textarea.field-input{min-height:80px;resize:vertical}
   </div>
 </div>
 
+<!-- 호텔 모달 (전역 공용) -->
+<div class="modal-bg" id="hotel-modal-bg" onclick="closeHotelPoolModal(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="hotel-modal-title">호텔 추가</h3>
+      <button class="modal-close" onclick="closeHotelPoolModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="ho-id">
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">호텔명 *</label><input type="text" id="ho-name" class="field-input" placeholder="예: 일반 숙소"></div>
+        <div class="field-group"><label class="field-label">등급</label><input type="text" id="ho-grade" class="field-input" placeholder="예: 3성급 추천"></div>
+      </div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">추가요금(원)</label><input type="number" id="ho-price" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">단위</label>
+          <select id="ho-per" class="field-input"><option value="pax">인당</option><option value="group">그룹</option></select></div>
+      </div>
+      <div class="field-group"><label class="field-label">설명</label><textarea id="ho-desc" class="field-input" placeholder="등급/위치 등"></textarea></div>
+      <div class="field-group"><label class="field-label">이미지 URL</label>
+        <input type="text" id="ho-image" class="field-input">
+        <button type="button" class="btn-add-row" style="margin-top:6px" onclick="document.getElementById('ho-img-file').click()">📎 이미지 업로드</button>
+        <input type="file" id="ho-img-file" accept="image/*" style="display:none" onchange="uploadToInput(this,'ho-image')">
+      </div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="ho-order" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">상태</label>
+          <select id="ho-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeHotelPoolModal()">취소</button>
+      <button class="btn-save" onclick="saveHotelPool()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 항공편 모달 (전역 공용) -->
+<div class="modal-bg" id="flight-modal-bg" onclick="closeFlightPoolModal(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="flight-modal-title">항공편 추가</h3>
+      <button class="modal-close" onclick="closeFlightPoolModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="fl2-id">
+      <div class="field-group"><label class="field-label">노선명 *</label><input type="text" id="fl2-name" class="field-input" placeholder="예: 인천→장가계 대한항공"></div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">출발지역</label><input type="text" id="fl2-location" class="field-input" placeholder="예: 인천"></div>
+        <div class="field-group"><label class="field-label">시간</label><input type="text" id="fl2-time" class="field-input" placeholder="예: 오전 출발·약 3시간30분"></div>
+      </div>
+      <div class="field-group"><label class="field-label">설명</label><textarea id="fl2-desc" class="field-input"></textarea></div>
+      <div class="field-group"><label class="field-label">이미지 URL</label>
+        <input type="text" id="fl2-image" class="field-input">
+        <button type="button" class="btn-add-row" style="margin-top:6px" onclick="document.getElementById('fl2-img-file').click()">📎 이미지 업로드</button>
+        <input type="file" id="fl2-img-file" accept="image/*" style="display:none" onchange="uploadToInput(this,'fl2-image')">
+      </div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="fl2-order" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">상태</label>
+          <select id="fl2-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeFlightPoolModal()">취소</button>
+      <button class="btn-save" onclick="saveFlightPool()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 명소 모달 (전역 공용) -->
+<div class="modal-bg" id="attraction-modal-bg" onclick="closeAttractionPoolModal(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="attraction-modal-title">명소 추가</h3>
+      <button class="modal-close" onclick="closeAttractionPoolModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="at-id">
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">key (영문) *</label><input type="text" id="at-key" class="field-input" placeholder="예: tianmen"></div>
+        <div class="field-group"><label class="field-label">라벨 *</label><input type="text" id="at-label" class="field-input" placeholder="예: 천문산"></div>
+      </div>
+      <div class="field-group"><label class="field-label">분류 *</label>
+        <select id="at-cat" class="field-input">
+          <option value="large">대형 (반나절, 같은 날 1개만)</option>
+          <option value="feature">특색 (반나절, 하루 여러 개 가능)</option>
+          <option value="local">인문 (시간대 제약 없음, 중복 가능)</option>
+        </select>
+        <div class="field-hint">기존 일정 데이터에서 이 key를 참조하므로, 한번 저장한 key는 가능하면 바꾸지 마세요</div>
+      </div>
+      <div class="field-group"><label class="field-label">설명</label><textarea id="at-desc" class="field-input"></textarea></div>
+      <div class="field-group"><label class="field-label">이미지 URL</label>
+        <input type="text" id="at-image" class="field-input">
+        <button type="button" class="btn-add-row" style="margin-top:6px" onclick="document.getElementById('at-img-file').click()">📎 이미지 업로드</button>
+        <input type="file" id="at-img-file" accept="image/*" style="display:none" onchange="uploadToInput(this,'at-image')">
+      </div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="at-order" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">상태</label>
+          <select id="at-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeAttractionPoolModal()">취소</button>
+      <button class="btn-save" onclick="saveAttractionPool()">저장</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -613,7 +737,7 @@ function showPanel(id, btn) {
   document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
   document.getElementById('panel-' + id).classList.add('active');
   if (btn) btn.classList.add('active');
-  const loaders = {dashboard:loadDashboard,tours:loadTours,spots:loadSpots,places:loadPlaces,reviews:loadReviews,stats:loadStats,users:loadUsers};
+  const loaders = {dashboard:loadDashboard,tours:loadTours,spots:loadSpots,places:loadPlaces,hotels:loadHotelPool,flights:loadFlightPool,attractions:loadAttractionPool,reviews:loadReviews,stats:loadStats,users:loadUsers};
   if (loaders[id]) loaders[id]();
 }
 
@@ -675,59 +799,8 @@ function renderOptRow(o={}) {
     <button class="btn-rm" onclick="this.parentNode.remove()">✕</button>`;
   return d;
 }
-function renderHotelRow(h={}) {
-  const d = document.createElement('div');
-  d.className = 'dyn-row';
-  d.innerHTML = `
-    <input type="text" placeholder="key" value="${h.key||''}" style="flex:1;max-width:80px">
-    <input type="text" placeholder="호텔명/등급" value="${h.name||''}" style="flex:2">
-    <input type="number" placeholder="추가요금" value="${h.price||''}" style="flex:1;max-width:90px">
-    <select style="flex:1;max-width:70px"><option value="pax" ${h.per==='pax'?'selected':''}>인당</option><option value="group" ${h.per==='group'?'selected':''}>그룹</option></select>
-    <input type="text" placeholder="설명(등급/위치 등)" value="${h.desc||''}" style="flex:2">
-    <button class="btn-rm" onclick="this.parentNode.remove()">✕</button>`;
-  return d;
-}
-function renderFlightRow(f={}) {
-  const d = document.createElement('div');
-  d.className = 'flight-row';
-  d.innerHTML = `
-    <div class="flight-row-line">
-      <input type="text" placeholder="key" value="${f.key||''}" style="flex:1;max-width:80px">
-      <input type="text" placeholder="노선명 (예: 인천→장가계 대한항공)" value="${f.name||''}" style="flex:3">
-      <button class="btn-rm" onclick="this.closest('.flight-row').remove()">✕</button>
-    </div>
-    <div class="flight-row-line">
-      <input type="text" placeholder="출발지역 (예: 인천)" value="${f.location||''}" style="flex:1">
-      <input type="text" placeholder="시간 (예: 오전 출발·약 3시간30분)" value="${f.time||''}" style="flex:2">
-    </div>
-    <div class="flight-row-line">
-      <input type="text" placeholder="설명" value="${f.desc||''}" style="flex:2">
-      <input type="text" placeholder="이미지 URL" value="${f.image||''}" class="flight-img-url" style="flex:2">
-      <button type="button" class="btn-add-row" onclick="this.nextElementSibling.click()" title="이미지 업로드">📎</button>
-      <input type="file" accept="image/*" style="display:none" onchange="uploadFlightImg(this)">
-    </div>`;
-  return d;
-}
 function addTier()   { document.getElementById('t-tiers-list').appendChild(renderTierRow()); }
 function addOpt()    { document.getElementById('t-opts-list').appendChild(renderOptRow()); }
-function addHotel()  { document.getElementById('t-hotels-list').appendChild(renderHotelRow()); }
-function addFlight() { document.getElementById('t-flights-list').appendChild(renderFlightRow()); }
-async function uploadFlightImg(fileInput) {
-  const files = [...fileInput.files];
-  if (!files.length) return;
-  const row = fileInput.closest('.flight-row');
-  const urlInput = row.querySelector('.flight-img-url');
-  const file = files[0];
-  const ext = file.name.includes('.') ? file.name.split('.').pop() : 'jpg';
-  const path = `${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
-  toast('이미지 업로드 중...', '');
-  const { error } = await sb.storage.from(STORAGE_BUCKET).upload(path, file, {cacheControl:'31536000', upsert:false});
-  if (error) { toast('업로드 실패','error'); return; }
-  const { data: urlData } = sb.storage.from(STORAGE_BUCKET).getPublicUrl(path);
-  if (urlInput) urlInput.value = urlData.publicUrl;
-  fileInput.value = '';
-  toast('✅ 이미지 업로드 완료','success');
-}
 function collectTiers() {
   return [...document.querySelectorAll('#t-tiers-list .dyn-row')].map(r=>{
     const ins = r.querySelectorAll('input');
@@ -744,35 +817,233 @@ function collectOpts() {
     return o;
   }).filter(o=>o.key&&o.label);
 }
-function collectHotels() {
-  return [...document.querySelectorAll('#t-hotels-list .dyn-row')].map(r=>{
-    const ins = r.querySelectorAll('input');
-    const sel = r.querySelector('select');
-    return {key:ins[0].value.trim(),name:ins[1].value.trim(),price:parseInt(ins[2].value)||0,per:sel.value,desc:ins[3].value.trim()};
-  }).filter(h=>h.key&&h.name);
-}
-function collectFlights() {
-  return [...document.querySelectorAll('#t-flights-list .flight-row')].map(r=>{
-    const ins = r.querySelectorAll('input');
-    return {key:ins[0].value.trim(),name:ins[1].value.trim(),location:ins[2].value.trim(),time:ins[3].value.trim(),desc:ins[4].value.trim(),image:ins[5].value.trim()};
-  }).filter(f=>f.key&&f.name);
+
+/* 단일 텍스트 입력칸에 이미지 업로드 (호텔/항공편/명소 전역 풀 공용) */
+async function uploadToInput(fileInput, targetId) {
+  const files = [...fileInput.files];
+  if (!files.length) return;
+  const file = files[0];
+  const ext = file.name.includes('.') ? file.name.split('.').pop() : 'jpg';
+  const path = `${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+  toast('이미지 업로드 중...', '');
+  const { error } = await sb.storage.from(STORAGE_BUCKET).upload(path, file, {cacheControl:'31536000', upsert:false});
+  if (error) { toast('업로드 실패','error'); return; }
+  const { data: urlData } = sb.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+  document.getElementById(targetId).value = urlData.publicUrl;
+  fileInput.value = '';
+  toast('✅ 이미지 업로드 완료','success');
 }
 
-/* 맞춤투어 명소 풀 (tour.html의 ATTRACTION_POOL과 동일 — 일정 입력 시 참고용) */
-const ATTRACTION_POOL_KEYS = {
-  large: ['tianmen(천문산)','forest_east(국가삼림공원 동문A·B선)','grand_canyon(장가계대협곡)','furong(부용진)','fenghuang(봉황고성)'],
-  feature: ['baofeng(보봉호)','huanglong(황룡동)','qixing(칠성산)','tujia(토가족풍정원)','forest_south(국가삼림공원 남문-황석채)','jinbianxi(금편계트레킹)'],
-  local: ['qiqilou(72기루)','supermarket(현지대형마트)','cafe(현지특색카페)'],
-};
-function updateItinHint() {
+/* ───── 호텔 관리 (전역 공용) ───── */
+async function loadHotelPool() {
+  const { data } = await sb.from('tour_hotels').select('*').order('sort_order');
+  document.getElementById('hotels-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">로드 실패 (테이블이 없으면 lotocha_supabase_global_pools.sql 실행 필요)</td></tr>'
+    : !data.length ? '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:20px">등록된 호텔 없음</td></tr>'
+    : data.map(h=>`<tr>
+        <td style="font-weight:700">${h.name}${h.grade?` (${h.grade})`:''}</td>
+        <td>${h.price?fmt(h.price)+(h.per==='pax'?'/인':''):'기본 포함'}</td>
+        <td><span class="badge badge-${h.is_active?'live':'archived'}">${h.is_active?'활성':'비활성'}</span></td>
+        <td>${h.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openHotelPoolModal('${h.id}')">편집</button>
+        <button class="btn-del" onclick="deleteHotelPool('${h.id}')">삭제</button></div></td></tr>`).join('');
+}
+function openHotelPoolModal(id) {
+  document.getElementById('hotel-modal-title').textContent = id ? '호텔 편집' : '호텔 추가';
+  const flds = ['ho-id','ho-name','ho-grade','ho-desc','ho-image'];
+  if (!id) {
+    flds.forEach(f=>document.getElementById(f).value='');
+    document.getElementById('ho-price').value='0'; document.getElementById('ho-per').value='pax';
+    document.getElementById('ho-order').value='0'; document.getElementById('ho-active').value='1';
+  } else {
+    sb.from('tour_hotels').select('*').eq('id',id).single().then(({data:h})=>{
+      if (!h) return;
+      document.getElementById('ho-id').value=h.id;
+      document.getElementById('ho-name').value=h.name||'';
+      document.getElementById('ho-grade').value=h.grade||'';
+      document.getElementById('ho-price').value=h.price||0;
+      document.getElementById('ho-per').value=h.per||'pax';
+      document.getElementById('ho-desc').value=h.desc_ko||'';
+      document.getElementById('ho-image').value=h.image||'';
+      document.getElementById('ho-order').value=h.sort_order||0;
+      document.getElementById('ho-active').value=h.is_active?'1':'0';
+    });
+  }
+  document.getElementById('hotel-modal-bg').classList.add('open');
+}
+function closeHotelPoolModal(e) {
+  if (e && e.target !== document.getElementById('hotel-modal-bg')) return;
+  document.getElementById('hotel-modal-bg').classList.remove('open');
+}
+async function saveHotelPool() {
+  const id = document.getElementById('ho-id').value;
+  const name = document.getElementById('ho-name').value.trim();
+  if (!name) { toast('호텔명을 입력하세요','error'); return; }
+  const payload = {
+    name, grade: document.getElementById('ho-grade').value.trim()||null,
+    price: parseInt(document.getElementById('ho-price').value)||0,
+    per: document.getElementById('ho-per').value,
+    desc_ko: document.getElementById('ho-desc').value.trim()||null,
+    image: document.getElementById('ho-image').value.trim()||null,
+    sort_order: parseInt(document.getElementById('ho-order').value)||0,
+    is_active: document.getElementById('ho-active').value==='1',
+    updated_at: new Date().toISOString(),
+  };
+  const { error } = id ? await sb.from('tour_hotels').update(payload).eq('id',id) : await sb.from('tour_hotels').insert(payload);
+  if (error) { toast('저장 실패: '+error.message,'error'); return; }
+  toast(id?'수정되었습니다':'추가되었습니다','success'); closeHotelPoolModal(); loadHotelPool();
+}
+async function deleteHotelPool(id) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  const { error } = await sb.from('tour_hotels').delete().eq('id',id);
+  if (error) { toast('삭제 실패','error'); return; }
+  toast('삭제되었습니다'); loadHotelPool();
+}
+
+/* ───── 항공편 관리 (전역 공용) ───── */
+async function loadFlightPool() {
+  const { data } = await sb.from('tour_flights').select('*').order('sort_order');
+  document.getElementById('flights-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">로드 실패 (테이블이 없으면 lotocha_supabase_global_pools.sql 실행 필요)</td></tr>'
+    : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">등록된 항공편 없음</td></tr>'
+    : data.map(f=>`<tr>
+        <td style="font-weight:700">${f.name}</td>
+        <td>${f.location||'-'}</td>
+        <td>${f.time_desc||'-'}</td>
+        <td><span class="badge badge-${f.is_active?'live':'archived'}">${f.is_active?'활성':'비활성'}</span></td>
+        <td>${f.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openFlightPoolModal('${f.id}')">편집</button>
+        <button class="btn-del" onclick="deleteFlightPool('${f.id}')">삭제</button></div></td></tr>`).join('');
+}
+function openFlightPoolModal(id) {
+  document.getElementById('flight-modal-title').textContent = id ? '항공편 편집' : '항공편 추가';
+  const flds = ['fl2-id','fl2-name','fl2-location','fl2-time','fl2-desc','fl2-image'];
+  if (!id) {
+    flds.forEach(f=>document.getElementById(f).value='');
+    document.getElementById('fl2-order').value='0'; document.getElementById('fl2-active').value='1';
+  } else {
+    sb.from('tour_flights').select('*').eq('id',id).single().then(({data:f})=>{
+      if (!f) return;
+      document.getElementById('fl2-id').value=f.id;
+      document.getElementById('fl2-name').value=f.name||'';
+      document.getElementById('fl2-location').value=f.location||'';
+      document.getElementById('fl2-time').value=f.time_desc||'';
+      document.getElementById('fl2-desc').value=f.desc_ko||'';
+      document.getElementById('fl2-image').value=f.image||'';
+      document.getElementById('fl2-order').value=f.sort_order||0;
+      document.getElementById('fl2-active').value=f.is_active?'1':'0';
+    });
+  }
+  document.getElementById('flight-modal-bg').classList.add('open');
+}
+function closeFlightPoolModal(e) {
+  if (e && e.target !== document.getElementById('flight-modal-bg')) return;
+  document.getElementById('flight-modal-bg').classList.remove('open');
+}
+async function saveFlightPool() {
+  const id = document.getElementById('fl2-id').value;
+  const name = document.getElementById('fl2-name').value.trim();
+  if (!name) { toast('노선명을 입력하세요','error'); return; }
+  const payload = {
+    name, location: document.getElementById('fl2-location').value.trim()||null,
+    time_desc: document.getElementById('fl2-time').value.trim()||null,
+    desc_ko: document.getElementById('fl2-desc').value.trim()||null,
+    image: document.getElementById('fl2-image').value.trim()||null,
+    sort_order: parseInt(document.getElementById('fl2-order').value)||0,
+    is_active: document.getElementById('fl2-active').value==='1',
+    updated_at: new Date().toISOString(),
+  };
+  const { error } = id ? await sb.from('tour_flights').update(payload).eq('id',id) : await sb.from('tour_flights').insert(payload);
+  if (error) { toast('저장 실패: '+error.message,'error'); return; }
+  toast(id?'수정되었습니다':'추가되었습니다','success'); closeFlightPoolModal(); loadFlightPool();
+}
+async function deleteFlightPool(id) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  const { error } = await sb.from('tour_flights').delete().eq('id',id);
+  if (error) { toast('삭제 실패','error'); return; }
+  toast('삭제되었습니다'); loadFlightPool();
+}
+
+/* ───── 명소 관리 (전역 공용) ───── */
+const ATTR_CAT_LABELS = {large:'대형',feature:'특색',local:'인문'};
+async function loadAttractionPool() {
+  const { data } = await sb.from('tour_attractions').select('*').order('sort_order');
+  document.getElementById('attractions-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">로드 실패 (테이블이 없으면 lotocha_supabase_global_pools.sql 실행 필요)</td></tr>'
+    : !data.length ? '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:20px">등록된 명소 없음</td></tr>'
+    : data.map(a=>`<tr>
+        <td style="font-family:monospace;font-size:12px">${a.key}</td>
+        <td style="font-weight:700">${a.label}</td>
+        <td>${ATTR_CAT_LABELS[a.cat]||a.cat}</td>
+        <td><span class="badge badge-${a.is_active?'live':'archived'}">${a.is_active?'활성':'비활성'}</span></td>
+        <td>${a.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openAttractionPoolModal('${a.id}')">편집</button>
+        <button class="btn-del" onclick="deleteAttractionPool('${a.id}')">삭제</button></div></td></tr>`).join('');
+}
+function openAttractionPoolModal(id) {
+  document.getElementById('attraction-modal-title').textContent = id ? '명소 편집' : '명소 추가';
+  const flds = ['at-id','at-key','at-label','at-desc','at-image'];
+  if (!id) {
+    flds.forEach(f=>document.getElementById(f).value='');
+    document.getElementById('at-cat').value='feature';
+    document.getElementById('at-order').value='0'; document.getElementById('at-active').value='1';
+  } else {
+    sb.from('tour_attractions').select('*').eq('id',id).single().then(({data:a})=>{
+      if (!a) return;
+      document.getElementById('at-id').value=a.id;
+      document.getElementById('at-key').value=a.key||'';
+      document.getElementById('at-label').value=a.label||'';
+      document.getElementById('at-cat').value=a.cat||'feature';
+      document.getElementById('at-desc').value=a.desc_ko||'';
+      document.getElementById('at-image').value=a.image||'';
+      document.getElementById('at-order').value=a.sort_order||0;
+      document.getElementById('at-active').value=a.is_active?'1':'0';
+    });
+  }
+  document.getElementById('attraction-modal-bg').classList.add('open');
+}
+function closeAttractionPoolModal(e) {
+  if (e && e.target !== document.getElementById('attraction-modal-bg')) return;
+  document.getElementById('attraction-modal-bg').classList.remove('open');
+}
+async function saveAttractionPool() {
+  const id = document.getElementById('at-id').value;
+  const key = document.getElementById('at-key').value.trim();
+  const label = document.getElementById('at-label').value.trim();
+  if (!key || !label) { toast('key와 라벨을 입력하세요','error'); return; }
+  const payload = {
+    key, label, cat: document.getElementById('at-cat').value,
+    desc_ko: document.getElementById('at-desc').value.trim()||null,
+    image: document.getElementById('at-image').value.trim()||null,
+    sort_order: parseInt(document.getElementById('at-order').value)||0,
+    is_active: document.getElementById('at-active').value==='1',
+    updated_at: new Date().toISOString(),
+  };
+  const { error } = id ? await sb.from('tour_attractions').update(payload).eq('id',id) : await sb.from('tour_attractions').insert(payload);
+  if (error) { toast('저장 실패: '+error.message,'error'); return; }
+  toast(id?'수정되었습니다':'추가되었습니다','success'); closeAttractionPoolModal(); loadAttractionPool();
+}
+async function deleteAttractionPool(id) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  const { error } = await sb.from('tour_attractions').delete().eq('id',id);
+  if (error) { toast('삭제 실패','error'); return; }
+  toast('삭제되었습니다'); loadAttractionPool();
+}
+
+/* 일정 입력 힌트 (패키지는 명소 풀에서 key 목록을 동적으로 불러와 표시) */
+async function updateItinHint() {
   const isPkg = document.getElementById('t-type').value === 'package';
   document.getElementById('t-itin-label').textContent = isPkg ? '일정 (itinerary, 참고용 추천 일정)' : '일정 (itinerary, 참고용)';
   document.getElementById('t-itinerary').placeholder = isPkg
     ? '1|am|tianmen\n1|evening|qiqilou\n2|am|grand_canyon\n2|pm|huanglong\n3|evening|supermarket\n3|evening|cafe'
     : '09:00|호텔 픽업 후 출발\n09:30|황룡동 입장 및 유람선 체험\n11:00|점심 식사';
-  document.getElementById('t-itin-hint').innerHTML = isPkg
-    ? `한 줄에 "일차|시간대|명소key" 형식 (시간대: am/pm/evening). 대형은 am 또는 pm 중 1개만, 같은 날 대형 중복 불가 / 특색은 am·pm 자유 / 인문은 시간대 무관·중복 가능.<br>대형: ${ATTRACTION_POOL_KEYS.large.join(', ')}<br>특색: ${ATTRACTION_POOL_KEYS.feature.join(', ')}<br>인문: ${ATTRACTION_POOL_KEYS.local.join(', ')}`
-    : '한 줄에 "시간|내용" 형식으로 입력 (줄바꿈 구분)';
+  if (!isPkg) {
+    document.getElementById('t-itin-hint').innerHTML = '한 줄에 "시간|내용" 형식으로 입력 (줄바꿈 구분)';
+    return;
+  }
+  document.getElementById('t-itin-hint').innerHTML = '한 줄에 "일차|시간대|명소key" 형식 (시간대: am/pm/evening). 대형은 am 또는 pm 중 1개만, 같은 날 대형 중복 불가 / 특색은 am·pm 자유 / 인문은 시간대 무관·중복 가능. 명소 key 목록 불러오는 중...';
+  const { data } = await sb.from('tour_attractions').select('key,label,cat').order('sort_order');
+  if (!data) return;
+  const byCat = {large:[],feature:[],local:[]};
+  data.forEach(a=>{ (byCat[a.cat]||byCat.feature).push(`${a.key}(${a.label})`); });
+  document.getElementById('t-itin-hint').innerHTML = `한 줄에 "일차|시간대|명소key" 형식 (시간대: am/pm/evening). 대형은 am 또는 pm 중 1개만, 같은 날 대형 중복 불가 / 특색은 am·pm 자유 / 인문은 시간대 무관·중복 가능.<br>대형: ${byCat.large.join(', ')||'(없음)'}<br>특색: ${byCat.feature.join(', ')||'(없음)'}<br>인문: ${byCat.local.join(', ')||'(없음)'}<br>※ key 목록은 좌측 메뉴 "명소 관리"에서 추가/수정할 수 있습니다`;
 }
 
 function openTourModal(id) {
@@ -780,8 +1051,6 @@ function openTourModal(id) {
   const clear = () => ['t-id','t-title-ko','t-title-cn','t-subtitle','t-desc','t-price-krw','t-price-cny','t-images','t-highlights','t-includes','t-excludes','t-itinerary'].forEach(f=>document.getElementById(f).value='');
   document.getElementById('t-tiers-list').innerHTML = '';
   document.getElementById('t-opts-list').innerHTML = '';
-  document.getElementById('t-hotels-list').innerHTML = '';
-  document.getElementById('t-flights-list').innerHTML = '';
   if (!id) {
     clear();
     document.getElementById('t-type').value='day_tour'; document.getElementById('t-status').value='live';
@@ -809,12 +1078,8 @@ function openTourModal(id) {
       updateItinHint();
       const tl = document.getElementById('t-tiers-list');
       const ol = document.getElementById('t-opts-list');
-      const hl = document.getElementById('t-hotels-list');
-      const fl = document.getElementById('t-flights-list');
       (p.price_tiers||[]).forEach(t=>tl.appendChild(renderTierRow(t)));
       (p.tour_options||[]).forEach(o=>ol.appendChild(renderOptRow(o)));
-      (p.hotel_options||[]).forEach(h=>hl.appendChild(renderHotelRow(h)));
-      (p.flight_options||[]).forEach(f=>fl.appendChild(renderFlightRow(f)));
     });
   }
   document.getElementById('tour-modal-bg').classList.add('open');
@@ -846,8 +1111,6 @@ async function saveTour() {
       : linesToItin(document.getElementById('t-itinerary').value),
     price_tiers: collectTiers(),
     tour_options: collectOpts(),
-    hotel_options: collectHotels(),
-    flight_options: collectFlights(),
     updated_at: new Date().toISOString(),
   };
   if (!payload.title_ko) { toast('상품명을 입력하세요','error'); return; }

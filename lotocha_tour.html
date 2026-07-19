@@ -348,33 +348,37 @@ let _modalProductId = null;
 let _pax = {};       // { adult:0, child:0, ... }
 let _opts = {};      // { massage:false, ... }
 let _date = '';
-let _hotel = null;     // 선택된 hotel_options key
-let _arrFlight = null; // 선택된 도착 항공편(flight_options) key
-let _depFlight = null; // 선택된 출발 항공편(flight_options) key
+let _hotel = null;     // 선택된 호텔 key (전역 풀의 id)
+let _arrFlight = null; // 선택된 도착 항공편 key (전역 풀의 id)
+let _depFlight = null; // 선택된 출발 항공편 key (전역 풀의 id)
 let _mealNote = '';    // 식사 요구사항 텍스트
-let _pkgDays = [];     // [{day:1, am:{key}|null, pm:{key}|null, evening:[{key},...]}, ...]
+let _pkgDays = [];     // [{day:1, am:{type,key}|null, pm:{type,key}|null, evening:[{type,key},...]}, ...]
 let _pickerOpen = null; // {day, slot} 현재 펼쳐진 선택 패널
 
-/* ───── 맞춤투어 명소 풀 ─────
-   large   : 대형 명소 — 반나절(오전/오후) 차지, 같은 날 최대 1개
-   feature : 특색 명소 — 반나절 차지, 하루에 여러 개 가능
-   local   : 인문 일정 — 시간대 제약 없음, 중복/복수 추가 가능 */
-const ATTRACTION_POOL = {
-  tianmen:      { label: '천문산',                    cat: 'large' },
-  forest_east:  { label: '국가삼림공원 (동문 A·B선)',     cat: 'large' },
-  grand_canyon: { label: '장가계대협곡',                cat: 'large' },
-  furong:       { label: '부용진',                     cat: 'large' },
-  fenghuang:    { label: '봉황고성',                    cat: 'large' },
-  baofeng:      { label: '보봉호',                     cat: 'feature' },
-  huanglong:    { label: '황룡동',                     cat: 'feature' },
-  qixing:       { label: '칠성산',                     cat: 'feature' },
-  tujia:        { label: '토가족 풍정원',                cat: 'feature' },
-  forest_south: { label: '국가삼림공원 (남문-황석채)',      cat: 'feature' },
-  jinbianxi:    { label: '금편계 트레킹',                cat: 'feature' },
-  qiqilou:      { label: '72기루 (야간 관람 추천)',        cat: 'local' },
-  supermarket:  { label: '현지 대형마트',                cat: 'local' },
-  cafe:         { label: '현지 특색 카페',                cat: 'local' },
-};
+/* ───── 전역 공용 풀 (admin "호텔 관리"/"항공편 관리"/"명소 관리"/"현지 업체"에서 관리) ───── */
+let GLOBAL_HOTELS = [];
+let GLOBAL_FLIGHTS = [];
+let GLOBAL_PLACES = [];
+/* ATTRACTION_POOL: large(대형, 반나절·같은날 1개) / feature(특색, 반나절·복수가능) / local(인문, 제약없음)
+   admin "명소 관리"에서 fetch — 표가 비어있으면 일정 직접 짜기가 비어 보일 수 있음 */
+let ATTRACTION_POOL = {};
+
+function normHotel(h)  { return { key: h.id, name: h.name, grade: h.grade, price: h.price, per: h.per, desc: h.desc_ko, image: h.image }; }
+function normFlight(f) { return { key: f.id, name: f.name, location: f.location, time: f.time_desc, desc: f.desc_ko, image: f.image }; }
+
+async function loadGlobalPools() {
+  if (!sb) return;
+  const [hRes, fRes, aRes, plRes] = await Promise.all([
+    sb.from('tour_hotels').select('*').eq('is_active', true).order('sort_order'),
+    sb.from('tour_flights').select('*').eq('is_active', true).order('sort_order'),
+    sb.from('tour_attractions').select('*').eq('is_active', true).order('sort_order'),
+    sb.from('local_places').select('*').eq('is_active', true).order('sort_order'),
+  ]);
+  GLOBAL_HOTELS = (hRes.data || []).map(normHotel);
+  GLOBAL_FLIGHTS = (fRes.data || []).map(normFlight);
+  (aRes.data || []).forEach(a => { ATTRACTION_POOL[a.key] = { label: a.label, cat: a.cat, desc: a.desc_ko, image: a.image }; });
+  GLOBAL_PLACES = plRes.data || [];
+}
 
 /* ───── 모달 열기 ───── */
 function openModal(id) {
@@ -396,8 +400,8 @@ function openModal(id) {
   const itinerary= Array.isArray(p.itinerary)    ? p.itinerary    : [];
   const includes = Array.isArray(p.includes)     ? p.includes     : [];
   const excludes = Array.isArray(p.excludes)     ? p.excludes     : [];
-  const hotelOpts = Array.isArray(p.hotel_options) ? p.hotel_options : [];
-  const flightOpts = Array.isArray(p.flight_options) ? p.flight_options : [];
+  const hotelOpts = GLOBAL_HOTELS;
+  const flightOpts = GLOBAL_FLIGHTS;
   const isPkg = p.product_type === 'package';
 
   tiers.forEach(t => _pax[t.key] = 0);
@@ -405,15 +409,15 @@ function openModal(id) {
   if (hotelOpts.length) _hotel = hotelOpts[0].key;
   if (flightOpts.length && isPkg) { _arrFlight = flightOpts[0].key; _depFlight = flightOpts[0].key; }
 
-  /* 패키지: 일정 템플릿 → 일자별 작업본(_pkgDays) 구성 */
+  /* 패키지: 일정 템플릿 → 일자별 작업본(_pkgDays) 구성 (type 없으면 명소풀 참조로 간주) */
   if (isPkg) {
     const looksStructured = itinerary.length && itinerary[0] && typeof itinerary[0].day !== 'undefined';
     _pkgDays = looksStructured
       ? itinerary.map(d => ({
           day: d.day,
-          am: d.am ? { key: d.am.key } : null,
-          pm: d.pm ? { key: d.pm.key } : null,
-          evening: (d.evening || []).map(e => ({ key: e.key })),
+          am: d.am ? { type: d.am.type || 'attr', key: d.am.key, id: d.am.id } : null,
+          pm: d.pm ? { type: d.pm.type || 'attr', key: d.pm.key, id: d.pm.id } : null,
+          evening: (d.evening || []).map(e => ({ type: e.type || 'attr', key: e.key, id: e.id })),
         }))
       : Array.from({ length: p.duration_days || 1 }, (_, i) => ({ day: i + 1, am: null, pm: null, evening: [] }));
   } else {
@@ -639,11 +643,8 @@ function selectGroupOpt(group, key) {
 
 /* ───── 호텔 선택 (라디오, 단일선택) ───── */
 function selectHotel(key) {
-  const p = allProducts.find(x => x.id === _modalProductId);
-  if (!p) return;
-  const hotelOpts = Array.isArray(p.hotel_options) ? p.hotel_options : [];
   _hotel = key;
-  hotelOpts.forEach(h => {
+  GLOBAL_HOTELS.forEach(h => {
     const el = document.getElementById('oh-' + h.key);
     if (el) el.classList.toggle('checked', h.key === key);
   });
@@ -652,12 +653,9 @@ function selectHotel(key) {
 
 /* ───── 항공편 선택 (도착/출발 각각 라디오, 단일선택) ───── */
 function selectFlight(type, key) {
-  const p = allProducts.find(x => x.id === _modalProductId);
-  if (!p) return;
-  const flightOpts = Array.isArray(p.flight_options) ? p.flight_options : [];
   if (type === 'arr') _arrFlight = key; else _depFlight = key;
   const prefix = type === 'arr' ? 'oarr-' : 'odep-';
-  flightOpts.forEach(f => {
+  GLOBAL_FLIGHTS.forEach(f => {
     const el = document.getElementById(prefix + f.key);
     if (el) el.classList.toggle('checked', f.key === key);
   });
@@ -667,22 +665,39 @@ function selectFlight(type, key) {
    규칙: 대형(large)은 오전/오후 중 반나절 차지, 같은 날 다른 슬롯에 이미 대형이 있으면 선택 불가
          특색(feature)은 반나절씩 자유 배치 (하루에 여러 개 가능)
          인문(local)은 시간대 제약 없음 — 오전/오후/저녁 어디든, 저녁은 여러 개 중복 추가 가능 */
+/* {type:'attr',key}|{type:'place',id} → {label,cat} 로 변환 (place는 항상 local 취급) */
+function resolveSlotItem(item) {
+  if (!item) return null;
+  if (item.type === 'place') {
+    const pl = GLOBAL_PLACES.find(x => x.id === item.id);
+    return pl ? { label: pl.name_ko, cat: 'local' } : null;
+  }
+  const a = ATTRACTION_POOL[item.key];
+  return a ? { label: a.label, cat: a.cat } : null;
+}
+function itemMatches(a, b) {
+  if (!a || !b) return false;
+  if (a.type === 'place' || b.type === 'place') return a.type === 'place' && b.type === 'place' && a.id === b.id;
+  return a.key === b.key;
+}
 function pkgSlotOptions(dayPlan, slot) {
-  return Object.keys(ATTRACTION_POOL).map(key => ({ key, ...ATTRACTION_POOL[key] })).filter(item => {
+  const attrItems = Object.keys(ATTRACTION_POOL).map(key => ({ type: 'attr', key, label: ATTRACTION_POOL[key].label, cat: ATTRACTION_POOL[key].cat }));
+  const placeItems = GLOBAL_PLACES.map(pl => ({ type: 'place', id: pl.id, label: pl.name_ko, cat: 'local' }));
+  return attrItems.concat(placeItems).filter(item => {
     if (slot === 'evening') return item.cat === 'local';
     if (item.cat !== 'large') return true;
     const other = slot === 'am' ? dayPlan.pm : dayPlan.am;
-    const otherItem = other ? ATTRACTION_POOL[other.key] : null;
-    return !(otherItem && otherItem.cat === 'large');
+    const otherResolved = resolveSlotItem(other);
+    return !(otherResolved && otherResolved.cat === 'large');
   });
 }
 
 function renderDayPlan() {
   const SLOT_LABEL = { am: '🌤 오전', pm: '🌇 오후', evening: '🌙 저녁' };
   const html = _pkgDays.map(d => {
-    const amItem = d.am ? ATTRACTION_POOL[d.am.key] : null;
-    const pmItem = d.pm ? ATTRACTION_POOL[d.pm.key] : null;
-    const eveItems = (d.evening || []).map(e => ATTRACTION_POOL[e.key]).filter(Boolean);
+    const amItem = resolveSlotItem(d.am);
+    const pmItem = resolveSlotItem(d.pm);
+    const eveItems = (d.evening || []).map(resolveSlotItem).filter(Boolean);
     const renderSlot = (slot, valueLabel, editLabel) => `
       <div class="slot-row" onclick="togglePicker(${d.day},'${slot}')">
         <span class="slot-label">${SLOT_LABEL[slot]}</span>
@@ -703,16 +718,23 @@ function renderDayPlan() {
 
 function renderPicker(d, slot) {
   const opts = pkgSlotOptions(d, slot);
+  const refArgs = o => o.type === 'place' ? `'place','${o.id}'` : `'attr','${o.key}'`;
   if (slot === 'evening') {
-    const selKeys = (d.evening || []).map(e => e.key);
+    const sel = d.evening || [];
     return `<div class="slot-picker">
-      ${opts.map(o => `<div class="picker-item ${selKeys.includes(o.key) ? 'on' : ''}" onclick="toggleEvening(${d.day},'${o.key}')">${selKeys.includes(o.key) ? '✓ ' : ''}${o.label}</div>`).join('')}
+      ${opts.map(o => {
+        const isOn = sel.some(e => itemMatches(e, o));
+        return `<div class="picker-item ${isOn ? 'on' : ''}" onclick="toggleEvening(${d.day},${refArgs(o)})">${isOn ? '✓ ' : ''}${o.label}</div>`;
+      }).join('')}
     </div>`;
   }
-  const curKey = d[slot] ? d[slot].key : null;
+  const cur = d[slot];
   return `<div class="slot-picker">
-    <div class="picker-item ${!curKey ? 'on' : ''}" onclick="pickAttraction(${d.day},'${slot}',null)">선택 안함</div>
-    ${opts.map(o => `<div class="picker-item ${curKey === o.key ? 'on' : ''}" onclick="pickAttraction(${d.day},'${slot}','${o.key}')">${o.label}</div>`).join('')}
+    <div class="picker-item ${!cur ? 'on' : ''}" onclick="pickAttraction(${d.day},'${slot}',null,null)">선택 안함</div>
+    ${opts.map(o => {
+      const isOn = cur && itemMatches(cur, o);
+      return `<div class="picker-item ${isOn ? 'on' : ''}" onclick="pickAttraction(${d.day},'${slot}',${refArgs(o)})">${o.label}</div>`;
+    }).join('')}
   </div>`;
 }
 
@@ -721,20 +743,21 @@ function togglePicker(day, slot) {
   renderDayPlan();
 }
 
-function pickAttraction(day, slot, key) {
+function pickAttraction(day, slot, type, value) {
   const d = _pkgDays.find(x => x.day === day);
   if (!d) return;
-  d[slot] = key ? { key } : null;
+  d[slot] = !type ? null : (type === 'place' ? { type: 'place', id: value } : { type: 'attr', key: value });
   _pickerOpen = null;
   renderDayPlan();
 }
 
-function toggleEvening(day, key) {
+function toggleEvening(day, type, value) {
   const d = _pkgDays.find(x => x.day === day);
   if (!d) return;
   d.evening = d.evening || [];
-  const idx = d.evening.findIndex(e => e.key === key);
-  if (idx === -1) d.evening.push({ key }); else d.evening.splice(idx, 1);
+  const item = type === 'place' ? { type: 'place', id: value } : { type: 'attr', key: value };
+  const idx = d.evening.findIndex(e => itemMatches(e, item));
+  if (idx === -1) d.evening.push(item); else d.evening.splice(idx, 1);
   renderDayPlan();
 }
 
@@ -744,7 +767,7 @@ function updatePriceSummary() {
   if (!p) return;
   const tiers  = Array.isArray(p.price_tiers)  ? p.price_tiers  : [];
   const options = Array.isArray(p.tour_options) ? p.tour_options : [];
-  const hotelOpts = Array.isArray(p.hotel_options) ? p.hotel_options : [];
+  const hotelOpts = GLOBAL_HOTELS;
 
   let total = 0;
   let totalPax = 0;
@@ -810,8 +833,8 @@ function toggleAcc(id) {
 function buildMsg(p) {
   const tiers  = Array.isArray(p.price_tiers)  ? p.price_tiers  : [];
   const options = Array.isArray(p.tour_options) ? p.tour_options : [];
-  const hotelOpts = Array.isArray(p.hotel_options) ? p.hotel_options : [];
-  const flightOpts = Array.isArray(p.flight_options) ? p.flight_options : [];
+  const hotelOpts = GLOBAL_HOTELS;
+  const flightOpts = GLOBAL_FLIGHTS;
   const isPkg = p.product_type === 'package';
 
   let msg = `[로투차 투어 예약 문의]\n━━━━━━━━━━━━━━\n`;
@@ -865,9 +888,10 @@ function buildMsg(p) {
   if (isPkg && _pkgDays.length) {
     msg += `━━━━━━━━━━━━━━\n🗺️ 선택 일정:\n`;
     _pkgDays.forEach(d => {
-      const am = d.am && ATTRACTION_POOL[d.am.key] ? ATTRACTION_POOL[d.am.key].label : '-';
-      const pm = d.pm && ATTRACTION_POOL[d.pm.key] ? ATTRACTION_POOL[d.pm.key].label : '-';
-      const eve = (d.evening || []).map(e => ATTRACTION_POOL[e.key] && ATTRACTION_POOL[e.key].label).filter(Boolean).join(', ') || '-';
+      const amR = resolveSlotItem(d.am), pmR = resolveSlotItem(d.pm);
+      const am = amR ? amR.label : '-';
+      const pm = pmR ? pmR.label : '-';
+      const eve = (d.evening || []).map(resolveSlotItem).filter(Boolean).map(r => r.label).join(', ') || '-';
       msg += `  ${d.day}일차: 오전 ${am} / 오후 ${pm} / 저녁 ${eve}\n`;
     });
   }
@@ -912,7 +936,7 @@ function sendInquiry(channel, msg) {
   }
 }
 
-loadProducts();
+(async function init() { await Promise.all([loadGlobalPools(), loadProducts()]); })();
 </script>
 </body>
 </html>
