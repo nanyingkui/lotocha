@@ -409,17 +409,25 @@ function openModal(id) {
   if (hotelOpts.length) _hotel = hotelOpts[0].key;
   if (flightOpts.length && isPkg) { _arrFlight = flightOpts[0].key; _depFlight = flightOpts[0].key; }
 
-  /* 패키지: 일정 템플릿 → 일자별 작업본(_pkgDays) 구성 (type 없으면 명소풀 참조로 간주) */
+  /* 패키지: 일정 템플릿 → 일자별 작업본(_pkgDays) 구성 (type 없으면 명소풀 참조로 간주)
+     ※ 날짜 수(_pkgDays.length)는 항상 상품의 duration_days를 기준으로 함.
+       저장된 itinerary가 그보다 일수가 많거나 적어도, 표시되는 일차 개수는 duration_days를 따르고
+       기존에 저장된 일자별 오전/오후/저녁 선택값은 해당 일차가 남아있는 한 그대로 유지됨. */
   if (isPkg) {
+    const numDays = p.duration_days || 1;
     const looksStructured = itinerary.length && itinerary[0] && typeof itinerary[0].day !== 'undefined';
-    _pkgDays = looksStructured
-      ? itinerary.map(d => ({
-          day: d.day,
-          am: d.am ? { type: d.am.type || 'attr', key: d.am.key, id: d.am.id } : null,
-          pm: d.pm ? { type: d.pm.type || 'attr', key: d.pm.key, id: d.pm.id } : null,
-          evening: (d.evening || []).map(e => ({ type: e.type || 'attr', key: e.key, id: e.id })),
-        }))
-      : Array.from({ length: p.duration_days || 1 }, (_, i) => ({ day: i + 1, am: null, pm: null, evening: [] }));
+    const itinByDay = {};
+    if (looksStructured) itinerary.forEach(d => { itinByDay[d.day] = d; });
+    _pkgDays = Array.from({ length: numDays }, (_, i) => {
+      const day = i + 1;
+      const d = itinByDay[day];
+      return {
+        day,
+        am: d && d.am ? { type: d.am.type || 'attr', key: d.am.key, id: d.am.id } : null,
+        pm: d && d.pm ? { type: d.pm.type || 'attr', key: d.pm.key, id: d.pm.id } : null,
+        evening: d && d.evening ? d.evening.map(e => ({ type: e.type || 'attr', key: e.key, id: e.id })) : [],
+      };
+    });
   } else {
     _pkgDays = [];
   }
