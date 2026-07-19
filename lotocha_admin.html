@@ -115,9 +115,28 @@ textarea.field-input{min-height:80px;resize:vertical}
 .dyn-row label.chk{display:flex;align-items:center;gap:4px;font-size:11px;color:#555;white-space:nowrap;flex-shrink:0}
 .dyn-row .btn-rm{background:#ffebee;color:var(--red);border:none;border-radius:6px;padding:5px 8px;font-size:13px;cursor:pointer;flex-shrink:0;font-weight:700}
 .btn-add-row{background:#e8eaf6;color:#3949ab;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px}
+
+/* ── 썸네일 2매 업로드 위젯 ── */
+.thumb-wrap{display:flex;gap:10px}
+.thumb-slot{width:110px;height:110px;border-radius:10px;position:relative;flex-shrink:0;overflow:hidden}
+.thumb-slot.empty{border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;cursor:pointer;color:#999;font-size:11px;font-weight:700;background:#f8f9fc;transition:border-color .2s,color .2s}
+.thumb-slot.empty:hover{border-color:var(--navy);color:var(--navy)}
+.thumb-slot.empty .thumb-plus{font-size:22px;line-height:1}
+.thumb-slot.filled{border:1.5px solid var(--border)}
+.thumb-slot.filled img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb-remove{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;border:none;background:rgba(20,20,30,.65);color:#fff;font-size:12px;font-weight:700;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center}
+.thumb-remove:hover{background:var(--red)}
 .dyn-row-head{display:flex;gap:6px;font-size:10px;font-weight:700;color:#aaa;padding-bottom:4px;padding-left:2px}
 .dyn-row-head span{flex:2;min-width:60px}
 .dyn-row-head span.sm{flex:1;min-width:60px}
+
+/* 항공편 row (필드가 많아 줄바꿈에 의존하지 않는 고정 3줄 레이아웃) */
+.flight-row{background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px;margin-bottom:8px}
+.flight-row-line{display:flex;gap:6px;margin-bottom:6px}
+.flight-row-line:last-child{margin-bottom:0}
+.flight-row input[type=text]{flex:1;min-width:0;padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;font-family:inherit;outline:none}
+.flight-row .btn-rm{background:#ffebee;color:var(--red);border:none;border-radius:6px;padding:5px 8px;font-size:13px;cursor:pointer;flex-shrink:0;font-weight:700}
+.flight-row .btn-add-row{margin-top:0;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -165,14 +184,31 @@ textarea.field-input{min-height:80px;resize:vertical}
       <button class="sb-item" data-panel="places" onclick="showPanel('places',this)">
         <span class="icon">🏪</span>현지 업체
       </button>
-      <button class="sb-item" data-panel="hotels" onclick="showPanel('hotels',this)">
-        <span class="icon">🏨</span>호텔 관리
+      <div class="sb-section">가이드 콘텐츠</div>
+      <button class="sb-item" data-panel="showstickets" onclick="showPanel('showstickets',this)">
+        <span class="icon">🎭</span>공연 · 입장권
       </button>
-      <button class="sb-item" data-panel="flights" onclick="showPanel('flights',this)">
-        <span class="icon">✈️</span>항공편 관리
+      <button class="sb-item" data-panel="paymethods" onclick="showPanel('paymethods',this)">
+        <span class="icon">💳</span>결제 방법
+      </button>
+      <button class="sb-item" data-panel="emergency" onclick="showPanel('emergency',this)">
+        <span class="icon">🛟</span>안전 · 응급
+      </button>
+      <button class="sb-item" data-panel="phrases" onclick="showPanel('phrases',this)">
+        <span class="icon">💬</span>현지 회화
+      </button>
+      <button class="sb-item" data-panel="tips" onclick="showPanel('tips',this)">
+        <span class="icon">💡</span>여행 팁
+      </button>
+      <div class="sb-section">카테고리 관리</div>
+      <button class="sb-item" data-panel="regions" onclick="showPanel('regions',this)">
+        <span class="icon">🗺️</span>지역
+      </button>
+      <button class="sb-item" data-panel="placecats" onclick="showPanel('placecats',this)">
+        <span class="icon">🏷️</span>업체 카테고리
       </button>
       <button class="sb-item" data-panel="attractions" onclick="showPanel('attractions',this)">
-        <span class="icon">🗺️</span>명소 관리
+        <span class="icon">🏔️</span>경관지
       </button>
       <div class="sb-section">운영</div>
       <button class="sb-item" data-panel="reviews" onclick="showPanel('reviews',this)">
@@ -267,36 +303,91 @@ textarea.field-input{min-height:80px;resize:vertical}
       </div>
     </div>
 
-    <!-- 호텔 관리 (전역 공용) -->
-    <div class="panel" id="panel-hotels">
-      <div class="page-title">🏨 호텔 관리</div>
-      <div class="page-sub">맞춤투어 전체 상품에 공통으로 표시되는 추천 호텔 목록</div>
+    <!-- 공연·입장권 -->
+    <div class="panel" id="panel-showstickets">
+      <div class="page-title">🎭 공연 · 입장권</div>
+      <div class="page-sub">가이드 페이지 도우미 탭 — 공연·입장권 카드 관리</div>
       <div class="table-wrap">
-        <div class="table-head"><h3>전체 호텔</h3><button class="btn-add" onclick="openHotelPoolModal()">+ 호텔 추가</button></div>
-        <table><thead><tr><th>호텔명/등급</th><th>추가요금</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
-        <tbody id="hotels-tbody"></tbody></table>
+        <div class="table-head"><h3>전체 항목</h3><button class="btn-add" onclick="openSTModal()">+ 항목 추가</button></div>
+        <table><thead><tr><th>구분</th><th>제목</th><th>가격</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <tbody id="st-tbody"></tbody></table>
       </div>
     </div>
 
-    <!-- 항공편 관리 (전역 공용) -->
-    <div class="panel" id="panel-flights">
-      <div class="page-title">✈️ 항공편 관리</div>
-      <div class="page-sub">맞춤투어 전체 상품에 공통으로 표시되는 한국→장가계 항공편 목록</div>
+    <!-- 결제 방법 -->
+    <div class="panel" id="panel-paymethods">
+      <div class="page-title">💳 결제 방법</div>
+      <div class="page-sub">가이드 페이지 도우미 탭 — 결제 방법 카드 관리</div>
       <div class="table-wrap">
-        <div class="table-head"><h3>전체 항공편</h3><button class="btn-add" onclick="openFlightPoolModal()">+ 항공편 추가</button></div>
-        <table><thead><tr><th>노선명</th><th>출발지역</th><th>시간</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
-        <tbody id="flights-tbody"></tbody></table>
+        <div class="table-head"><h3>전체 항목</h3><button class="btn-add" onclick="openPMModal()">+ 항목 추가</button></div>
+        <table><thead><tr><th>키</th><th>이름</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <tbody id="pm-tbody"></tbody></table>
       </div>
     </div>
 
-    <!-- 명소 관리 (전역 공용) -->
+    <!-- 안전·응급 -->
+    <div class="panel" id="panel-emergency">
+      <div class="page-title">🛟 안전 · 응급</div>
+      <div class="page-sub">가이드 페이지 도우미 탭 — 긴급전화·병원·인터넷 정보 관리</div>
+      <div class="table-wrap">
+        <div class="table-head"><h3>전체 항목</h3><button class="btn-add" onclick="openEIModal()">+ 항목 추가</button></div>
+        <table><thead><tr><th>구분</th><th>라벨</th><th>값</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <tbody id="ei-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- 현지 회화 -->
+    <div class="panel" id="panel-phrases">
+      <div class="page-title">💬 현지 회화</div>
+      <div class="page-sub">가이드 페이지 도우미 탭 — 회화 카드 관리</div>
+      <div class="table-wrap">
+        <div class="table-head"><h3>전체 문구</h3><button class="btn-add" onclick="openPHModal()">+ 문구 추가</button></div>
+        <table><thead><tr><th>카테고리</th><th>중국어</th><th>한국어</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <tbody id="ph-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- 여행 팁 -->
+    <div class="panel" id="panel-tips">
+      <div class="page-title">💡 여행 팁</div>
+      <div class="page-sub">가이드 페이지 도우미 탭 — 구역별 여행 팁 관리</div>
+      <div class="table-wrap">
+        <div class="table-head"><h3>전체 팁</h3><button class="btn-add" onclick="openTPModal()">+ 팁 추가</button></div>
+        <table><thead><tr><th>경관지</th><th>내용</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <tbody id="tp-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- 지역 관리 -->
+    <div class="panel" id="panel-regions">
+      <div class="page-title">🗺️ 지역</div>
+      <div class="page-sub">현지 업체 필터용 지역 목록 관리</div>
+      <div class="table-wrap">
+        <div class="table-head"><h3>전체 지역</h3><button class="btn-add" onclick="openRGModal()">+ 지역 추가</button></div>
+        <table><thead><tr><th>이름</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <tbody id="rg-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- 업체 카테고리 관리 -->
+    <div class="panel" id="panel-placecats">
+      <div class="page-title">🏷️ 업체 카테고리</div>
+      <div class="page-sub">현지 업체 분류 목록 관리</div>
+      <div class="table-wrap">
+        <div class="table-head"><h3>전체 카테고리</h3><button class="btn-add" onclick="openPCModal()">+ 카테고리 추가</button></div>
+        <table><thead><tr><th>키</th><th>이름</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <tbody id="pc-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- 경관지 관리 -->
     <div class="panel" id="panel-attractions">
-      <div class="page-title">🗺️ 명소 관리</div>
-      <div class="page-sub">맞춤투어 "일정 직접 짜기"에서 쓰이는 명소 풀 (대형/특색/인문)</div>
+      <div class="page-title">🏔️ 경관지</div>
+      <div class="page-sub">국가삼림공원·천문산·황룡동+대협곡은 지도·GPS·구역·일정 기능에 고정 연결되어 삭제할 수 없습니다. 새로 추가하는 경관지는 태그·필터 용도로만 사용되며, 지도 탭에 자동 반영되지 않습니다.</div>
       <div class="table-wrap">
-        <div class="table-head"><h3>전체 명소</h3><button class="btn-add" onclick="openAttractionPoolModal()">+ 명소 추가</button></div>
-        <table><thead><tr><th>key</th><th>라벨</th><th>분류</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
-        <tbody id="attractions-tbody"></tbody></table>
+        <div class="table-head"><h3>전체 경관지</h3><button class="btn-add" onclick="openATModal()">+ 경관지 추가</button></div>
+        <table><thead><tr><th>키</th><th>이름</th><th>보호됨</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <tbody id="at-tbody"></tbody></table>
       </div>
     </div>
 
@@ -367,7 +458,27 @@ textarea.field-input{min-height:80px;resize:vertical}
           <div id="t-opts-list"></div>
           <button type="button" class="btn-add-row" onclick="addOpt()">+ 옵션 추가</button>
         </div>
-        <div class="field-hint">선택그룹: 같은 값을 입력한 옵션끼리는 라디오(단일선택)로 묶임 (예: 식사 업그레이드는 group=meal). 비워두면 기존처럼 체크박스 다중선택. 같은 그룹의 첫 항목이 고객 화면에서 기본 선택됨. ※ 숙박/항공편은 모든 맞춤투어 상품에 공통 적용되며 좌측 메뉴의 "호텔 관리"/"항공편 관리"에서 한번만 관리하면 됩니다</div>
+        <div class="field-hint">선택그룹: 같은 값을 입력한 옵션끼리는 라디오(단일선택)로 묶임 (예: 식사 업그레이드는 group=meal). 비워두면 기존처럼 체크박스 다중선택. 같은 그룹의 첫 항목이 고객 화면에서 기본 선택됨. ※ 숙박은 아래 "추천 호텔" 항목을 사용하세요</div>
+      </div>
+
+      <!-- 추천 호텔 (맞춤투어용) -->
+      <div class="field-group">
+        <label class="field-label">추천 호텔 (hotel_options, 맞춤투어용)</label>
+        <div class="dyn-section">
+          <div id="t-hotels-list"></div>
+          <button type="button" class="btn-add-row" onclick="addHotel()">+ 호텔 추가</button>
+        </div>
+        <div class="field-hint">고객 화면에 라디오(단일선택)로 표시됩니다. 첫 항목이 기본 선택됨. "중국 명절 기간 가격 변동 안내"는 고객 화면에 자동으로 함께 표시됩니다</div>
+      </div>
+
+      <!-- 항공편 (맞춤투어용) -->
+      <div class="field-group">
+        <label class="field-label">한국→장가계 항공편 (flight_options, 맞춤투어용)</label>
+        <div class="dyn-section">
+          <div id="t-flights-list"></div>
+          <button type="button" class="btn-add-row" onclick="addFlight()">+ 항공편 추가</button>
+        </div>
+        <div class="field-hint">고객 화면에 "도착 항공편"과 "출발 항공편"으로 각각 따로 선택할 수 있게 표시됩니다 (같은 목록을 양쪽에 사용). 이미지는 URL 직접 입력 또는 📎 버튼으로 업로드 가능. 항공권 자체는 포함 사항이 아니라 픽업·센딩 시간 조율용 정보입니다</div>
       </div>
 
       <!-- 일정 (참고용) -->
@@ -414,11 +525,9 @@ textarea.field-input{min-height:80px;resize:vertical}
         <div class="field-group"><label class="field-label">경도 (lon)</label><input type="number" id="s-lon" class="field-input" step="0.0000001"></div>
       </div>
       <div class="field-group"><label class="field-label">고덕지도 딥링크</label><input type="text" id="s-gaode" class="field-input" placeholder="androidamap://..."><div class="field-hint">고덕지도 앱 → 장소 공유 → 링크 복사</div></div>
-      <div class="field-group"><label class="field-label">이미지 URL (줄바꿈 구분)</label>
-        <textarea id="s-images" class="field-input" placeholder="https://...jpg"></textarea>
-        <button type="button" class="btn-add-row" style="margin-top:6px" onclick="document.getElementById('s-img-file').click()">📎 이미지 업로드</button>
-        <input type="file" id="s-img-file" accept="*/*" multiple style="display:none" onchange="uploadMedia(this,'s-images')">
-        <div class="field-hint">파일 형식 무제한 | 여러 파일 동시 선택 가능</div>
+      <div class="field-group"><label class="field-label">썸네일 (최대 2장)</label>
+        <div class="thumb-wrap" id="s-img-wrap"></div>
+        <input type="hidden" id="s-img-data" value="[]">
       </div>
       <div class="field-group"><label class="field-label">영상 URL (유튜브·빌리빌리·직접 링크)</label>
         <input type="text" id="s-video-url" class="field-input" placeholder="https://youtu.be/xxxxx 또는 https://bilibili.com/video/BVxxxx">
@@ -488,11 +597,9 @@ textarea.field-input{min-height:80px;resize:vertical}
         <div class="field-group"><label class="field-label">경도</label><input type="number" id="pl-lon" class="field-input" step="0.0000001"></div>
       </div>
       <div class="field-group"><label class="field-label">고덕지도 딥링크</label><input type="text" id="pl-gaode" class="field-input" placeholder="androidamap://..."></div>
-      <div class="field-group"><label class="field-label">이미지 URL (줄바꿈 구분)</label>
-        <textarea id="pl-images" class="field-input" placeholder="https://...jpg"></textarea>
-        <button type="button" class="btn-add-row" style="margin-top:6px" onclick="document.getElementById('pl-img-file').click()">📎 이미지 업로드</button>
-        <input type="file" id="pl-img-file" accept="*/*" multiple style="display:none" onchange="uploadMedia(this,'pl-images')">
-        <div class="field-hint">파일 형식 무제한 | 여러 파일 동시 선택 가능</div>
+      <div class="field-group"><label class="field-label">썸네일 (최대 2장)</label>
+        <div class="thumb-wrap" id="pl-img-wrap"></div>
+        <input type="hidden" id="pl-img-data" value="[]">
       </div>
       <div class="field-group"><label class="field-label">설명</label><textarea id="pl-desc" class="field-input"></textarea></div>
       <div class="field-group"><label class="field-label">태그 (쉼표 구분)</label><input type="text" id="pl-tags" class="field-input" placeholder="한국어메뉴, 카드가능, 주차가능"></div>
@@ -509,112 +616,224 @@ textarea.field-input{min-height:80px;resize:vertical}
   </div>
 </div>
 
-<!-- 호텔 모달 (전역 공용) -->
-<div class="modal-bg" id="hotel-modal-bg" onclick="closeHotelPoolModal(event)">
+<!-- 공연·입장권 모달 -->
+<div class="modal-bg" id="st-modal-bg" onclick="closeSTModal(event)">
   <div class="modal">
     <div class="modal-head">
-      <h3 id="hotel-modal-title">호텔 추가</h3>
-      <button class="modal-close" onclick="closeHotelPoolModal()">✕</button>
+      <h3 id="st-modal-title">항목 추가</h3>
+      <button class="modal-close" onclick="closeSTModal()">✕</button>
     </div>
     <div class="modal-body">
-      <input type="hidden" id="ho-id">
+      <input type="hidden" id="st-id">
       <div class="field-row">
-        <div class="field-group"><label class="field-label">호텔명 *</label><input type="text" id="ho-name" class="field-input" placeholder="예: 일반 숙소"></div>
-        <div class="field-group"><label class="field-label">등급</label><input type="text" id="ho-grade" class="field-input" placeholder="예: 3성급 추천"></div>
-      </div>
-      <div class="field-row">
-        <div class="field-group"><label class="field-label">추가요금(원)</label><input type="number" id="ho-price" class="field-input" value="0"></div>
-        <div class="field-group"><label class="field-label">단위</label>
-          <select id="ho-per" class="field-input"><option value="pax">인당</option><option value="group">그룹</option></select></div>
-      </div>
-      <div class="field-group"><label class="field-label">설명</label><textarea id="ho-desc" class="field-input" placeholder="등급/위치 등"></textarea></div>
-      <div class="field-group"><label class="field-label">이미지 URL</label>
-        <input type="text" id="ho-image" class="field-input">
-        <button type="button" class="btn-add-row" style="margin-top:6px" onclick="document.getElementById('ho-img-file').click()">📎 이미지 업로드</button>
-        <input type="file" id="ho-img-file" accept="image/*" style="display:none" onchange="uploadToInput(this,'ho-image')">
-      </div>
-      <div class="field-row">
-        <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="ho-order" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">구분 *</label>
+          <select id="st-kind" class="field-input"><option value="show">공연</option><option value="ticket">입장권</option></select></div>
         <div class="field-group"><label class="field-label">상태</label>
-          <select id="ho-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+          <select id="st-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
       </div>
+      <div class="field-group"><label class="field-label">제목 *</label><input type="text" id="st-title" class="field-input"></div>
+      <div class="field-group"><label class="field-label">부제/설명</label><input type="text" id="st-subtitle" class="field-input"></div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">시간 정보</label><input type="text" id="st-time" class="field-input" placeholder="매일 19:30 (약 80분)"></div>
+        <div class="field-group"><label class="field-label">가격 정보</label><input type="text" id="st-price" class="field-input" placeholder="¥160~280"></div>
+      </div>
+      <div class="field-group"><label class="field-label">링크 (줄바꿈 구분, "라벨|URL" 형식)</label>
+        <textarea id="st-links" class="field-input" placeholder="🎫 Trip.com|https://..."></textarea>
+        <div class="field-hint">한 줄에 하나씩, 라벨과 URL은 | 로 구분</div>
+      </div>
+      <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="st-order" class="field-input" value="0"></div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeHotelPoolModal()">취소</button>
-      <button class="btn-save" onclick="saveHotelPool()">저장</button>
+      <button class="btn-cancel" onclick="closeSTModal()">취소</button>
+      <button class="btn-save" onclick="saveST()">저장</button>
     </div>
   </div>
 </div>
 
-<!-- 항공편 모달 (전역 공용) -->
-<div class="modal-bg" id="flight-modal-bg" onclick="closeFlightPoolModal(event)">
+<!-- 결제 방법 모달 -->
+<div class="modal-bg" id="pm-modal-bg" onclick="closePMModal(event)">
   <div class="modal">
     <div class="modal-head">
-      <h3 id="flight-modal-title">항공편 추가</h3>
-      <button class="modal-close" onclick="closeFlightPoolModal()">✕</button>
+      <h3 id="pm-modal-title">결제 방법 추가</h3>
+      <button class="modal-close" onclick="closePMModal()">✕</button>
     </div>
     <div class="modal-body">
-      <input type="hidden" id="fl2-id">
-      <div class="field-group"><label class="field-label">노선명 *</label><input type="text" id="fl2-name" class="field-input" placeholder="예: 인천→장가계 대한항공"></div>
+      <input type="hidden" id="pm-id-orig">
       <div class="field-row">
-        <div class="field-group"><label class="field-label">출발지역</label><input type="text" id="fl2-location" class="field-input" placeholder="예: 인천"></div>
-        <div class="field-group"><label class="field-label">시간</label><input type="text" id="fl2-time" class="field-input" placeholder="예: 오전 출발·약 3시간30분"></div>
-      </div>
-      <div class="field-group"><label class="field-label">설명</label><textarea id="fl2-desc" class="field-input"></textarea></div>
-      <div class="field-group"><label class="field-label">이미지 URL</label>
-        <input type="text" id="fl2-image" class="field-input">
-        <button type="button" class="btn-add-row" style="margin-top:6px" onclick="document.getElementById('fl2-img-file').click()">📎 이미지 업로드</button>
-        <input type="file" id="fl2-img-file" accept="image/*" style="display:none" onchange="uploadToInput(this,'fl2-image')">
-      </div>
-      <div class="field-row">
-        <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="fl2-order" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">키 (영문, 고유값) *</label><input type="text" id="pm-key" class="field-input" placeholder="kakao"></div>
         <div class="field-group"><label class="field-label">상태</label>
-          <select id="fl2-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+          <select id="pm-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
       </div>
+      <div class="field-group"><label class="field-label">이름 *</label><input type="text" id="pm-name" class="field-input"></div>
+      <div class="field-group"><label class="field-label">부제</label><input type="text" id="pm-subtitle" class="field-input"></div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">아이콘 이모지</label><input type="text" id="pm-emoji" class="field-input" placeholder="💛"></div>
+        <div class="field-group"><label class="field-label">배경색</label><input type="text" id="pm-bg" class="field-input" placeholder="#FEE500"></div>
+      </div>
+      <div class="field-group"><label class="field-label">단계 (줄바꿈 구분, HTML 태그 사용 가능)</label>
+        <textarea id="pm-steps" class="field-input" placeholder="카카오톡 → 하단 <b>···</b> → <b>카카오페이</b>"></textarea>
+      </div>
+      <div class="field-group"><label class="field-label">주의사항</label><input type="text" id="pm-note" class="field-input"></div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">링크 라벨</label><input type="text" id="pm-link-label" class="field-input" placeholder="카카오페이 공식 →"></div>
+        <div class="field-group"><label class="field-label">링크 URL</label><input type="text" id="pm-link-url" class="field-input" placeholder="https://pay.kakao.com"></div>
+      </div>
+      <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="pm-order" class="field-input" value="0"></div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeFlightPoolModal()">취소</button>
-      <button class="btn-save" onclick="saveFlightPool()">저장</button>
+      <button class="btn-cancel" onclick="closePMModal()">취소</button>
+      <button class="btn-save" onclick="savePM()">저장</button>
     </div>
   </div>
 </div>
 
-<!-- 명소 모달 (전역 공용) -->
-<div class="modal-bg" id="attraction-modal-bg" onclick="closeAttractionPoolModal(event)">
+<!-- 안전·응급 모달 -->
+<div class="modal-bg" id="ei-modal-bg" onclick="closeEIModal(event)">
   <div class="modal">
     <div class="modal-head">
-      <h3 id="attraction-modal-title">명소 추가</h3>
-      <button class="modal-close" onclick="closeAttractionPoolModal()">✕</button>
+      <h3 id="ei-modal-title">항목 추가</h3>
+      <button class="modal-close" onclick="closeEIModal()">✕</button>
     </div>
     <div class="modal-body">
-      <input type="hidden" id="at-id">
+      <input type="hidden" id="ei-id">
       <div class="field-row">
-        <div class="field-group"><label class="field-label">key (영문) *</label><input type="text" id="at-key" class="field-input" placeholder="예: tianmen"></div>
-        <div class="field-group"><label class="field-label">라벨 *</label><input type="text" id="at-label" class="field-input" placeholder="예: 천문산"></div>
+        <div class="field-group"><label class="field-label">구분 *</label>
+          <select id="ei-section" class="field-input"><option value="phone">긴급 전화</option><option value="hospital">병원·영사관</option><option value="connectivity">인터넷·VPN</option></select></div>
+        <div class="field-group"><label class="field-label">상태</label>
+          <select id="ei-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
       </div>
-      <div class="field-group"><label class="field-label">분류 *</label>
-        <select id="at-cat" class="field-input">
-          <option value="large">대형 (반나절, 같은 날 1개만)</option>
-          <option value="feature">특색 (반나절, 하루 여러 개 가능)</option>
-          <option value="local">인문 (시간대 제약 없음, 중복 가능)</option>
-        </select>
-        <div class="field-hint">기존 일정 데이터에서 이 key를 참조하므로, 한번 저장한 key는 가능하면 바꾸지 마세요</div>
-      </div>
-      <div class="field-group"><label class="field-label">설명</label><textarea id="at-desc" class="field-input"></textarea></div>
-      <div class="field-group"><label class="field-label">이미지 URL</label>
-        <input type="text" id="at-image" class="field-input">
-        <button type="button" class="btn-add-row" style="margin-top:6px" onclick="document.getElementById('at-img-file').click()">📎 이미지 업로드</button>
-        <input type="file" id="at-img-file" accept="image/*" style="display:none" onchange="uploadToInput(this,'at-image')">
-      </div>
+      <div class="field-group"><label class="field-label">라벨 *</label><input type="text" id="ei-label" class="field-input" placeholder="경찰"></div>
+      <div class="field-group"><label class="field-label">값 *</label><input type="text" id="ei-value" class="field-input" placeholder="110"></div>
+      <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="ei-order" class="field-input" value="0"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeEIModal()">취소</button>
+      <button class="btn-save" onclick="saveEI()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 현지 회화 모달 -->
+<div class="modal-bg" id="ph-modal-bg" onclick="closePHModal(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="ph-modal-title">문구 추가</h3>
+      <button class="modal-close" onclick="closePHModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="ph-id">
       <div class="field-row">
+        <div class="field-group"><label class="field-label">카테고리 *</label><input type="text" id="ph-category" class="field-input" placeholder="🚕 교통"></div>
+        <div class="field-group"><label class="field-label">상태</label>
+          <select id="ph-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+      </div>
+      <div class="field-group"><label class="field-label">중국어 *</label><input type="text" id="ph-cn" class="field-input"></div>
+      <div class="field-group"><label class="field-label">병음</label><input type="text" id="ph-py" class="field-input"></div>
+      <div class="field-group"><label class="field-label">한국어 *</label><input type="text" id="ph-ko" class="field-input"></div>
+      <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="ph-order" class="field-input" value="0"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closePHModal()">취소</button>
+      <button class="btn-save" onclick="savePH()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 여행 팁 모달 -->
+<div class="modal-bg" id="tp-modal-bg" onclick="closeTPModal(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="tp-modal-title">팁 추가</h3>
+      <button class="modal-close" onclick="closeTPModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="tp-id">
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">경관지 *</label>
+          <select id="tp-attr" class="field-input"><option value="forest">삼림공원</option><option value="tianmen">천문산</option><option value="canyon">협곡</option></select></div>
+        <div class="field-group"><label class="field-label">상태</label>
+          <select id="tp-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+      </div>
+      <div class="field-group"><label class="field-label">내용 *</label><input type="text" id="tp-text" class="field-input" placeholder="👟 운동화 필수."></div>
+      <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="tp-order" class="field-input" value="0"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeTPModal()">취소</button>
+      <button class="btn-save" onclick="saveTP()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 지역 모달 -->
+<div class="modal-bg" id="rg-modal-bg" onclick="closeRGModal(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="rg-modal-title">지역 추가</h3>
+      <button class="modal-close" onclick="closeRGModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="rg-id">
+      <div class="field-group"><label class="field-label">이름 *</label><input type="text" id="rg-name" class="field-input" placeholder="봉황고성"></div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="rg-order" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">상태</label>
+          <select id="rg-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeRGModal()">취소</button>
+      <button class="btn-save" onclick="saveRG()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 업체 카테고리 모달 -->
+<div class="modal-bg" id="pc-modal-bg" onclick="closePCModal(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="pc-modal-title">카테고리 추가</h3>
+      <button class="modal-close" onclick="closePCModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="pc-id-orig">
+      <div class="field-group"><label class="field-label">키 (영문, 고유값) *</label><input type="text" id="pc-key" class="field-input" placeholder="bar"></div>
+      <div class="field-group"><label class="field-label">이름 *</label><input type="text" id="pc-name" class="field-input" placeholder="바/술집"></div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">아이콘 이모지</label><input type="text" id="pc-icon" class="field-input" placeholder="🍺"></div>
+        <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="pc-order" class="field-input" value="0"></div>
+      </div>
+      <div class="field-group"><label class="field-label">상태</label>
+        <select id="pc-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closePCModal()">취소</button>
+      <button class="btn-save" onclick="savePC()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 경관지 모달 -->
+<div class="modal-bg" id="at-modal-bg" onclick="closeATModal(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="at-modal-title">경관지 추가</h3>
+      <button class="modal-close" onclick="closeATModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="at-id-orig">
+      <div class="field-group"><label class="field-label">키 (영문, 고유값) *</label><input type="text" id="at-key" class="field-input" placeholder="phoenix_town"></div>
+      <div class="field-group"><label class="field-label">이름 *</label><input type="text" id="at-name" class="field-input" placeholder="봉황고성"></div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">아이콘 이모지</label><input type="text" id="at-icon" class="field-input" placeholder="🏯"></div>
         <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="at-order" class="field-input" value="0"></div>
-        <div class="field-group"><label class="field-label">상태</label>
-          <select id="at-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
       </div>
+      <div class="field-group"><label class="field-label">상태</label>
+        <select id="at-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+      <div class="field-hint">⚠️ 새로 추가하는 경관지는 지도·GPS·구역 탭에 자동 반영되지 않으며, 태그·필터 용도로만 쓰입니다.</div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeAttractionPoolModal()">취소</button>
-      <button class="btn-save" onclick="saveAttractionPool()">저장</button>
+      <button class="btn-cancel" onclick="closeATModal()">취소</button>
+      <button class="btn-save" onclick="saveAT()">저장</button>
     </div>
   </div>
 </div>
@@ -629,6 +848,35 @@ try { sb = window.supabase.createClient(SUPA_URL, SUPA_KEY); } catch(e) {}
 
 const ATTR_LABELS = {forest:'삼림공원', tianmen:'천문산', canyon:'협곡'};
 const STORAGE_BUCKET = 'lotocha-media';
+
+/* ───── 카테고리 데이터 (지역 / 업체 카테고리 / 경관지) ───── */
+let REGIONS_LIST = [{name_ko:'시내'},{name_ko:'무릉원'},{name_ko:'천문산'},{name_ko:'황룡동'},{name_ko:'기타'}];
+let CATEGORIES_LIST = [{cat_key:'restaurant',name_ko:'식당'},{cat_key:'cafe',name_ko:'카페'},{cat_key:'hotel',name_ko:'호텔/숙소'},{cat_key:'shop',name_ko:'쇼핑'},{cat_key:'attraction',name_ko:'볼거리'},{cat_key:'transport',name_ko:'교통'},{cat_key:'etc',name_ko:'기타'}];
+let ATTRACTIONS_LIST = [{attr_key:'forest',name_ko:'국가삼림공원',is_protected:true},{attr_key:'tianmen',name_ko:'천문산',is_protected:true},{attr_key:'canyon',name_ko:'황룡동+대협곡',is_protected:true}];
+
+async function loadCategoryData() {
+  try {
+    const [{data:regions},{data:cats},{data:attrs}] = await Promise.all([
+      sb.from('guide_regions').select('*').eq('is_active',true).order('sort_order'),
+      sb.from('guide_place_categories').select('*').eq('is_active',true).order('sort_order'),
+      sb.from('guide_attractions').select('*').eq('is_active',true).order('sort_order'),
+    ]);
+    if (regions && regions.length) REGIONS_LIST = regions;
+    if (cats && cats.length) { CATEGORIES_LIST = cats; Object.assign(CAT_LABELS, Object.fromEntries(cats.map(c=>[c.cat_key,c.name_ko]))); }
+    if (attrs && attrs.length) { ATTRACTIONS_LIST = attrs; Object.assign(ATTR_LABELS, Object.fromEntries(attrs.map(a=>[a.attr_key,a.name_ko]))); }
+  } catch(e) { console.warn('카테고리 로드 실패', e); }
+  populateCategorySelects();
+}
+function populateCategorySelects() {
+  const plCat = document.getElementById('pl-cat');
+  if (plCat) { const cur=plCat.value; plCat.innerHTML = CATEGORIES_LIST.map(c=>`<option value="${c.cat_key}">${c.name_ko}</option>`).join(''); if(cur) plCat.value=cur; }
+  const plArea = document.getElementById('pl-area');
+  if (plArea) { const cur=plArea.value; plArea.innerHTML = REGIONS_LIST.map(r=>`<option value="${r.name_ko}">${r.name_ko}</option>`).join(''); if(cur) plArea.value=cur; }
+  const sAttr = document.getElementById('s-attr');
+  if (sAttr) { const cur=sAttr.value; sAttr.innerHTML = ATTRACTIONS_LIST.map(a=>`<option value="${a.attr_key}">${a.name_ko}</option>`).join(''); if(cur) sAttr.value=cur; }
+  const tpAttr = document.getElementById('tp-attr');
+  if (tpAttr) { const cur=tpAttr.value; tpAttr.innerHTML = ATTRACTIONS_LIST.map(a=>`<option value="${a.attr_key}">${a.name_ko}</option>`).join(''); if(cur) tpAttr.value=cur; }
+}
 
 async function uploadMedia(fileInput, targetId) {
   const files = [...fileInput.files];
@@ -649,6 +897,47 @@ async function uploadMedia(fileInput, targetId) {
   if (failed === 0) toast(`✅ ${uploaded}개 업로드 완료`, 'success');
   else toast(`⚠️ ${uploaded}개 완료, ${failed}개 실패`, 'error');
 }
+/* ── 썸네일 2매 업로드 위젯 (prefix 예: 's-img', 'pl-img') ── */
+function thumbGetArr(prefix) {
+  try { return JSON.parse(document.getElementById(prefix+'-data').value || '[]'); } catch(e) { return []; }
+}
+function renderThumbWidget(prefix) {
+  const urls = thumbGetArr(prefix);
+  const wrap = document.getElementById(prefix+'-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = [0,1].map(i => {
+    const url = urls[i];
+    if (url) {
+      return `<div class="thumb-slot filled"><img src="${url}" alt=""><button type="button" class="thumb-remove" onclick="thumbRemove('${prefix}',${i})">✕</button></div>`;
+    }
+    return `<div class="thumb-slot empty" onclick="document.getElementById('${prefix}-file-${i}').click()"><span class="thumb-plus">+</span><span>업로드</span><input type="file" id="${prefix}-file-${i}" accept="image/*" style="display:none" onchange="thumbUpload('${prefix}',${i},this)"></div>`;
+  }).join('');
+}
+function setThumbWidget(prefix, arr) {
+  document.getElementById(prefix+'-data').value = JSON.stringify((arr||[]).filter(Boolean).slice(0,2));
+  renderThumbWidget(prefix);
+}
+async function thumbUpload(prefix, idx, fileInput) {
+  const file = fileInput.files[0];
+  if (!file) return;
+  const urls = thumbGetArr(prefix);
+  toast('업로드 중...', '');
+  const ext = file.name.includes('.') ? file.name.split('.').pop() : 'jpg';
+  const path = `${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+  const { error } = await sb.storage.from(STORAGE_BUCKET).upload(path, file, {cacheControl:'31536000', upsert:false});
+  if (error) { toast('업로드 실패: '+error.message, 'error'); return; }
+  const { data: urlData } = sb.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+  urls[idx] = urlData.publicUrl;
+  document.getElementById(prefix+'-data').value = JSON.stringify(urls.filter(Boolean).slice(0,2));
+  renderThumbWidget(prefix);
+  toast('✅ 업로드 완료', 'success');
+}
+function thumbRemove(prefix, idx) {
+  const urls = thumbGetArr(prefix);
+  urls[idx] = null;
+  document.getElementById(prefix+'-data').value = JSON.stringify(urls.filter(Boolean));
+  renderThumbWidget(prefix);
+}
 function toast(msg, type='') {
   const t = document.getElementById('toast');
   t.textContent = msg; t.className = 'toast show ' + type;
@@ -658,6 +947,8 @@ function fmt(n) { return n ? n.toLocaleString('ko-KR')+'원' : '-'; }
 function dateStr(s) { return s ? s.slice(0,10) : '-'; }
 function linesToArr(s) { return s.split('\n').map(x=>x.trim()).filter(Boolean); }
 function arrToLines(a) { return (a||[]).join('\n'); }
+function linesToLinks(s) { return s.split('\n').map(x=>x.trim()).filter(Boolean).map(line=>{const i=line.indexOf('|');return i===-1?{label:line,url:''}:{label:line.slice(0,i).trim(),url:line.slice(i+1).trim()};}); }
+function linksToLines(a) { return (a||[]).map(l=>`${l.label}|${l.url}`).join('\n'); }
 function linesToItin(s) {
   return s.split('\n').map(x=>x.trim()).filter(Boolean).map(line=>{
     const idx = line.indexOf('|');
@@ -729,6 +1020,7 @@ async function initApp(user) {
   }
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
+  await loadCategoryData();
   loadDashboard();
 }
 
@@ -737,7 +1029,9 @@ function showPanel(id, btn) {
   document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
   document.getElementById('panel-' + id).classList.add('active');
   if (btn) btn.classList.add('active');
-  const loaders = {dashboard:loadDashboard,tours:loadTours,spots:loadSpots,places:loadPlaces,hotels:loadHotelPool,flights:loadFlightPool,attractions:loadAttractionPool,reviews:loadReviews,stats:loadStats,users:loadUsers};
+  const loaders = {dashboard:loadDashboard,tours:loadTours,spots:loadSpots,places:loadPlaces,reviews:loadReviews,stats:loadStats,users:loadUsers,
+    showstickets:loadST,paymethods:loadPM,emergency:loadEI,phrases:loadPH,tips:loadTP,
+    regions:loadRG,placecats:loadPC,attractions:loadAT};
   if (loaders[id]) loaders[id]();
 }
 
@@ -799,8 +1093,59 @@ function renderOptRow(o={}) {
     <button class="btn-rm" onclick="this.parentNode.remove()">✕</button>`;
   return d;
 }
+function renderHotelRow(h={}) {
+  const d = document.createElement('div');
+  d.className = 'dyn-row';
+  d.innerHTML = `
+    <input type="text" placeholder="key" value="${h.key||''}" style="flex:1;max-width:80px">
+    <input type="text" placeholder="호텔명/등급" value="${h.name||''}" style="flex:2">
+    <input type="number" placeholder="추가요금" value="${h.price||''}" style="flex:1;max-width:90px">
+    <select style="flex:1;max-width:70px"><option value="pax" ${h.per==='pax'?'selected':''}>인당</option><option value="group" ${h.per==='group'?'selected':''}>그룹</option></select>
+    <input type="text" placeholder="설명(등급/위치 등)" value="${h.desc||''}" style="flex:2">
+    <button class="btn-rm" onclick="this.parentNode.remove()">✕</button>`;
+  return d;
+}
+function renderFlightRow(f={}) {
+  const d = document.createElement('div');
+  d.className = 'flight-row';
+  d.innerHTML = `
+    <div class="flight-row-line">
+      <input type="text" placeholder="key" value="${f.key||''}" style="flex:1;max-width:80px">
+      <input type="text" placeholder="노선명 (예: 인천→장가계 대한항공)" value="${f.name||''}" style="flex:3">
+      <button class="btn-rm" onclick="this.closest('.flight-row').remove()">✕</button>
+    </div>
+    <div class="flight-row-line">
+      <input type="text" placeholder="출발지역 (예: 인천)" value="${f.location||''}" style="flex:1">
+      <input type="text" placeholder="시간 (예: 오전 출발·약 3시간30분)" value="${f.time||''}" style="flex:2">
+    </div>
+    <div class="flight-row-line">
+      <input type="text" placeholder="설명" value="${f.desc||''}" style="flex:2">
+      <input type="text" placeholder="이미지 URL" value="${f.image||''}" class="flight-img-url" style="flex:2">
+      <button type="button" class="btn-add-row" onclick="this.nextElementSibling.click()" title="이미지 업로드">📎</button>
+      <input type="file" accept="image/*" style="display:none" onchange="uploadFlightImg(this)">
+    </div>`;
+  return d;
+}
 function addTier()   { document.getElementById('t-tiers-list').appendChild(renderTierRow()); }
 function addOpt()    { document.getElementById('t-opts-list').appendChild(renderOptRow()); }
+function addHotel()  { document.getElementById('t-hotels-list').appendChild(renderHotelRow()); }
+function addFlight() { document.getElementById('t-flights-list').appendChild(renderFlightRow()); }
+async function uploadFlightImg(fileInput) {
+  const files = [...fileInput.files];
+  if (!files.length) return;
+  const row = fileInput.closest('.flight-row');
+  const urlInput = row.querySelector('.flight-img-url');
+  const file = files[0];
+  const ext = file.name.includes('.') ? file.name.split('.').pop() : 'jpg';
+  const path = `${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+  toast('이미지 업로드 중...', '');
+  const { error } = await sb.storage.from(STORAGE_BUCKET).upload(path, file, {cacheControl:'31536000', upsert:false});
+  if (error) { toast('업로드 실패','error'); return; }
+  const { data: urlData } = sb.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+  if (urlInput) urlInput.value = urlData.publicUrl;
+  fileInput.value = '';
+  toast('✅ 이미지 업로드 완료','success');
+}
 function collectTiers() {
   return [...document.querySelectorAll('#t-tiers-list .dyn-row')].map(r=>{
     const ins = r.querySelectorAll('input');
@@ -817,233 +1162,35 @@ function collectOpts() {
     return o;
   }).filter(o=>o.key&&o.label);
 }
-
-/* 단일 텍스트 입력칸에 이미지 업로드 (호텔/항공편/명소 전역 풀 공용) */
-async function uploadToInput(fileInput, targetId) {
-  const files = [...fileInput.files];
-  if (!files.length) return;
-  const file = files[0];
-  const ext = file.name.includes('.') ? file.name.split('.').pop() : 'jpg';
-  const path = `${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
-  toast('이미지 업로드 중...', '');
-  const { error } = await sb.storage.from(STORAGE_BUCKET).upload(path, file, {cacheControl:'31536000', upsert:false});
-  if (error) { toast('업로드 실패','error'); return; }
-  const { data: urlData } = sb.storage.from(STORAGE_BUCKET).getPublicUrl(path);
-  document.getElementById(targetId).value = urlData.publicUrl;
-  fileInput.value = '';
-  toast('✅ 이미지 업로드 완료','success');
+function collectHotels() {
+  return [...document.querySelectorAll('#t-hotels-list .dyn-row')].map(r=>{
+    const ins = r.querySelectorAll('input');
+    const sel = r.querySelector('select');
+    return {key:ins[0].value.trim(),name:ins[1].value.trim(),price:parseInt(ins[2].value)||0,per:sel.value,desc:ins[3].value.trim()};
+  }).filter(h=>h.key&&h.name);
+}
+function collectFlights() {
+  return [...document.querySelectorAll('#t-flights-list .flight-row')].map(r=>{
+    const ins = r.querySelectorAll('input');
+    return {key:ins[0].value.trim(),name:ins[1].value.trim(),location:ins[2].value.trim(),time:ins[3].value.trim(),desc:ins[4].value.trim(),image:ins[5].value.trim()};
+  }).filter(f=>f.key&&f.name);
 }
 
-/* ───── 호텔 관리 (전역 공용) ───── */
-async function loadHotelPool() {
-  const { data } = await sb.from('tour_hotels').select('*').order('sort_order');
-  document.getElementById('hotels-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">로드 실패 (테이블이 없으면 lotocha_supabase_global_pools.sql 실행 필요)</td></tr>'
-    : !data.length ? '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:20px">등록된 호텔 없음</td></tr>'
-    : data.map(h=>`<tr>
-        <td style="font-weight:700">${h.name}${h.grade?` (${h.grade})`:''}</td>
-        <td>${h.price?fmt(h.price)+(h.per==='pax'?'/인':''):'기본 포함'}</td>
-        <td><span class="badge badge-${h.is_active?'live':'archived'}">${h.is_active?'활성':'비활성'}</span></td>
-        <td>${h.sort_order}</td>
-        <td><div class="act-btns"><button class="btn-edit" onclick="openHotelPoolModal('${h.id}')">편집</button>
-        <button class="btn-del" onclick="deleteHotelPool('${h.id}')">삭제</button></div></td></tr>`).join('');
-}
-function openHotelPoolModal(id) {
-  document.getElementById('hotel-modal-title').textContent = id ? '호텔 편집' : '호텔 추가';
-  const flds = ['ho-id','ho-name','ho-grade','ho-desc','ho-image'];
-  if (!id) {
-    flds.forEach(f=>document.getElementById(f).value='');
-    document.getElementById('ho-price').value='0'; document.getElementById('ho-per').value='pax';
-    document.getElementById('ho-order').value='0'; document.getElementById('ho-active').value='1';
-  } else {
-    sb.from('tour_hotels').select('*').eq('id',id).single().then(({data:h})=>{
-      if (!h) return;
-      document.getElementById('ho-id').value=h.id;
-      document.getElementById('ho-name').value=h.name||'';
-      document.getElementById('ho-grade').value=h.grade||'';
-      document.getElementById('ho-price').value=h.price||0;
-      document.getElementById('ho-per').value=h.per||'pax';
-      document.getElementById('ho-desc').value=h.desc_ko||'';
-      document.getElementById('ho-image').value=h.image||'';
-      document.getElementById('ho-order').value=h.sort_order||0;
-      document.getElementById('ho-active').value=h.is_active?'1':'0';
-    });
-  }
-  document.getElementById('hotel-modal-bg').classList.add('open');
-}
-function closeHotelPoolModal(e) {
-  if (e && e.target !== document.getElementById('hotel-modal-bg')) return;
-  document.getElementById('hotel-modal-bg').classList.remove('open');
-}
-async function saveHotelPool() {
-  const id = document.getElementById('ho-id').value;
-  const name = document.getElementById('ho-name').value.trim();
-  if (!name) { toast('호텔명을 입력하세요','error'); return; }
-  const payload = {
-    name, grade: document.getElementById('ho-grade').value.trim()||null,
-    price: parseInt(document.getElementById('ho-price').value)||0,
-    per: document.getElementById('ho-per').value,
-    desc_ko: document.getElementById('ho-desc').value.trim()||null,
-    image: document.getElementById('ho-image').value.trim()||null,
-    sort_order: parseInt(document.getElementById('ho-order').value)||0,
-    is_active: document.getElementById('ho-active').value==='1',
-    updated_at: new Date().toISOString(),
-  };
-  const { error } = id ? await sb.from('tour_hotels').update(payload).eq('id',id) : await sb.from('tour_hotels').insert(payload);
-  if (error) { toast('저장 실패: '+error.message,'error'); return; }
-  toast(id?'수정되었습니다':'추가되었습니다','success'); closeHotelPoolModal(); loadHotelPool();
-}
-async function deleteHotelPool(id) {
-  if (!confirm('삭제하시겠습니까?')) return;
-  const { error } = await sb.from('tour_hotels').delete().eq('id',id);
-  if (error) { toast('삭제 실패','error'); return; }
-  toast('삭제되었습니다'); loadHotelPool();
-}
-
-/* ───── 항공편 관리 (전역 공용) ───── */
-async function loadFlightPool() {
-  const { data } = await sb.from('tour_flights').select('*').order('sort_order');
-  document.getElementById('flights-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">로드 실패 (테이블이 없으면 lotocha_supabase_global_pools.sql 실행 필요)</td></tr>'
-    : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">등록된 항공편 없음</td></tr>'
-    : data.map(f=>`<tr>
-        <td style="font-weight:700">${f.name}</td>
-        <td>${f.location||'-'}</td>
-        <td>${f.time_desc||'-'}</td>
-        <td><span class="badge badge-${f.is_active?'live':'archived'}">${f.is_active?'활성':'비활성'}</span></td>
-        <td>${f.sort_order}</td>
-        <td><div class="act-btns"><button class="btn-edit" onclick="openFlightPoolModal('${f.id}')">편집</button>
-        <button class="btn-del" onclick="deleteFlightPool('${f.id}')">삭제</button></div></td></tr>`).join('');
-}
-function openFlightPoolModal(id) {
-  document.getElementById('flight-modal-title').textContent = id ? '항공편 편집' : '항공편 추가';
-  const flds = ['fl2-id','fl2-name','fl2-location','fl2-time','fl2-desc','fl2-image'];
-  if (!id) {
-    flds.forEach(f=>document.getElementById(f).value='');
-    document.getElementById('fl2-order').value='0'; document.getElementById('fl2-active').value='1';
-  } else {
-    sb.from('tour_flights').select('*').eq('id',id).single().then(({data:f})=>{
-      if (!f) return;
-      document.getElementById('fl2-id').value=f.id;
-      document.getElementById('fl2-name').value=f.name||'';
-      document.getElementById('fl2-location').value=f.location||'';
-      document.getElementById('fl2-time').value=f.time_desc||'';
-      document.getElementById('fl2-desc').value=f.desc_ko||'';
-      document.getElementById('fl2-image').value=f.image||'';
-      document.getElementById('fl2-order').value=f.sort_order||0;
-      document.getElementById('fl2-active').value=f.is_active?'1':'0';
-    });
-  }
-  document.getElementById('flight-modal-bg').classList.add('open');
-}
-function closeFlightPoolModal(e) {
-  if (e && e.target !== document.getElementById('flight-modal-bg')) return;
-  document.getElementById('flight-modal-bg').classList.remove('open');
-}
-async function saveFlightPool() {
-  const id = document.getElementById('fl2-id').value;
-  const name = document.getElementById('fl2-name').value.trim();
-  if (!name) { toast('노선명을 입력하세요','error'); return; }
-  const payload = {
-    name, location: document.getElementById('fl2-location').value.trim()||null,
-    time_desc: document.getElementById('fl2-time').value.trim()||null,
-    desc_ko: document.getElementById('fl2-desc').value.trim()||null,
-    image: document.getElementById('fl2-image').value.trim()||null,
-    sort_order: parseInt(document.getElementById('fl2-order').value)||0,
-    is_active: document.getElementById('fl2-active').value==='1',
-    updated_at: new Date().toISOString(),
-  };
-  const { error } = id ? await sb.from('tour_flights').update(payload).eq('id',id) : await sb.from('tour_flights').insert(payload);
-  if (error) { toast('저장 실패: '+error.message,'error'); return; }
-  toast(id?'수정되었습니다':'추가되었습니다','success'); closeFlightPoolModal(); loadFlightPool();
-}
-async function deleteFlightPool(id) {
-  if (!confirm('삭제하시겠습니까?')) return;
-  const { error } = await sb.from('tour_flights').delete().eq('id',id);
-  if (error) { toast('삭제 실패','error'); return; }
-  toast('삭제되었습니다'); loadFlightPool();
-}
-
-/* ───── 명소 관리 (전역 공용) ───── */
-const ATTR_CAT_LABELS = {large:'대형',feature:'특색',local:'인문'};
-async function loadAttractionPool() {
-  const { data } = await sb.from('tour_attractions').select('*').order('sort_order');
-  document.getElementById('attractions-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">로드 실패 (테이블이 없으면 lotocha_supabase_global_pools.sql 실행 필요)</td></tr>'
-    : !data.length ? '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:20px">등록된 명소 없음</td></tr>'
-    : data.map(a=>`<tr>
-        <td style="font-family:monospace;font-size:12px">${a.key}</td>
-        <td style="font-weight:700">${a.label}</td>
-        <td>${ATTR_CAT_LABELS[a.cat]||a.cat}</td>
-        <td><span class="badge badge-${a.is_active?'live':'archived'}">${a.is_active?'활성':'비활성'}</span></td>
-        <td>${a.sort_order}</td>
-        <td><div class="act-btns"><button class="btn-edit" onclick="openAttractionPoolModal('${a.id}')">편집</button>
-        <button class="btn-del" onclick="deleteAttractionPool('${a.id}')">삭제</button></div></td></tr>`).join('');
-}
-function openAttractionPoolModal(id) {
-  document.getElementById('attraction-modal-title').textContent = id ? '명소 편집' : '명소 추가';
-  const flds = ['at-id','at-key','at-label','at-desc','at-image'];
-  if (!id) {
-    flds.forEach(f=>document.getElementById(f).value='');
-    document.getElementById('at-cat').value='feature';
-    document.getElementById('at-order').value='0'; document.getElementById('at-active').value='1';
-  } else {
-    sb.from('tour_attractions').select('*').eq('id',id).single().then(({data:a})=>{
-      if (!a) return;
-      document.getElementById('at-id').value=a.id;
-      document.getElementById('at-key').value=a.key||'';
-      document.getElementById('at-label').value=a.label||'';
-      document.getElementById('at-cat').value=a.cat||'feature';
-      document.getElementById('at-desc').value=a.desc_ko||'';
-      document.getElementById('at-image').value=a.image||'';
-      document.getElementById('at-order').value=a.sort_order||0;
-      document.getElementById('at-active').value=a.is_active?'1':'0';
-    });
-  }
-  document.getElementById('attraction-modal-bg').classList.add('open');
-}
-function closeAttractionPoolModal(e) {
-  if (e && e.target !== document.getElementById('attraction-modal-bg')) return;
-  document.getElementById('attraction-modal-bg').classList.remove('open');
-}
-async function saveAttractionPool() {
-  const id = document.getElementById('at-id').value;
-  const key = document.getElementById('at-key').value.trim();
-  const label = document.getElementById('at-label').value.trim();
-  if (!key || !label) { toast('key와 라벨을 입력하세요','error'); return; }
-  const payload = {
-    key, label, cat: document.getElementById('at-cat').value,
-    desc_ko: document.getElementById('at-desc').value.trim()||null,
-    image: document.getElementById('at-image').value.trim()||null,
-    sort_order: parseInt(document.getElementById('at-order').value)||0,
-    is_active: document.getElementById('at-active').value==='1',
-    updated_at: new Date().toISOString(),
-  };
-  const { error } = id ? await sb.from('tour_attractions').update(payload).eq('id',id) : await sb.from('tour_attractions').insert(payload);
-  if (error) { toast('저장 실패: '+error.message,'error'); return; }
-  toast(id?'수정되었습니다':'추가되었습니다','success'); closeAttractionPoolModal(); loadAttractionPool();
-}
-async function deleteAttractionPool(id) {
-  if (!confirm('삭제하시겠습니까?')) return;
-  const { error } = await sb.from('tour_attractions').delete().eq('id',id);
-  if (error) { toast('삭제 실패','error'); return; }
-  toast('삭제되었습니다'); loadAttractionPool();
-}
-
-/* 일정 입력 힌트 (패키지는 명소 풀에서 key 목록을 동적으로 불러와 표시) */
-async function updateItinHint() {
+/* 맞춤투어 명소 풀 (tour.html의 ATTRACTION_POOL과 동일 — 일정 입력 시 참고용) */
+const ATTRACTION_POOL_KEYS = {
+  large: ['tianmen(천문산)','forest_east(국가삼림공원 동문A·B선)','grand_canyon(장가계대협곡)','furong(부용진)','fenghuang(봉황고성)'],
+  feature: ['baofeng(보봉호)','huanglong(황룡동)','qixing(칠성산)','tujia(토가족풍정원)','forest_south(국가삼림공원 남문-황석채)','jinbianxi(금편계트레킹)'],
+  local: ['qiqilou(72기루)','supermarket(현지대형마트)','cafe(현지특색카페)'],
+};
+function updateItinHint() {
   const isPkg = document.getElementById('t-type').value === 'package';
   document.getElementById('t-itin-label').textContent = isPkg ? '일정 (itinerary, 참고용 추천 일정)' : '일정 (itinerary, 참고용)';
   document.getElementById('t-itinerary').placeholder = isPkg
     ? '1|am|tianmen\n1|evening|qiqilou\n2|am|grand_canyon\n2|pm|huanglong\n3|evening|supermarket\n3|evening|cafe'
     : '09:00|호텔 픽업 후 출발\n09:30|황룡동 입장 및 유람선 체험\n11:00|점심 식사';
-  if (!isPkg) {
-    document.getElementById('t-itin-hint').innerHTML = '한 줄에 "시간|내용" 형식으로 입력 (줄바꿈 구분)';
-    return;
-  }
-  document.getElementById('t-itin-hint').innerHTML = '한 줄에 "일차|시간대|명소key" 형식 (시간대: am/pm/evening). 대형은 am 또는 pm 중 1개만, 같은 날 대형 중복 불가 / 특색은 am·pm 자유 / 인문은 시간대 무관·중복 가능. 명소 key 목록 불러오는 중...';
-  const { data } = await sb.from('tour_attractions').select('key,label,cat').order('sort_order');
-  if (!data) return;
-  const byCat = {large:[],feature:[],local:[]};
-  data.forEach(a=>{ (byCat[a.cat]||byCat.feature).push(`${a.key}(${a.label})`); });
-  document.getElementById('t-itin-hint').innerHTML = `한 줄에 "일차|시간대|명소key" 형식 (시간대: am/pm/evening). 대형은 am 또는 pm 중 1개만, 같은 날 대형 중복 불가 / 특색은 am·pm 자유 / 인문은 시간대 무관·중복 가능.<br>대형: ${byCat.large.join(', ')||'(없음)'}<br>특색: ${byCat.feature.join(', ')||'(없음)'}<br>인문: ${byCat.local.join(', ')||'(없음)'}<br>※ key 목록은 좌측 메뉴 "명소 관리"에서 추가/수정할 수 있습니다`;
+  document.getElementById('t-itin-hint').innerHTML = isPkg
+    ? `한 줄에 "일차|시간대|명소key" 형식 (시간대: am/pm/evening). 대형은 am 또는 pm 중 1개만, 같은 날 대형 중복 불가 / 특색은 am·pm 자유 / 인문은 시간대 무관·중복 가능.<br>대형: ${ATTRACTION_POOL_KEYS.large.join(', ')}<br>특색: ${ATTRACTION_POOL_KEYS.feature.join(', ')}<br>인문: ${ATTRACTION_POOL_KEYS.local.join(', ')}`
+    : '한 줄에 "시간|내용" 형식으로 입력 (줄바꿈 구분)';
 }
 
 function openTourModal(id) {
@@ -1051,6 +1198,8 @@ function openTourModal(id) {
   const clear = () => ['t-id','t-title-ko','t-title-cn','t-subtitle','t-desc','t-price-krw','t-price-cny','t-images','t-highlights','t-includes','t-excludes','t-itinerary'].forEach(f=>document.getElementById(f).value='');
   document.getElementById('t-tiers-list').innerHTML = '';
   document.getElementById('t-opts-list').innerHTML = '';
+  document.getElementById('t-hotels-list').innerHTML = '';
+  document.getElementById('t-flights-list').innerHTML = '';
   if (!id) {
     clear();
     document.getElementById('t-type').value='day_tour'; document.getElementById('t-status').value='live';
@@ -1078,8 +1227,12 @@ function openTourModal(id) {
       updateItinHint();
       const tl = document.getElementById('t-tiers-list');
       const ol = document.getElementById('t-opts-list');
+      const hl = document.getElementById('t-hotels-list');
+      const fl = document.getElementById('t-flights-list');
       (p.price_tiers||[]).forEach(t=>tl.appendChild(renderTierRow(t)));
       (p.tour_options||[]).forEach(o=>ol.appendChild(renderOptRow(o)));
+      (p.hotel_options||[]).forEach(h=>hl.appendChild(renderHotelRow(h)));
+      (p.flight_options||[]).forEach(f=>fl.appendChild(renderFlightRow(f)));
     });
   }
   document.getElementById('tour-modal-bg').classList.add('open');
@@ -1111,6 +1264,8 @@ async function saveTour() {
       : linesToItin(document.getElementById('t-itinerary').value),
     price_tiers: collectTiers(),
     tour_options: collectOpts(),
+    hotel_options: collectHotels(),
+    flight_options: collectFlights(),
     updated_at: new Date().toISOString(),
   };
   if (!payload.title_ko) { toast('상품명을 입력하세요','error'); return; }
@@ -1138,9 +1293,10 @@ async function loadSpots() {
 function openSpotModal(id) {
   document.getElementById('spot-modal-title').textContent = id ? '스팟 편집' : '스팟 추가';
   if (!id) {
-    ['s-id','s-id-orig','s-zone','s-name-ko','s-name-cn','s-lat','s-lon','s-gaode','s-images','s-video-url','s-desc','s-tip','s-hours','s-price'].forEach(f=>document.getElementById(f).value='');
+    ['s-id','s-id-orig','s-zone','s-name-ko','s-name-cn','s-lat','s-lon','s-gaode','s-video-url','s-desc','s-tip','s-hours','s-price'].forEach(f=>document.getElementById(f).value='');
     document.getElementById('s-attr').value='forest'; document.getElementById('s-type').value='landmark';
     document.getElementById('s-order').value='0'; document.getElementById('s-status').value='live';
+    setThumbWidget('s-img', []);
   } else {
     sb.from('guide_spots').select('*').eq('id',id).single().then(({data:s})=>{
       if (!s) return;
@@ -1149,7 +1305,7 @@ function openSpotModal(id) {
       document.getElementById('s-type').value=s.type; document.getElementById('s-name-ko').value=s.name_ko||'';
       document.getElementById('s-name-cn').value=s.name_cn||''; document.getElementById('s-lat').value=s.lat||'';
       document.getElementById('s-lon').value=s.lon||''; document.getElementById('s-gaode').value=s.gaode_uri||'';
-      document.getElementById('s-images').value=arrToLines(s.images); document.getElementById('s-video-url').value=s.video_url||''; document.getElementById('s-desc').value=s.desc_ko||'';
+      setThumbWidget('s-img', s.images); document.getElementById('s-video-url').value=s.video_url||''; document.getElementById('s-desc').value=s.desc_ko||'';
       document.getElementById('s-tip').value=s.tip_ko||''; document.getElementById('s-hours').value=s.hours||'';
       document.getElementById('s-price').value=s.price||''; document.getElementById('s-order').value=s.sort_order||0;
       document.getElementById('s-status').value=s.status||'live';
@@ -1174,7 +1330,7 @@ async function saveSpot() {
     lat: parseFloat(document.getElementById('s-lat').value)||null,
     lon: parseFloat(document.getElementById('s-lon').value)||null,
     gaode_uri: document.getElementById('s-gaode').value.trim()||null,
-    images: linesToArr(document.getElementById('s-images').value),
+    images: thumbGetArr('s-img'),
     video_url: document.getElementById('s-video-url').value.trim()||null,
     desc_ko: document.getElementById('s-desc').value.trim()||null,
     tip_ko: document.getElementById('s-tip').value.trim()||null,
@@ -1274,13 +1430,14 @@ async function loadPlaces() {
 
 function openPlaceModal(id) {
   document.getElementById('place-modal-title').textContent = id ? '업체 편집' : '업체 추가';
-  const flds = ['pl-id','pl-name-ko','pl-name-cn','pl-address','pl-phone','pl-wechat','pl-hours','pl-price-range','pl-lat','pl-lon','pl-gaode','pl-images','pl-desc','pl-tags'];
+  const flds = ['pl-id','pl-name-ko','pl-name-cn','pl-address','pl-phone','pl-wechat','pl-hours','pl-price-range','pl-lat','pl-lon','pl-gaode','pl-desc','pl-tags'];
   if (!id) {
     flds.forEach(f=>document.getElementById(f).value='');
     document.getElementById('pl-cat').value='restaurant';
     document.getElementById('pl-area').value='시내';
     document.getElementById('pl-order').value='0';
     document.getElementById('pl-active').value='1';
+    setThumbWidget('pl-img', []);
   } else {
     sb.from('local_places').select('*').eq('id',id).single().then(({data:p})=>{
       if (!p) return;
@@ -1297,7 +1454,7 @@ function openPlaceModal(id) {
       document.getElementById('pl-lat').value=p.lat||'';
       document.getElementById('pl-lon').value=p.lon||'';
       document.getElementById('pl-gaode').value=p.gaode_uri||'';
-      document.getElementById('pl-images').value=arrToLines(p.images);
+      setThumbWidget('pl-img', p.images);
       document.getElementById('pl-desc').value=p.desc_ko||'';
       document.getElementById('pl-tags').value=(p.tags||[]).join(', ');
       document.getElementById('pl-order').value=p.sort_order||0;
@@ -1328,7 +1485,7 @@ async function savePlace() {
     lat: parseFloat(document.getElementById('pl-lat').value)||null,
     lon: parseFloat(document.getElementById('pl-lon').value)||null,
     gaode_uri: document.getElementById('pl-gaode').value.trim()||null,
-    images: linesToArr(document.getElementById('pl-images').value),
+    images: thumbGetArr('pl-img'),
     desc_ko: document.getElementById('pl-desc').value.trim()||null,
     tags: tagsRaw ? tagsRaw.split(',').map(t=>t.trim()).filter(Boolean) : [],
     sort_order: parseInt(document.getElementById('pl-order').value)||0,
@@ -1344,6 +1501,392 @@ async function deletePlace(id) {
   const { error } = await sb.from('local_places').delete().eq('id',id);
   if (error) { toast('삭제 실패','error'); return; }
   toast('삭제되었습니다'); loadPlaces();
+}
+
+/* ───── 공연·입장권 (guide_shows_tickets) ───── */
+async function loadST() {
+  const { data } = await sb.from('guide_shows_tickets').select('*').order('sort_order');
+  document.getElementById('st-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">로드 실패</td></tr>'
+    : data.map(s=>`<tr>
+        <td>${s.kind==='show'?'공연':'입장권'}</td><td style="font-weight:700">${s.title_ko}</td><td>${s.price_info||''}</td>
+        <td><span class="badge ${s.is_active?'badge-live':'badge-draft'}">${s.is_active?'활성':'비활성'}</span></td><td>${s.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openSTModal('${s.id}')">편집</button>
+        <button class="btn-del" onclick="deleteST('${s.id}')">삭제</button></div></td></tr>`).join('');
+}
+function openSTModal(id) {
+  document.getElementById('st-modal-title').textContent = id ? '항목 편집' : '항목 추가';
+  document.getElementById('st-id').value = id||'';
+  if (!id) {
+    document.getElementById('st-kind').value='show'; document.getElementById('st-active').value='1';
+    ['st-title','st-subtitle','st-time','st-price','st-links'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('st-order').value='0';
+  } else {
+    sb.from('guide_shows_tickets').select('*').eq('id',id).single().then(({data:s})=>{
+      if (!s) return;
+      document.getElementById('st-kind').value=s.kind; document.getElementById('st-active').value=s.is_active?'1':'0';
+      document.getElementById('st-title').value=s.title_ko||''; document.getElementById('st-subtitle').value=s.subtitle_ko||'';
+      document.getElementById('st-time').value=s.time_info||''; document.getElementById('st-price').value=s.price_info||'';
+      document.getElementById('st-links').value=linksToLines(s.links); document.getElementById('st-order').value=s.sort_order||0;
+    });
+  }
+  document.getElementById('st-modal-bg').classList.add('open');
+}
+function closeSTModal(e) { if (e && e.target !== document.getElementById('st-modal-bg')) return; document.getElementById('st-modal-bg').classList.remove('open'); }
+async function saveST() {
+  const id = document.getElementById('st-id').value;
+  const title = document.getElementById('st-title').value.trim();
+  if (!title) { toast('제목을 입력하세요','error'); return; }
+  const payload = {
+    kind: document.getElementById('st-kind').value,
+    title_ko: title,
+    subtitle_ko: document.getElementById('st-subtitle').value.trim()||'',
+    time_info: document.getElementById('st-time').value.trim()||'',
+    price_info: document.getElementById('st-price').value.trim()||'',
+    links: linesToLinks(document.getElementById('st-links').value),
+    sort_order: parseInt(document.getElementById('st-order').value)||0,
+    is_active: document.getElementById('st-active').value==='1',
+  };
+  const { error } = id ? await sb.from('guide_shows_tickets').update(payload).eq('id',id) : await sb.from('guide_shows_tickets').insert(payload);
+  if (error) { toast('저장 실패: '+error.message,'error'); return; }
+  toast(id?'수정되었습니다':'추가되었습니다','success'); closeSTModal(); loadST();
+}
+async function deleteST(id) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  const { error } = await sb.from('guide_shows_tickets').delete().eq('id',id);
+  if (error) { toast('삭제 실패','error'); return; }
+  toast('삭제되었습니다'); loadST();
+}
+
+/* ───── 결제 방법 (guide_payment_methods) ───── */
+async function loadPM() {
+  const { data } = await sb.from('guide_payment_methods').select('*').order('sort_order');
+  document.getElementById('pm-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">로드 실패</td></tr>'
+    : data.map(m=>`<tr>
+        <td>${m.method_key}</td><td style="font-weight:700">${m.logo_emoji||''} ${m.name_ko}</td>
+        <td><span class="badge ${m.is_active?'badge-live':'badge-draft'}">${m.is_active?'활성':'비활성'}</span></td><td>${m.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openPMModal('${m.id}')">편집</button>
+        <button class="btn-del" onclick="deletePM('${m.id}')">삭제</button></div></td></tr>`).join('');
+}
+function openPMModal(id) {
+  document.getElementById('pm-modal-title').textContent = id ? '결제 방법 편집' : '결제 방법 추가';
+  document.getElementById('pm-id-orig').value = id||'';
+  if (!id) {
+    document.getElementById('pm-active').value='1';
+    ['pm-key','pm-name','pm-subtitle','pm-emoji','pm-bg','pm-steps','pm-note','pm-link-label','pm-link-url'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('pm-order').value='0';
+  } else {
+    sb.from('guide_payment_methods').select('*').eq('id',id).single().then(({data:m})=>{
+      if (!m) return;
+      document.getElementById('pm-key').value=m.method_key; document.getElementById('pm-active').value=m.is_active?'1':'0';
+      document.getElementById('pm-name').value=m.name_ko||''; document.getElementById('pm-subtitle').value=m.subtitle_ko||'';
+      document.getElementById('pm-emoji').value=m.logo_emoji||''; document.getElementById('pm-bg').value=m.logo_bg||'';
+      document.getElementById('pm-steps').value=arrToLines(m.steps); document.getElementById('pm-note').value=m.note_html||'';
+      document.getElementById('pm-link-label').value=m.link_label||''; document.getElementById('pm-link-url').value=m.link_url||'';
+      document.getElementById('pm-order').value=m.sort_order||0;
+    });
+  }
+  document.getElementById('pm-modal-bg').classList.add('open');
+}
+function closePMModal(e) { if (e && e.target !== document.getElementById('pm-modal-bg')) return; document.getElementById('pm-modal-bg').classList.remove('open'); }
+async function savePM() {
+  const origId = document.getElementById('pm-id-orig').value;
+  const key = document.getElementById('pm-key').value.trim();
+  const name = document.getElementById('pm-name').value.trim();
+  if (!key || !name) { toast('키와 이름을 입력하세요','error'); return; }
+  const payload = {
+    method_key: key, name_ko: name,
+    subtitle_ko: document.getElementById('pm-subtitle').value.trim()||'',
+    logo_emoji: document.getElementById('pm-emoji').value.trim()||'💳',
+    logo_bg: document.getElementById('pm-bg').value.trim()||'#f5f5f5',
+    steps: linesToArr(document.getElementById('pm-steps').value),
+    note_html: document.getElementById('pm-note').value.trim()||'',
+    link_label: document.getElementById('pm-link-label').value.trim()||'',
+    link_url: document.getElementById('pm-link-url').value.trim()||'',
+    sort_order: parseInt(document.getElementById('pm-order').value)||0,
+    is_active: document.getElementById('pm-active').value==='1',
+  };
+  const { error } = origId ? await sb.from('guide_payment_methods').update(payload).eq('id',origId) : await sb.from('guide_payment_methods').insert(payload);
+  if (error) { toast('저장 실패: '+error.message,'error'); return; }
+  toast(origId?'수정되었습니다':'추가되었습니다','success'); closePMModal(); loadPM();
+}
+async function deletePM(id) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  const { error } = await sb.from('guide_payment_methods').delete().eq('id',id);
+  if (error) { toast('삭제 실패','error'); return; }
+  toast('삭제되었습니다'); loadPM();
+}
+
+/* ───── 안전·응급 (guide_emergency_info) ───── */
+const EI_SECTION_LABEL = {phone:'긴급 전화', hospital:'병원·영사관', connectivity:'인터넷·VPN'};
+async function loadEI() {
+  const { data } = await sb.from('guide_emergency_info').select('*').order('section').order('sort_order');
+  document.getElementById('ei-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">로드 실패</td></tr>'
+    : data.map(e=>`<tr>
+        <td>${EI_SECTION_LABEL[e.section]||e.section}</td><td style="font-weight:700">${e.label}</td><td>${e.value}</td>
+        <td><span class="badge ${e.is_active?'badge-live':'badge-draft'}">${e.is_active?'활성':'비활성'}</span></td><td>${e.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openEIModal('${e.id}')">편집</button>
+        <button class="btn-del" onclick="deleteEI('${e.id}')">삭제</button></div></td></tr>`).join('');
+}
+function openEIModal(id) {
+  document.getElementById('ei-modal-title').textContent = id ? '항목 편집' : '항목 추가';
+  document.getElementById('ei-id').value = id||'';
+  if (!id) {
+    document.getElementById('ei-section').value='phone'; document.getElementById('ei-active').value='1';
+    document.getElementById('ei-label').value=''; document.getElementById('ei-value').value=''; document.getElementById('ei-order').value='0';
+  } else {
+    sb.from('guide_emergency_info').select('*').eq('id',id).single().then(({data:e})=>{
+      if (!e) return;
+      document.getElementById('ei-section').value=e.section; document.getElementById('ei-active').value=e.is_active?'1':'0';
+      document.getElementById('ei-label').value=e.label||''; document.getElementById('ei-value').value=e.value||'';
+      document.getElementById('ei-order').value=e.sort_order||0;
+    });
+  }
+  document.getElementById('ei-modal-bg').classList.add('open');
+}
+function closeEIModal(e) { if (e && e.target !== document.getElementById('ei-modal-bg')) return; document.getElementById('ei-modal-bg').classList.remove('open'); }
+async function saveEI() {
+  const id = document.getElementById('ei-id').value;
+  const label = document.getElementById('ei-label').value.trim();
+  const value = document.getElementById('ei-value').value.trim();
+  if (!label || !value) { toast('라벨과 값을 입력하세요','error'); return; }
+  const payload = {
+    section: document.getElementById('ei-section').value, label, value,
+    sort_order: parseInt(document.getElementById('ei-order').value)||0,
+    is_active: document.getElementById('ei-active').value==='1',
+  };
+  const { error } = id ? await sb.from('guide_emergency_info').update(payload).eq('id',id) : await sb.from('guide_emergency_info').insert(payload);
+  if (error) { toast('저장 실패: '+error.message,'error'); return; }
+  toast(id?'수정되었습니다':'추가되었습니다','success'); closeEIModal(); loadEI();
+}
+async function deleteEI(id) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  const { error } = await sb.from('guide_emergency_info').delete().eq('id',id);
+  if (error) { toast('삭제 실패','error'); return; }
+  toast('삭제되었습니다'); loadEI();
+}
+
+/* ───── 현지 회화 (guide_phrases) ───── */
+async function loadPH() {
+  const { data } = await sb.from('guide_phrases').select('*').order('category').order('sort_order');
+  document.getElementById('ph-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">로드 실패</td></tr>'
+    : data.map(p=>`<tr>
+        <td>${p.category}</td><td style="font-weight:700">${p.phrase_cn}</td><td>${p.phrase_ko}</td>
+        <td><span class="badge ${p.is_active?'badge-live':'badge-draft'}">${p.is_active?'활성':'비활성'}</span></td><td>${p.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openPHModal('${p.id}')">편집</button>
+        <button class="btn-del" onclick="deletePH('${p.id}')">삭제</button></div></td></tr>`).join('');
+}
+function openPHModal(id) {
+  document.getElementById('ph-modal-title').textContent = id ? '문구 편집' : '문구 추가';
+  document.getElementById('ph-id').value = id||'';
+  if (!id) {
+    document.getElementById('ph-active').value='1';
+    ['ph-category','ph-cn','ph-py','ph-ko'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('ph-order').value='0';
+  } else {
+    sb.from('guide_phrases').select('*').eq('id',id).single().then(({data:p})=>{
+      if (!p) return;
+      document.getElementById('ph-category').value=p.category||''; document.getElementById('ph-active').value=p.is_active?'1':'0';
+      document.getElementById('ph-cn').value=p.phrase_cn||''; document.getElementById('ph-py').value=p.pinyin||'';
+      document.getElementById('ph-ko').value=p.phrase_ko||''; document.getElementById('ph-order').value=p.sort_order||0;
+    });
+  }
+  document.getElementById('ph-modal-bg').classList.add('open');
+}
+function closePHModal(e) { if (e && e.target !== document.getElementById('ph-modal-bg')) return; document.getElementById('ph-modal-bg').classList.remove('open'); }
+async function savePH() {
+  const id = document.getElementById('ph-id').value;
+  const cn = document.getElementById('ph-cn').value.trim();
+  const ko = document.getElementById('ph-ko').value.trim();
+  if (!cn || !ko) { toast('중국어와 한국어를 입력하세요','error'); return; }
+  const payload = {
+    category: document.getElementById('ph-category').value.trim()||'기본',
+    phrase_cn: cn, pinyin: document.getElementById('ph-py').value.trim()||'', phrase_ko: ko,
+    sort_order: parseInt(document.getElementById('ph-order').value)||0,
+    is_active: document.getElementById('ph-active').value==='1',
+  };
+  const { error } = id ? await sb.from('guide_phrases').update(payload).eq('id',id) : await sb.from('guide_phrases').insert(payload);
+  if (error) { toast('저장 실패: '+error.message,'error'); return; }
+  toast(id?'수정되었습니다':'추가되었습니다','success'); closePHModal(); loadPH();
+}
+async function deletePH(id) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  const { error } = await sb.from('guide_phrases').delete().eq('id',id);
+  if (error) { toast('삭제 실패','error'); return; }
+  toast('삭제되었습니다'); loadPH();
+}
+
+/* ───── 여행 팁 (guide_tips) ───── */
+async function loadTP() {
+  const { data } = await sb.from('guide_tips').select('*').order('attr_id').order('sort_order');
+  document.getElementById('tp-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">로드 실패</td></tr>'
+    : data.map(t=>`<tr>
+        <td>${ATTR_LABELS[t.attr_id]||t.attr_id}</td><td style="font-weight:700">${t.tip_text}</td>
+        <td><span class="badge ${t.is_active?'badge-live':'badge-draft'}">${t.is_active?'활성':'비활성'}</span></td><td>${t.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openTPModal('${t.id}')">편집</button>
+        <button class="btn-del" onclick="deleteTP('${t.id}')">삭제</button></div></td></tr>`).join('');
+}
+function openTPModal(id) {
+  document.getElementById('tp-modal-title').textContent = id ? '팁 편집' : '팁 추가';
+  document.getElementById('tp-id').value = id||'';
+  if (!id) {
+    document.getElementById('tp-attr').value='forest'; document.getElementById('tp-active').value='1';
+    document.getElementById('tp-text').value=''; document.getElementById('tp-order').value='0';
+  } else {
+    sb.from('guide_tips').select('*').eq('id',id).single().then(({data:t})=>{
+      if (!t) return;
+      document.getElementById('tp-attr').value=t.attr_id; document.getElementById('tp-active').value=t.is_active?'1':'0';
+      document.getElementById('tp-text').value=t.tip_text||''; document.getElementById('tp-order').value=t.sort_order||0;
+    });
+  }
+  document.getElementById('tp-modal-bg').classList.add('open');
+}
+function closeTPModal(e) { if (e && e.target !== document.getElementById('tp-modal-bg')) return; document.getElementById('tp-modal-bg').classList.remove('open'); }
+async function saveTP() {
+  const id = document.getElementById('tp-id').value;
+  const text = document.getElementById('tp-text').value.trim();
+  if (!text) { toast('내용을 입력하세요','error'); return; }
+  const payload = {
+    attr_id: document.getElementById('tp-attr').value, tip_text: text,
+    sort_order: parseInt(document.getElementById('tp-order').value)||0,
+    is_active: document.getElementById('tp-active').value==='1',
+  };
+  const { error } = id ? await sb.from('guide_tips').update(payload).eq('id',id) : await sb.from('guide_tips').insert(payload);
+  if (error) { toast('저장 실패: '+error.message,'error'); return; }
+  toast(id?'수정되었습니다':'추가되었습니다','success'); closeTPModal(); loadTP();
+}
+async function deleteTP(id) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  const { error } = await sb.from('guide_tips').delete().eq('id',id);
+  if (error) { toast('삭제 실패','error'); return; }
+  toast('삭제되었습니다'); loadTP();
+}
+
+/* ───── 지역 (guide_regions) ───── */
+async function loadRG() {
+  const { data } = await sb.from('guide_regions').select('*').order('sort_order');
+  document.getElementById('rg-tbody').innerHTML = !data ? '<tr><td colspan="4" style="color:var(--red)">로드 실패</td></tr>'
+    : data.map(r=>`<tr>
+        <td style="font-weight:700">${r.name_ko}</td>
+        <td><span class="badge ${r.is_active?'badge-live':'badge-draft'}">${r.is_active?'활성':'비활성'}</span></td><td>${r.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openRGModal('${r.id}')">편집</button>
+        <button class="btn-del" onclick="deleteRG('${r.id}')">삭제</button></div></td></tr>`).join('');
+}
+function openRGModal(id) {
+  document.getElementById('rg-modal-title').textContent = id ? '지역 편집' : '지역 추가';
+  document.getElementById('rg-id').value = id||'';
+  if (!id) { document.getElementById('rg-name').value=''; document.getElementById('rg-order').value='0'; document.getElementById('rg-active').value='1'; }
+  else {
+    sb.from('guide_regions').select('*').eq('id',id).single().then(({data:r})=>{
+      if (!r) return;
+      document.getElementById('rg-name').value=r.name_ko||''; document.getElementById('rg-order').value=r.sort_order||0;
+      document.getElementById('rg-active').value=r.is_active?'1':'0';
+    });
+  }
+  document.getElementById('rg-modal-bg').classList.add('open');
+}
+function closeRGModal(e) { if (e && e.target !== document.getElementById('rg-modal-bg')) return; document.getElementById('rg-modal-bg').classList.remove('open'); }
+async function saveRG() {
+  const id = document.getElementById('rg-id').value;
+  const name = document.getElementById('rg-name').value.trim();
+  if (!name) { toast('이름을 입력하세요','error'); return; }
+  const payload = { name_ko:name, sort_order: parseInt(document.getElementById('rg-order').value)||0, is_active: document.getElementById('rg-active').value==='1' };
+  const { error } = id ? await sb.from('guide_regions').update(payload).eq('id',id) : await sb.from('guide_regions').insert(payload);
+  if (error) { toast('저장 실패: '+error.message,'error'); return; }
+  toast(id?'수정되었습니다':'추가되었습니다','success'); closeRGModal(); loadRG(); loadCategoryData();
+}
+async function deleteRG(id) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  const { error } = await sb.from('guide_regions').delete().eq('id',id);
+  if (error) { toast('삭제 실패','error'); return; }
+  toast('삭제되었습니다'); loadRG(); loadCategoryData();
+}
+
+/* ───── 업체 카테고리 (guide_place_categories) ───── */
+async function loadPC() {
+  const { data } = await sb.from('guide_place_categories').select('*').order('sort_order');
+  document.getElementById('pc-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">로드 실패</td></tr>'
+    : data.map(c=>`<tr>
+        <td>${c.cat_key}</td><td style="font-weight:700">${c.icon||''} ${c.name_ko}</td>
+        <td><span class="badge ${c.is_active?'badge-live':'badge-draft'}">${c.is_active?'활성':'비활성'}</span></td><td>${c.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openPCModal('${c.id}')">편집</button>
+        <button class="btn-del" onclick="deletePC('${c.id}')">삭제</button></div></td></tr>`).join('');
+}
+function openPCModal(id) {
+  document.getElementById('pc-modal-title').textContent = id ? '카테고리 편집' : '카테고리 추가';
+  document.getElementById('pc-id-orig').value = id||'';
+  if (!id) { ['pc-key','pc-name','pc-icon'].forEach(f=>document.getElementById(f).value=''); document.getElementById('pc-order').value='0'; document.getElementById('pc-active').value='1'; }
+  else {
+    sb.from('guide_place_categories').select('*').eq('id',id).single().then(({data:c})=>{
+      if (!c) return;
+      document.getElementById('pc-key').value=c.cat_key||''; document.getElementById('pc-name').value=c.name_ko||'';
+      document.getElementById('pc-icon').value=c.icon||''; document.getElementById('pc-order').value=c.sort_order||0;
+      document.getElementById('pc-active').value=c.is_active?'1':'0';
+    });
+  }
+  document.getElementById('pc-modal-bg').classList.add('open');
+}
+function closePCModal(e) { if (e && e.target !== document.getElementById('pc-modal-bg')) return; document.getElementById('pc-modal-bg').classList.remove('open'); }
+async function savePC() {
+  const origId = document.getElementById('pc-id-orig').value;
+  const key = document.getElementById('pc-key').value.trim();
+  const name = document.getElementById('pc-name').value.trim();
+  if (!key || !name) { toast('키와 이름을 입력하세요','error'); return; }
+  const payload = { cat_key:key, name_ko:name, icon: document.getElementById('pc-icon').value.trim()||'📍',
+    sort_order: parseInt(document.getElementById('pc-order').value)||0, is_active: document.getElementById('pc-active').value==='1' };
+  const { error } = origId ? await sb.from('guide_place_categories').update(payload).eq('id',origId) : await sb.from('guide_place_categories').insert(payload);
+  if (error) { toast('저장 실패: '+error.message,'error'); return; }
+  toast(origId?'수정되었습니다':'추가되었습니다','success'); closePCModal(); loadPC(); loadCategoryData();
+}
+async function deletePC(id) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  const { error } = await sb.from('guide_place_categories').delete().eq('id',id);
+  if (error) { toast('삭제 실패','error'); return; }
+  toast('삭제되었습니다'); loadPC(); loadCategoryData();
+}
+
+/* ───── 경관지 (guide_attractions) ───── */
+async function loadAT() {
+  const { data } = await sb.from('guide_attractions').select('*').order('sort_order');
+  document.getElementById('at-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">로드 실패</td></tr>'
+    : data.map(a=>`<tr>
+        <td>${a.attr_key}</td><td style="font-weight:700">${a.icon||''} ${a.name_ko}</td>
+        <td>${a.is_protected?'🔒 보호됨':'-'}</td>
+        <td><span class="badge ${a.is_active?'badge-live':'badge-draft'}">${a.is_active?'활성':'비활성'}</span></td><td>${a.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openATModal('${a.id}')">편집</button>
+        ${a.is_protected?'':`<button class="btn-del" onclick="deleteAT('${a.id}')">삭제</button>`}</div></td></tr>`).join('');
+}
+function openATModal(id) {
+  document.getElementById('at-modal-title').textContent = id ? '경관지 편집' : '경관지 추가';
+  document.getElementById('at-id-orig').value = id||'';
+  if (!id) { ['at-key','at-name','at-icon'].forEach(f=>document.getElementById(f).value=''); document.getElementById('at-order').value='0'; document.getElementById('at-active').value='1'; }
+  else {
+    sb.from('guide_attractions').select('*').eq('id',id).single().then(({data:a})=>{
+      if (!a) return;
+      document.getElementById('at-key').value=a.attr_key||''; document.getElementById('at-name').value=a.name_ko||'';
+      document.getElementById('at-icon').value=a.icon||''; document.getElementById('at-order').value=a.sort_order||0;
+      document.getElementById('at-active').value=a.is_active?'1':'0';
+      document.getElementById('at-key').disabled = !!a.is_protected;
+    });
+  }
+  document.getElementById('at-modal-bg').classList.add('open');
+}
+function closeATModal(e) { if (e && e.target !== document.getElementById('at-modal-bg')) return; document.getElementById('at-key').disabled=false; document.getElementById('at-modal-bg').classList.remove('open'); }
+async function saveAT() {
+  const origId = document.getElementById('at-id-orig').value;
+  const key = document.getElementById('at-key').value.trim();
+  const name = document.getElementById('at-name').value.trim();
+  if (!key || !name) { toast('키와 이름을 입력하세요','error'); return; }
+  const payload = { attr_key:key, name_ko:name, icon: document.getElementById('at-icon').value.trim()||'📍',
+    sort_order: parseInt(document.getElementById('at-order').value)||0, is_active: document.getElementById('at-active').value==='1' };
+  const { error } = origId ? await sb.from('guide_attractions').update(payload).eq('id',origId) : await sb.from('guide_attractions').insert(payload);
+  if (error) { toast('저장 실패: '+error.message,'error'); return; }
+  toast(origId?'수정되었습니다':'추가되었습니다','success'); closeATModal(); loadAT(); loadCategoryData();
+}
+async function deleteAT(id) {
+  if (!confirm('삭제하시겠습니까? (보호된 경관지는 삭제할 수 없습니다)')) return;
+  const { error } = await sb.from('guide_attractions').delete().eq('id',id);
+  if (error) { toast('삭제 실패: '+error.message,'error'); return; }
+  toast('삭제되었습니다'); loadAT(); loadCategoryData();
 }
 
 // 세션 자동 복원

@@ -384,43 +384,7 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
   <div class="card"><div class="ctitle">💡 여행 팁</div><div id="plan-tips"></div></div>
 
   <div class="helper-section-title">🎭 공연 · 입장권</div>
-  <div class="show-card">
-    <div class="show-title">매력상서 (魅力湘西)</div>
-    <div class="show-sub">후난 토가족·묘족 전통 민속 공연.</div>
-    <div class="show-info-row"><div class="show-label">시간</div><div class="show-val">매일 19:30 (약 80분)</div></div>
-    <div class="show-info-row"><div class="show-label">가격</div><div class="show-val">¥160~280</div></div>
-    <div class="local-btns" style="margin-top:12px">
-      <a href="https://kr.trip.com/attraction/buy/zhangjiajie-charming-xiangxi/" target="_blank" class="local-btn lb-gold">🎫 Trip.com</a>
-      <a href="https://experiences.myrealtrip.com/search?query=장가계+매력상서" target="_blank" class="local-btn lb-green">🎫 마이리얼트립</a>
-    </div>
-  </div>
-  <div class="show-card" style="margin-top:-5px">
-    <div class="show-title">천문호선 (天门狐仙)</div>
-    <div class="show-sub">천문산 절벽 야외 대형 공연.</div>
-    <div class="show-info-row"><div class="show-label">시간</div><div class="show-val">매일 20:00 (약 50분)</div></div>
-    <div class="show-info-row"><div class="show-label">가격</div><div class="show-val">¥180~380</div></div>
-    <div class="local-btns" style="margin-top:12px">
-      <a href="https://www.waug.com/ko/activities/143405" target="_blank" class="local-btn lb-gold">🎫 와그</a>
-      <a href="https://kr.trip.com/moments/theme/poi-tianmen-fox-fairy-93422-attraction-993137/" target="_blank" class="local-btn lb-green">🎫 Trip.com</a>
-    </div>
-  </div>
-  <div class="card">
-    <div class="local-item">
-      <div class="local-head"><div class="local-name">🌲 국가삼림공원</div><div class="local-price">¥236 (4일권)</div></div>
-      <div class="local-desc">여권 1개당 4일 재입장.</div>
-      <div class="local-btns"><a href="https://kr.trip.com/travel-guide/attraction/zhangjiajie/zhangjiajie-national-forest-park/" target="_blank" class="local-btn lb-gold">Trip.com</a></div>
-    </div>
-    <div class="local-item">
-      <div class="local-head"><div class="local-name">⛰️ 천문산 케이블카+입장</div><div class="local-price">¥268</div></div>
-      <div class="local-desc">온라인 예약 강력 추천.</div>
-      <div class="local-btns"><a href="https://experiences.myrealtrip.com/products/3887183" target="_blank" class="local-btn lb-gold">마이리얼트립</a></div>
-    </div>
-    <div class="local-item">
-      <div class="local-head"><div class="local-name">🌉 대협곡 유리다리</div><div class="local-price">¥216</div></div>
-      <div class="local-desc">1일 8,000명 제한. 사전 예약 필수.</div>
-      <div class="local-btns"><a href="https://kr.trip.com/travel-guide/attraction/zhangjiajie/zhangjiajie-grand-canyon/" target="_blank" class="local-btn lb-gold">Trip.com</a></div>
-    </div>
-  </div>
+  <div id="shows-tickets-list"></div>
 
   <div class="helper-section-title">🚄 고속철</div>
   <div class="train-card">
@@ -441,101 +405,20 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
   <div class="card" style="background:linear-gradient(135deg,#fff3cd,#fff8e1)">
     <div style="font-size:15px;color:#856404;line-height:1.8"><b>💡 중국 결제 TIP</b><br>카카오페이 > 알리페이 순으로 준비하세요.</div>
   </div>
-  <div class="pay-method" id="pay-kakao">
-    <div class="pay-head" onclick="togglePay('kakao')">
-      <div class="pay-logo" style="background:#FEE500">💛</div>
-      <div class="pay-head-text"><div class="pay-name">카카오페이 × 알리페이플러스</div><div class="pay-sub">한국인 가장 간편</div></div>
-      <div class="pay-toggle">⌄</div>
-    </div>
-    <div class="pay-body">
-      <div class="pay-step"><div class="pay-num">1</div><div class="pay-step-text">카카오톡 → 하단 <b>···</b> → <b>카카오페이</b></div></div>
-      <div class="pay-step"><div class="pay-num">2</div><div class="pay-step-text"><b>결제</b> 탭 → <b>🌐 지구본</b> → <b>중국(China)</b></div></div>
-      <div class="pay-step"><div class="pay-num">3</div><div class="pay-step-text">QR코드 → 가맹점 스캔</div></div>
-      <div class="pay-note">⚠️ 출발 전 카카오페이머니 잔고 확인.</div>
-      <a href="https://pay.kakao.com" target="_blank" class="pay-link">카카오페이 공식 →</a>
-    </div>
-  </div>
-  <div class="pay-method" id="pay-alipay">
-    <div class="pay-head" onclick="togglePay('alipay')">
-      <div class="pay-logo" style="background:#1677ff">🔵</div>
-      <div class="pay-head-text"><div class="pay-name">알리페이 (支付宝)</div><div class="pay-sub">여권 인증 + 한국 카드 등록</div></div>
-      <div class="pay-toggle">⌄</div>
-    </div>
-    <div class="pay-body">
-      <div class="pay-step"><div class="pay-num">1</div><div class="pay-step-text"><b>한국에서 미리</b> Alipay 설치</div></div>
-      <div class="pay-step"><div class="pay-num">2</div><div class="pay-step-text">국가코드 <b>+82</b> → SMS 인증</div></div>
-      <div class="pay-step"><div class="pay-num">3</div><div class="pay-step-text">"Tour Pass" 검색 → 여권 업로드</div></div>
-      <div class="pay-step"><div class="pay-num">4</div><div class="pay-step-text">Visa/Mastercard 한국 카드 등록</div></div>
-      <div class="pay-note">⚠️ 인증 1~3일 소요. 출발 3일 전 완료 필수.</div>
-      <a href="https://intl.alipay.com" target="_blank" class="pay-link">알리페이 →</a>
-    </div>
-  </div>
-  <div class="pay-method" id="pay-wechat">
-    <div class="pay-head" onclick="togglePay('wechat')">
-      <div class="pay-logo" style="background:#07c160">💚</div>
-      <div class="pay-head-text"><div class="pay-name">위챗페이 (WeChat Pay)</div><div class="pay-sub">카드 등록 필요</div></div>
-      <div class="pay-toggle">⌄</div>
-    </div>
-    <div class="pay-body">
-      <div class="pay-step"><div class="pay-num">1</div><div class="pay-step-text">WeChat 설치 → 한국 번호 가입</div></div>
-      <div class="pay-step"><div class="pay-num">2</div><div class="pay-step-text">Me → Services → Wallet → Cards</div></div>
-      <div class="pay-step"><div class="pay-num">3</div><div class="pay-step-text">해외 카드 등록 + 여권 인증</div></div>
-      <div class="pay-note">⚠️ 외국인은 개인 간 송금 제한.</div>
-      <a href="https://www.wechat.com" target="_blank" class="pay-link">WeChat →</a>
-    </div>
-  </div>
-  <div class="pay-method" id="pay-didi">
-    <div class="pay-head" onclick="togglePay('didi')">
-      <div class="pay-logo" style="background:#ff6400">🚕</div>
-      <div class="pay-head-text"><div class="pay-name">디디택시 (DiDi)</div><div class="pay-sub">알리페이 앱에서 호출</div></div>
-      <div class="pay-toggle">⌄</div>
-    </div>
-    <div class="pay-body">
-      <div class="pay-step"><div class="pay-num">1</div><div class="pay-step-text">알리페이 → 검색 <b>"滴滴出行"</b></div></div>
-      <div class="pay-step"><div class="pay-num">2</div><div class="pay-step-text">목적지 입력 (영문/중문)</div></div>
-      <div class="pay-step"><div class="pay-num">3</div><div class="pay-step-text">Confirm → 배차 후 탑승</div></div>
-      <div class="pay-note">💡 하차 시 알리페이 자동 결제.</div>
-      <div class="phrase-card" onclick="copyText('请去张家界国家森林公园南门')" style="margin-top:8px">
-        <div class="phrase-cn">请去张家界国家森林公园南门</div>
-        <div class="phrase-py">Qǐng qù zhāngjiājiè guójiā sēnlín gōngyuán nán mén</div>
-        <div class="phrase-ko">삼림공원 남문으로 가주세요</div>
-        <div class="phrase-hint">👆 탭하면 복사</div>
-      </div>
-    </div>
-  </div>
-  <div class="pay-method" id="pay-cash">
-    <div class="pay-head" onclick="togglePay('cash')">
-      <div class="pay-logo" style="background:#f5f5f5">💴</div>
-      <div class="pay-head-text"><div class="pay-name">현금 & ATM</div><div class="pay-sub">최후 수단</div></div>
-      <div class="pay-toggle">⌄</div>
-    </div>
-    <div class="pay-body">
-      <div class="pay-step"><div class="pay-num">1</div><div class="pay-step-text"><b>중국은행</b> 또는 <b>공상은행</b> ATM</div></div>
-      <div class="pay-step"><div class="pay-num">2</div><div class="pay-step-text">Visa/Mastercard. 1회 최대 2,000~3,000위안</div></div>
-      <div class="pay-note">💡 경관지 매표소는 카드 단말기 대부분 구비.</div>
-    </div>
-  </div>
+  <div id="payment-methods-list"></div>
 
   <div class="helper-section-title">🛟 안전 · 응급</div>
   <div class="card">
     <div class="ctitle">🚨 긴급 전화</div>
-    <div class="emg-grid">
-      <a href="tel:110" class="emg-btn"><div class="emg-num">110</div><div class="emg-label">경찰</div></a>
-      <a href="tel:120" class="emg-btn"><div class="emg-num">120</div><div class="emg-label">구급차</div></a>
-      <a href="tel:119" class="emg-btn"><div class="emg-num">119</div><div class="emg-label">소방</div></a>
-      <a href="tel:12301" class="emg-btn" style="background:var(--blue)"><div class="emg-num">12301</div><div class="emg-label">관광 불편</div></a>
-    </div>
+    <div class="emg-grid" id="emergency-phone-list"></div>
   </div>
   <div class="card">
     <div class="ctitle">🏥 병원 · 영사관</div>
-    <div class="info-row"><div class="info-lbl">시내 병원</div><div>장가계시 인민병원 ☎ +86-744-8222120</div></div>
-    <div class="info-row"><div class="info-lbl">무릉원</div><div>무릉원구 인민병원 ☎ +86-744-5610120</div></div>
-    <div class="info-row"><div class="info-lbl">🇰🇷 영사관</div><div>주창사 한국총영사관 ☎ +86-731-8256-0525</div></div>
+    <div id="emergency-hospital-list"></div>
   </div>
   <div class="card">
     <div class="ctitle">📶 인터넷 · VPN</div>
-    <div class="info-row"><div class="info-lbl">VPN</div><div>출국 전 설치 필수. ExpressVPN·Surfshark</div></div>
-    <div class="info-row"><div class="info-lbl">SIM</div><div>공항: 차이나유니콤 관광 SIM 30일 ¥100</div></div>
+    <div id="emergency-connectivity-list"></div>
   </div>
 
   <div class="helper-section-title">💬 현지 회화</div>
@@ -668,7 +551,7 @@ const TRANSPORT = {
   },
 };
 
-const PHRASES = [
+const PHRASES_FALLBACK = [
   {cat:'🚕 교통',items:[
     {cn:'请带我去张家界国家森林公园南门',py:'Qǐng dài wǒ qù... nán mén',ko:'삼림공원 남문으로'},
     {cn:'请带我去天门山索道下站',py:'Qǐng dài wǒ qù tiānménshān suǒdào xià zhàn',ko:'천문산 케이블카 하단'},
@@ -693,6 +576,104 @@ const PHRASES = [
   ]},
 ];
 
+/* ── 공연·입장권 / 결제 방법 / 안전·응급: DB 폴백용 원본 데이터 ── */
+const SHOWS_TICKETS_FALLBACK = [
+  {kind:'show',title_ko:'매력상서 (魅力湘西)',subtitle_ko:'후난 토가족·묘족 전통 민속 공연.',time_info:'매일 19:30 (약 80분)',price_info:'¥160~280',links:[{label:'🎫 Trip.com',url:'https://kr.trip.com/attraction/buy/zhangjiajie-charming-xiangxi/'},{label:'🎫 마이리얼트립',url:'https://experiences.myrealtrip.com/search?query=장가계+매력상서'}]},
+  {kind:'show',title_ko:'천문호선 (天门狐仙)',subtitle_ko:'천문산 절벽 야외 대형 공연.',time_info:'매일 20:00 (약 50분)',price_info:'¥180~380',links:[{label:'🎫 와그',url:'https://www.waug.com/ko/activities/143405'},{label:'🎫 Trip.com',url:'https://kr.trip.com/moments/theme/poi-tianmen-fox-fairy-93422-attraction-993137/'}]},
+  {kind:'ticket',title_ko:'🌲 국가삼림공원',subtitle_ko:'여권 1개당 4일 재입장.',time_info:'',price_info:'¥236 (4일권)',links:[{label:'Trip.com',url:'https://kr.trip.com/travel-guide/attraction/zhangjiajie/zhangjiajie-national-forest-park/'}]},
+  {kind:'ticket',title_ko:'⛰️ 천문산 케이블카+입장',subtitle_ko:'온라인 예약 강력 추천.',time_info:'',price_info:'¥268',links:[{label:'마이리얼트립',url:'https://experiences.myrealtrip.com/products/3887183'}]},
+  {kind:'ticket',title_ko:'🌉 대협곡 유리다리',subtitle_ko:'1일 8,000명 제한. 사전 예약 필수.',time_info:'',price_info:'¥216',links:[{label:'Trip.com',url:'https://kr.trip.com/travel-guide/attraction/zhangjiajie/zhangjiajie-grand-canyon/'}]},
+];
+const PAYMENT_METHODS_FALLBACK = [
+  {method_key:'kakao',name_ko:'카카오페이 × 알리페이플러스',subtitle_ko:'한국인 가장 간편',logo_emoji:'💛',logo_bg:'#FEE500',steps:['카카오톡 → 하단 <b>···</b> → <b>카카오페이</b>','<b>결제</b> 탭 → <b>🌐 지구본</b> → <b>중국(China)</b>','QR코드 → 가맹점 스캔'],note_html:'⚠️ 출발 전 카카오페이머니 잔고 확인.',link_label:'카카오페이 공식 →',link_url:'https://pay.kakao.com'},
+  {method_key:'alipay',name_ko:'알리페이 (支付宝)',subtitle_ko:'여권 인증 + 한국 카드 등록',logo_emoji:'🔵',logo_bg:'#1677ff',steps:['<b>한국에서 미리</b> Alipay 설치','국가코드 <b>+82</b> → SMS 인증','"Tour Pass" 검색 → 여권 업로드','Visa/Mastercard 한국 카드 등록'],note_html:'⚠️ 인증 1~3일 소요. 출발 3일 전 완료 필수.',link_label:'알리페이 →',link_url:'https://intl.alipay.com'},
+  {method_key:'wechat',name_ko:'위챗페이 (WeChat Pay)',subtitle_ko:'카드 등록 필요',logo_emoji:'💚',logo_bg:'#07c160',steps:['WeChat 설치 → 한국 번호 가입','Me → Services → Wallet → Cards','해외 카드 등록 + 여권 인증'],note_html:'⚠️ 외국인은 개인 간 송금 제한.',link_label:'WeChat →',link_url:'https://www.wechat.com'},
+  {method_key:'didi',name_ko:'디디택시 (DiDi)',subtitle_ko:'알리페이 앱에서 호출',logo_emoji:'🚕',logo_bg:'#ff6400',steps:['알리페이 → 검색 <b>"滴滴出行"</b>','목적지 입력 (영문/중문)','Confirm → 배차 후 탑승'],note_html:'💡 하차 시 알리페이 자동 결제.',link_label:'',link_url:''},
+  {method_key:'cash',name_ko:'현금 & ATM',subtitle_ko:'최후 수단',logo_emoji:'💴',logo_bg:'#f5f5f5',steps:['<b>중국은행</b> 또는 <b>공상은행</b> ATM','Visa/Mastercard. 1회 최대 2,000~3,000위안'],note_html:'💡 경관지 매표소는 카드 단말기 대부분 구비.',link_label:'',link_url:''},
+];
+const EMERGENCY_INFO_FALLBACK = {
+  phone:[{label:'경찰',value:'110',extra:{}},{label:'구급차',value:'120',extra:{}},{label:'소방',value:'119',extra:{}},{label:'관광 불편',value:'12301',extra:{color:'var(--blue)'}}],
+  hospital:[{label:'시내 병원',value:'장가계시 인민병원 ☎ +86-744-8222120'},{label:'무릉원',value:'무릉원구 인민병원 ☎ +86-744-5610120'},{label:'🇰🇷 영사관',value:'주창사 한국총영사관 ☎ +86-731-8256-0525'}],
+  connectivity:[{label:'VPN',value:'출국 전 설치 필수. ExpressVPN·Surfshark'},{label:'SIM',value:'공항: 차이나유니콤 관광 SIM 30일 ¥100'}],
+};
+
+async function loadShowsTickets(){
+  let rows=SHOWS_TICKETS_FALLBACK;
+  try{ if(sb){ const{data,error}=await sb.from('guide_shows_tickets').select('*').eq('is_active',true).order('sort_order'); if(!error&&data&&data.length>0) rows=data; } }catch(e){}
+  const shows=rows.filter(r=>r.kind==='show'), tickets=rows.filter(r=>r.kind==='ticket');
+  const showHtml=shows.map((s,i)=>`
+    <div class="show-card"${i>0?' style="margin-top:-5px"':''}>
+      <div class="show-title">${s.title_ko}</div>
+      <div class="show-sub">${s.subtitle_ko||''}</div>
+      ${s.time_info?`<div class="show-info-row"><div class="show-label">시간</div><div class="show-val">${s.time_info}</div></div>`:''}
+      ${s.price_info?`<div class="show-info-row"><div class="show-label">가격</div><div class="show-val">${s.price_info}</div></div>`:''}
+      <div class="local-btns" style="margin-top:12px">${(s.links||[]).map(l=>`<a href="${l.url}" target="_blank" class="local-btn lb-gold">${l.label}</a>`).join('')}</div>
+    </div>`).join('');
+  const ticketHtml=tickets.length?`<div class="card">${tickets.map(t=>`
+    <div class="local-item">
+      <div class="local-head"><div class="local-name">${t.title_ko}</div><div class="local-price">${t.price_info||''}</div></div>
+      <div class="local-desc">${t.subtitle_ko||''}</div>
+      <div class="local-btns">${(t.links||[]).map(l=>`<a href="${l.url}" target="_blank" class="local-btn lb-gold">${l.label}</a>`).join('')}</div>
+    </div>`).join('')}</div>`:'';
+  document.getElementById('shows-tickets-list').innerHTML=showHtml+ticketHtml;
+}
+
+async function loadPaymentMethods(){
+  let rows=PAYMENT_METHODS_FALLBACK;
+  try{ if(sb){ const{data,error}=await sb.from('guide_payment_methods').select('*').eq('is_active',true).order('sort_order'); if(!error&&data&&data.length>0) rows=data; } }catch(e){}
+  document.getElementById('payment-methods-list').innerHTML=`
+    <div class="card" style="background:linear-gradient(135deg,#fff3cd,#fff8e1)">
+      <div style="font-size:15px;color:#856404;line-height:1.8"><b>💡 중국 결제 TIP</b><br>카카오페이 > 알리페이 순으로 준비하세요.</div>
+    </div>` + rows.map(m=>`
+    <div class="pay-method" id="pay-${m.method_key}">
+      <div class="pay-head" onclick="togglePay('${m.method_key}')">
+        <div class="pay-logo" style="background:${m.logo_bg}">${m.logo_emoji}</div>
+        <div class="pay-head-text"><div class="pay-name">${m.name_ko}</div><div class="pay-sub">${m.subtitle_ko||''}</div></div>
+        <div class="pay-toggle">⌄</div>
+      </div>
+      <div class="pay-body">
+        ${(m.steps||[]).map((s,i)=>`<div class="pay-step"><div class="pay-num">${i+1}</div><div class="pay-step-text">${s}</div></div>`).join('')}
+        ${m.note_html?`<div class="pay-note">${m.note_html}</div>`:''}
+        ${m.method_key==='didi'?`<div class="phrase-card" onclick="copyText('请去张家界国家森林公园南门')" style="margin-top:8px">
+          <div class="phrase-cn">请去张家界国家森林公园南门</div>
+          <div class="phrase-py">Qǐng qù zhāngjiājiè guójiā sēnlín gōngyuán nán mén</div>
+          <div class="phrase-ko">삼림공원 남문으로 가주세요</div>
+          <div class="phrase-hint">👆 탭하면 복사</div>
+        </div>`:''}
+        ${m.link_url?`<a href="${m.link_url}" target="_blank" class="pay-link">${m.link_label}</a>`:''}
+      </div>
+    </div>`).join('');
+}
+
+async function loadEmergencyInfo(){
+  let data=EMERGENCY_INFO_FALLBACK;
+  try{
+    if(sb){
+      const{data:rows,error}=await sb.from('guide_emergency_info').select('*').eq('is_active',true).order('sort_order');
+      if(!error&&rows&&rows.length>0){
+        data={phone:rows.filter(r=>r.section==='phone'),hospital:rows.filter(r=>r.section==='hospital'),connectivity:rows.filter(r=>r.section==='connectivity')};
+      }
+    }
+  }catch(e){}
+  document.getElementById('emergency-phone-list').innerHTML=data.phone.map(p=>`<a href="tel:${p.value}" class="emg-btn"${p.extra&&p.extra.color?` style="background:${p.extra.color}"`:''}><div class="emg-num">${p.value}</div><div class="emg-label">${p.label}</div></a>`).join('');
+  document.getElementById('emergency-hospital-list').innerHTML=data.hospital.map(h=>`<div class="info-row"><div class="info-lbl">${h.label}</div><div>${h.value}</div></div>`).join('');
+  document.getElementById('emergency-connectivity-list').innerHTML=data.connectivity.map(c=>`<div class="info-row"><div class="info-lbl">${c.label}</div><div>${c.value}</div></div>`).join('');
+}
+
+let TIPS_DATA=null;
+async function loadTips(){
+  try{
+    if(sb){
+      const{data,error}=await sb.from('guide_tips').select('*').eq('is_active',true).order('sort_order');
+      if(!error&&data&&data.length>0){
+        TIPS_DATA={};
+        data.forEach(t=>{ if(!TIPS_DATA[t.attr_id])TIPS_DATA[t.attr_id]=[]; TIPS_DATA[t.attr_id].push(t.tip_text); });
+      }
+    }
+  }catch(e){}
+  renderPlanTips();
+}
+
 let currentAttr='forest',currentTab='map',currentZone='south',weatherMode='sunny';
 let map,userMarker,mapMarkers=[],cdTimer=null,spotsData={};
 let currentReviewSpotId=null,currentReviewAttrId=null,selectedRating=0;
@@ -703,7 +684,8 @@ const PLACE_CAT_LABEL={restaurant:'식당',cafe:'카페',hotel:'호텔/숙소',s
 
 document.addEventListener('DOMContentLoaded',async()=>{
   initMap(); updateClock(); setInterval(updateClock,15000);
-  renderPhrases(); startGPS();
+  loadPhrases(); startGPS();
+  loadShowsTickets(); loadPaymentMethods(); loadEmergencyInfo(); loadTips();
   await loadSpotsData();
   selectAttr('forest'); selectTab('map');
   loadPlaces();
@@ -951,10 +933,24 @@ function renderSmartPlan(){
   }).join('');
 }
 function renderRainPlan(){const a=ATTRS[currentAttr];document.getElementById('rain-plan').innerHTML=a.rainPlan.map(r=>`<div class="rain-item">${r.item}</div>`).join('');document.getElementById('rain-avoid').innerHTML=a.rainAvoid.map(r=>`<div style="font-size:15px;color:#c62828;line-height:1.8;padding:6px 0;border-bottom:1px solid #f5f5f5">${r.item}</div>`).join('');}
-function renderPlanTips(){document.getElementById('plan-tips').innerHTML=ATTRS[currentAttr].tips.map(t=>`<div style="font-size:15px;color:#555;line-height:1.8;padding:6px 0;border-bottom:1px solid #f5f5f5">${t}</div>`).join('');}
+function renderPlanTips(){const tips=(TIPS_DATA&&TIPS_DATA[currentAttr])||ATTRS[currentAttr].tips;document.getElementById('plan-tips').innerHTML=tips.map(t=>`<div style="font-size:15px;color:#555;line-height:1.8;padding:6px 0;border-bottom:1px solid #f5f5f5">${t}</div>`).join('');}
 function togglePay(id){const el=document.getElementById('pay-'+id);if(el)el.classList.toggle('open');}
 
-function renderPhrases(){document.getElementById('phrase-list').innerHTML=PHRASES.map(cat=>`<div class="phrase-cat">${cat.cat}</div>`+cat.items.map(p=>`<div class="phrase-card" onclick="copyText('${p.cn.replace(/'/g,"\\'")}')"><div class="phrase-cn">${p.cn}</div><div class="phrase-py">${p.py}</div><div class="phrase-ko">${p.ko}</div><div class="phrase-hint">👆 탭 → 중국어 복사</div></div>`).join('')).join('');}
+function renderPhrases(cats){document.getElementById('phrase-list').innerHTML=cats.map(cat=>`<div class="phrase-cat">${cat.cat}</div>`+cat.items.map(p=>`<div class="phrase-card" onclick="copyText('${p.cn.replace(/'/g,"\\'")}')"><div class="phrase-cn">${p.cn}</div><div class="phrase-py">${p.py}</div><div class="phrase-ko">${p.ko}</div><div class="phrase-hint">👆 탭 → 중국어 복사</div></div>`).join('')).join('');}
+async function loadPhrases(){
+  let cats=PHRASES_FALLBACK;
+  try{
+    if(sb){
+      const{data,error}=await sb.from('guide_phrases').select('*').eq('is_active',true).order('sort_order');
+      if(!error&&data&&data.length>0){
+        const byCat={};
+        data.forEach(p=>{ if(!byCat[p.category])byCat[p.category]=[]; byCat[p.category].push({cn:p.phrase_cn,py:p.pinyin,ko:p.phrase_ko}); });
+        cats=Object.keys(byCat).map(cat=>({cat,items:byCat[cat]}));
+      }
+    }
+  }catch(e){}
+  renderPhrases(cats);
+}
 function copyText(text){navigator.clipboard.writeText(text).then(()=>showToast('✓ 복사됨!'));}
 
 async function openReviewSheet(spotId,attrId,spotName){
