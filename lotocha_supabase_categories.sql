@@ -12,7 +12,9 @@ create table if not exists guide_regions (
   created_at timestamptz default now()
 );
 alter table guide_regions enable row level security;
+drop policy if exists "public read active regions" on guide_regions;
 create policy "public read active regions" on guide_regions for select using (is_active = true);
+drop policy if exists "authenticated manage regions" on guide_regions;
 create policy "authenticated manage regions" on guide_regions for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
 
 insert into guide_regions (name_ko, sort_order) values
@@ -36,7 +38,9 @@ create table if not exists guide_place_categories (
   created_at timestamptz default now()
 );
 alter table guide_place_categories enable row level security;
+drop policy if exists "public read active place_categories" on guide_place_categories;
 create policy "public read active place_categories" on guide_place_categories for select using (is_active = true);
+drop policy if exists "authenticated manage place_categories" on guide_place_categories;
 create policy "authenticated manage place_categories" on guide_place_categories for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
 
 insert into guide_place_categories (cat_key, name_ko, icon, sort_order) values
@@ -63,7 +67,9 @@ create table if not exists guide_attractions (
   created_at timestamptz default now()
 );
 alter table guide_attractions enable row level security;
+drop policy if exists "public read active attractions" on guide_attractions;
 create policy "public read active attractions" on guide_attractions for select using (is_active = true);
+drop policy if exists "authenticated manage attractions" on guide_attractions;
 create policy "authenticated manage attractions" on guide_attractions for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
 
 insert into guide_attractions (attr_key, name_ko, icon, is_protected, sort_order) values
