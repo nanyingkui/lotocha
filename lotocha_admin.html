@@ -191,7 +191,10 @@ textarea.field-input{min-height:80px;resize:vertical}
             <span class="icon">📊</span>대시보드
           </button>
           <button class="sb-item" data-panel="tours" onclick="showPanel('tours',this)">
-            <span class="icon">🏔️</span>투어 상품
+            <span class="icon">🌅</span>1일투어 상품
+          </button>
+          <button class="sb-item" data-panel="pkgsettings" onclick="showPanel('pkgsettings',this)">
+            <span class="icon">🧭</span>맞춤투어 설정
           </button>
           <button class="sb-item" data-panel="spots" onclick="showPanel('spots',this)">
             <span class="icon">📍</span>가이드 스팟
@@ -300,21 +303,22 @@ textarea.field-input{min-height:80px;resize:vertical}
       </div>
     </div>
 
-    <!-- 투어 상품 -->
+    <!-- 투어 상품 (1일투어 전용) -->
     <div class="panel" id="panel-tours">
-      <div class="page-title">🏔️ 투어 상품</div>
-      <div class="page-sub">1일투어 및 맞춤투어 관리. 맞춤투어는 이제 고객이 출발일·귀국일을 직접 선택해 일정을 짜므로, 기본 예약용 맞춤투어 상품은 1개면 충분합니다. 여러 개를 만들어도 되는 경우는 "클래식 코스"·"테마 코스"처럼 내용이 실제로 다른 상품일 때뿐입니다 — 단순히 일수만 다른 중복 상품(초안 포함)은 정리해 주세요.</div>
-      <div class="subtab-bar" id="tours-filter-bar">
-        <button class="subtab-btn active" data-tf="all" onclick="setToursFilter('all',this)">전체</button>
-        <button class="subtab-btn" data-tf="day_tour" onclick="setToursFilter('day_tour',this)">1일투어</button>
-        <button class="subtab-btn" data-tf="package" onclick="setToursFilter('package',this)">맞춤투어</button>
-      </div>
-      <div id="tours-dup-warning"></div>
+      <div class="page-title">🌅 1일투어 상품</div>
+      <div class="page-sub">1일투어 상품 관리 (여러 개 등록 가능). 맞춤투어는 별도 "맞춤투어 설정" 메뉴에서 관리합니다.</div>
       <div class="table-wrap">
-        <div class="table-head"><h3>전체 상품</h3><button class="btn-add" onclick="openTourModal()">+ 상품 추가</button></div>
-        <table><thead><tr><th>타입</th><th>상품명</th><th>가격</th><th>기간</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <div class="table-head"><h3>전체 상품</h3><button class="btn-add" onclick="openTourModal(null,'day_tour')">+ 상품 추가</button></div>
+        <table><thead><tr><th>상품명</th><th>가격</th><th>기간</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
         <tbody id="tours-tbody"></tbody></table>
       </div>
+    </div>
+
+    <!-- 맞춤투어 설정 (단일 상품) -->
+    <div class="panel" id="panel-pkgsettings">
+      <div class="page-title">🧭 맞춤투어 설정</div>
+      <div class="page-sub">맞춤투어는 고객이 출발일·귀국일을 직접 선택해 일정을 짜므로, 상품은 1개면 충분합니다. 여기서 그 1개 상품의 제목·설명·가격·포함사항 등을 바로 편집하세요.</div>
+      <div id="pkgsettings-body"></div>
     </div>
 
     <!-- 스팟 -->
@@ -1391,7 +1395,7 @@ function showPanel(id, btn) {
     const grp = btn.closest('.sb-group');
     if (grp) grp.classList.remove('collapsed');
   }
-  const loaders = {dashboard:loadDashboard,tours:loadTours,spots:loadSpots,places:loadPlaces,reviews:loadReviews,stats:loadStats,users:loadUsers,
+  const loaders = {dashboard:loadDashboard,tours:loadTours,pkgsettings:loadPkgSettings,spots:loadSpots,places:loadPlaces,reviews:loadReviews,stats:loadStats,users:loadUsers,
     hotels:loadHotelPool,flights:loadFlightPool,attractions:loadAttractionPool,
     addonsvc:loadAddonSvc,pricing:loadPricing,
     showstickets:loadST,paymethods:loadPM,emergency:loadEI,phrases:loadPH,tips:loadTP,
@@ -1440,52 +1444,51 @@ async function loadDashboard() {
         <button class="btn-reject" onclick="deleteReview('${r.id}')">삭제</button></div></td></tr>`).join('');
 }
 
-let _toursFilter = 'all';
-let _toursCache = null;
-function setToursFilter(f, btn) {
-  _toursFilter = f;
-  document.querySelectorAll('#tours-filter-bar .subtab-btn').forEach(b=>b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  renderTours();
-}
+/* 2026-07-20 확정: 맞춤투어는 상품이 1개(설정)면 충분하므로 별도 "맞춤투어 설정" 패널로 분리.
+   이 목록(투어 상품)은 이제 1일투어 전용 — 여러 개를 만들고 관리하는 기존 방식 그대로 유지 */
 async function loadTours() {
-  const { data } = await sb.from('tour_products').select('*').order('sort_order');
-  _toursCache = data;
-  renderTours();
-}
-function renderTours() {
-  const all = _toursCache;
-  const warnEl = document.getElementById('tours-dup-warning');
-  const tbody = document.getElementById('tours-tbody');
-  if (!all) {
-    tbody.innerHTML = '<tr><td colspan="7" style="color:var(--red)">로드 실패</td></tr>';
-    warnEl.innerHTML = '';
-    return;
-  }
-  /* 2026-07-20 확정: 맞춤투어는 고객이 출발일·귀국일을 직접 골라 박수/일수를 정하므로
-     기간별로 상품을 여러 개 만들 필요가 없음 — 라이브 상태 맞춤투어는 전체 통틀어 1개면 충분 */
-  const livePkgs = all.filter(p => p.product_type === 'package' && p.status === 'live');
-  warnEl.innerHTML = livePkgs.length <= 1 ? '' : `<div class="dup-warning">
-    ⚠️ 라이브 상태 맞춤투어 상품이 ${livePkgs.length}개 있습니다. 맞춤투어는 고객이 출발일·귀국일을 직접 선택해 박수/일수를 정하므로 상품은 1개만 있으면 충분합니다. 남길 1개를 정하고 나머지는 "보관 처리"로 정리하세요.
-    <div class="dup-group">
-      ${livePkgs.map(p => `<span class="dup-chip">${p.title_ko || '(제목없음)'} (${p.duration_days}일)<button onclick="archiveTour('${p.id}')">이건 보관 처리</button></span>`).join('')}
-    </div>
-  </div>`;
-
-  const filtered = _toursFilter === 'all' ? all : all.filter(p => p.product_type === _toursFilter);
-  tbody.innerHTML = !filtered.length ? '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:20px">상품 없음</td></tr>'
-    : filtered.map(p=>`<tr>
-        <td><span class="badge ${p.product_type==='day_tour'?'badge-day':'badge-pkg'}">${p.product_type==='day_tour'?'1일투어':'맞춤투어'}</span></td>
+  const { data } = await sb.from('tour_products').select('*').eq('product_type','day_tour').order('sort_order');
+  document.getElementById('tours-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">로드 실패</td></tr>'
+    : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">상품 없음</td></tr>'
+    : data.map(p=>`<tr>
         <td style="font-weight:700">${p.title_ko}</td><td>${fmt(p.price_krw)}</td><td>${p.duration_days}일</td>
         <td><span class="badge badge-${p.status}">${{live:'라이브',draft:'초안',pending:'검토중',archived:'보관'}[p.status]||p.status}</span></td>
         <td>${p.sort_order}</td>
         <td><div class="act-btns"><button class="btn-edit" onclick="openTourModal('${p.id}')">편집</button>
         <button class="btn-del" onclick="deleteTour('${p.id}')">삭제</button></div></td></tr>`).join('');
 }
-async function archiveTour(id) {
-  const { error } = await sb.from('tour_products').update({ status: 'archived', updated_at: new Date().toISOString() }).eq('id', id);
-  if (error) { toast('처리 실패: '+error.message,'error'); return; }
-  toast('보관 처리되었습니다','success'); loadTours();
+
+/* ───── 맞춤투어 설정 (단일 상품, 목록/추가 없이 이 패널에서 바로 편집) ───── */
+let _pkgProductId = null;
+async function loadPkgSettings() {
+  const { data } = await sb.from('tour_products').select('*').eq('product_type','package').order('created_at').limit(1);
+  const el = document.getElementById('pkgsettings-body');
+  const row = data && data[0];
+  _pkgProductId = row ? row.id : null;
+  if (!row) {
+    el.innerHTML = `<div class="min-pax-note" style="margin-bottom:12px">아직 맞춤투어 상품이 없습니다. 아래 버튼으로 1개를 만드세요 (딱 1개만 있으면 됩니다).</div>
+      <button class="btn-save" onclick="openTourModal(null,'package')">+ 맞춤투어 만들기</button>`;
+    return;
+  }
+  el.innerHTML = `
+    <div class="table-wrap" style="margin-bottom:0">
+      <div style="padding:20px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+          <div>
+            <div style="font-size:18px;font-weight:900;color:var(--navy);margin-bottom:4px">${row.title_ko||'(제목없음)'}</div>
+            <div style="font-size:14px;color:#888;margin-bottom:8px">${row.subtitle_ko||''}</div>
+            <span class="badge badge-${row.status}">${{live:'라이브',draft:'초안',pending:'검토중',archived:'보관'}[row.status]||row.status}</span>
+          </div>
+          <button class="btn-edit" onclick="openTourModal('${row.id}')">편집</button>
+        </div>
+        <div style="margin-top:16px;font-size:14px;color:#555;line-height:1.8">
+          <div>기본 일수(고객 날짜 선택 전 미리보기): <b>${row.duration_days||1}일</b></div>
+          <div>연령별 가격(price_tiers): <b>${Array.isArray(row.price_tiers)?row.price_tiers.length:0}개 설정됨</b></div>
+          <div>선택 옵션(tour_options): <b>${Array.isArray(row.tour_options)?row.tour_options.length:0}개 설정됨</b></div>
+          <div>참고용 클래식 일정: <b>${Array.isArray(row.itinerary)&&row.itinerary.length?row.itinerary.length+'일 등록됨':'없음'}</b></div>
+        </div>
+      </div>
+    </div>`;
 }
 
 function renderTierRow(t={}) {
@@ -2029,14 +2032,15 @@ async function updateItinHint() {
   document.getElementById('t-itin-hint').innerHTML = `한 줄에 "일차|시간대|명소key" 형식 (시간대: am/pm/evening). 대형은 am 또는 pm 중 1개만, 같은 날 대형 중복 불가 / 특색은 am·pm 자유 / 인문은 시간대 무관·중복 가능.<br>대형: ${byCat.large.join(', ')||'(없음)'}<br>특색: ${byCat.feature.join(', ')||'(없음)'}<br>인문: ${byCat.local.join(', ')||'(없음)'}<br>※ key 목록은 좌측 메뉴 "명소 관리"에서 추가/수정할 수 있습니다`;
 }
 
-function openTourModal(id) {
+function openTourModal(id, presetType) {
   document.getElementById('tour-modal-title').textContent = id ? '투어 상품 편집' : '투어 상품 추가';
   const clear = () => ['t-id','t-title-ko','t-title-cn','t-subtitle','t-desc','t-price-krw','t-price-cny','t-images','t-highlights','t-includes','t-excludes','t-itinerary'].forEach(f=>document.getElementById(f).value='');
   document.getElementById('t-tiers-list').innerHTML = '';
   document.getElementById('t-opts-list').innerHTML = '';
   if (!id) {
     clear();
-    document.getElementById('t-type').value='day_tour'; document.getElementById('t-status').value='live';
+    document.getElementById('t-type').value = presetType || 'day_tour';
+    document.getElementById('t-status').value='live';
     document.getElementById('t-days').value='1'; document.getElementById('t-order').value='0';
     updateItinHint();
   } else {
@@ -2099,7 +2103,8 @@ async function saveTour() {
   if (!payload.title_ko) { toast('상품명을 입력하세요','error'); return; }
   const { error } = id ? await sb.from('tour_products').update(payload).eq('id',id) : await sb.from('tour_products').insert(payload);
   if (error) { toast('저장 실패: '+error.message,'error'); return; }
-  toast(id?'수정되었습니다':'추가되었습니다','success'); closeTourModal(); loadTours();
+  toast(id?'수정되었습니다':'추가되었습니다','success'); closeTourModal();
+  if (payload.product_type === 'package') loadPkgSettings(); else loadTours();
 }
 async function deleteTour(id) {
   if (!confirm('삭제하시겠습니까?')) return;

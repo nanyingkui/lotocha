@@ -399,6 +399,7 @@ function recomputePkgDuration() {
     hint.textContent = '출발일과 귀국일을 모두 선택하면 총 일수가 자동으로 계산됩니다';
   }
   if (document.getElementById('pkg-dayplan')) { _pickerOpen = null; renderDayPlan(); }
+  if (document.getElementById('price-summary')) updatePriceSummary();
 }
 /* 일수가 바뀌면 캔버스 크기를 다시 맞춤 — 기존에 짜둔 일차는 그대로 유지, 없어진 일차의 콤보는 정리 */
 function resizePkgDays(numDays) {
@@ -450,11 +451,15 @@ function cardHTML(p) {
       </div>
       <div class="card-title">${p.title_ko || '—'}</div>
       <div class="card-subtitle">${p.subtitle_ko || ''}</div>
+      ${isPkg && !displayPrice ? `
+      <div class="price-row">
+        <span class="price-krw" style="font-size:17px">📅 날짜·인원 선택 시 실시간 견적</span>
+      </div>` : `
       <div class="price-row">
         <span class="price-from">성인 기준</span>
         <span class="price-krw">${fmt(displayPrice)}</span>
         ${p.price_cny ? `<span style="font-size:15px;color:#aaa">${fmtCny(p.price_cny)}</span>` : ''}
-      </div>
+      </div>`}
       <div class="price-label">최소 ${p.min_pax || 2}인 출발</div>
       ${highlights.length ? `<div class="highlights">${highlights.map(h=>`<span class="highlight-tag">${h}</span>`).join('')}</div>` : ''}
       <div class="card-footer">
@@ -532,24 +537,38 @@ let GLOBAL_PLACES = [];
    admin "명소 관리"에서 fetch — 표가 비어있으면 일정 직접 짜기가 비어 보일 수 있음 */
 let ATTRACTION_POOL = {};
 let ADDON_SERVICES = []; // 마사지 등 (admin "부가서비스 관리")
+/* 2026-07-20 추가: 맞춤투어 실시간 견적 계산용 — admin "가격 설정"에서 관리 */
+let PRICING = {};           // tour_pricing_settings key→value (차량/가이드/호텔/식사/환율)
+let MARGIN_SETTINGS = null; // tour_margin_settings (단일 행)
+let AGE_DISCOUNTS = [];     // tour_age_discounts
+let COST_BUFFERS = [];      // tour_cost_buffers (자연손모 등)
 
 function normHotel(h)  { return { key: h.id, name: h.name, grade: h.grade, price: h.price, per: h.per, desc: h.desc_ko, image: h.image }; }
 function normFlight(f) { return { key: f.id, name: f.name, location: f.location, time: f.time_desc, desc: f.desc_ko, image: f.image }; }
 
 async function loadGlobalPools() {
   if (!sb) return;
-  const [hRes, fRes, aRes, plRes, adRes] = await Promise.all([
+  const [hRes, fRes, aRes, plRes, adRes, prRes, mgRes, agRes, cbRes] = await Promise.all([
     sb.from('tour_hotels').select('*').eq('is_active', true).order('sort_order'),
     sb.from('tour_flights').select('*').eq('is_active', true).order('sort_order'),
     sb.from('tour_attractions').select('*').eq('is_active', true).order('sort_order'),
     sb.from('local_places').select('*').eq('is_active', true).order('sort_order'),
     sb.from('tour_addon_services').select('*').eq('is_active', true).order('sort_order'),
+    sb.from('tour_pricing_settings').select('*'),
+    sb.from('tour_margin_settings').select('*').eq('id', 1).maybeSingle(),
+    sb.from('tour_age_discounts').select('*').eq('is_active', true),
+    sb.from('tour_cost_buffers').select('*').eq('is_active', true),
   ]);
   GLOBAL_HOTELS = (hRes.data || []).map(normHotel);
   GLOBAL_FLIGHTS = (fRes.data || []).map(normFlight);
   (aRes.data || []).forEach(a => { ATTRACTION_POOL[a.key] = { label: a.label, cat: a.cat, slot_type: a.slot_type || 'half_day', price: a.price || 0, desc: a.desc_ko, image: a.image }; });
   GLOBAL_PLACES = plRes.data || [];
   ADDON_SERVICES = adRes.data || [];
+  PRICING = {};
+  (prRes.data || []).forEach(r => { PRICING[r.key] = r.value; });
+  MARGIN_SETTINGS = mgRes.data || { mode: 'per_person', value_type: 'amount', value: 0 };
+  AGE_DISCOUNTS = agRes.data || [];
+  COST_BUFFERS = cbRes.data || [];
 }
 
 /* ───── 모달 열기 ───── */
@@ -1064,6 +1083,7 @@ function pickAttraction(day, slot, type, value) {
   d[slot] = !type ? null : (type === 'place' ? { type: 'place', id: value } : { type: 'attr', key: value });
   _pickerOpen = null;
   renderDayPlan();
+  updatePriceSummary();
 }
 
 function toggleEvening(day, type, value) {
@@ -1074,6 +1094,7 @@ function toggleEvening(day, type, value) {
   const idx = d.evening.findIndex(e => itemMatches(e, item));
   if (idx === -1) d.evening.push(item); else d.evening.splice(idx, 1);
   renderDayPlan();
+  updatePriceSummary();
 }
 
 function pickFullDay(day, key) {
@@ -1083,12 +1104,14 @@ function pickFullDay(day, key) {
   d.am = null; d.pm = null;
   _pickerOpen = null;
   renderDayPlan();
+  updatePriceSummary();
 }
 function clearFullDay(day) {
   const d = _pkgDays.find(x => x.day === day);
   if (!d) return;
   d.full = null;
   renderDayPlan();
+  updatePriceSummary();
 }
 
 /* 콤보 선택: 같은 key(특히 봉황고성)는 전체 일정에서 1개만 유지 — 새로 고르면 기존 것을 옮김 */
@@ -1101,10 +1124,12 @@ function pickCombo(day, key) {
   if (d) { d.full = null; d.pm = null; d.evening = []; }
   _pickerOpen = null;
   renderDayPlan();
+  updatePriceSummary();
 }
 function removeCombo(day) {
   _pkgCombos = _pkgCombos.filter(c => c.day !== day);
   renderDayPlan();
+  updatePriceSummary();
 }
 
 /* ───── 부가서비스 (마사지 등, 날짜 미지정 — 인원×횟수 카운터) ───── */
@@ -1129,6 +1154,7 @@ function changeAddon(id, delta) {
   _addons[id] = Math.max(0, (_addons[id] || 0) + delta);
   const el = document.getElementById('cnt-addon-' + id);
   if (el) el.textContent = _addons[id];
+  updatePriceSummary();
 }
 
 /* ───── 클래식 일정 보기 팝업 (참고 예시 → 캔버스로 복사) ───── */
@@ -1200,6 +1226,84 @@ function copyClassicItinerary() {
   if (el) el.remove();
   _pickerOpen = null;
   renderDayPlan();
+  updatePriceSummary();
+}
+
+/* ───── 맞춤투어 실시간 견적 계산 (2026-07-20 확정 공식) ─────
+   1인당 원가(위안) = [(박수×차량단가 + 박수×가이드단가) / 총인원]
+                    + (박수×호텔단가/2) + Σ선택한 명소 단가 + (박수×2×식사단가)
+                    + 부가서비스 원가/총인원 + 자연손모 등 비용
+   → 환율 적용해 원화 환산 → 이윤(인당/주문당, 금액/비율) 적용 */
+function carRateForPax(n) {
+  if (n <= 4) return PRICING.car_7seat;
+  if (n <= 7) return PRICING.car_9seat;
+  if (n <= 12) return PRICING.car_14seat;
+  return PRICING.car_bus; // 13인 이상 — null이면 "고객센터 문의"
+}
+function sumAttractionCost() {
+  let sum = 0;
+  _pkgDays.forEach(d => {
+    if (d.full) sum += (resolveSlotItem(d.full) || {}).price || 0;
+    if (d.am)   sum += (resolveSlotItem(d.am)   || {}).price || 0;
+    if (d.pm)   sum += (resolveSlotItem(d.pm)   || {}).price || 0;
+    (d.evening || []).forEach(e => { sum += (resolveSlotItem(e) || {}).price || 0; });
+  });
+  _pkgCombos.forEach(c => { const a = ATTRACTION_POOL[c.key]; if (a) sum += a.price || 0; });
+  return sum;
+}
+/* 연령별 할인 — 개별 나이 입력 UI가 없어, 티어 키/라벨로 근사 매칭 (관리자가 직접 tier 가격을 넣으면 이 로직은 적용되지 않음) */
+function ageDiscountForTier(t) {
+  const key = (t.key || '').toLowerCase();
+  const label = t.label || '';
+  if (key.includes('senior') || label.includes('경로') || label.includes('시니어')) {
+    const d = AGE_DISCOUNTS.find(x => x.min_age != null);
+    return d ? (d.discount_krw || 0) : 0;
+  }
+  if (key.includes('child') || label.includes('어린이') || label.includes('소아')) {
+    const d = AGE_DISCOUNTS.find(x => x.max_age != null);
+    return d ? (d.discount_krw || 0) : 0;
+  }
+  return 0;
+}
+function computePkgCost(totalPax) {
+  if (!totalPax) return null;
+  if (!_date || !_returnDate) return { needDates: true };
+  const nights = Math.max(_numDays - 1, 0);
+  const carRate = carRateForPax(totalPax);
+  if (carRate == null) return { inquiryOnly: true };
+  const guideRate = PRICING.guide_daily || 0;
+  const hotelRate = PRICING.hotel_night || 0;
+  const mealRate  = PRICING.meal_per || 0;
+  const exchangeRate = PRICING.exchange_rate || 190;
+
+  const vehicleGuidePerPerson = (nights * carRate + nights * guideRate) / totalPax;
+  const hotelPerPerson = nights * hotelRate / 2;
+  const attractionsCost = sumAttractionCost();
+  const mealPerPerson = nights * 2 * mealRate;
+  const addonTotal = Object.entries(_addons).reduce((s, [id, cnt]) => {
+    const a = ADDON_SERVICES.find(x => x.id === id);
+    return s + (a && cnt > 0 ? (a.price || 0) * cnt : 0);
+  }, 0);
+  const addonPerPerson = addonTotal / totalPax;
+  const bufferPerPerson = COST_BUFFERS.reduce((s, b) => {
+    const amtCny = b.currency === 'KRW' ? (b.amount || 0) / exchangeRate : (b.amount || 0);
+    return s + (b.per_unit === 'pax' ? amtCny : amtCny / totalPax);
+  }, 0);
+
+  const baseCny = vehicleGuidePerPerson + hotelPerPerson + attractionsCost + mealPerPerson + addonPerPerson + bufferPerPerson;
+  const baseKrw = baseCny * exchangeRate;
+
+  const mg = MARGIN_SETTINGS || { mode: 'per_person', value_type: 'amount', value: 0 };
+  let perPerson;
+  if (mg.mode === 'per_order') {
+    let orderTotal = baseKrw * totalPax;
+    orderTotal = mg.value_type === 'percent' ? orderTotal * (1 + (mg.value || 0) / 100) : orderTotal + (mg.value || 0);
+    perPerson = orderTotal / totalPax;
+  } else {
+    perPerson = mg.value_type === 'percent' ? baseKrw * (1 + (mg.value || 0) / 100) : baseKrw + (mg.value || 0);
+  }
+  perPerson = Math.round(perPerson / 1000) * 1000;
+  return { perPerson, inquiryOnly: false };
 }
 
 /* ───── 가격 요약 업데이트 ───── */
@@ -1209,21 +1313,14 @@ function updatePriceSummary() {
   const tiers  = Array.isArray(p.price_tiers)  ? p.price_tiers  : [];
   const options = Array.isArray(p.tour_options) ? p.tour_options : [];
   const hotelOpts = GLOBAL_HOTELS;
+  const isPkg = p.product_type === 'package';
 
-  let total = 0;
   let totalPax = 0;
   let minPax = 0;
-  let lines = [];
-
   tiers.forEach(t => {
     const cnt = _pax[t.key] || 0;
-    if (cnt > 0) {
-      const sub = cnt * t.price;
-      total += sub;
-      totalPax += cnt;
-      if (t.counts_min) minPax += cnt;
-      lines.push(`<div class="price-line"><span>${t.label} × ${cnt}인</span><span>${fmtFull(sub)}</span></div>`);
-    }
+    totalPax += cnt;
+    if (cnt > 0 && t.counts_min) minPax += cnt;
   });
 
   if (totalPax === 0) {
@@ -1231,6 +1328,35 @@ function updatePriceSummary() {
       '<div class="price-empty">인원을 선택하면 금액이 계산됩니다</div>';
     return;
   }
+
+  /* 맞춤투어는 기존 원가(차량·가이드·호텔·명소·식사·부가서비스·자연손모)를 실시간 조합해
+     계산 — 단, admin이 해당 티어에 고정 가격을 직접 입력한 경우 그 값을 그대로 사용 */
+  const pkgCost = isPkg ? computePkgCost(totalPax) : null;
+
+  let total = 0;
+  let lines = [];
+  tiers.forEach(t => {
+    const cnt = _pax[t.key] || 0;
+    if (cnt <= 0) return;
+    if (isPkg && !t.price) {
+      if (pkgCost && pkgCost.needDates) {
+        lines.push(`<div class="price-line"><span>${t.label} × ${cnt}인</span><span>날짜 선택 필요</span></div>`);
+        return;
+      }
+      if (!pkgCost || pkgCost.inquiryOnly) {
+        lines.push(`<div class="price-line"><span>${t.label} × ${cnt}인</span><span>문의</span></div>`);
+        return;
+      }
+      const unit = Math.max(0, pkgCost.perPerson - ageDiscountForTier(t));
+      const sub = unit * cnt;
+      total += sub;
+      lines.push(`<div class="price-line"><span>${t.label} × ${cnt}인 (실시간 견적)</span><span>${fmtFull(sub)}</span></div>`);
+    } else {
+      const sub = cnt * t.price;
+      total += sub;
+      lines.push(`<div class="price-line"><span>${t.label} × ${cnt}인</span><span>${fmtFull(sub)}</span></div>`);
+    }
+  });
 
   options.forEach(o => {
     if (_opts[o.key]) {
@@ -1252,12 +1378,15 @@ function updatePriceSummary() {
   const warn = minPax < 2
     ? '<div class="min-warn">⚠️ 최소 2인 이상 출발 (영유아 제외)</div>'
     : '';
+  const pkgNote = isPkg
+    ? '<div class="min-pax-note" style="color:rgba(255,255,255,.6);margin-top:6px">📌 선택하신 날짜·인원·일정 기준 실시간 예상 견적이며, 실제 금액은 상담을 통해 최종 확정됩니다.</div>'
+    : '';
 
   document.getElementById('price-summary').innerHTML = `
     ${lines.join('')}
     <div class="price-divider"></div>
     <div class="price-total-row"><span>예상 총 금액</span><span>${fmtFull(total)}</span></div>
-    ${warn}`;
+    ${warn}${pkgNote}`;
 }
 
 /* ───── 아코디언 ───── */
@@ -1293,15 +1422,29 @@ function buildMsg(p) {
   let total = 0;
   let totalPax = 0;
   let hasPax = false;
+  tiers.forEach(t => { totalPax += _pax[t.key] || 0; });
+  const pkgCost = isPkg ? computePkgCost(totalPax) : null;
 
   tiers.forEach(t => {
     const cnt = _pax[t.key] || 0;
     if (cnt > 0) {
       hasPax = true;
-      const sub = cnt * t.price;
-      total += sub;
-      totalPax += cnt;
-      msg += `  ${t.label} × ${cnt}인 = ${fmtFull(sub)}\n`;
+      if (isPkg && !t.price) {
+        if (pkgCost && pkgCost.needDates) {
+          msg += `  ${t.label} × ${cnt}인 = (날짜 선택 필요)\n`;
+        } else if (!pkgCost || pkgCost.inquiryOnly) {
+          msg += `  ${t.label} × ${cnt}인 = 문의\n`;
+        } else {
+          const unit = Math.max(0, pkgCost.perPerson - ageDiscountForTier(t));
+          const sub = unit * cnt;
+          total += sub;
+          msg += `  ${t.label} × ${cnt}인 = ${fmtFull(sub)} (실시간 견적)\n`;
+        }
+      } else {
+        const sub = cnt * t.price;
+        total += sub;
+        msg += `  ${t.label} × ${cnt}인 = ${fmtFull(sub)}\n`;
+      }
     }
   });
 
