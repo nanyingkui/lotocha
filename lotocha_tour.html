@@ -513,8 +513,8 @@ let _arrTime = '';    // 도착 시간 (맞춤투어만)
 let _depTime = '';    // 출발(귀국) 시간 (맞춤투어만)
 let _numDays = 1;      // 현재 열린 상품의 기본 일수 (맞춤투어는 출발일·귀국일 선택 시 실제 값으로 재계산됨)
 let _hotel = null;     // 선택된 호텔 key (전역 풀의 id)
-let _arrFlight = null; // 선택된 도착 항공편 key (전역 풀의 id)
-let _depFlight = null; // 선택된 출발 항공편 key (전역 풀의 id)
+let _arrFlightInfo = ''; // 도착 항공편 자유 입력 (항공사·편명, 없으면 빈 문자열)
+let _depFlightInfo = ''; // 출발(귀국) 항공편 자유 입력
 let _mealNote = '';    // 식사 요구사항 텍스트
 let _pkgDays = [];     // [{day:1, full:{type,key}|null, am:{type,key}|null, pm:{type,key}|null, evening:[{type,key},...]}, ...]
 let _pickerOpen = null; // {day, slot} 현재 펼쳐진 선택 패널 (slot: 'full'|'am'|'pm'|'evening'|'combo')
@@ -565,8 +565,8 @@ function openModal(id) {
   _arrTime = '';
   _depTime = '';
   _hotel = null;
-  _arrFlight = null;
-  _depFlight = null;
+  _arrFlightInfo = '';
+  _depFlightInfo = '';
   _mealNote = '';
   _pickerOpen = null;
   _pkgCombos = [];
@@ -579,14 +579,12 @@ function openModal(id) {
   const includes = Array.isArray(p.includes)     ? p.includes     : [];
   const excludes = Array.isArray(p.excludes)     ? p.excludes     : [];
   const hotelOpts = GLOBAL_HOTELS;
-  const flightOpts = GLOBAL_FLIGHTS;
   const isPkg = p.product_type === 'package';
   _numDays = p.duration_days || 1;
 
   tiers.forEach(t => _pax[t.key] = 0);
   options.forEach(o => _opts[o.key] = false);
   if (hotelOpts.length) _hotel = hotelOpts[0].key;
-  if (flightOpts.length && isPkg) { _arrFlight = flightOpts[0].key; _depFlight = flightOpts[0].key; }
 
   /* 패키지: 기본은 완전 빈 캔버스 (2026-07-20 확정) — duration_days 기준 일자만 만들어두고
      내용은 비워둠. 추천 참고 일정(itinerary)은 캔버스에 자동으로 채우지 않고,
@@ -684,24 +682,22 @@ function openModal(id) {
     </div>`;
   }
 
-  /* ── 항공편 선택 (도착 / 출발, 패키지만) ── */
-  if (isPkg && flightOpts.length) {
-    const renderFlightSection = (type, title) => `
+  /* ── 항공편 정보 (자유 입력, 패키지만) — 2026-07-20: 미리 정해둔 노선 목록에서 고르는 대신
+     실제 항공편(항공사·편명)을 직접 입력하거나, 아직 미정이면 비워두고 비고에 메모하도록 변경 */
+  if (isPkg) {
+    html += `
     <div class="booking-section">
-      <div class="booking-section-title">${title}</div>
-      ${flightOpts.map(f => `
-        <div class="option-row" onclick="selectFlight('${type}','${f.key}')">
-          <div class="opt-check radio" id="o${type}-${f.key}"></div>
-          ${f.image ? `<img class="option-thumb" src="${f.image}" alt="">` : ''}
-          <div class="option-info">
-            <div class="option-label">${f.name || ''}${f.location ? ` · ${f.location}` : ''}</div>
-            <div class="option-price">${f.time ? f.time + (f.desc ? ' · ' : '') : ''}${f.desc || ''}</div>
-          </div>
-        </div>`).join('')}
+      <div class="booking-section-title">✈️ 항공편 정보 (선택 사항)</div>
+      <div class="field-group" style="margin-bottom:10px">
+        <div class="date-field-label" style="margin-bottom:4px">도착 항공편 (한국 → 장가계)</div>
+        <input type="text" class="date-input" id="bk-arr-flight" placeholder="예: 대한항공 KE163 (모르면 비워두세요)" oninput="_arrFlightInfo=this.value">
+      </div>
+      <div class="field-group">
+        <div class="date-field-label" style="margin-bottom:4px">출발 항공편 (장가계 → 한국)</div>
+        <input type="text" class="date-input" id="bk-dep-flight" placeholder="예: 대한항공 KE164 (모르면 비워두세요)" oninput="_depFlightInfo=this.value">
+      </div>
+      <div class="min-pax-note">📌 항공권은 포함 사항이 아닙니다. 아직 항공편이 확정되지 않았다면 위 칸은 비워두고, 출발일/귀국일만 선택한 뒤 아래 기타 요청사항에 메모해 주세요.</div>
     </div>`;
-    html += renderFlightSection('arr', '✈️ 도착 항공편 선택 (한국 → 장가계)');
-    html += renderFlightSection('dep', '🛫 출발 항공편 선택 (장가계 → 한국)');
-    html += `<div class="min-pax-note">📌 항공권은 포함 사항이 아니며, 선택하신 항공편 정보는 공항 픽업·센딩 시간을 맞추기 위한 참고용입니다. 정확한 스케줄은 상담을 통해 확인해 주세요.</div>`;
   }
 
   /* ── 그룹(라디오, 단일선택) 옵션 + 일반(체크박스, 다중선택) 옵션 ── */
@@ -807,8 +803,6 @@ function openModal(id) {
     if (_opts[k]) { const el = document.getElementById('oc-' + k); if (el) el.classList.add('checked'); }
   });
   if (_hotel) { const el = document.getElementById('oh-' + _hotel); if (el) el.classList.add('checked'); }
-  if (_arrFlight) { const el = document.getElementById('oarr-' + _arrFlight); if (el) el.classList.add('checked'); }
-  if (_depFlight) { const el = document.getElementById('odep-' + _depFlight); if (el) el.classList.add('checked'); }
   if (isPkg) { renderDayPlan(); renderAddons(); }
   document.getElementById('modal-bg').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -872,16 +866,6 @@ function selectHotel(key) {
   updatePriceSummary();
 }
 
-/* ───── 항공편 선택 (도착/출발 각각 라디오, 단일선택) ───── */
-function selectFlight(type, key) {
-  if (type === 'arr') _arrFlight = key; else _depFlight = key;
-  const prefix = type === 'arr' ? 'oarr-' : 'odep-';
-  GLOBAL_FLIGHTS.forEach(f => {
-    const el = document.getElementById(prefix + f.key);
-    if (el) el.classList.toggle('checked', f.key === key);
-  });
-}
-
 /* ───── 맞춤투어 일자별 일정 빌더 (2026-07-20 v2 — 슬롯 타입 기반, 전면 모듈화) ─────
    1일차: 항상 고정 (공항 픽업 → 호텔 투숙, 관광 없음)
    마지막날: 오전 반나절만 가능 (항공편 시간에 맞춰 가이드가 현장 조정), 오후/저녁 없음
@@ -911,7 +895,8 @@ function eveningOptions() {
   const placeItems = GLOBAL_PLACES.map(pl => ({ type: 'place', id: pl.id, label: pl.name_ko, price: 0 }));
   return attrOptionsBySlot('evening').concat(placeItems);
 }
-function priceTag(price) { return price ? ` · ${price.toLocaleString()}위안` : ''; }
+/* 2026-07-20 확정: 원가(위안) 단가는 고객에게 노출하지 않음 — 일정 빌더에는 명소명만 표시 */
+function priceTag(price) { return ''; }
 
 /* 콤보(오후+저녁/오후+저녁+익일오전) 헬퍼: 해당 일차가 콤보의 시작일인지 / 다음날(익일오전) 연속인지 판정 */
 function comboAtStart(day) { return _pkgCombos.find(c => c.day === day) || null; }
@@ -1290,7 +1275,6 @@ function buildMsg(p) {
   const tiers  = Array.isArray(p.price_tiers)  ? p.price_tiers  : [];
   const options = Array.isArray(p.tour_options) ? p.tour_options : [];
   const hotelOpts = GLOBAL_HOTELS;
-  const flightOpts = GLOBAL_FLIGHTS;
   const isPkg = p.product_type === 'package';
 
   let msg = `[로투차 투어 예약 문의]\n━━━━━━━━━━━━━━\n`;
@@ -1299,14 +1283,10 @@ function buildMsg(p) {
   if (isPkg) {
     msg += `📅 출발(도착)일: ${_date || '(미선택)'}${_arrTime ? ' ' + _arrTime : ''}\n`;
     msg += `🛬 귀국일: ${_returnDate || '(미선택)'}${_depTime ? ' ' + _depTime : ''}\n`;
+    msg += `✈️ 도착 항공편: ${_arrFlightInfo || '(미정)'}\n`;
+    msg += `🛫 출발 항공편: ${_depFlightInfo || '(미정)'}\n`;
   } else {
     msg += `📅 여행 날짜: ${_date || '(미선택)'}\n`;
-  }
-  if (isPkg && flightOpts.length) {
-    const arr = flightOpts.find(f => f.key === _arrFlight);
-    const dep = flightOpts.find(f => f.key === _depFlight);
-    msg += `✈️ 도착 항공편: ${arr ? `${arr.name}${arr.time ? ' ('+arr.time+')' : ''}` : '(미선택)'}\n`;
-    msg += `🛫 출발 항공편: ${dep ? `${dep.name}${dep.time ? ' ('+dep.time+')' : ''}` : '(미선택)'}\n`;
   }
   msg += `━━━━━━━━━━━━━━\n👥 인원:\n`;
 
@@ -1404,7 +1384,7 @@ function quickInquire(id) {
   const p = allProducts.find(x => x.id === id);
   if (!p) return;
   _modalProductId = id;
-  _pax = {}; _opts = {}; _date = ''; _returnDate = ''; _arrTime = ''; _depTime = ''; _hotel = null; _arrFlight = null; _depFlight = null; _mealNote = ''; _pkgDays = []; _pkgCombos = []; _addons = {};
+  _pax = {}; _opts = {}; _date = ''; _returnDate = ''; _arrTime = ''; _depTime = ''; _hotel = null; _arrFlightInfo = ''; _depFlightInfo = ''; _mealNote = ''; _pkgDays = []; _pkgCombos = []; _addons = {};
   sendInquiry('kakao', buildMsg(p));
 }
 
