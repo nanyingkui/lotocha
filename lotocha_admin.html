@@ -34,7 +34,11 @@ body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:v
 .sb-logo h2{color:var(--gold);font-size:14px;font-weight:900;margin-top:4px}
 .sb-logo p{color:rgba(255,255,255,.4);font-size:11px;margin-top:2px}
 .sb-nav{padding:12px 0}
-.sb-section{padding:8px 20px 4px;font-size:10px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:.5px}
+.sb-group-header{width:100%;display:flex;align-items:center;justify-content:space-between;padding:10px 20px 6px;font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.5px;background:none;border:none;cursor:pointer;font-family:inherit}
+.sb-group-header:hover{color:#fff}
+.sb-group-arrow{transition:transform .2s;font-size:10px}
+.sb-group.collapsed .sb-group-arrow{transform:rotate(-90deg)}
+.sb-group.collapsed .sb-group-body{display:none}
 .sb-item{display:flex;align-items:center;gap:10px;padding:9px 20px;color:rgba(255,255,255,.6);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;border:none;background:none;width:100%;text-align:left;font-family:inherit}
 .sb-item:hover{background:rgba(255,255,255,.06);color:#fff}
 .sb-item.active{background:rgba(245,166,35,.15);color:var(--gold)}
@@ -56,6 +60,11 @@ body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:v
 
 /* ── 테이블 ── */
 .table-wrap{background:var(--white);border-radius:14px;box-shadow:0 2px 8px rgba(26,42,94,.06);overflow:hidden;margin-bottom:20px}
+.subtab-bar{display:flex;gap:6px;margin-bottom:16px;border-bottom:1.5px solid #eee;flex-wrap:wrap}
+.subtab-btn{background:none;border:none;padding:10px 14px;font-size:13px;font-weight:700;color:#999;cursor:pointer;font-family:inherit;border-bottom:2.5px solid transparent;margin-bottom:-1.5px}
+.subtab-btn.active{color:var(--navy);border-bottom-color:var(--gold)}
+.pricing-subtab{display:none}
+.pricing-subtab.active{display:block}
 .table-head{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .table-head h3{font-size:14px;font-weight:900;color:var(--navy)}
 .btn-add{background:var(--navy);color:var(--gold);border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
@@ -171,67 +180,97 @@ textarea.field-input{min-height:80px;resize:vertical}
       <p id="sb-role">-</p>
     </div>
     <nav class="sb-nav">
-      <div class="sb-section">콘텐츠</div>
-      <button class="sb-item active" data-panel="dashboard" onclick="showPanel('dashboard',this)">
-        <span class="icon">📊</span>대시보드
-      </button>
-      <button class="sb-item" data-panel="tours" onclick="showPanel('tours',this)">
-        <span class="icon">🏔️</span>투어 상품
-      </button>
-      <button class="sb-item" data-panel="spots" onclick="showPanel('spots',this)">
-        <span class="icon">📍</span>가이드 스팟
-      </button>
-      <button class="sb-item" data-panel="places" onclick="showPanel('places',this)">
-        <span class="icon">🏪</span>현지 업체
-      </button>
-      <div class="sb-section">맞춤투어 공용 데이터</div>
-      <button class="sb-item" data-panel="hotels" onclick="showPanel('hotels',this)">
-        <span class="icon">🏨</span>호텔 관리
-      </button>
-      <button class="sb-item" data-panel="flights" onclick="showPanel('flights',this)">
-        <span class="icon">✈️</span>항공편 관리
-      </button>
-      <button class="sb-item" data-panel="attractions" onclick="showPanel('attractions',this)">
-        <span class="icon">🗺️</span>명소 관리
-      </button>
-      <div class="sb-section">가이드 콘텐츠</div>
-      <button class="sb-item" data-panel="showstickets" onclick="showPanel('showstickets',this)">
-        <span class="icon">🎭</span>공연 · 입장권
-      </button>
-      <button class="sb-item" data-panel="paymethods" onclick="showPanel('paymethods',this)">
-        <span class="icon">💳</span>결제 방법
-      </button>
-      <button class="sb-item" data-panel="emergency" onclick="showPanel('emergency',this)">
-        <span class="icon">🛟</span>안전 · 응급
-      </button>
-      <button class="sb-item" data-panel="phrases" onclick="showPanel('phrases',this)">
-        <span class="icon">💬</span>현지 회화
-      </button>
-      <button class="sb-item" data-panel="tips" onclick="showPanel('tips',this)">
-        <span class="icon">💡</span>여행 팁
-      </button>
-      <div class="sb-section">카테고리 관리</div>
-      <button class="sb-item" data-panel="regions" onclick="showPanel('regions',this)">
-        <span class="icon">🗺️</span>지역
-      </button>
-      <button class="sb-item" data-panel="placecats" onclick="showPanel('placecats',this)">
-        <span class="icon">🏷️</span>업체 카테고리
-      </button>
-      <button class="sb-item" data-panel="guideattr" onclick="showPanel('guideattr',this)">
-        <span class="icon">🏔️</span>경관지
-      </button>
-      <div class="sb-section">운영</div>
-      <button class="sb-item" data-panel="reviews" onclick="showPanel('reviews',this)">
-        <span class="icon">💬</span>리뷰 관리
-        <span class="sb-badge" id="review-badge" style="display:none">0</span>
-      </button>
-      <button class="sb-item" data-panel="stats" onclick="showPanel('stats',this)">
-        <span class="icon">📈</span>방문 통계
-      </button>
-      <div class="sb-section" id="sb-section-users" style="display:none">관리자</div>
-      <button class="sb-item" id="sb-users-btn" data-panel="users" onclick="showPanel('users',this)" style="display:none">
-        <span class="icon">👥</span>사용자 관리
-      </button>
+      <div class="sb-group" data-group="content">
+        <button class="sb-group-header" onclick="toggleSbGroup(this)"><span>콘텐츠</span><span class="sb-group-arrow">▾</span></button>
+        <div class="sb-group-body">
+          <button class="sb-item active" data-panel="dashboard" onclick="showPanel('dashboard',this)">
+            <span class="icon">📊</span>대시보드
+          </button>
+          <button class="sb-item" data-panel="tours" onclick="showPanel('tours',this)">
+            <span class="icon">🏔️</span>투어 상품
+          </button>
+          <button class="sb-item" data-panel="spots" onclick="showPanel('spots',this)">
+            <span class="icon">📍</span>가이드 스팟
+          </button>
+          <button class="sb-item" data-panel="places" onclick="showPanel('places',this)">
+            <span class="icon">🏪</span>현지 업체
+          </button>
+        </div>
+      </div>
+      <div class="sb-group" data-group="tourdata">
+        <button class="sb-group-header" onclick="toggleSbGroup(this)"><span>맞춤투어 공용 데이터</span><span class="sb-group-arrow">▾</span></button>
+        <div class="sb-group-body">
+          <button class="sb-item" data-panel="hotels" onclick="showPanel('hotels',this)">
+            <span class="icon">🏨</span>호텔 관리
+          </button>
+          <button class="sb-item" data-panel="flights" onclick="showPanel('flights',this)">
+            <span class="icon">✈️</span>항공편 관리
+          </button>
+          <button class="sb-item" data-panel="attractions" onclick="showPanel('attractions',this)">
+            <span class="icon">🗺️</span>명소 관리
+          </button>
+          <button class="sb-item" data-panel="addonsvc" onclick="showPanel('addonsvc',this)">
+            <span class="icon">💆</span>부가서비스 관리
+          </button>
+          <button class="sb-item" data-panel="pricing" onclick="showPanel('pricing',this)">
+            <span class="icon">💰</span>가격 설정
+          </button>
+        </div>
+      </div>
+      <div class="sb-group" data-group="guide">
+        <button class="sb-group-header" onclick="toggleSbGroup(this)"><span>가이드 콘텐츠</span><span class="sb-group-arrow">▾</span></button>
+        <div class="sb-group-body">
+          <button class="sb-item" data-panel="showstickets" onclick="showPanel('showstickets',this)">
+            <span class="icon">🎭</span>공연 · 입장권
+          </button>
+          <button class="sb-item" data-panel="paymethods" onclick="showPanel('paymethods',this)">
+            <span class="icon">💳</span>결제 방법
+          </button>
+          <button class="sb-item" data-panel="emergency" onclick="showPanel('emergency',this)">
+            <span class="icon">🛟</span>안전 · 응급
+          </button>
+          <button class="sb-item" data-panel="phrases" onclick="showPanel('phrases',this)">
+            <span class="icon">💬</span>현지 회화
+          </button>
+          <button class="sb-item" data-panel="tips" onclick="showPanel('tips',this)">
+            <span class="icon">💡</span>여행 팁
+          </button>
+        </div>
+      </div>
+      <div class="sb-group" data-group="category">
+        <button class="sb-group-header" onclick="toggleSbGroup(this)"><span>카테고리 관리</span><span class="sb-group-arrow">▾</span></button>
+        <div class="sb-group-body">
+          <button class="sb-item" data-panel="regions" onclick="showPanel('regions',this)">
+            <span class="icon">🗺️</span>지역
+          </button>
+          <button class="sb-item" data-panel="placecats" onclick="showPanel('placecats',this)">
+            <span class="icon">🏷️</span>업체 카테고리
+          </button>
+          <button class="sb-item" data-panel="guideattr" onclick="showPanel('guideattr',this)">
+            <span class="icon">🏔️</span>경관지
+          </button>
+        </div>
+      </div>
+      <div class="sb-group" data-group="ops">
+        <button class="sb-group-header" onclick="toggleSbGroup(this)"><span>운영</span><span class="sb-group-arrow">▾</span></button>
+        <div class="sb-group-body">
+          <button class="sb-item" data-panel="reviews" onclick="showPanel('reviews',this)">
+            <span class="icon">💬</span>리뷰 관리
+            <span class="sb-badge" id="review-badge" style="display:none">0</span>
+          </button>
+          <button class="sb-item" data-panel="stats" onclick="showPanel('stats',this)">
+            <span class="icon">📈</span>방문 통계
+          </button>
+        </div>
+      </div>
+      <div class="sb-group" data-group="admin" id="sb-group-users" style="display:none">
+        <button class="sb-group-header" onclick="toggleSbGroup(this)"><span>관리자</span><span class="sb-group-arrow">▾</span></button>
+        <div class="sb-group-body">
+          <button class="sb-item" id="sb-users-btn" data-panel="users" onclick="showPanel('users',this)">
+            <span class="icon">👥</span>사용자 관리
+          </button>
+        </div>
+      </div>
     </nav>
     <div class="sb-footer">
       <div class="sb-user" id="sb-email"></div>
@@ -338,11 +377,79 @@ textarea.field-input{min-height:80px;resize:vertical}
     <!-- 명소 관리 (전역 공용) -->
     <div class="panel" id="panel-attractions">
       <div class="page-title">🗺️ 명소 관리</div>
-      <div class="page-sub">맞춤투어 "일정 직접 짜기"에서 쓰이는 명소 풀 (대형/특색/인문). ※ 도우미 페이지의 "경관지"(위 카테고리 관리)와는 다른 목록입니다.</div>
+      <div class="page-sub">맞춤투어 "일정 직접 짜기"에서 쓰이는 명소 풀 (슬롯 타입별로 자유 조합). ※ 도우미 페이지의 "경관지"(위 카테고리 관리)와는 다른 목록입니다.</div>
       <div class="table-wrap">
         <div class="table-head"><h3>전체 명소</h3><button class="btn-add" onclick="openAttractionPoolModal()">+ 명소 추가</button></div>
-        <table><thead><tr><th>key</th><th>라벨</th><th>분류</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <table><thead><tr><th>key</th><th>라벨</th><th>슬롯 타입</th><th>1인당 요금</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
         <tbody id="attractions-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- 부가서비스 관리 (전역 공용, 마사지 등 슬롯 미점유 항목) -->
+    <div class="panel" id="panel-addonsvc">
+      <div class="page-title">💆 부가서비스 관리</div>
+      <div class="page-sub">마사지 등 시간대 슬롯을 점유하지 않는 개인별 추가 항목. 요금에는 차량·기사·가이드비가 이미 포함되어 있습니다.</div>
+      <div class="table-wrap">
+        <div class="table-head"><h3>전체 항목</h3><button class="btn-add" onclick="openAddonModal()">+ 항목 추가</button></div>
+        <table><thead><tr><th>항목명</th><th>소요시간</th><th>1인당 요금</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <tbody id="addonsvc-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- 가격 설정 (전역 공용 — 원가 단가/환율/이윤/연령할인/자연손모를 한 곳에 모음) -->
+    <div class="panel" id="panel-pricing">
+      <div class="page-title">💰 가격 설정</div>
+      <div class="page-sub">원가 단가·환율·이윤·연령 할인·자연손모를 한 페이지에서 관리합니다.</div>
+      <div class="subtab-bar">
+        <button class="subtab-btn active" data-subtab="rates" onclick="showPricingSubtab('rates',this)">원가 단가 · 환율</button>
+        <button class="subtab-btn" data-subtab="margin" onclick="showPricingSubtab('margin',this)">이윤 설정</button>
+        <button class="subtab-btn" data-subtab="agediscount" onclick="showPricingSubtab('agediscount',this)">연령 할인</button>
+        <button class="subtab-btn" data-subtab="costbuffer" onclick="showPricingSubtab('costbuffer',this)">자연손모 · 기타원가</button>
+      </div>
+
+      <div class="pricing-subtab active" id="pst-rates">
+        <div class="page-sub">값이 비어있는(고객센터 문의) 항목은 고정 단가가 없다는 뜻입니다. exchange_rate는 위안→원 환율입니다.</div>
+        <div class="table-wrap">
+          <div class="table-head"><h3>전체 항목</h3></div>
+          <table><thead><tr><th>항목</th><th>단가</th><th>단위</th><th>비고</th><th>액션</th></tr></thead>
+          <tbody id="pricing-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div class="pricing-subtab" id="pst-margin">
+        <div class="page-sub">인당(모든 인원 각각 고정 마진) 또는 주문당(예약 1건당 고정 마진) 중 선택하고, 금액(원) 또는 원가 대비 비율(%) 중 선택합니다.</div>
+        <div class="field-row">
+          <div class="field-group"><label class="field-label">기준</label>
+            <select id="mg-mode" class="field-input">
+              <option value="per_person">인당</option>
+              <option value="per_order">주문당</option>
+            </select></div>
+          <div class="field-group"><label class="field-label">방식</label>
+            <select id="mg-type" class="field-input">
+              <option value="amount">고정 금액 (원)</option>
+              <option value="percent">원가 대비 비율 (%)</option>
+            </select></div>
+        </div>
+        <div class="field-group"><label class="field-label">값</label><input type="number" id="mg-value" class="field-input"></div>
+        <button class="btn-save" onclick="saveMargin()">저장</button>
+      </div>
+
+      <div class="pricing-subtab" id="pst-agediscount">
+        <div class="page-sub">장가계 관광지 경로할인 등, 연령대별 1인당 원화 고정 할인액</div>
+        <div class="table-wrap">
+          <div class="table-head"><h3>전체 항목</h3><button class="btn-add" onclick="openAgeDiscModal()">+ 항목 추가</button></div>
+          <table><thead><tr><th>구간</th><th>연령 범위</th><th>1인당 할인액</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+          <tbody id="agediscount-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div class="pricing-subtab" id="pst-costbuffer">
+        <div class="page-sub">자연손모 등 견적에 반영할 기타 원가 항목 (이름·금액·통화·단위 자유 설정)</div>
+        <div class="table-wrap">
+          <div class="table-head"><h3>전체 항목</h3><button class="btn-add" onclick="openCostBufferModal()">+ 항목 추가</button></div>
+          <table><thead><tr><th>항목명</th><th>금액</th><th>통화</th><th>기준</th><th>상태</th><th>액션</th></tr></thead>
+          <tbody id="costbuffer-tbody"></tbody></table>
+        </div>
       </div>
     </div>
 
@@ -722,14 +829,18 @@ textarea.field-input{min-height:80px;resize:vertical}
         <div class="field-group"><label class="field-label">key (영문) *</label><input type="text" id="atp-key" class="field-input" placeholder="예: tianmen"></div>
         <div class="field-group"><label class="field-label">라벨 *</label><input type="text" id="atp-label" class="field-input" placeholder="예: 천문산"></div>
       </div>
-      <div class="field-group"><label class="field-label">분류 *</label>
-        <select id="atp-cat" class="field-input">
-          <option value="large">대형 (반나절, 같은 날 1개만)</option>
-          <option value="feature">특색 (반나절, 하루 여러 개 가능)</option>
-          <option value="local">인문 (시간대 제약 없음, 중복 가능)</option>
+      <div class="field-group"><label class="field-label">슬롯 타입 *</label>
+        <select id="atp-slot" class="field-input">
+          <option value="full_day">하루종일 (오전+오후 모두 사용)</option>
+          <option value="half_day">반나절 (오전 또는 오후, 자유 교체)</option>
+          <option value="evening">저녁/야간 전용</option>
+          <option value="pm_evening">오후+저녁 결합 (당일치기)</option>
+          <option value="pm_evening_nextam">오후+저녁+익일오전 결합</option>
         </select>
         <div class="field-hint">기존 일정 데이터에서 이 key를 참조하므로, 한번 저장한 key는 가능하면 바꾸지 마세요</div>
       </div>
+      <div class="field-group"><label class="field-label">1인당 요금 (위안)</label>
+        <input type="number" id="atp-price" class="field-input" value="0" placeholder="예: 260 (무료면 0)"></div>
       <div class="field-group"><label class="field-label">설명</label><textarea id="atp-desc" class="field-input"></textarea></div>
       <div class="field-group"><label class="field-label">이미지 URL</label>
         <input type="text" id="atp-image" class="field-input">
@@ -745,6 +856,109 @@ textarea.field-input{min-height:80px;resize:vertical}
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeAttractionPoolModal()">취소</button>
       <button class="btn-save" onclick="saveAttractionPool()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 부가서비스 모달 (전역 공용) -->
+<div class="modal-bg" id="addon-modal-bg">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="addon-modal-title">부가서비스 추가</h3>
+      <button class="modal-close" onclick="closeAddonModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="addon-id">
+      <div class="field-group"><label class="field-label">항목명 *</label><input type="text" id="addon-name" class="field-input" placeholder="예: 발마사지 60분"></div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">소요시간 (분)</label><input type="number" id="addon-duration" class="field-input" placeholder="예: 60"></div>
+        <div class="field-group"><label class="field-label">1인당 요금 (위안)</label><input type="number" id="addon-price" class="field-input" value="0"></div>
+      </div>
+      <div class="field-group"><label class="field-label">비고</label><input type="text" id="addon-note" class="field-input" placeholder="예: 차량·기사·가이드비 포함"></div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="addon-order" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">상태</label>
+          <select id="addon-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeAddonModal()">취소</button>
+      <button class="btn-save" onclick="saveAddon()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 가격 설정 모달 (전역 공용, key 고정 — value/note만 수정) -->
+<div class="modal-bg" id="pricing-modal-bg">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="pricing-modal-title">가격 설정 편집</h3>
+      <button class="modal-close" onclick="closePricingModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="pr-key">
+      <div class="field-group"><label class="field-label">단가 (비워두면 "고객센터 문의")</label><input type="number" id="pr-value" class="field-input" placeholder="예: 500"></div>
+      <div class="field-group"><label class="field-label">비고</label><input type="text" id="pr-note" class="field-input"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closePricingModal()">취소</button>
+      <button class="btn-save" onclick="savePricing()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 연령 할인 모달 -->
+<div class="modal-bg" id="agedisc-modal-bg">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="agedisc-modal-title">연령 할인 추가</h3>
+      <button class="modal-close" onclick="closeAgeDiscModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="agedisc-id">
+      <div class="field-group"><label class="field-label">구간명 *</label><input type="text" id="agedisc-label" class="field-input" placeholder="예: 만 60세 이상"></div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">최소 연령 (비우면 제한 없음)</label><input type="number" id="agedisc-minage" class="field-input"></div>
+        <div class="field-group"><label class="field-label">최대 연령 (비우면 제한 없음)</label><input type="number" id="agedisc-maxage" class="field-input"></div>
+      </div>
+      <div class="field-group"><label class="field-label">1인당 할인액 (원)</label><input type="number" id="agedisc-krw" class="field-input" value="0"></div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="agedisc-order" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">상태</label>
+          <select id="agedisc-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeAgeDiscModal()">취소</button>
+      <button class="btn-save" onclick="saveAgeDisc()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 자연손모 · 기타원가 모달 -->
+<div class="modal-bg" id="costbuffer-modal-bg">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="costbuffer-modal-title">기타원가 추가</h3>
+      <button class="modal-close" onclick="closeCostBufferModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="costbuffer-id">
+      <div class="field-group"><label class="field-label">항목명 *</label><input type="text" id="costbuffer-name" class="field-input" placeholder="예: 자연손모"></div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">금액</label><input type="number" id="costbuffer-amount" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">통화</label>
+          <select id="costbuffer-currency" class="field-input"><option value="CNY">위안 (CNY)</option><option value="KRW">원 (KRW)</option></select></div>
+      </div>
+      <div class="field-group"><label class="field-label">기준</label>
+        <select id="costbuffer-perunit" class="field-input"><option value="order">주문당</option><option value="pax">인당</option></select></div>
+      <div class="field-group"><label class="field-label">비고</label><input type="text" id="costbuffer-note" class="field-input"></div>
+      <div class="field-group"><label class="field-label">상태</label>
+        <select id="costbuffer-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeCostBufferModal()">취소</button>
+      <button class="btn-save" onclick="saveCostBuffer()">저장</button>
     </div>
   </div>
 </div>
@@ -1148,11 +1362,11 @@ async function initApp(user) {
   document.getElementById('sb-email').textContent = user.email;
   document.getElementById('sb-role').textContent = {superadmin:'슈퍼어드민',admin:'어드민',editor:'에디터'}[userRole]||userRole;
   if (userRole === 'superadmin' || userRole === 'admin') {
-    document.getElementById('sb-section-users').style.display = '';
-    document.getElementById('sb-users-btn').style.display = '';
+    document.getElementById('sb-group-users').style.display = '';
   }
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
+  restoreSbGroups();
   await loadCategoryData();
   loadDashboard();
 }
@@ -1161,12 +1375,36 @@ function showPanel(id, btn) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
   document.getElementById('panel-' + id).classList.add('active');
-  if (btn) btn.classList.add('active');
+  if (btn) {
+    btn.classList.add('active');
+    const grp = btn.closest('.sb-group');
+    if (grp) grp.classList.remove('collapsed');
+  }
   const loaders = {dashboard:loadDashboard,tours:loadTours,spots:loadSpots,places:loadPlaces,reviews:loadReviews,stats:loadStats,users:loadUsers,
     hotels:loadHotelPool,flights:loadFlightPool,attractions:loadAttractionPool,
+    addonsvc:loadAddonSvc,pricing:loadPricing,
     showstickets:loadST,paymethods:loadPM,emergency:loadEI,phrases:loadPH,tips:loadTP,
     regions:loadRG,placecats:loadPC,guideattr:loadGA};
   if (loaders[id]) loaders[id]();
+}
+
+/* 사이드바 그룹 접기/펼치기 — 상태를 기억해 다음 방문 때도 유지 */
+function toggleSbGroup(headerBtn) {
+  const grp = headerBtn.closest('.sb-group');
+  if (!grp) return;
+  grp.classList.toggle('collapsed');
+  try {
+    const collapsed = [...document.querySelectorAll('.sb-group.collapsed')].map(g => g.dataset.group);
+    localStorage.setItem('lotocha_admin_sb_collapsed', JSON.stringify(collapsed));
+  } catch (e) {}
+}
+function restoreSbGroups() {
+  try {
+    const collapsed = JSON.parse(localStorage.getItem('lotocha_admin_sb_collapsed') || '[]');
+    document.querySelectorAll('.sb-group').forEach(g => {
+      if (collapsed.includes(g.dataset.group)) g.classList.add('collapsed');
+    });
+  } catch (e) {}
 }
 
 async function loadDashboard() {
@@ -1391,14 +1629,16 @@ async function deleteFlightPool(id) {
 
 /* ───── 명소 관리 (전역 공용, tour_attractions — 맞춤투어 "일정 직접 짜기"용. 도우미 페이지 경관지(guide_attractions)와는 다른 테이블) ───── */
 const ATTR_POOL_CAT_LABELS = {large:'대형',feature:'특색',local:'인문'};
+const SLOT_TYPE_LABELS = {full_day:'하루종일',half_day:'반나절',evening:'저녁/야간',pm_evening:'오후+저녁',pm_evening_nextam:'오후+저녁+익일오전'};
 async function loadAttractionPool() {
   const { data } = await sb.from('tour_attractions').select('*').order('sort_order');
-  document.getElementById('attractions-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">로드 실패 (테이블이 없으면 lotocha_supabase_global_pools.sql 실행 필요)</td></tr>'
-    : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">등록된 명소 없음</td></tr>'
+  document.getElementById('attractions-tbody').innerHTML = !data ? '<tr><td colspan="7" style="color:var(--red)">로드 실패 (테이블이 없으면 lotocha_supabase_global_pools.sql / lotocha_supabase_pricing_model.sql 실행 필요)</td></tr>'
+    : !data.length ? '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:20px">등록된 명소 없음</td></tr>'
     : data.map(a=>`<tr>
         <td style="font-family:monospace;font-size:12px">${a.key}</td>
         <td style="font-weight:700">${a.label}</td>
-        <td>${ATTR_POOL_CAT_LABELS[a.cat]||a.cat}</td>
+        <td>${SLOT_TYPE_LABELS[a.slot_type]||a.slot_type||'-'}</td>
+        <td>${a.price ? a.price+'위안' : '무료'}</td>
         <td><span class="badge badge-${a.is_active?'live':'archived'}">${a.is_active?'활성':'비활성'}</span></td>
         <td>${a.sort_order}</td>
         <td><div class="act-btns"><button class="btn-edit" onclick="openAttractionPoolModal('${a.id}')">편집</button>
@@ -1409,7 +1649,8 @@ function openAttractionPoolModal(id) {
   const flds = ['atp-id','atp-key','atp-label','atp-desc','atp-image'];
   if (!id) {
     flds.forEach(f=>document.getElementById(f).value='');
-    document.getElementById('atp-cat').value='feature';
+    document.getElementById('atp-slot').value='half_day';
+    document.getElementById('atp-price').value='0';
     document.getElementById('atp-order').value='0'; document.getElementById('atp-active').value='1';
   } else {
     sb.from('tour_attractions').select('*').eq('id',id).single().then(({data:a})=>{
@@ -1417,7 +1658,8 @@ function openAttractionPoolModal(id) {
       document.getElementById('atp-id').value=a.id;
       document.getElementById('atp-key').value=a.key||'';
       document.getElementById('atp-label').value=a.label||'';
-      document.getElementById('atp-cat').value=a.cat||'feature';
+      document.getElementById('atp-slot').value=a.slot_type||'half_day';
+      document.getElementById('atp-price').value=a.price||0;
       document.getElementById('atp-desc').value=a.desc_ko||'';
       document.getElementById('atp-image').value=a.image||'';
       document.getElementById('atp-order').value=a.sort_order||0;
@@ -1435,8 +1677,12 @@ async function saveAttractionPool() {
   const key = document.getElementById('atp-key').value.trim();
   const label = document.getElementById('atp-label').value.trim();
   if (!key || !label) { toast('key와 라벨을 입력하세요','error'); return; }
+  const slotType = document.getElementById('atp-slot').value;
+  /* cat은 하위호환용 — slot_type 기준으로 대략 매핑해 자동 채움 */
+  const catMap = {full_day:'large', half_day:'feature', evening:'local', pm_evening:'large', pm_evening_nextam:'large'};
   const payload = {
-    key, label, cat: document.getElementById('atp-cat').value,
+    key, label, cat: catMap[slotType]||'feature', slot_type: slotType,
+    price: parseInt(document.getElementById('atp-price').value)||0,
     desc_ko: document.getElementById('atp-desc').value.trim()||null,
     image: document.getElementById('atp-image').value.trim()||null,
     sort_order: parseInt(document.getElementById('atp-order').value)||0,
@@ -1452,6 +1698,266 @@ async function deleteAttractionPool(id) {
   const { error } = await sb.from('tour_attractions').delete().eq('id',id);
   if (error) { toast('삭제 실패','error'); return; }
   toast('삭제되었습니다'); loadAttractionPool();
+}
+
+/* ───── 부가서비스 관리 (전역 공용, tour_addon_services — 마사지 등 슬롯 미점유 항목) ───── */
+async function loadAddonSvc() {
+  const { data } = await sb.from('tour_addon_services').select('*').order('sort_order');
+  document.getElementById('addonsvc-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">로드 실패 (테이블이 없으면 lotocha_supabase_pricing_model.sql 실행 필요)</td></tr>'
+    : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">등록된 항목 없음</td></tr>'
+    : data.map(a=>`<tr>
+        <td style="font-weight:700">${a.name}</td>
+        <td>${a.duration_min?a.duration_min+'분':'-'}</td>
+        <td>${a.price?a.price+'위안':'무료'}</td>
+        <td><span class="badge badge-${a.is_active?'live':'archived'}">${a.is_active?'활성':'비활성'}</span></td>
+        <td>${a.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openAddonModal('${a.id}')">편집</button>
+        <button class="btn-del" onclick="deleteAddon('${a.id}')">삭제</button></div></td></tr>`).join('');
+}
+function openAddonModal(id) {
+  document.getElementById('addon-modal-title').textContent = id ? '부가서비스 편집' : '부가서비스 추가';
+  const flds = ['addon-id','addon-name','addon-duration','addon-price','addon-note'];
+  if (!id) {
+    flds.forEach(f=>document.getElementById(f).value='');
+    document.getElementById('addon-order').value='0'; document.getElementById('addon-active').value='1';
+  } else {
+    sb.from('tour_addon_services').select('*').eq('id',id).single().then(({data:a})=>{
+      if (!a) return;
+      document.getElementById('addon-id').value=a.id;
+      document.getElementById('addon-name').value=a.name||'';
+      document.getElementById('addon-duration').value=a.duration_min||'';
+      document.getElementById('addon-price').value=a.price||0;
+      document.getElementById('addon-note').value=a.note||'';
+      document.getElementById('addon-order').value=a.sort_order||0;
+      document.getElementById('addon-active').value=a.is_active?'1':'0';
+    });
+  }
+  document.getElementById('addon-modal-bg').classList.add('open');
+}
+function closeAddonModal(e) {
+  if (e && e.target !== document.getElementById('addon-modal-bg')) return;
+  document.getElementById('addon-modal-bg').classList.remove('open');
+}
+async function saveAddon() {
+  const id = document.getElementById('addon-id').value;
+  const name = document.getElementById('addon-name').value.trim();
+  if (!name) { toast('항목명을 입력하세요','error'); return; }
+  const payload = {
+    name,
+    duration_min: parseInt(document.getElementById('addon-duration').value)||null,
+    price: parseInt(document.getElementById('addon-price').value)||0,
+    note: document.getElementById('addon-note').value.trim()||null,
+    sort_order: parseInt(document.getElementById('addon-order').value)||0,
+    is_active: document.getElementById('addon-active').value==='1',
+    updated_at: new Date().toISOString(),
+  };
+  const { error } = id ? await sb.from('tour_addon_services').update(payload).eq('id',id) : await sb.from('tour_addon_services').insert(payload);
+  if (error) { toast('저장 실패: '+error.message,'error'); return; }
+  toast(id?'수정되었습니다':'추가되었습니다','success'); closeAddonModal(); loadAddonSvc();
+}
+async function deleteAddon(id) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  const { error } = await sb.from('tour_addon_services').delete().eq('id',id);
+  if (error) { toast('삭제 실패','error'); return; }
+  toast('삭제되었습니다'); loadAddonSvc();
+}
+
+/* ───── 가격 설정 (전역 공용, tour_pricing_settings — key는 고정, value/note만 수정) ───── */
+async function loadPricing() {
+  const { data } = await sb.from('tour_pricing_settings').select('*').order('sort_order');
+  document.getElementById('pricing-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">로드 실패 (테이블이 없으면 lotocha_supabase_pricing_model.sql 실행 필요)</td></tr>'
+    : !data.length ? '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:20px">등록된 항목 없음</td></tr>'
+    : data.map(r=>`<tr>
+        <td style="font-weight:700">${r.label}</td>
+        <td>${r.value===null?'<span style="color:var(--red)">고객센터 문의</span>':r.value}</td>
+        <td>${r.unit||'-'}</td>
+        <td style="color:#888;font-size:13px">${r.note||''}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openPricingModal('${r.key}')">편집</button></div></td></tr>`).join('');
+}
+function openPricingModal(key) {
+  sb.from('tour_pricing_settings').select('*').eq('key',key).single().then(({data:r})=>{
+    if (!r) return;
+    document.getElementById('pr-key').value=r.key;
+    document.getElementById('pricing-modal-title').textContent = r.label;
+    document.getElementById('pr-value').value = r.value===null ? '' : r.value;
+    document.getElementById('pr-note').value = r.note||'';
+  });
+  document.getElementById('pricing-modal-bg').classList.add('open');
+}
+function closePricingModal(e) {
+  if (e && e.target !== document.getElementById('pricing-modal-bg')) return;
+  document.getElementById('pricing-modal-bg').classList.remove('open');
+}
+async function savePricing() {
+  const key = document.getElementById('pr-key').value;
+  const raw = document.getElementById('pr-value').value.trim();
+  const payload = {
+    value: raw==='' ? null : parseFloat(raw),
+    note: document.getElementById('pr-note').value.trim()||null,
+    updated_at: new Date().toISOString(),
+  };
+  const { error } = await sb.from('tour_pricing_settings').update(payload).eq('key',key);
+  if (error) { toast('저장 실패: '+error.message,'error'); return; }
+  toast('수정되었습니다','success'); closePricingModal(); loadPricing();
+}
+
+/* ───── 가격 설정 페이지 내 서브탭 (원가단가/이윤/연령할인/자연손모를 한 곳에서 관리) ───── */
+function showPricingSubtab(id, btn) {
+  document.querySelectorAll('#panel-pricing .subtab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#panel-pricing .pricing-subtab').forEach(p=>p.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.getElementById('pst-'+id).classList.add('active');
+  const loaders = { margin: loadMargin, agediscount: loadAgeDiscounts, costbuffer: loadCostBuffers };
+  if (loaders[id]) loaders[id]();
+}
+
+/* ── 이윤 설정 (단일 레코드, tour_margin_settings) ── */
+async function loadMargin() {
+  const { data } = await sb.from('tour_margin_settings').select('*').eq('id',1).single();
+  if (!data) return;
+  document.getElementById('mg-mode').value = data.mode || 'per_person';
+  document.getElementById('mg-type').value = data.value_type || 'amount';
+  document.getElementById('mg-value').value = data.value ?? 0;
+}
+async function saveMargin() {
+  const payload = {
+    id: 1,
+    mode: document.getElementById('mg-mode').value,
+    value_type: document.getElementById('mg-type').value,
+    value: parseFloat(document.getElementById('mg-value').value) || 0,
+    updated_at: new Date().toISOString(),
+  };
+  const { error } = await sb.from('tour_margin_settings').upsert(payload);
+  if (error) { toast('저장 실패: '+error.message,'error'); return; }
+  toast('저장되었습니다','success');
+}
+
+/* ── 연령별 할인 (tour_age_discounts) ── */
+async function loadAgeDiscounts() {
+  const { data } = await sb.from('tour_age_discounts').select('*').order('sort_order');
+  document.getElementById('agediscount-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">로드 실패 (lotocha_supabase_pricing_model2.sql 실행 필요)</td></tr>'
+    : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">등록된 항목 없음</td></tr>'
+    : data.map(r=>`<tr>
+        <td style="font-weight:700">${r.label}</td>
+        <td>${r.min_age!=null?r.min_age+'세 이상':''}${r.min_age!=null&&r.max_age!=null?' · ':''}${r.max_age!=null?r.max_age+'세 이하':''}</td>
+        <td>${r.discount_krw.toLocaleString()}원</td>
+        <td><span class="badge badge-${r.is_active?'live':'archived'}">${r.is_active?'활성':'비활성'}</span></td>
+        <td>${r.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openAgeDiscModal('${r.id}')">편집</button>
+        <button class="btn-del" onclick="deleteAgeDisc('${r.id}')">삭제</button></div></td></tr>`).join('');
+}
+function openAgeDiscModal(id) {
+  document.getElementById('agedisc-modal-title').textContent = id ? '연령 할인 편집' : '연령 할인 추가';
+  const flds = ['agedisc-id','agedisc-label','agedisc-minage','agedisc-maxage','agedisc-krw'];
+  if (!id) {
+    flds.forEach(f=>document.getElementById(f).value='');
+    document.getElementById('agedisc-order').value='0'; document.getElementById('agedisc-active').value='1';
+  } else {
+    sb.from('tour_age_discounts').select('*').eq('id',id).single().then(({data:r})=>{
+      if (!r) return;
+      document.getElementById('agedisc-id').value=r.id;
+      document.getElementById('agedisc-label').value=r.label||'';
+      document.getElementById('agedisc-minage').value=r.min_age??'';
+      document.getElementById('agedisc-maxage').value=r.max_age??'';
+      document.getElementById('agedisc-krw').value=r.discount_krw||0;
+      document.getElementById('agedisc-order').value=r.sort_order||0;
+      document.getElementById('agedisc-active').value=r.is_active?'1':'0';
+    });
+  }
+  document.getElementById('agedisc-modal-bg').classList.add('open');
+}
+function closeAgeDiscModal(e) {
+  if (e && e.target !== document.getElementById('agedisc-modal-bg')) return;
+  document.getElementById('agedisc-modal-bg').classList.remove('open');
+}
+async function saveAgeDisc() {
+  const id = document.getElementById('agedisc-id').value;
+  const label = document.getElementById('agedisc-label').value.trim();
+  if (!label) { toast('구간명을 입력하세요','error'); return; }
+  const minRaw = document.getElementById('agedisc-minage').value.trim();
+  const maxRaw = document.getElementById('agedisc-maxage').value.trim();
+  const payload = {
+    label,
+    min_age: minRaw==='' ? null : parseInt(minRaw),
+    max_age: maxRaw==='' ? null : parseInt(maxRaw),
+    discount_krw: parseInt(document.getElementById('agedisc-krw').value)||0,
+    sort_order: parseInt(document.getElementById('agedisc-order').value)||0,
+    is_active: document.getElementById('agedisc-active').value==='1',
+    updated_at: new Date().toISOString(),
+  };
+  const { error } = id ? await sb.from('tour_age_discounts').update(payload).eq('id',id) : await sb.from('tour_age_discounts').insert(payload);
+  if (error) { toast('저장 실패: '+error.message,'error'); return; }
+  toast(id?'수정되었습니다':'추가되었습니다','success'); closeAgeDiscModal(); loadAgeDiscounts();
+}
+async function deleteAgeDisc(id) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  const { error } = await sb.from('tour_age_discounts').delete().eq('id',id);
+  if (error) { toast('삭제 실패','error'); return; }
+  toast('삭제되었습니다'); loadAgeDiscounts();
+}
+
+/* ── 자연손모 · 기타원가 (tour_cost_buffers) ── */
+async function loadCostBuffers() {
+  const { data } = await sb.from('tour_cost_buffers').select('*').order('sort_order');
+  document.getElementById('costbuffer-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">로드 실패 (lotocha_supabase_pricing_model2.sql 실행 필요)</td></tr>'
+    : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">등록된 항목 없음</td></tr>'
+    : data.map(r=>`<tr>
+        <td style="font-weight:700">${r.name}</td>
+        <td>${Number(r.amount).toLocaleString()}</td>
+        <td>${r.currency}</td>
+        <td>${r.per_unit==='pax'?'인당':'주문당'}</td>
+        <td><span class="badge badge-${r.is_active?'live':'archived'}">${r.is_active?'활성':'비활성'}</span></td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openCostBufferModal('${r.id}')">편집</button>
+        <button class="btn-del" onclick="deleteCostBuffer('${r.id}')">삭제</button></div></td></tr>`).join('');
+}
+function openCostBufferModal(id) {
+  document.getElementById('costbuffer-modal-title').textContent = id ? '기타원가 편집' : '기타원가 추가';
+  const flds = ['costbuffer-id','costbuffer-name','costbuffer-amount','costbuffer-note'];
+  if (!id) {
+    flds.forEach(f=>document.getElementById(f).value='');
+    document.getElementById('costbuffer-currency').value='CNY';
+    document.getElementById('costbuffer-perunit').value='order';
+    document.getElementById('costbuffer-active').value='1';
+  } else {
+    sb.from('tour_cost_buffers').select('*').eq('id',id).single().then(({data:r})=>{
+      if (!r) return;
+      document.getElementById('costbuffer-id').value=r.id;
+      document.getElementById('costbuffer-name').value=r.name||'';
+      document.getElementById('costbuffer-amount').value=r.amount||0;
+      document.getElementById('costbuffer-currency').value=r.currency||'CNY';
+      document.getElementById('costbuffer-perunit').value=r.per_unit||'order';
+      document.getElementById('costbuffer-note').value=r.note||'';
+      document.getElementById('costbuffer-active').value=r.is_active?'1':'0';
+    });
+  }
+  document.getElementById('costbuffer-modal-bg').classList.add('open');
+}
+function closeCostBufferModal(e) {
+  if (e && e.target !== document.getElementById('costbuffer-modal-bg')) return;
+  document.getElementById('costbuffer-modal-bg').classList.remove('open');
+}
+async function saveCostBuffer() {
+  const id = document.getElementById('costbuffer-id').value;
+  const name = document.getElementById('costbuffer-name').value.trim();
+  if (!name) { toast('항목명을 입력하세요','error'); return; }
+  const payload = {
+    name,
+    amount: parseFloat(document.getElementById('costbuffer-amount').value)||0,
+    currency: document.getElementById('costbuffer-currency').value,
+    per_unit: document.getElementById('costbuffer-perunit').value,
+    note: document.getElementById('costbuffer-note').value.trim()||null,
+    is_active: document.getElementById('costbuffer-active').value==='1',
+    updated_at: new Date().toISOString(),
+  };
+  const { error } = id ? await sb.from('tour_cost_buffers').update(payload).eq('id',id) : await sb.from('tour_cost_buffers').insert(payload);
+  if (error) { toast('저장 실패: '+error.message,'error'); return; }
+  toast(id?'수정되었습니다':'추가되었습니다','success'); closeCostBufferModal(); loadCostBuffers();
+}
+async function deleteCostBuffer(id) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  const { error } = await sb.from('tour_cost_buffers').delete().eq('id',id);
+  if (error) { toast('삭제 실패','error'); return; }
+  toast('삭제되었습니다'); loadCostBuffers();
 }
 
 /* 일정 입력 힌트 (패키지는 명소 풀(tour_attractions)에서 key 목록을 동적으로 불러와 표시) */

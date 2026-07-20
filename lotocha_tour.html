@@ -24,6 +24,20 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 .cta-sub{font-size:13px;opacity:.8;margin-top:1px}
 .cta-btn{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:8px;padding:7px 14px;font-size:14px;font-weight:900;text-decoration:none;white-space:nowrap;flex-shrink:0}
 
+/* 브랜드 특징 스트립 */
+.brand-strip{background:#fff;padding:10px 14px 12px;border-bottom:1px solid #eee;cursor:pointer}
+.brand-strip-title{font-size:13px;font-weight:800;color:var(--navy);display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.brand-strip-more{font-size:12px;color:var(--gold);font-weight:700;flex-shrink:0}
+.brand-strip-scroll{display:flex;gap:8px;overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none}
+.brand-strip-scroll::-webkit-scrollbar{display:none}
+.brand-chip{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;background:#f6f7fb;border-radius:10px;padding:8px 10px;min-width:62px;text-align:center}
+.brand-chip .ic{font-size:18px;line-height:1}
+.brand-chip .tx{font-size:10.5px;font-weight:700;color:#666;white-space:nowrap}
+.brand-modal-body{padding:4px 2px 8px}
+.brand-item{padding:12px 0;border-bottom:1px solid #f0f0f0}
+.brand-item:last-child{border-bottom:none}
+.brand-item-title{font-size:15px;font-weight:900;color:var(--navy);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+
 /* 탭 */
 .tab-bar{background:#fff;border-bottom:1px solid #e0e7f0;display:flex}
 .tab-btn{flex:1;padding:12px 0;font-size:16px;font-weight:700;color:#aaa;cursor:pointer;border:none;background:none;border-bottom:2.5px solid transparent;font-family:inherit;transition:all .2s}
@@ -205,6 +219,21 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
   <button class="tab-btn" id="tab-pkg" onclick="switchTab('pkg')">🧭 맞춤투어</button>
 </div>
 
+<div class="brand-strip" onclick="openBrandModal()">
+  <div class="brand-strip-title">✨ 로투차만의 특별한 서비스 <span class="brand-strip-more">자세히 보기 ›</span></div>
+  <div class="brand-strip-scroll">
+    <div class="brand-chip"><span class="ic">🔒</span><span class="tx">단독투어</span></div>
+    <div class="brand-chip"><span class="ic">🚫</span><span class="tx">노쇼핑·노옵션</span></div>
+    <div class="brand-chip"><span class="ic">🗓️</span><span class="tx">자유 일정</span></div>
+    <div class="brand-chip"><span class="ic">🍜</span><span class="tx">현지 맛집</span></div>
+    <div class="brand-chip"><span class="ic">🚗</span><span class="tx">프리미엄 차량</span></div>
+    <div class="brand-chip"><span class="ic">💳</span><span class="tx">안심 결제</span></div>
+    <div class="brand-chip"><span class="ic">✅</span><span class="tx">환불 보장</span></div>
+    <div class="brand-chip"><span class="ic">🎁</span><span class="tx">무료 서비스</span></div>
+    <div class="brand-chip"><span class="ic">😌</span><span class="tx">여유로운 일정</span></div>
+  </div>
+</div>
+
 <div class="wrap">
   <div id="day-list"><div class="loading"><div class="spinner"></div>상품 불러오는 중...</div></div>
   <div id="pkg-list" style="display:none"><div class="loading"><div class="spinner"></div>상품 불러오는 중...</div></div>
@@ -227,6 +256,70 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-content" id="modal-content"></div>
+  </div>
+</div>
+
+<!-- 로투차만의 특별한 서비스 모달 -->
+<div class="modal-bg" id="brand-modal-bg" onclick="closeBrandModal(event)">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <div class="modal-header">
+      <div class="modal-title">✨ 로투차만의 특별한 서비스</div>
+      <button class="modal-close" onclick="closeBrandModal()">✕</button>
+    </div>
+    <div class="modal-content">
+      <div class="brand-modal-body">
+        <div class="brand-item">
+          <div class="brand-item-title">🔒 ① 우리끼리만 즐기는 단독투어</div>
+          <div class="list-item">· 2명부터 단독투어 진행</div>
+          <div class="list-item">· 다른 팀과 합류 없이 우리 일행만 편안하게 여행</div>
+        </div>
+        <div class="brand-item">
+          <div class="brand-item-title">🚫 ② 쇼핑·강제옵션 없는 여행</div>
+          <div class="list-item">· 쇼핑센터 방문 없음</div>
+          <div class="list-item">· 강제 옵션 및 추가 구매 권유 없음</div>
+          <div class="list-item">· 관광에만 집중하는 일정</div>
+        </div>
+        <div class="brand-item">
+          <div class="brand-item-title">🗓️ ③ 자유로운 맞춤 일정</div>
+          <div class="list-item">· 도착 시간과 날씨에 맞춰 일정 조정</div>
+          <div class="list-item">· 고객 취향에 맞는 맞춤형 여행</div>
+        </div>
+        <div class="brand-item">
+          <div class="brand-item-title">🍜 ④ 현지인이 추천하는 맛집</div>
+          <div class="list-item">· 단체 관광식당이 아닌 현지 인기 맛집 이용</div>
+          <div class="list-item">· 장가계 현지 음식을 제대로 경험</div>
+        </div>
+        <div class="brand-item">
+          <div class="brand-item-title">🚗 ⑤ 프리미엄 차량 이용</div>
+          <div class="list-item">· 벤츠 V class · Buick GL8 · 럭셔리 9인승 or 14인승</div>
+          <div class="list-item">· 쾌적하고 넓은 차량 제공</div>
+        </div>
+        <div class="brand-item">
+          <div class="brand-item-title">💳 ⑥ 안심 결제</div>
+          <div class="list-item">· 예약 시 예약금 50%만 결제</div>
+          <div class="list-item">· 잔금은 현지에서 가이드 미팅 후 현금 결제</div>
+        </div>
+        <div class="brand-item">
+          <div class="brand-item-title">✅ ⑦ No 쇼핑 · No 옵션 보장</div>
+          <div class="list-item">· 쇼핑 및 옵션 강요 시 환불 보장</div>
+          <div class="list-item">· 고객 만족을 최우선으로 운영</div>
+        </div>
+        <div class="brand-item">
+          <div class="brand-item-title">🎁 ⑧ 다양한 무료 서비스</div>
+          <div class="list-item">· 커피 1인 1잔 (1일 기준)</div>
+          <div class="list-item">· 생수 · 물티슈 · 휴지 제공</div>
+          <div class="list-item">· 환전 서비스</div>
+          <div class="list-item">· 후기 이벤트 참여 시 동행 스냅 촬영 무료 제공</div>
+        </div>
+        <div class="brand-item">
+          <div class="brand-item-title">😌 ⑨ 여유로운 여행</div>
+          <div class="list-item">· 늦은 아침 출발 가능</div>
+          <div class="list-item">· 쇼핑 일정 없이 관광에 집중</div>
+          <div class="list-item">· 체력 부담을 줄인 일정 운영</div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -372,32 +465,40 @@ let _hotel = null;     // 선택된 호텔 key (전역 풀의 id)
 let _arrFlight = null; // 선택된 도착 항공편 key (전역 풀의 id)
 let _depFlight = null; // 선택된 출발 항공편 key (전역 풀의 id)
 let _mealNote = '';    // 식사 요구사항 텍스트
-let _pkgDays = [];     // [{day:1, am:{type,key}|null, pm:{type,key}|null, evening:[{type,key},...]}, ...]
-let _pickerOpen = null; // {day, slot} 현재 펼쳐진 선택 패널
+let _pkgDays = [];     // [{day:1, full:{type,key}|null, am:{type,key}|null, pm:{type,key}|null, evening:[{type,key},...]}, ...]
+let _pickerOpen = null; // {day, slot} 현재 펼쳐진 선택 패널 (slot: 'full'|'am'|'pm'|'evening'|'combo')
+let _pkgCombos = [];    // [{day, key}] — 오후+저녁(당일치기)/오후+저녁+익일오전 슬롯 명소 (day = 시작일)
+let _addons = {};       // {addonId: count} — 부가서비스(마사지 등, 슬롯 미점유)
+let _classicOpen = false; // 클래식 일정 보기 팝업 열림 여부
+let _classicItinerary = []; // 현재 열린 상품의 참고용 추천 일정 원본 (itinerary 필드, 복사 전용)
 
-/* ───── 전역 공용 풀 (admin "호텔 관리"/"항공편 관리"/"명소 관리"/"현지 업체"에서 관리) ───── */
+/* ───── 전역 공용 풀 (admin "호텔 관리"/"항공편 관리"/"명소 관리"/"부가서비스 관리"/"현지 업체"에서 관리) ───── */
 let GLOBAL_HOTELS = [];
 let GLOBAL_FLIGHTS = [];
 let GLOBAL_PLACES = [];
-/* ATTRACTION_POOL: large(대형, 반나절·같은날 1개) / feature(특색, 반나절·복수가능) / local(인문, 제약없음)
+/* ATTRACTION_POOL: slot_type 기준 — full_day(하루종일) / half_day(반나절, 자유교체) /
+   evening(저녁·야간 전용) / pm_evening(오후+저녁 결합, 당일치기) / pm_evening_nextam(오후+저녁+익일오전 결합)
    admin "명소 관리"에서 fetch — 표가 비어있으면 일정 직접 짜기가 비어 보일 수 있음 */
 let ATTRACTION_POOL = {};
+let ADDON_SERVICES = []; // 마사지 등 (admin "부가서비스 관리")
 
 function normHotel(h)  { return { key: h.id, name: h.name, grade: h.grade, price: h.price, per: h.per, desc: h.desc_ko, image: h.image }; }
 function normFlight(f) { return { key: f.id, name: f.name, location: f.location, time: f.time_desc, desc: f.desc_ko, image: f.image }; }
 
 async function loadGlobalPools() {
   if (!sb) return;
-  const [hRes, fRes, aRes, plRes] = await Promise.all([
+  const [hRes, fRes, aRes, plRes, adRes] = await Promise.all([
     sb.from('tour_hotels').select('*').eq('is_active', true).order('sort_order'),
     sb.from('tour_flights').select('*').eq('is_active', true).order('sort_order'),
     sb.from('tour_attractions').select('*').eq('is_active', true).order('sort_order'),
     sb.from('local_places').select('*').eq('is_active', true).order('sort_order'),
+    sb.from('tour_addon_services').select('*').eq('is_active', true).order('sort_order'),
   ]);
   GLOBAL_HOTELS = (hRes.data || []).map(normHotel);
   GLOBAL_FLIGHTS = (fRes.data || []).map(normFlight);
-  (aRes.data || []).forEach(a => { ATTRACTION_POOL[a.key] = { label: a.label, cat: a.cat, desc: a.desc_ko, image: a.image }; });
+  (aRes.data || []).forEach(a => { ATTRACTION_POOL[a.key] = { label: a.label, cat: a.cat, slot_type: a.slot_type || 'half_day', price: a.price || 0, desc: a.desc_ko, image: a.image }; });
   GLOBAL_PLACES = plRes.data || [];
+  ADDON_SERVICES = adRes.data || [];
 }
 
 /* ───── 모달 열기 ───── */
@@ -415,6 +516,9 @@ function openModal(id) {
   _depFlight = null;
   _mealNote = '';
   _pickerOpen = null;
+  _pkgCombos = [];
+  _addons = {};
+  _classicOpen = false;
 
   const tiers   = Array.isArray(p.price_tiers)  ? p.price_tiers  : [];
   const options  = Array.isArray(p.tour_options) ? p.tour_options : [];
@@ -431,25 +535,14 @@ function openModal(id) {
   if (hotelOpts.length) _hotel = hotelOpts[0].key;
   if (flightOpts.length && isPkg) { _arrFlight = flightOpts[0].key; _depFlight = flightOpts[0].key; }
 
-  /* 패키지: 일정 템플릿 → 일자별 작업본(_pkgDays) 구성 (type 없으면 명소풀 참조로 간주)
-     ※ 날짜 수(_pkgDays.length)는 항상 상품의 duration_days를 기준으로 함.
-       저장된 itinerary가 그보다 일수가 많거나 적어도, 표시되는 일차 개수는 duration_days를 따르고
-       기존에 저장된 일자별 오전/오후/저녁 선택값은 해당 일차가 남아있는 한 그대로 유지됨. */
+  /* 패키지: 기본은 완전 빈 캔버스 (2026-07-20 확정) — duration_days 기준 일자만 만들어두고
+     내용은 비워둠. 추천 참고 일정(itinerary)은 캔버스에 자동으로 채우지 않고,
+     "클래식 일정 보기" 팝업에서 사용자가 "복사" 버튼을 눌러야 캔버스에 적용됨. */
+  _classicItinerary = itinerary; // 팝업에서 참고용으로 그대로 사용
   if (isPkg) {
     const numDays = _numDays;
-    const looksStructured = itinerary.length && itinerary[0] && typeof itinerary[0].day !== 'undefined';
-    const itinByDay = {};
-    if (looksStructured) itinerary.forEach(d => { itinByDay[d.day] = d; });
-    _pkgDays = Array.from({ length: numDays }, (_, i) => {
-      const day = i + 1;
-      const d = itinByDay[day];
-      return {
-        day,
-        am: d && d.am ? { type: d.am.type || 'attr', key: d.am.key, id: d.am.id } : null,
-        pm: d && d.pm ? { type: d.pm.type || 'attr', key: d.pm.key, id: d.pm.id } : null,
-        evening: d && d.evening ? d.evening.map(e => ({ type: e.type || 'attr', key: e.key, id: e.id })) : [],
-      };
-    });
+    _pkgDays = Array.from({ length: numDays }, (_, i) => ({ day: i + 1, full: null, am: null, pm: null, evening: [] }));
+    _pkgCombos = [];
   } else {
     _pkgDays = [];
   }
@@ -592,9 +685,15 @@ function openModal(id) {
   if (isPkg) {
     html += `
     <div class="booking-section">
-      <div class="booking-section-title">🗺️ 일정 직접 짜기 (추천 일정 기준, 자유롭게 변경 가능)</div>
-      <div class="min-pax-note">📌 대형 명소(천문산·대협곡 등)는 반나절을 차지하며 같은 날 최대 1개만 가능합니다. 특색 명소는 반나절씩 자유 배치 가능하고, 인문 일정(72기루·마트·카페 등)은 시간대 제약 없이 여러 개 추가할 수 있습니다. 실제 입장 가능 여부와 정확한 일정은 상담을 통해 최종 확정됩니다.</div>
+      <div class="booking-section-title">🗺️ 일정 직접 짜기 (빈 캔버스 — 자유롭게 조합)</div>
+      <div class="min-pax-note">📌 하루종일 명소(국가삼림공원)는 그 날 오전·오후를 모두 차지합니다. 반나절 명소는 오전/오후에 자유롭게 배치·교체 가능하고, 저녁/야간 일정은 여러 개 추가할 수 있습니다. 부용진·홍석림·봉황고성 같은 오후+저녁(+익일오전) 명소는 별도 버튼으로 추가합니다. 실제 입장 가능 여부와 정확한 일정은 상담을 통해 최종 확정됩니다.</div>
+      ${_classicItinerary.length ? `<button type="button" class="btn-add-row" style="width:100%;margin-bottom:10px" onclick="openClassicModal()">📋 클래식 일정 보기 (참고 예시 복사)</button>` : ''}
       <div id="pkg-dayplan"></div>
+    </div>
+    <div class="booking-section">
+      <div class="booking-section-title">💆 부가서비스 (선택, 슬롯 점유 없음)</div>
+      <div id="pkg-addons"></div>
+      <div class="min-pax-note">📌 위 요금에는 차량·기사·가이드비가 포함되어 있으며, 실제 청구는 상담을 통해 확정됩니다.</div>
     </div>
     <div class="booking-section">
       <div class="booking-section-title">🍽️ 식사 요구사항</div>
@@ -645,7 +744,7 @@ function openModal(id) {
   if (_hotel) { const el = document.getElementById('oh-' + _hotel); if (el) el.classList.add('checked'); }
   if (_arrFlight) { const el = document.getElementById('oarr-' + _arrFlight); if (el) el.classList.add('checked'); }
   if (_depFlight) { const el = document.getElementById('odep-' + _depFlight); if (el) el.classList.add('checked'); }
-  if (isPkg) renderDayPlan();
+  if (isPkg) { renderDayPlan(); renderAddons(); }
   document.getElementById('modal-bg').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -654,6 +753,17 @@ function openModal(id) {
 function closeModal(e) {
   if (e && e.target !== document.getElementById('modal-bg')) return;
   document.getElementById('modal-bg').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ───── 로투차만의 특별한 서비스 모달 ───── */
+function openBrandModal() {
+  document.getElementById('brand-modal-bg').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeBrandModal(e) {
+  if (e && e.target !== document.getElementById('brand-modal-bg')) return;
+  document.getElementById('brand-modal-bg').classList.remove('open');
   document.body.style.overflow = '';
 }
 
@@ -707,79 +817,179 @@ function selectFlight(type, key) {
   });
 }
 
-/* ───── 맞춤투어 일자별 일정 빌더 ─────
-   규칙: 대형(large)은 오전/오후 중 반나절 차지, 같은 날 다른 슬롯에 이미 대형이 있으면 선택 불가
-         특색(feature)은 반나절씩 자유 배치 (하루에 여러 개 가능)
-         인문(local)은 시간대 제약 없음 — 오전/오후/저녁 어디든, 저녁은 여러 개 중복 추가 가능 */
-/* {type:'attr',key}|{type:'place',id} → {label,cat} 로 변환 (place는 항상 local 취급) */
+/* ───── 맞춤투어 일자별 일정 빌더 (2026-07-20 v2 — 슬롯 타입 기반, 전면 모듈화) ─────
+   1일차: 항상 고정 (공항 픽업 → 호텔 투숙, 관광 없음)
+   마지막날: 오전 반나절만 가능 (항공편 시간에 맞춰 가이드가 현장 조정), 오후/저녁 없음
+   중간일(2~마지막 전날): 하루종일(오전+오후 통째) 또는 오전/오후 각각 반나절 자유 선택 +
+                         저녁/야간(여러 개 가능) + 오후+저녁(+익일오전) 특별 일정(콤보) 선택 가능
+   부가서비스(마사지 등)는 날짜에 묶이지 않는 별도 카운터로 처리 (renderAddons 참고) */
 function resolveSlotItem(item) {
   if (!item) return null;
   if (item.type === 'place') {
     const pl = GLOBAL_PLACES.find(x => x.id === item.id);
-    return pl ? { label: pl.name_ko, cat: 'local' } : null;
+    return pl ? { label: pl.name_ko, cat: 'local', slot_type: 'evening', price: 0 } : null;
   }
   const a = ATTRACTION_POOL[item.key];
-  return a ? { label: a.label, cat: a.cat } : null;
+  return a ? { label: a.label, cat: a.cat, slot_type: a.slot_type, price: a.price || 0 } : null;
 }
 function itemMatches(a, b) {
   if (!a || !b) return false;
   if (a.type === 'place' || b.type === 'place') return a.type === 'place' && b.type === 'place' && a.id === b.id;
   return a.key === b.key;
 }
-function pkgSlotOptions(dayPlan, slot) {
-  const attrItems = Object.keys(ATTRACTION_POOL).map(key => ({ type: 'attr', key, label: ATTRACTION_POOL[key].label, cat: ATTRACTION_POOL[key].cat }));
-  const placeItems = GLOBAL_PLACES.map(pl => ({ type: 'place', id: pl.id, label: pl.name_ko, cat: 'local' }));
-  return attrItems.concat(placeItems).filter(item => {
-    if (slot === 'evening') return item.cat === 'local';
-    if (item.cat !== 'large') return true;
-    const other = slot === 'am' ? dayPlan.pm : dayPlan.am;
-    const otherResolved = resolveSlotItem(other);
-    return !(otherResolved && otherResolved.cat === 'large');
-  });
+function attrOptionsBySlot(slotType) {
+  return Object.keys(ATTRACTION_POOL)
+    .filter(key => ATTRACTION_POOL[key].slot_type === slotType)
+    .map(key => ({ type: 'attr', key, label: ATTRACTION_POOL[key].label, price: ATTRACTION_POOL[key].price || 0 }));
+}
+function eveningOptions() {
+  const placeItems = GLOBAL_PLACES.map(pl => ({ type: 'place', id: pl.id, label: pl.name_ko, price: 0 }));
+  return attrOptionsBySlot('evening').concat(placeItems);
+}
+function priceTag(price) { return price ? ` · ${price.toLocaleString()}위안` : ''; }
+
+/* 콤보(오후+저녁/오후+저녁+익일오전) 헬퍼: 해당 일차가 콤보의 시작일인지 / 다음날(익일오전) 연속인지 판정 */
+function comboAtStart(day) { return _pkgCombos.find(c => c.day === day) || null; }
+function comboAtNextAM(day) {
+  return _pkgCombos.find(c => {
+    const a = ATTRACTION_POOL[c.key];
+    return a && a.slot_type === 'pm_evening_nextam' && c.day + 1 === day;
+  }) || null;
 }
 
 function renderDayPlan() {
-  const SLOT_LABEL = { am: '🌤 오전', pm: '🌇 오후', evening: '🌙 저녁' };
+  const numDays = _numDays;
   const html = _pkgDays.map(d => {
-    const amItem = resolveSlotItem(d.am);
-    const pmItem = resolveSlotItem(d.pm);
-    const eveItems = (d.evening || []).map(resolveSlotItem).filter(Boolean);
-    const renderSlot = (slot, valueLabel, editLabel) => `
-      <div class="slot-row" onclick="togglePicker(${d.day},'${slot}')">
-        <span class="slot-label">${SLOT_LABEL[slot]}</span>
-        <span class="slot-value">${valueLabel}</span>
-        <span class="slot-edit">${editLabel} ›</span>
+    if (d.day === 1) {
+      return `<div class="day-plan-card"><div class="day-plan-title">1일차</div>
+        <div class="slot-row" style="cursor:default"><span class="slot-value">🛬 공항 픽업 → 호텔 투숙 (관광 없음)</span></div>
+      </div>`;
+    }
+    if (d.day === numDays && numDays > 1) {
+      const amItem = resolveSlotItem(d.am);
+      return `<div class="day-plan-card"><div class="day-plan-title">${d.day}일차 (마지막날)</div>
+        <div class="slot-row" onclick="togglePicker(${d.day},'am')">
+          <span class="slot-label">🌤 오전</span>
+          <span class="slot-value">${amItem ? amItem.label + priceTag(amItem.price) : '선택 안함'}</span>
+          <span class="slot-edit">변경 ›</span>
+        </div>
+        ${_pickerOpen && _pickerOpen.day === d.day && _pickerOpen.slot === 'am' ? renderPicker(d, 'am') : ''}
+        <div class="min-pax-note" style="margin-top:6px">✈️ 오후: 공항 센딩 (귀국 항공편 시간에 맞춰 가이드가 현장 조정)</div>
+      </div>`;
+    }
+
+    /* 중간일 */
+    const startCombo = comboAtStart(d.day);
+    const contCombo = comboAtNextAM(d.day);
+    let rows = '';
+
+    /* 오전 슬롯 */
+    if (contCombo) {
+      const a = ATTRACTION_POOL[contCombo.key];
+      rows += `<div class="slot-row" style="cursor:default">
+        <span class="slot-label">🌤 오전</span>
+        <span class="slot-value">${a ? a.label : ''} (전날 저녁부터 이어짐)</span>
+        <span class="slot-edit" style="color:var(--red)" onclick="removeCombo(${contCombo.day})">제거 ›</span>
+      </div>`;
+    } else if (!d.full) {
+      const amItem = resolveSlotItem(d.am);
+      rows += `<div class="slot-row" onclick="togglePicker(${d.day},'am')">
+        <span class="slot-label">🌤 오전</span>
+        <span class="slot-value">${amItem ? amItem.label + priceTag(amItem.price) : '선택 안함'}</span>
+        <span class="slot-edit">변경 ›</span>
       </div>
-      ${_pickerOpen && _pickerOpen.day === d.day && _pickerOpen.slot === slot ? renderPicker(d, slot) : ''}`;
-    return `
-    <div class="day-plan-card">
-      <div class="day-plan-title">${d.day}일차</div>
-      ${renderSlot('am', amItem ? amItem.label : '선택 안함', '변경')}
-      ${renderSlot('pm', pmItem ? pmItem.label : '선택 안함', '변경')}
-      ${renderSlot('evening', eveItems.length ? eveItems.map(e => e.label).join(', ') : '선택 안함', '추가')}
-    </div>`;
+      ${_pickerOpen && _pickerOpen.day === d.day && _pickerOpen.slot === 'am' ? renderPicker(d, 'am') : ''}`;
+    }
+
+    /* 오후 슬롯 */
+    if (startCombo) {
+      const a = ATTRACTION_POOL[startCombo.key];
+      rows += `<div class="slot-row" style="cursor:default">
+        <span class="slot-label">🌇 오후</span>
+        <span class="slot-value">${a ? a.label + priceTag(a.price) : ''} (오후+저녁${a && a.slot_type === 'pm_evening_nextam' ? '+익일오전' : ''})</span>
+        <span class="slot-edit" style="color:var(--red)" onclick="removeCombo(${d.day})">제거 ›</span>
+      </div>`;
+    } else if (d.full) {
+      const fullItem = resolveSlotItem(d.full);
+      rows += `<div class="slot-row" style="cursor:default">
+        <span class="slot-label">🌞 하루종일</span>
+        <span class="slot-value">${fullItem ? fullItem.label + priceTag(fullItem.price) : ''}</span>
+        <span class="slot-edit" style="color:var(--red)" onclick="clearFullDay(${d.day})">제거 ›</span>
+      </div>`;
+    } else {
+      const pmItem = resolveSlotItem(d.pm);
+      rows += `<div class="slot-row" onclick="togglePicker(${d.day},'pm')">
+        <span class="slot-label">🌇 오후</span>
+        <span class="slot-value">${pmItem ? pmItem.label + priceTag(pmItem.price) : '선택 안함'}</span>
+        <span class="slot-edit">변경 ›</span>
+      </div>
+      ${_pickerOpen && _pickerOpen.day === d.day && _pickerOpen.slot === 'pm' ? renderPicker(d, 'pm') : ''}`;
+    }
+
+    /* 저녁 슬롯 (콤보가 이 날을 점유 중이면 잠금) */
+    if (startCombo) {
+      rows += `<div class="slot-row" style="cursor:default"><span class="slot-label">🌙 저녁</span><span class="slot-value">(오후 일정에 포함)</span></div>`;
+    } else {
+      const eveItems = (d.evening || []).map(resolveSlotItem).filter(Boolean);
+      rows += `<div class="slot-row" onclick="togglePicker(${d.day},'evening')">
+        <span class="slot-label">🌙 저녁</span>
+        <span class="slot-value">${eveItems.length ? eveItems.map(e => e.label).join(', ') : '선택 안함'}</span>
+        <span class="slot-edit">추가 ›</span>
+      </div>
+      ${_pickerOpen && _pickerOpen.day === d.day && _pickerOpen.slot === 'evening' ? renderPicker(d, 'evening') : ''}`;
+    }
+
+    /* 하루종일/콤보 전환 버튼 (일반 상태일 때만) */
+    if (!d.full && !startCombo && !contCombo) {
+      rows += `<div style="display:flex;gap:8px;margin-top:6px">
+        <button type="button" class="btn-add-row" style="flex:1;font-size:13px" onclick="togglePicker(${d.day},'full')">🌞 하루종일 명소로 전환</button>
+        <button type="button" class="btn-add-row" style="flex:1;font-size:13px" onclick="togglePicker(${d.day},'combo')">🌇🌙 오후+저녁 특별 일정</button>
+      </div>
+      ${_pickerOpen && _pickerOpen.day === d.day && _pickerOpen.slot === 'full' ? renderPicker(d, 'full') : ''}
+      ${_pickerOpen && _pickerOpen.day === d.day && _pickerOpen.slot === 'combo' ? renderPicker(d, 'combo') : ''}`;
+    }
+
+    return `<div class="day-plan-card"><div class="day-plan-title">${d.day}일차</div>${rows}</div>`;
   }).join('');
   document.getElementById('pkg-dayplan').innerHTML = html;
 }
 
 function renderPicker(d, slot) {
-  const opts = pkgSlotOptions(d, slot);
   const refArgs = o => o.type === 'place' ? `'place','${o.id}'` : `'attr','${o.key}'`;
   if (slot === 'evening') {
     const sel = d.evening || [];
+    const opts = eveningOptions();
     return `<div class="slot-picker">
       ${opts.map(o => {
         const isOn = sel.some(e => itemMatches(e, o));
-        return `<div class="picker-item ${isOn ? 'on' : ''}" onclick="toggleEvening(${d.day},${refArgs(o)})">${isOn ? '✓ ' : ''}${o.label}</div>`;
+        return `<div class="picker-item ${isOn ? 'on' : ''}" onclick="toggleEvening(${d.day},${refArgs(o)})">${isOn ? '✓ ' : ''}${o.label}${priceTag(o.price)}</div>`;
       }).join('')}
     </div>`;
   }
+  if (slot === 'full') {
+    const opts = attrOptionsBySlot('full_day');
+    return `<div class="slot-picker">
+      ${opts.map(o => `<div class="picker-item" onclick="pickFullDay(${d.day},'${o.key}')">${o.label}${priceTag(o.price)}</div>`).join('')}
+    </div>`;
+  }
+  if (slot === 'combo') {
+    const opts = attrOptionsBySlot('pm_evening').concat(attrOptionsBySlot('pm_evening_nextam'));
+    return `<div class="slot-picker">
+      ${opts.map(o => {
+        const a = ATTRACTION_POOL[o.key];
+        const tag = a.slot_type === 'pm_evening_nextam' ? ' (오후+저녁+익일오전, 1회만)' : ' (오후+저녁, 당일치기)';
+        return `<div class="picker-item" onclick="pickCombo(${d.day},'${o.key}')">${o.label}${priceTag(o.price)}${tag}</div>`;
+      }).join('')}
+    </div>`;
+  }
+  /* am / pm: 반나절 명소 */
+  const opts = attrOptionsBySlot('half_day');
   const cur = d[slot];
   return `<div class="slot-picker">
     <div class="picker-item ${!cur ? 'on' : ''}" onclick="pickAttraction(${d.day},'${slot}',null,null)">선택 안함</div>
     ${opts.map(o => {
       const isOn = cur && itemMatches(cur, o);
-      return `<div class="picker-item ${isOn ? 'on' : ''}" onclick="pickAttraction(${d.day},'${slot}',${refArgs(o)})">${o.label}</div>`;
+      return `<div class="picker-item ${isOn ? 'on' : ''}" onclick="pickAttraction(${d.day},'${slot}',${refArgs(o)})">${o.label}${priceTag(o.price)}</div>`;
     }).join('')}
   </div>`;
 }
@@ -804,6 +1014,132 @@ function toggleEvening(day, type, value) {
   const item = type === 'place' ? { type: 'place', id: value } : { type: 'attr', key: value };
   const idx = d.evening.findIndex(e => itemMatches(e, item));
   if (idx === -1) d.evening.push(item); else d.evening.splice(idx, 1);
+  renderDayPlan();
+}
+
+function pickFullDay(day, key) {
+  const d = _pkgDays.find(x => x.day === day);
+  if (!d) return;
+  d.full = { type: 'attr', key };
+  d.am = null; d.pm = null;
+  _pickerOpen = null;
+  renderDayPlan();
+}
+function clearFullDay(day) {
+  const d = _pkgDays.find(x => x.day === day);
+  if (!d) return;
+  d.full = null;
+  renderDayPlan();
+}
+
+/* 콤보 선택: 같은 key(특히 봉황고성)는 전체 일정에서 1개만 유지 — 새로 고르면 기존 것을 옮김 */
+function pickCombo(day, key) {
+  const a = ATTRACTION_POOL[key];
+  if (!a) return;
+  _pkgCombos = _pkgCombos.filter(c => c.key !== key);
+  _pkgCombos.push({ day, key });
+  const d = _pkgDays.find(x => x.day === day);
+  if (d) { d.full = null; d.pm = null; d.evening = []; }
+  _pickerOpen = null;
+  renderDayPlan();
+}
+function removeCombo(day) {
+  _pkgCombos = _pkgCombos.filter(c => c.day !== day);
+  renderDayPlan();
+}
+
+/* ───── 부가서비스 (마사지 등, 날짜 미지정 — 인원×횟수 카운터) ───── */
+function renderAddons() {
+  const el = document.getElementById('pkg-addons');
+  if (!el) return;
+  if (!ADDON_SERVICES.length) { el.innerHTML = '<div class="min-pax-note">등록된 부가서비스가 없습니다</div>'; return; }
+  el.innerHTML = ADDON_SERVICES.map(a => `
+    <div class="pax-row">
+      <div class="pax-info">
+        <div class="pax-label">${a.name}${a.duration_min ? ' (' + a.duration_min + '분)' : ''}</div>
+        <div class="pax-price">${a.price ? a.price.toLocaleString() + '위안/인/회' : '무료'}${a.note ? ' · ' + a.note : ''}</div>
+      </div>
+      <div class="pax-counter">
+        <button class="counter-btn" onclick="changeAddon('${a.id}',-1)">−</button>
+        <span class="counter-val" id="cnt-addon-${a.id}">${_addons[a.id] || 0}</span>
+        <button class="counter-btn" onclick="changeAddon('${a.id}',1)">+</button>
+      </div>
+    </div>`).join('');
+}
+function changeAddon(id, delta) {
+  _addons[id] = Math.max(0, (_addons[id] || 0) + delta);
+  const el = document.getElementById('cnt-addon-' + id);
+  if (el) el.textContent = _addons[id];
+}
+
+/* ───── 클래식 일정 보기 팝업 (참고 예시 → 캔버스로 복사) ───── */
+function openClassicModal() { _classicOpen = true; renderClassicModal(); }
+function closeClassicModal(e) {
+  if (e && e.target && e.target.id !== 'classic-modal-bg') return;
+  _classicOpen = false;
+  const el = document.getElementById('classic-modal-bg');
+  if (el) el.remove();
+}
+function renderClassicModal() {
+  let old = document.getElementById('classic-modal-bg');
+  if (old) old.remove();
+  if (!_classicOpen) return;
+  const byDay = {};
+  _classicItinerary.forEach(d => { byDay[d.day] = d; });
+  const days = Object.keys(byDay).map(Number).sort((a, b) => a - b);
+  const dayHtml = days.map(day => {
+    const d = byDay[day];
+    const label = t => { if (!t) return '-'; const a = ATTRACTION_POOL[t.key]; return a ? a.label : (t.key || '-'); };
+    const eve = (d.evening || []).map(label).join(', ') || '-';
+    return `<div class="day-plan-card"><div class="day-plan-title">${day}일차</div>
+      <div class="slot-row" style="cursor:default"><span class="slot-label">🌤 오전</span><span class="slot-value">${label(d.am)}</span></div>
+      <div class="slot-row" style="cursor:default"><span class="slot-label">🌇 오후</span><span class="slot-value">${label(d.pm)}</span></div>
+      <div class="slot-row" style="cursor:default"><span class="slot-label">🌙 저녁</span><span class="slot-value">${eve}</span></div>
+    </div>`;
+  }).join('');
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg open';
+  bg.id = 'classic-modal-bg';
+  bg.style.zIndex = 950;
+  bg.innerHTML = `<div class="modal">
+    <div class="modal-drag"></div>
+    <div class="modal-header">
+      <div class="modal-title">📋 클래식 일정 (참고 예시)</div>
+      <button class="modal-close" onclick="closeClassicModal()">✕</button>
+    </div>
+    <div class="modal-content">
+      <div class="min-pax-note" style="margin-bottom:10px">과거 견적 기준 참고 예시입니다. 강제 규칙이 아니며, "복사" 시 지금 캔버스의 내용을 덮어씁니다.</div>
+      ${dayHtml}
+      <button type="button" class="btn-detail" style="width:100%;margin-top:10px" onclick="copyClassicItinerary()">이 일정 캔버스에 복사</button>
+    </div>
+  </div>`;
+  document.body.appendChild(bg);
+}
+function copyClassicItinerary() {
+  const byDay = {};
+  _classicItinerary.forEach(d => { byDay[d.day] = d; });
+  const numDays = _numDays;
+  _pkgCombos = [];
+  _pkgDays = Array.from({ length: numDays }, (_, i) => {
+    const day = i + 1;
+    const d = byDay[day];
+    if (!d) return { day, full: null, am: null, pm: null, evening: [] };
+    const amKey = d.am && d.am.key, pmKey = d.pm && d.pm.key;
+    /* 오전·오후가 같은 key이고 하루종일(full_day) 명소면 하루종일로 변환 */
+    if (amKey && amKey === pmKey && ATTRACTION_POOL[amKey] && ATTRACTION_POOL[amKey].slot_type === 'full_day') {
+      return { day, full: { type: 'attr', key: amKey }, am: null, pm: null, evening: (d.evening || []).map(e => ({ type: e.type || 'attr', key: e.key, id: e.id })) };
+    }
+    return {
+      day, full: null,
+      am: d.am ? { type: d.am.type || 'attr', key: d.am.key, id: d.am.id } : null,
+      pm: d.pm ? { type: d.pm.type || 'attr', key: d.pm.key, id: d.pm.id } : null,
+      evening: d.evening ? d.evening.map(e => ({ type: e.type || 'attr', key: e.key, id: e.id })) : [],
+    };
+  });
+  _classicOpen = false;
+  const el = document.getElementById('classic-modal-bg');
+  if (el) el.remove();
+  _pickerOpen = null;
   renderDayPlan();
 }
 
@@ -939,11 +1275,37 @@ function buildMsg(p) {
   if (isPkg && _pkgDays.length) {
     msg += `━━━━━━━━━━━━━━\n🗺️ 선택 일정:\n`;
     _pkgDays.forEach(d => {
+      if (d.day === 1) { msg += `  1일차: 공항 픽업 → 호텔 투숙\n`; return; }
+      const startCombo = comboAtStart(d.day);
+      const contCombo = comboAtNextAM(d.day);
+      if (startCombo) {
+        const a = ATTRACTION_POOL[startCombo.key];
+        msg += `  ${d.day}일차: 오후+저녁 특별일정 - ${a ? a.label : startCombo.key}${a && a.slot_type === 'pm_evening_nextam' ? ' (익일오전까지 이어짐)' : ''}\n`;
+        return;
+      }
+      if (contCombo && !d.am) {
+        const a = ATTRACTION_POOL[contCombo.key];
+        msg += `  ${d.day}일차: 오전 ${a ? a.label : ''} (전날 저녁부터 이어짐)\n`;
+        return;
+      }
+      if (d.full) {
+        const fullR = resolveSlotItem(d.full);
+        msg += `  ${d.day}일차: 하루종일 ${fullR ? fullR.label : '-'}\n`;
+        return;
+      }
       const amR = resolveSlotItem(d.am), pmR = resolveSlotItem(d.pm);
       const am = amR ? amR.label : '-';
       const pm = pmR ? pmR.label : '-';
       const eve = (d.evening || []).map(resolveSlotItem).filter(Boolean).map(r => r.label).join(', ') || '-';
       msg += `  ${d.day}일차: 오전 ${am} / 오후 ${pm} / 저녁 ${eve}\n`;
+    });
+  }
+
+  if (isPkg && Object.values(_addons).some(c => c > 0)) {
+    msg += `💆 부가서비스:\n`;
+    ADDON_SERVICES.forEach(a => {
+      const cnt = _addons[a.id] || 0;
+      if (cnt > 0) msg += `  ${a.name} × ${cnt}회 (${(a.price || 0).toLocaleString()}위안/회)\n`;
     });
   }
 
@@ -968,7 +1330,7 @@ function quickInquire(id) {
   const p = allProducts.find(x => x.id === id);
   if (!p) return;
   _modalProductId = id;
-  _pax = {}; _opts = {}; _date = ''; _returnDate = ''; _hotel = null; _arrFlight = null; _depFlight = null; _mealNote = ''; _pkgDays = [];
+  _pax = {}; _opts = {}; _date = ''; _returnDate = ''; _hotel = null; _arrFlight = null; _depFlight = null; _mealNote = ''; _pkgDays = []; _pkgCombos = []; _addons = {};
   sendInquiry('kakao', buildMsg(p));
 }
 
