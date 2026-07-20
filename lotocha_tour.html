@@ -352,13 +352,46 @@ function addDaysToDateStr(dateStr, days) {
   d.setDate(d.getDate() + days);
   return d.toISOString().split('T')[0];
 }
-/* 출발일 선택 시 귀국일(출발일 + (총 일수-1))을 자동 계산해 표시 */
+/* 출발일/귀국일: 2026-07-20 확정 — 맞춤투어는 상품마다 고정된 일수(duration_days)가 아니라
+   고객이 직접 고른 출발일·귀국일의 날짜 차이로 총 박수/일수를 계산한다.
+   (맞춤투어 상품은 이제 3박4일/4박5일/5박6일처럼 기간별로 여러 개 만들 필요 없이 1개만 있으면 됨) */
+function daysBetween(startStr, endStr) {
+  const a = new Date(startStr + 'T00:00:00');
+  const b = new Date(endStr + 'T00:00:00');
+  return Math.round((b - a) / 86400000);
+}
 function onDepartureDateChange(val) {
   _date = val;
-  const returnInput = document.getElementById('bk-return-date');
-  if (!val) { _returnDate = ''; if (returnInput) returnInput.value = ''; return; }
-  _returnDate = addDaysToDateStr(val, Math.max(_numDays - 1, 0));
-  if (returnInput) returnInput.value = _returnDate;
+  recomputePkgDuration();
+}
+function onReturnDateChange(val) {
+  _returnDate = val;
+  recomputePkgDuration();
+}
+function recomputePkgDuration() {
+  const hint = document.getElementById('bk-days-hint');
+  if (_date && _returnDate) {
+    const nights = daysBetween(_date, _returnDate);
+    if (nights >= 1) {
+      _numDays = nights + 1;
+      resizePkgDays(_numDays);
+      if (hint) hint.textContent = `${nights}박 ${_numDays}일 일정으로 계산됩니다`;
+    } else if (hint) {
+      hint.textContent = '귀국일은 출발일 이후 날짜로 선택해 주세요';
+    }
+  } else if (hint) {
+    hint.textContent = '출발일과 귀국일을 모두 선택하면 총 일수가 자동으로 계산됩니다';
+  }
+  if (document.getElementById('pkg-dayplan')) { _pickerOpen = null; renderDayPlan(); }
+}
+/* 일수가 바뀌면 캔버스 크기를 다시 맞춤 — 기존에 짜둔 일차는 그대로 유지, 없어진 일차의 콤보는 정리 */
+function resizePkgDays(numDays) {
+  const old = _pkgDays;
+  _pkgDays = Array.from({ length: numDays }, (_, i) => {
+    const day = i + 1;
+    return old.find(d => d.day === day) || { day, full: null, am: null, pm: null, evening: [] };
+  });
+  _pkgCombos = _pkgCombos.filter(c => c.day >= 1 && c.day + 1 <= numDays || (c.day >= 1 && c.day <= numDays));
 }
 
 /* ───── 탭 전환 ───── */
@@ -570,10 +603,12 @@ function openModal(id) {
         </div>
         <div class="date-field">
           <div class="date-field-label">귀국일</div>
-          <input type="date" class="date-input" id="bk-return-date" disabled>
+          <input type="date" class="date-input" id="bk-return-date"
+            min="${getTodayStr()}"
+            onchange="onReturnDateChange(this.value)">
         </div>
       </div>
-      <div class="date-auto-hint">총 ${_numDays}일 일정 기준으로 귀국일이 자동 계산됩니다</div>
+      <div class="date-auto-hint" id="bk-days-hint">출발일과 귀국일을 모두 선택하면 총 일수가 자동으로 계산됩니다</div>
       ` : `
       <input type="date" class="date-input" id="bk-date"
         min="${getTodayStr()}"
