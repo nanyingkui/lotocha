@@ -82,6 +82,11 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 /* 날짜 */
 .date-input{width:100%;border:1.5px solid #ddd;border-radius:9px;padding:10px 12px;font-size:15px;font-family:inherit;color:var(--navy);background:#fff;outline:none;-webkit-appearance:none}
 .date-input:focus{border-color:var(--navy)}
+.date-input:disabled{background:#f0f1f5;color:#999}
+.date-row{display:flex;gap:10px}
+.date-field{flex:1;min-width:0}
+.date-field-label{font-size:12px;color:#999;font-weight:700;margin-bottom:5px}
+.date-auto-hint{font-size:12px;color:#aaa;margin-top:6px}
 
 /* 최소인원 안내 */
 .min-pax-note{font-size:14px;color:#e65100;font-weight:700;background:#fff3e0;padding:6px 10px;border-radius:7px;margin-bottom:10px}
@@ -249,6 +254,19 @@ function fmtCny(n) {
 function getTodayStr() {
   return new Date().toISOString().split('T')[0];
 }
+function addDaysToDateStr(dateStr, days) {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setDate(d.getDate() + days);
+  return d.toISOString().split('T')[0];
+}
+/* 출발일 선택 시 귀국일(출발일 + (총 일수-1))을 자동 계산해 표시 */
+function onDepartureDateChange(val) {
+  _date = val;
+  const returnInput = document.getElementById('bk-return-date');
+  if (!val) { _returnDate = ''; if (returnInput) returnInput.value = ''; return; }
+  _returnDate = addDaysToDateStr(val, Math.max(_numDays - 1, 0));
+  if (returnInput) returnInput.value = _returnDate;
+}
 
 /* ───── 탭 전환 ───── */
 function switchTab(tab) {
@@ -348,6 +366,8 @@ let _modalProductId = null;
 let _pax = {};       // { adult:0, child:0, ... }
 let _opts = {};      // { massage:false, ... }
 let _date = '';
+let _returnDate = ''; // 귀국일 (출발일 + 일정 일수로 자동 계산, 맞춤투어만)
+let _numDays = 1;      // 현재 열린 상품의 duration_days
 let _hotel = null;     // 선택된 호텔 key (전역 풀의 id)
 let _arrFlight = null; // 선택된 도착 항공편 key (전역 풀의 id)
 let _depFlight = null; // 선택된 출발 항공편 key (전역 풀의 id)
@@ -389,6 +409,7 @@ function openModal(id) {
   _pax = {};
   _opts = {};
   _date = '';
+  _returnDate = '';
   _hotel = null;
   _arrFlight = null;
   _depFlight = null;
@@ -403,6 +424,7 @@ function openModal(id) {
   const hotelOpts = GLOBAL_HOTELS;
   const flightOpts = GLOBAL_FLIGHTS;
   const isPkg = p.product_type === 'package';
+  _numDays = p.duration_days || 1;
 
   tiers.forEach(t => _pax[t.key] = 0);
   options.forEach(o => _opts[o.key] = false);
@@ -414,7 +436,7 @@ function openModal(id) {
        저장된 itinerary가 그보다 일수가 많거나 적어도, 표시되는 일차 개수는 duration_days를 따르고
        기존에 저장된 일자별 오전/오후/저녁 선택값은 해당 일차가 남아있는 한 그대로 유지됨. */
   if (isPkg) {
-    const numDays = p.duration_days || 1;
+    const numDays = _numDays;
     const looksStructured = itinerary.length && itinerary[0] && typeof itinerary[0].day !== 'undefined';
     const itinByDay = {};
     if (looksStructured) itinerary.forEach(d => { itinByDay[d.day] = d; });
@@ -439,15 +461,31 @@ function openModal(id) {
 
   document.getElementById('modal-title').textContent = p.title_ko || '—';
 
-  /* ── 날짜 선택 ── */
+  /* ── 날짜 선택 (맞춤투어는 출발일+귀국일, 1일투어는 단일 날짜) ── */
   let html = `
     <div class="modal-subtitle">${p.subtitle_ko || ''}</div>
 
     <div class="booking-section">
-      <div class="booking-section-title">📅 여행 날짜</div>
+      <div class="booking-section-title">📅 ${isPkg ? '출발일 / 귀국일' : '여행 날짜'}</div>
+      ${isPkg ? `
+      <div class="date-row">
+        <div class="date-field">
+          <div class="date-field-label">출발일</div>
+          <input type="date" class="date-input" id="bk-date"
+            min="${getTodayStr()}"
+            onchange="onDepartureDateChange(this.value)">
+        </div>
+        <div class="date-field">
+          <div class="date-field-label">귀국일</div>
+          <input type="date" class="date-input" id="bk-return-date" disabled>
+        </div>
+      </div>
+      <div class="date-auto-hint">총 ${_numDays}일 일정 기준으로 귀국일이 자동 계산됩니다</div>
+      ` : `
       <input type="date" class="date-input" id="bk-date"
         min="${getTodayStr()}"
         onchange="_date=this.value">
+      `}
     </div>`;
 
   /* ── 인원 선택 ── */
@@ -848,7 +886,12 @@ function buildMsg(p) {
   let msg = `[로투차 투어 예약 문의]\n━━━━━━━━━━━━━━\n`;
   msg += `📌 상품: ${p.title_ko}\n`;
   msg += `🗓️ 유형: ${isPkg ? '맞춤투어 ' + p.duration_days + '일' : '1일투어'}\n`;
-  msg += `📅 여행 날짜: ${_date || '(미선택)'}\n`;
+  if (isPkg) {
+    msg += `📅 출발일: ${_date || '(미선택)'}\n`;
+    msg += `🛬 귀국일: ${_returnDate || '(미선택)'}\n`;
+  } else {
+    msg += `📅 여행 날짜: ${_date || '(미선택)'}\n`;
+  }
   if (isPkg && flightOpts.length) {
     const arr = flightOpts.find(f => f.key === _arrFlight);
     const dep = flightOpts.find(f => f.key === _depFlight);
@@ -925,7 +968,7 @@ function quickInquire(id) {
   const p = allProducts.find(x => x.id === id);
   if (!p) return;
   _modalProductId = id;
-  _pax = {}; _opts = {}; _date = ''; _hotel = null; _arrFlight = null; _depFlight = null; _mealNote = ''; _pkgDays = [];
+  _pax = {}; _opts = {}; _date = ''; _returnDate = ''; _hotel = null; _arrFlight = null; _depFlight = null; _mealNote = ''; _pkgDays = [];
   sendInquiry('kakao', buildMsg(p));
 }
 

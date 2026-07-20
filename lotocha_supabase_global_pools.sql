@@ -79,15 +79,22 @@ CREATE INDEX IF NOT EXISTS idx_tour_flights_order     ON tour_flights(sort_order
 CREATE INDEX IF NOT EXISTS idx_tour_attractions_order ON tour_attractions(sort_order);
 
 -- ── 시드 데이터: 기존에 상품마다 중복 입력돼 있던 placeholder를 전역으로 1회만 ──
-INSERT INTO tour_hotels (name, grade, desc_ko, price, per, sort_order) VALUES
+-- (재실행해도 안전하도록 테이블이 완전히 비어있을 때만 시드 삽입)
+INSERT INTO tour_hotels (name, grade, desc_ko, price, per, sort_order)
+SELECT * FROM (VALUES
   ('일반 숙소', '3성급 추천', '시내 또는 무릉원 인근 3성급 호텔', 0, 'pax', 1),
-  ('고급 숙소 업그레이드', '4~5성급', '4~5성급 호텔로 업그레이드', 0, 'pax', 2);
+  ('고급 숙소 업그레이드', '4~5성급', '4~5성급 호텔로 업그레이드', 0, 'pax', 2)
+) AS seed(name, grade, desc_ko, price, per, sort_order)
+WHERE NOT EXISTS (SELECT 1 FROM tour_hotels);
 
-INSERT INTO tour_flights (name, location, time_desc, desc_ko, sort_order) VALUES
+INSERT INTO tour_flights (name, location, time_desc, desc_ko, sort_order)
+SELECT * FROM (VALUES
   ('인천 ↔ 장가계(허화공항)', '인천', '직항 약 3시간 30분 (정확한 시간표는 상담 시 안내)', '', 1),
   ('부산(김해) ↔ 장가계(허화공항)', '부산', '직항 (정확한 시간표는 상담 시 안내)', '', 2),
   ('대구 ↔ 장가계(허화공항)', '대구', '직항 (정확한 시간표는 상담 시 안내)', '', 3),
-  ('청주 ↔ 장가계(허화공항)', '청주', '직항 (정확한 시간표는 상담 시 안내)', '', 4);
+  ('청주 ↔ 장가계(허화공항)', '청주', '직항 (정확한 시간표는 상담 시 안내)', '', 4)
+) AS seed(name, location, time_desc, desc_ko, sort_order)
+WHERE NOT EXISTS (SELECT 1 FROM tour_flights);
 
 INSERT INTO tour_attractions (key, label, cat, sort_order) VALUES
   ('tianmen',      '천문산',                'large',   1),
@@ -103,7 +110,8 @@ INSERT INTO tour_attractions (key, label, cat, sort_order) VALUES
   ('jinbianxi',    '금편계 트레킹',          'feature', 11),
   ('qiqilou',      '72기루 (야간 관람 추천)', 'local',   12),
   ('supermarket',  '현지 대형마트 (일반)',    'local',   13),
-  ('cafe',         '현지 특색 카페 (일반)',   'local',   14);
+  ('cafe',         '현지 특색 카페 (일반)',   'local',   14)
+ON CONFLICT (key) DO NOTHING;
 
 -- ⚠️ 참고: tour_products의 hotel_options / flight_options 컬럼은 더이상 코드에서
 -- 쓰지 않습니다 (전역 테이블로 대체됨). 기존 컬럼은 안전을 위해 삭제하지 않고
