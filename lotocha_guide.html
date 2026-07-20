@@ -327,15 +327,8 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
   <div id="spot-list"></div>
 </div>
 <div class="page" id="page-places">
-  <div class="cat-filter">
+  <div class="cat-filter" id="place-cat-filter">
     <button class="cat-chip on" onclick="filterPlaces('all')" data-cat="all">전체</button>
-    <button class="cat-chip" onclick="filterPlaces('restaurant')" data-cat="restaurant">🍜 식당</button>
-    <button class="cat-chip" onclick="filterPlaces('cafe')" data-cat="cafe">☕ 카페</button>
-    <button class="cat-chip" onclick="filterPlaces('hotel')" data-cat="hotel">🏨 숙소</button>
-    <button class="cat-chip" onclick="filterPlaces('shop')" data-cat="shop">🛍️ 쇼핑</button>
-    <button class="cat-chip" onclick="filterPlaces('attraction')" data-cat="attraction">🎭 볼거리</button>
-    <button class="cat-chip" onclick="filterPlaces('transport')" data-cat="transport">🚕 교통</button>
-    <button class="cat-chip" onclick="filterPlaces('etc')" data-cat="etc">✨ 기타</button>
   </div>
   <div id="places-list"></div>
 </div>
@@ -679,8 +672,35 @@ let map,userMarker,mapMarkers=[],cdTimer=null,spotsData={};
 let currentReviewSpotId=null,currentReviewAttrId=null,selectedRating=0;
 let placesData=[],currentPlaceCat='all';
 const TYPE_ICON={landmark:'🏔️',transport:'🚌',viewpoint:'🌅',toilet:'🚻',food:'🍜',rest:'☕',ticket:'🎫',info:'ℹ️',danger:'⚠️'};
-const PLACE_CAT_ICON={restaurant:'🍜',cafe:'☕',hotel:'🏨',shop:'🛍️',attraction:'🎭',transport:'🚕',etc:'✨'};
-const PLACE_CAT_LABEL={restaurant:'식당',cafe:'카페',hotel:'호텔/숙소',shop:'쇼핑',attraction:'볼거리',transport:'교통',etc:'기타'};
+/* 업체 카테고리: admin "카테고리 관리 > 업체 카테고리"에서 관리. 로드 실패 시 아래 fallback 사용 */
+const PLACE_CATS_FALLBACK=[
+  {cat_key:'restaurant',name_ko:'식당',icon:'🍜'},
+  {cat_key:'cafe',name_ko:'카페',icon:'☕'},
+  {cat_key:'hotel',name_ko:'호텔/숙소',icon:'🏨'},
+  {cat_key:'shop',name_ko:'쇼핑',icon:'🛍️'},
+  {cat_key:'attraction',name_ko:'볼거리',icon:'🎭'},
+  {cat_key:'transport',name_ko:'교통',icon:'🚕'},
+  {cat_key:'etc',name_ko:'기타',icon:'✨'},
+];
+let PLACE_CAT_ICON={},PLACE_CAT_LABEL={};
+function applyPlaceCats(cats){
+  PLACE_CAT_ICON={};PLACE_CAT_LABEL={};
+  cats.forEach(c=>{PLACE_CAT_ICON[c.cat_key]=c.icon||'📍';PLACE_CAT_LABEL[c.cat_key]=c.name_ko;});
+  const wrap=document.getElementById('place-cat-filter');
+  if(wrap){
+    wrap.innerHTML='<button class="cat-chip on" onclick="filterPlaces(\'all\')" data-cat="all">전체</button>'
+      +cats.map(c=>`<button class="cat-chip" onclick="filterPlaces('${c.cat_key}')" data-cat="${c.cat_key}">${c.icon||''} ${c.name_ko}</button>`).join('');
+  }
+}
+async function loadPlaceCategories(){
+  try{
+    if(sb){
+      const{data,error}=await sb.from('guide_place_categories').select('*').eq('is_active',true).order('sort_order');
+      if(!error&&data&&data.length){applyPlaceCats(data);return;}
+    }
+  }catch(e){console.warn('업체 카테고리 로드 실패',e);}
+  applyPlaceCats(PLACE_CATS_FALLBACK);
+}
 
 document.addEventListener('DOMContentLoaded',async()=>{
   initMap(); updateClock(); setInterval(updateClock,15000);
@@ -688,6 +708,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   loadShowsTickets(); loadPaymentMethods(); loadEmergencyInfo(); loadTips();
   await loadSpotsData();
   selectAttr('forest'); selectTab('map');
+  await loadPlaceCategories();
   loadPlaces();
   logVisit(); loadVisitorCount();
   fetchWeather(); setInterval(fetchWeather, 600000);
