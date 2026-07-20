@@ -362,9 +362,25 @@ function daysBetween(startStr, endStr) {
 }
 function onDepartureDateChange(val) {
   _date = val;
+  /* 귀국일 입력창 자체가 출발일 이전 날짜를 고를 수 없도록 min을 갱신 */
+  const returnInput = document.getElementById('bk-return-date');
+  if (returnInput && val) returnInput.min = val;
+  /* 이미 골라둔 귀국일이 새 출발일보다 빠르면 무효화 (화면에 잘못된 값이 남지 않도록) */
+  if (val && _returnDate && daysBetween(val, _returnDate) < 1) {
+    _returnDate = '';
+    if (returnInput) returnInput.value = '';
+  }
   recomputePkgDuration();
 }
 function onReturnDateChange(val) {
+  if (_date && val && daysBetween(_date, val) < 1) {
+    const hint = document.getElementById('bk-days-hint');
+    if (hint) hint.textContent = '귀국일은 출발일 이후 날짜로 선택해 주세요';
+    _returnDate = '';
+    const returnInput = document.getElementById('bk-return-date');
+    if (returnInput) returnInput.value = '';
+    return;
+  }
   _returnDate = val;
   recomputePkgDuration();
 }
@@ -429,7 +445,7 @@ function cardHTML(p) {
     <div class="card-img">${getEmoji(p)}</div>
     <div class="card-body">
       <div class="card-badge-row">
-        <span class="badge ${isPkg ? 'badge-pkg' : 'badge-day'}">${isPkg ? '맞춤투어 ' + p.duration_days + '일' : '1일투어'}</span>
+        <span class="badge ${isPkg ? 'badge-pkg' : 'badge-day'}">${isPkg ? '🧭 일정 자유 선택' : '1일투어'}</span>
         <span class="badge badge-live">예약 가능</span>
       </div>
       <div class="card-title">${p.title_ko || '—'}</div>
@@ -906,17 +922,26 @@ function comboAtNextAM(day) {
   }) || null;
 }
 
+/* 출발일이 선택돼 있으면 "N일차" 옆에 실제 달력 날짜(예: 10/12(월))를 같이 표시 */
+function dayLabel(dayNum, suffix) {
+  const base = `${dayNum}일차${suffix ? ' ' + suffix : ''}`;
+  if (!_date) return base;
+  const dateStr = addDaysToDateStr(_date, dayNum - 1);
+  const d = new Date(dateStr + 'T00:00:00');
+  const wd = ['일','월','화','수','목','금','토'][d.getDay()];
+  return `${base} · ${d.getMonth() + 1}/${d.getDate()}(${wd})`;
+}
 function renderDayPlan() {
   const numDays = _numDays;
   const html = _pkgDays.map(d => {
     if (d.day === 1) {
-      return `<div class="day-plan-card"><div class="day-plan-title">1일차</div>
+      return `<div class="day-plan-card"><div class="day-plan-title">${dayLabel(1)}</div>
         <div class="slot-row" style="cursor:default"><span class="slot-value">🛬 공항 픽업 → 호텔 투숙 (관광 없음)</span></div>
       </div>`;
     }
     if (d.day === numDays && numDays > 1) {
       const amItem = resolveSlotItem(d.am);
-      return `<div class="day-plan-card"><div class="day-plan-title">${d.day}일차 (마지막날)</div>
+      return `<div class="day-plan-card"><div class="day-plan-title">${dayLabel(d.day, '(마지막날)')}</div>
         <div class="slot-row" onclick="togglePicker(${d.day},'am')">
           <span class="slot-label">🌤 오전</span>
           <span class="slot-value">${amItem ? amItem.label + priceTag(amItem.price) : '선택 안함'}</span>
@@ -998,7 +1023,7 @@ function renderDayPlan() {
       ${_pickerOpen && _pickerOpen.day === d.day && _pickerOpen.slot === 'combo' ? renderPicker(d, 'combo') : ''}`;
     }
 
-    return `<div class="day-plan-card"><div class="day-plan-title">${d.day}일차</div>${rows}</div>`;
+    return `<div class="day-plan-card"><div class="day-plan-title">${dayLabel(d.day)}</div>${rows}</div>`;
   }).join('');
   document.getElementById('pkg-dayplan').innerHTML = html;
 }
