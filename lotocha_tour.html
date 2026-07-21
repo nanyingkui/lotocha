@@ -783,12 +783,12 @@ function openModal(id) {
     html += `
     <div class="booking-section">
       <div class="booking-section-title">${GROUP_LABEL[g] || '✅ ' + g + ' 선택'}</div>
-      ${groupMap[g].map(o => `
+      ${groupMap[g].map((o, idx) => `
         <div class="option-row" onclick="selectGroupOpt('${g}','${o.key}')">
           <div class="opt-check radio" id="oc-${o.key}"></div>
           <div class="option-info">
             <div class="option-label">${o.label}</div>
-            <div class="option-price">${o.price ? '+ ' + fmtFull(o.price) + (o.per==='pax' ? ' / 인' : '') : '기본 포함'}</div>
+            <div class="option-price">${o.price ? '+ ' + fmtFull(o.price) + (o.per==='pax' ? ' / 인' : '') : (idx === 0 ? '기본 포함' : '추가 요금 별도 (상담 시 안내)')}</div>
           </div>
         </div>`).join('')}
     </div>`;
