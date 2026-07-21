@@ -294,7 +294,8 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
   <div class="attr-bar">
     <button class="attr-btn on" onclick="selectAttr('forest')" id="attr-forest">🌲 국가삼림공원</button>
     <button class="attr-btn" onclick="selectAttr('tianmen')" id="attr-tianmen">⛰️ 천문산</button>
-    <button class="attr-btn" onclick="selectAttr('canyon')" id="attr-canyon">🌉 황룡동+대협곡</button>
+    <button class="attr-btn" onclick="selectAttr('huanglongdong')" id="attr-huanglongdong">🐉 황룡동</button>
+    <button class="attr-btn" onclick="selectAttr('canyon')" id="attr-canyon">🌉 대협곡</button>
   </div>
 </div>
 <div class="cdbar" id="cdbar"></div>
@@ -505,21 +506,34 @@ const ATTRS = {
     rainAvoid:[{item:'🌉 유리잔도 — 비 폐쇄'},{item:'🚡 케이블카 — 강풍 중단'}],
     tips:['🧥 정상 6°C 낮음. 겉옷 필수.','📸 케이블카에서 항공 사진.','⏰ 최소 4시간.'],
   },
-  canyon:{name:'황룡동+대협곡',icon:'🌉',center:[29.3630,110.2700],zoom:13,
+  canyon:{name:'대협곡',icon:'🌉',center:[29.3630,110.2700],zoom:13,
     gaode:'https://uri.amap.com/search?keyword=张家界大峡谷&city=张家界',
-    gaodeNav:'https://uri.amap.com/navigation?to=110.2700,29.3640,黄龙洞景区&mode=car&src=lotocha&coordinate=gaode&callnative=1',
-    lastTransport:[{name:'유리다리 입장 마감',time:'17:00'},{name:'황룡동 마지막 입장',time:'16:30'}],
+    gaodeNav:'https://uri.amap.com/navigation?to=110.2700,29.3640,张家界大峡谷&mode=car&src=lotocha&coordinate=gaode&callnative=1',
+    lastTransport:[{name:'유리다리 입장 마감',time:'17:00'}],
     plan:[
-      {time:'09:00',name:'픽업 후 이동',desc:'1~1.5시간.',warn:''},
-      {time:'09:30',name:'황룡동 관람',desc:'지하 유람선. 약 1.5시간.',warn:''},
-      {time:'11:00',name:'점심식사',desc:'황룡동 인근.',warn:''},
-      {time:'12:30',name:'유리다리',desc:'신발 커버 필수.',warn:'비 오면 폐쇄'},
-      {time:'13:30',name:'협곡 트레킹',desc:'수직 절벽.',warn:''},
-      {time:'16:30',name:'출구·해산',desc:'귀환 1.5시간.',warn:''},
+      {time:'10:00',name:'픽업 후 이동',desc:'무릉원 기준 약 1시간, 시내 기준 약 1시간30분.',warn:''},
+      {time:'11:00',name:'유리다리',desc:'신발 커버 필수.',warn:'비 오면 폐쇄'},
+      {time:'12:00',name:'협곡 트레킹',desc:'수직 절벽.',warn:''},
+      {time:'13:30',name:'점심식사',desc:'대협곡 인근.',warn:''},
+      {time:'15:00',name:'출구·해산',desc:'귀환 1~1.5시간.',warn:''},
     ],
-    rainPlan:[{item:'🦎 황룡동 — 실내'},{item:'⚠️ 유리다리 — 비 폐쇄'},{item:'🌲 삼림공원 대안'}],
+    rainPlan:[{item:'⚠️ 유리다리 — 비 폐쇄'},{item:'🌲 삼림공원/황룡동 대안'}],
     rainAvoid:[{item:'🪟 유리다리 — 비 폐쇄'},{item:'🎢 미끄럼틀 — 비 위험'}],
-    tips:['🚗 시내에서 130km.','📅 유리다리 8,000명 제한.','💧 물·간식 넉넉히.'],
+    tips:['🚗 시내에서 약 130km, 황룡동에서도 약 30km(40분~1시간) 떨어져 있어 별도 이동이 필요합니다.','📅 유리다리 1일 최대 8,000명 제한.','💧 물·간식 넉넉히.'],
+  },
+  huanglongdong:{name:'황룡동',icon:'🐉',center:[29.348,110.478],zoom:14,
+    gaode:'https://uri.amap.com/search?keyword=张家界黄龙洞&city=张家界',
+    gaodeNav:'https://uri.amap.com/navigation?to=110.478,29.348,黄龙洞景区&mode=car&src=lotocha&coordinate=gaode&callnative=1',
+    lastTransport:[{name:'황룡동 마지막 입장',time:'16:30'}],
+    plan:[
+      {time:'09:00',name:'무릉원 픽업·이동',desc:'약 20~30분.',warn:''},
+      {time:'09:30',name:'황룡동 입장',desc:'지하 유람선 포함, 약 1.5시간.',warn:''},
+      {time:'11:00',name:'점심식사',desc:'황룡동 인근.',warn:''},
+      {time:'12:00',name:'출구·해산',desc:'대협곡 이동 시 약 40분~1시간 추가.',warn:''},
+    ],
+    rainPlan:[{item:'🦎 황룡동 — 실내 동굴이라 비 영향 적음'}],
+    rainAvoid:[],
+    tips:['🌡️ 동굴 내부는 서늘합니다(약 17°C). 겉옷 준비.','🚣 지하 유람선 포함, 방수 신발 추천.','🚗 대협곡과는 약 30km(40분~1시간) 떨어져 있어, 같은 날 묶어 가려면 이동시간을 고려하세요.'],
   },
 };
 
@@ -527,16 +541,19 @@ const TRANSPORT = {
   wulingyuan:{
     forest:[{icon:'🚶',name:'도보',detail:'무릉원 숙소 → 남문. 15~25분.',price:'무료',badge:'b-green',badgeTxt:'가까움'},{icon:'🚕',name:'택시',detail:'5~10분.',price:'¥10~15',badge:'b-green',badgeTxt:'빠름'}],
     tianmen:[{icon:'🚕',name:'택시',detail:'약 45분.',price:'¥100~130',badge:'b-gold',badgeTxt:'추천'},{icon:'🚌',name:'버스+환승',detail:'1시간 20분.',price:'¥25',badge:'b-green',badgeTxt:'저렴'}],
-    canyon:[{icon:'🚕',name:'로투차 전용 차량',detail:'약 40분.',price:'투어 포함',badge:'b-green',badgeTxt:'추천'},{icon:'🚕',name:'택시 개인',detail:'왕복 예약 필수.',price:'¥120~160',badge:'b-gold',badgeTxt:'왕복 필요'}],
+    huanglongdong:[{icon:'🚕',name:'로투차 전용 차량',detail:'약 20~30분.',price:'투어 포함',badge:'b-green',badgeTxt:'추천'},{icon:'🚕',name:'택시',detail:'약 30분.',price:'¥30~50',badge:'b-green',badgeTxt:'가까움'}],
+    canyon:[{icon:'🚕',name:'로투차 전용 차량',detail:'약 1시간.',price:'투어 포함',badge:'b-green',badgeTxt:'추천'},{icon:'🚕',name:'택시 개인',detail:'왕복 예약 필수.',price:'¥120~160',badge:'b-gold',badgeTxt:'왕복 필요'}],
   },
   city:{
     forest:[{icon:'🚌',name:'108번 버스',detail:'약 1시간 30분.',price:'¥12',badge:'b-green',badgeTxt:'저렴'},{icon:'🚕',name:'택시',detail:'약 50분.',price:'¥100~130',badge:'b-gold',badgeTxt:'편리'}],
     tianmen:[{icon:'🚕',name:'택시',detail:'15~20분.',price:'¥25~35',badge:'b-green',badgeTxt:'가까움'}],
+    huanglongdong:[{icon:'🚕',name:'택시',detail:'약 40~50분.',price:'¥60~80',badge:'b-green',badgeTxt:'가까움'}],
     canyon:[{icon:'🚕',name:'로투차 전용 차량',detail:'약 1시간 30분.',price:'투어 포함',badge:'b-green',badgeTxt:'추천'},{icon:'🚕',name:'택시 개인',detail:'왕복 예약 필수.',price:'¥250~320',badge:'b-red',badgeTxt:'비쌈'}],
   },
   airport:{
     forest:[{icon:'🚕',name:'공항 → 무릉원',detail:'약 1시간.',price:'¥130~160',badge:'b-gold',badgeTxt:'1단계'}],
     tianmen:[{icon:'🚕',name:'공항 → 시내',detail:'약 20분.',price:'¥30~50',badge:'b-green',badgeTxt:'가까움'}],
+    huanglongdong:[{icon:'🚕',name:'공항 → 황룡동',detail:'약 1시간.',price:'¥130~160',badge:'b-gold',badgeTxt:'가까움'},{icon:'🚕',name:'로투차 공항 픽업',detail:'투어 예약 시 포함.',price:'투어 포함',badge:'b-green',badgeTxt:'추천'}],
     canyon:[{icon:'🚕',name:'공항 → 대협곡 직행',detail:'약 1시간 20분.',price:'¥180~220',badge:'b-gold',badgeTxt:'직행'},{icon:'🚕',name:'로투차 공항 픽업',detail:'투어 예약 시 포함.',price:'투어 포함',badge:'b-green',badgeTxt:'추천'}],
   },
 };

@@ -374,7 +374,7 @@ textarea.field-input{min-height:80px;resize:vertical}
     <!-- 地点 -->
     <div class="panel" id="panel-spots">
       <div class="page-title">📍 向导地点</div>
-      <div class="page-sub">地点信息管理。"景区"是大分类(例: 黄龙洞+大峡谷)，"区域"是其中的具体位置(例: 黄龙洞溶洞 / 大峡谷玻璃桥) — 即使景区相同，区域不同实际上就是不同的地点。</div>
+      <div class="page-sub">地点信息管理。"景区"是大分类(如国家森林公园)，部分景区下还有"区域"这一更具体的位置(如森林公园的南门/袁家界等) — 黄龙洞和大峡谷是两个相距约30公里的独立景点，已拆分为各自独立的景区，不再合并。</div>
       <div class="table-wrap">
         <div class="table-head"><h3>全部地点</h3><button class="btn-add" onclick="openSpotModal()">+ 添加地点</button></div>
         <table><thead><tr><th>景区</th><th>区域</th><th>地点名</th><th>类型</th><th>状态</th><th>操作</th></tr></thead>
@@ -540,7 +540,7 @@ textarea.field-input{min-height:80px;resize:vertical}
     <!-- 景区管理 -->
     <div class="panel" id="panel-guideattr">
       <div class="page-title">🏔️ 景区</div>
-      <div class="page-sub">国家森林公园/天门山/黄龙洞+大峡谷已固定关联地图、GPS、区域、行程功能，无法删除。新增的景区仅用于标签/筛选用途，不会自动反映到地图标签页。</div>
+      <div class="page-sub">国家森林公园/天门山/黄龙洞/大峡谷这4个已固定关联地图、GPS、区域、行程功能，无法删除。新增的景区仅用于标签/筛选用途，不会自动反映到地图标签页。</div>
       <div class="table-wrap">
         <div class="table-head"><h3>全部景区</h3><button class="btn-add" onclick="openGAModal()">+ 添加景区</button></div>
         <table><thead><tr><th>键</th><th>名称</th><th>受保护</th><th>状态</th><th>顺序</th><th>操作</th></tr></thead>
@@ -647,7 +647,7 @@ textarea.field-input{min-height:80px;resize:vertical}
       <div class="field-row">
         <div class="field-group"><label class="field-label">地点 ID *</label><input type="text" id="s-id" class="field-input" placeholder="forest_south_1"><div class="field-hint">英文_小写字母</div></div>
         <div class="field-group"><label class="field-label">景区 *</label>
-          <select id="s-attr" class="field-input" onchange="onSpotAttrChange()"><option value="forest">国家森林公园</option><option value="tianmen">天门山</option><option value="canyon">黄龙洞+大峡谷</option></select></div>
+          <select id="s-attr" class="field-input" onchange="onSpotAttrChange()"><option value="forest">国家森林公园</option><option value="tianmen">天门山</option><option value="huanglongdong">黄龙洞</option><option value="canyon">大峡谷</option></select></div>
       </div>
       <div class="field-row">
         <div class="field-group"><label class="field-label">区域</label><select id="s-zone" class="field-input"></select></div>
@@ -1107,7 +1107,7 @@ textarea.field-input{min-height:80px;resize:vertical}
       <input type="hidden" id="tp-id">
       <div class="field-row">
         <div class="field-group"><label class="field-label">景区 *</label>
-          <select id="tp-attr" class="field-input"><option value="forest">森林公园</option><option value="tianmen">天门山</option><option value="canyon">峡谷</option></select></div>
+          <select id="tp-attr" class="field-input"><option value="forest">森林公园</option><option value="tianmen">天门山</option><option value="huanglongdong">黄龙洞</option><option value="canyon">大峡谷</option></select></div>
         <div class="field-group"><label class="field-label">状态</label>
           <select id="tp-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
       </div>
@@ -1203,13 +1203,13 @@ const SUPA_KEY = 'sb_publishable_oxeR92SfBDMzYAvcNitbPw_Vf0u1y0K';
 let sb, currentUser, userRole;
 try { sb = window.supabase.createClient(SUPA_URL, SUPA_KEY); } catch(e) {}
 
-const ATTR_LABELS = {forest:'森林公园', tianmen:'天门山', canyon:'峡谷'};
+const ATTR_LABELS = {forest:'森林公园', tianmen:'天门山', huanglongdong:'黄龙洞', canyon:'大峡谷'};
 /* 向导地点 "区域(zone_id)" 标签 — 与实际向导页面(lotocha_guide.html)的区域名保持一致。
-   即使景区(attr)相同，区域不同实际上就是不同地点，因此在列表中按区域分类显示 */
+   即使景区(attr)相同，区域不同实际上就是不同地点，因此在列表中按区域分类显示。
+   2026-07-21: 황룡동/대협곡已拆分为两个独立景区(huanglongdong/canyon)，各自不再需要子区域。 */
 const ZONE_LABELS = {
   forest: {south:'南门·十里画廊', yuanjia:'袁家界·百龙电梯', tianzi:'天子山·索道', yangjiajie:'杨家界换乘中心'},
   tianmen: {base:'缆车下站·市区', summit:'山顶·天门洞·玻璃栈道'},
-  canyon: {huanglongdong:'黄龙洞溶洞', bridge:'大峡谷玻璃桥'},
 };
 function zoneLabel(attrId, zoneId) {
   if (!zoneId) return '-';
@@ -1220,7 +1220,7 @@ const STORAGE_BUCKET = 'lotocha-media';
 /* ───── 分类数据 (地区 / 商户分类 / 景区) ───── */
 let REGIONS_LIST = [{name_ko:'市内'},{name_ko:'武陵源'},{name_ko:'天门山'},{name_ko:'黄龙洞'},{name_ko:'其他'}];
 let CATEGORIES_LIST = [{cat_key:'restaurant',name_ko:'餐厅'},{cat_key:'cafe',name_ko:'咖啡厅'},{cat_key:'hotel',name_ko:'酒店/住宿'},{cat_key:'shop',name_ko:'购物'},{cat_key:'attraction',name_ko:'景点游览'},{cat_key:'transport',name_ko:'交通'},{cat_key:'etc',name_ko:'其他'}];
-let ATTRACTIONS_LIST = [{attr_key:'forest',name_ko:'国家森林公园',is_protected:true},{attr_key:'tianmen',name_ko:'天门山',is_protected:true},{attr_key:'canyon',name_ko:'黄龙洞+大峡谷',is_protected:true}];
+let ATTRACTIONS_LIST = [{attr_key:'forest',name_ko:'国家森林公园',is_protected:true},{attr_key:'tianmen',name_ko:'天门山',is_protected:true},{attr_key:'huanglongdong',name_ko:'黄龙洞',is_protected:true},{attr_key:'canyon',name_ko:'大峡谷',is_protected:true}];
 
 async function loadCategoryData() {
   try {
@@ -2177,15 +2177,9 @@ function populateZoneSelect(attrId, selected) {
   if (selected && zones[selected]) sel.value = selected;
 }
 function onSpotAttrChange() { populateZoneSelect(document.getElementById('s-attr').value, ''); }
-function syncSpotAttrLabels() {
-  ['forest','tianmen','canyon'].forEach(k => {
-    const opt = document.querySelector(`#s-attr option[value="${k}"]`);
-    if (opt && ATTR_LABELS[k]) opt.textContent = ATTR_LABELS[k];
-  });
-}
 function openSpotModal(id) {
   document.getElementById('spot-modal-title').textContent = id ? '编辑地点' : '添加地点';
-  syncSpotAttrLabels();
+  populateCategorySelects(); // s-attr/tp-attr 옵션을 ATTRACTIONS_LIST(DB) 기준으로 최신화
   if (!id) {
     ['s-id','s-id-orig','s-name-ko','s-name-cn','s-lat','s-lon','s-gaode','s-video-url','s-desc','s-tip','s-hours','s-price'].forEach(f=>document.getElementById(f).value='');
     document.getElementById('s-attr').value='forest'; document.getElementById('s-type').value='landmark';
