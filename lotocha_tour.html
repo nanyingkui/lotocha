@@ -673,7 +673,7 @@ function openModal(id) {
         <div class="pax-row">
           <div class="pax-info">
             <div class="pax-label">${t.label}</div>
-            <div class="pax-price">${fmtFull(t.price)} / 인</div>
+            <div class="pax-price">${isPkg && !t.price ? '📊 날짜·인원 선택 시 실시간 계산' : fmtFull(t.price) + ' / 인'}</div>
           </div>
           <div class="pax-counter">
             <button class="counter-btn" onclick="changePax('${t.key}',-1,event)">−</button>
