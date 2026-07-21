@@ -88,6 +88,9 @@ tr:hover td{background:#fafbfe}
 .btn-edit{background:#e8eaf6;color:#3949ab;border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
 .btn-del{background:#ffebee;color:var(--red);border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
 .btn-approve{background:#e8f5e9;color:var(--green);border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+.move-btns{display:flex;flex-direction:column;gap:2px}
+.btn-move{background:#eceff1;color:#455a64;border:none;border-radius:4px;width:22px;height:18px;font-size:10px;line-height:1;cursor:pointer;font-family:inherit}
+.btn-move:disabled{opacity:.3;cursor:default}
 .btn-reject{background:#ffebee;color:var(--red);border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
 
 /* ── 弹窗 ── */
@@ -380,7 +383,7 @@ textarea.field-input{min-height:80px;resize:vertical}
       <div class="page-sub">地点信息管理。"景区"是大分类(如国家森林公园)，部分景区下还有"区域"这一更具体的位置(如森林公园的南门/袁家界等) — 黄龙洞和大峡谷是两个相距约30公里的独立景点，已拆分为各自独立的景区，不再合并。</div>
       <div class="table-wrap">
         <div class="table-head"><h3>全部地点</h3><button class="btn-add" onclick="openSpotModal()">+ 添加地点</button></div>
-        <table><thead><tr><th>景区</th><th>区域</th><th>地点名</th><th>类型</th><th>状态</th><th>操作</th></tr></thead>
+        <table><thead><tr><th>景区</th><th>区域</th><th>地点名</th><th>类型</th><th>状态</th><th>顺序</th><th>操作</th></tr></thead>
         <tbody id="spots-tbody"></tbody></table>
       </div>
     </div>
@@ -662,11 +665,8 @@ textarea.field-input{min-height:80px;resize:vertical}
         <div class="field-group"><label class="field-label">价格(韩元)</label><input type="number" id="t-price-krw" class="field-input" placeholder="89000"></div>
         <div class="field-group"><label class="field-label">价格(人民币)</label><input type="number" id="t-price-cny" class="field-input" placeholder="480"></div>
       </div>
-      <div class="field-row">
-        <div class="field-group"><label class="field-label">天数</label><input type="number" id="t-days" class="field-input" value="1">
-          <div class="field-hint" id="t-days-hint"></div></div>
-        <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="t-order" class="field-input" value="0"></div>
-      </div>
+      <div class="field-group"><label class="field-label">天数</label><input type="number" id="t-days" class="field-input" value="1">
+        <div class="field-hint" id="t-days-hint"></div></div>
       <div class="field-group"><label class="field-label">主图 URL(以换行分隔)</label>
         <textarea id="t-images" class="field-input" placeholder="https://...jpg"></textarea>
         <button type="button" class="btn-add-row" style="margin-top:6px" onclick="document.getElementById('t-img-file').click()">📎 图片上传</button>
@@ -757,10 +757,8 @@ textarea.field-input{min-height:80px;resize:vertical}
         <div class="field-group"><label class="field-label">营业时间</label><input type="text" id="s-hours" class="field-input" placeholder="07:00–18:00"></div>
         <div class="field-group"><label class="field-label">价格信息</label><input type="text" id="s-price" class="field-input" placeholder="免费 / ¥245"></div>
       </div>
-      <div class="field-row">
-        <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="s-order" class="field-input" value="0"></div>
-        <div class="field-group"><label class="field-label">状态</label>
-          <select id="s-status" class="field-input"><option value="live">上线</option><option value="draft">草稿</option></select></div>
+      <div class="field-group"><label class="field-label">状态</label>
+        <select id="s-status" class="field-input"><option value="live">上线</option><option value="draft">草稿</option></select></div>
       </div>
     </div>
     <div class="modal-footer">
@@ -821,10 +819,8 @@ textarea.field-input{min-height:80px;resize:vertical}
       </div>
       <div class="field-group"><label class="field-label">说明</label><textarea id="pl-desc" class="field-input"></textarea></div>
       <div class="field-group"><label class="field-label">标签(逗号分隔)</label><input type="text" id="pl-tags" class="field-input" placeholder="韩语菜单, 可刷卡, 可停车"></div>
-      <div class="field-row">
-        <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="pl-order" class="field-input" value="0"></div>
-        <div class="field-group"><label class="field-label">状态</label>
-          <select id="pl-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
+      <div class="field-group"><label class="field-label">状态</label>
+        <select id="pl-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
       </div>
     </div>
     <div class="modal-footer">
@@ -858,11 +854,8 @@ textarea.field-input{min-height:80px;resize:vertical}
         <button type="button" class="btn-add-row" style="margin-top:6px" onclick="document.getElementById('ho-img-file').click()">📎 图片上传</button>
         <input type="file" id="ho-img-file" accept="image/*" style="display:none" onchange="uploadToInput(this,'ho-image')">
       </div>
-      <div class="field-row">
-        <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="ho-order" class="field-input" value="0"></div>
-        <div class="field-group"><label class="field-label">状态</label>
-          <select id="ho-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
-      </div>
+      <div class="field-group"><label class="field-label">状态</label>
+        <select id="ho-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeHotelPoolModal()">取消</button>
@@ -892,7 +885,6 @@ textarea.field-input{min-height:80px;resize:vertical}
         <input type="file" id="fl2-img-file" accept="image/*" style="display:none" onchange="uploadToInput(this,'fl2-image')">
       </div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="fl2-order" class="field-input" value="0"></div>
         <div class="field-group"><label class="field-label">状态</label>
           <select id="fl2-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
       </div>
@@ -935,11 +927,8 @@ textarea.field-input{min-height:80px;resize:vertical}
         <button type="button" class="btn-add-row" style="margin-top:6px" onclick="document.getElementById('atp-img-file').click()">📎 图片上传</button>
         <input type="file" id="atp-img-file" accept="image/*" style="display:none" onchange="uploadToInput(this,'atp-image')">
       </div>
-      <div class="field-row">
-        <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="atp-order" class="field-input" value="0"></div>
-        <div class="field-group"><label class="field-label">状态</label>
-          <select id="atp-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
-      </div>
+      <div class="field-group"><label class="field-label">状态</label>
+        <select id="atp-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeAttractionPoolModal()">取消</button>
@@ -963,11 +952,8 @@ textarea.field-input{min-height:80px;resize:vertical}
         <div class="field-group"><label class="field-label">每人费用(人民币)</label><input type="number" id="addon-price" class="field-input" value="0"></div>
       </div>
       <div class="field-group"><label class="field-label">备注</label><input type="text" id="addon-note" class="field-input" placeholder="例: 含车辆/司机/导游费"></div>
-      <div class="field-row">
-        <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="addon-order" class="field-input" value="0"></div>
-        <div class="field-group"><label class="field-label">状态</label>
-          <select id="addon-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
-      </div>
+      <div class="field-group"><label class="field-label">状态</label>
+        <select id="addon-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeAddonModal()">取消</button>
@@ -1010,11 +996,8 @@ textarea.field-input{min-height:80px;resize:vertical}
         <div class="field-group"><label class="field-label">最大年龄(留空则不限)</label><input type="number" id="agedisc-maxage" class="field-input"></div>
       </div>
       <div class="field-group"><label class="field-label">每人折扣金额(韩元)</label><input type="number" id="agedisc-krw" class="field-input" value="0"></div>
-      <div class="field-row">
-        <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="agedisc-order" class="field-input" value="0"></div>
-        <div class="field-group"><label class="field-label">状态</label>
-          <select id="agedisc-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
-      </div>
+      <div class="field-group"><label class="field-label">状态</label>
+        <select id="agedisc-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeAgeDiscModal()">取消</button>
@@ -1076,7 +1059,6 @@ textarea.field-input{min-height:80px;resize:vertical}
         <textarea id="st-links" class="field-input" placeholder="🎫 Trip.com|https://..."></textarea>
         <div class="field-hint">每行一条，标签和URL用 | 分隔</div>
       </div>
-      <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="st-order" class="field-input" value="0"></div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeSTModal()">取消</button>
@@ -1113,7 +1095,6 @@ textarea.field-input{min-height:80px;resize:vertical}
         <div class="field-group"><label class="field-label">链接标签</label><input type="text" id="pm-link-label" class="field-input" placeholder="Kakao Pay 官方 →"></div>
         <div class="field-group"><label class="field-label">链接 URL</label><input type="text" id="pm-link-url" class="field-input" placeholder="https://pay.kakao.com"></div>
       </div>
-      <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="pm-order" class="field-input" value="0"></div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closePMModal()">取消</button>
@@ -1139,7 +1120,6 @@ textarea.field-input{min-height:80px;resize:vertical}
       </div>
       <div class="field-group"><label class="field-label">标签 *</label><input type="text" id="ei-label" class="field-input" placeholder="警察"></div>
       <div class="field-group"><label class="field-label">值 *</label><input type="text" id="ei-value" class="field-input" placeholder="110"></div>
-      <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="ei-order" class="field-input" value="0"></div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeEIModal()">取消</button>
@@ -1165,7 +1145,6 @@ textarea.field-input{min-height:80px;resize:vertical}
       <div class="field-group"><label class="field-label">中文 *</label><input type="text" id="ph-cn" class="field-input"></div>
       <div class="field-group"><label class="field-label">拼音</label><input type="text" id="ph-py" class="field-input"></div>
       <div class="field-group"><label class="field-label">韩语 *</label><input type="text" id="ph-ko" class="field-input"></div>
-      <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="ph-order" class="field-input" value="0"></div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closePHModal()">取消</button>
@@ -1190,7 +1169,6 @@ textarea.field-input{min-height:80px;resize:vertical}
           <select id="tp-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
       </div>
       <div class="field-group"><label class="field-label">内容 *</label><input type="text" id="tp-text" class="field-input" placeholder="👟 必须穿运动鞋。"></div>
-      <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="tp-order" class="field-input" value="0"></div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeTPModal()">取消</button>
@@ -1209,11 +1187,8 @@ textarea.field-input{min-height:80px;resize:vertical}
     <div class="modal-body">
       <input type="hidden" id="rg-id">
       <div class="field-group"><label class="field-label">名称 *</label><input type="text" id="rg-name" class="field-input" placeholder="凤凰古城"></div>
-      <div class="field-row">
-        <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="rg-order" class="field-input" value="0"></div>
-        <div class="field-group"><label class="field-label">状态</label>
-          <select id="rg-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
-      </div>
+      <div class="field-group"><label class="field-label">状态</label>
+        <select id="rg-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeRGModal()">取消</button>
@@ -1233,10 +1208,7 @@ textarea.field-input{min-height:80px;resize:vertical}
       <input type="hidden" id="pc-id-orig">
       <div class="field-group"><label class="field-label">key (英文，唯一值) *</label><input type="text" id="pc-key" class="field-input" placeholder="bar"></div>
       <div class="field-group"><label class="field-label">名称 *</label><input type="text" id="pc-name" class="field-input" placeholder="酒吧"></div>
-      <div class="field-row">
-        <div class="field-group"><label class="field-label">图标表情符号</label><input type="text" id="pc-icon" class="field-input" placeholder="🍺"></div>
-        <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="pc-order" class="field-input" value="0"></div>
-      </div>
+      <div class="field-group"><label class="field-label">图标表情符号</label><input type="text" id="pc-icon" class="field-input" placeholder="🍺"></div>
       <div class="field-group"><label class="field-label">状态</label>
         <select id="pc-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
     </div>
@@ -1258,10 +1230,7 @@ textarea.field-input{min-height:80px;resize:vertical}
       <input type="hidden" id="ga-id-orig">
       <div class="field-group"><label class="field-label">key（系统自动生成，无需填写）</label><input type="text" id="ga-key" class="field-input" readonly style="background:#f5f5f5;color:#999"></div>
       <div class="field-group"><label class="field-label">名称 *</label><input type="text" id="ga-name" class="field-input" placeholder="凤凰古城"></div>
-      <div class="field-row">
-        <div class="field-group"><label class="field-label">图标表情符号</label><input type="text" id="ga-icon" class="field-input" placeholder="🏯"></div>
-        <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="ga-order" class="field-input" value="0"></div>
-      </div>
+      <div class="field-group"><label class="field-label">图标表情符号</label><input type="text" id="ga-icon" class="field-input" placeholder="🏯"></div>
       <div class="field-group"><label class="field-label">状态</label>
         <select id="ga-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
       <div class="field-hint">💡 保存后请到"景区详情设置"面板为该景区配置地图定位，配置完成后会自动出现在向导页面的地图标签页。</div>
@@ -1282,10 +1251,7 @@ textarea.field-input{min-height:80px;resize:vertical}
     </div>
     <div class="modal-body">
       <input type="hidden" id="ps-id">
-      <div class="field-row">
-        <div class="field-group"><label class="field-label">时间 (HH:MM) *</label><input type="text" id="ps-time" class="field-input" placeholder="09:00"></div>
-        <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="ps-order" class="field-input" value="0"></div>
-      </div>
+      <div class="field-group"><label class="field-label">时间 (HH:MM) *</label><input type="text" id="ps-time" class="field-input" placeholder="09:00"></div>
       <div class="field-group"><label class="field-label">标题 *</label><input type="text" id="ps-title" class="field-input" placeholder="南门入场·购票"></div>
       <div class="field-group"><label class="field-label">说明</label><input type="text" id="ps-desc" class="field-input" placeholder="请携带护照"></div>
       <div class="field-group"><label class="field-label">警告(红色警示文字，没有则留空)</label><input type="text" id="ps-warn" class="field-input" placeholder="旺季排队60分钟"></div>
@@ -1309,7 +1275,6 @@ textarea.field-input{min-height:80px;resize:vertical}
       <div class="field-group"><label class="field-label">类型 *</label>
         <select id="ri-kind" class="field-input"><option value="plan">推荐(下雨天的替代活动)</option><option value="avoid">避开(下雨天有风险/关闭)</option></select></div>
       <div class="field-group"><label class="field-label">内容 *</label><input type="text" id="ri-text" class="field-input" placeholder="🦎 黄龙洞 — 室内洞穴"></div>
-      <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="ri-order" class="field-input" value="0"></div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeRainItemModal()">取消</button>
@@ -1329,7 +1294,6 @@ textarea.field-input{min-height:80px;resize:vertical}
       <input type="hidden" id="lt-id">
       <div class="field-group"><label class="field-label">名称 *</label><input type="text" id="lt-name" class="field-input" placeholder="百龙电梯"></div>
       <div class="field-group"><label class="field-label">最晚时间 (HH:MM) *</label><input type="text" id="lt-time" class="field-input" placeholder="18:00"></div>
-      <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="lt-order" class="field-input" value="0"></div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeLastTModal()">取消</button>
@@ -1360,7 +1324,6 @@ textarea.field-input{min-height:80px;resize:vertical}
           <select id="to-badge" class="field-input"><option value="b-green">绿色(推荐/便宜)</option><option value="b-gold">金色(普通)</option><option value="b-red">红色(贵/需注意)</option></select></div>
       </div>
       <div class="field-group"><label class="field-label">标签文字</label><input type="text" id="to-badgetxt" class="field-input" placeholder="推荐"></div>
-      <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="to-order" class="field-input" value="0"></div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeTransOptModal()">取消</button>
@@ -1384,7 +1347,6 @@ textarea.field-input{min-height:80px;resize:vertical}
       </div>
       <div class="field-group"><label class="field-label">名称 *</label><input type="text" id="az-name" class="field-input" placeholder="南门·画廊"></div>
       <div class="field-group"><label class="field-label">接驳车信息(可使用HTML标签)</label><input type="text" id="az-shuttle" class="field-input" placeholder="🚌 <b>接驳车:</b> 杨家界换乘中心10~15分钟 | <b>末班18:30</b>"></div>
-      <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="az-order" class="field-input" value="0"></div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeADZoneModal()">取消</button>
@@ -1510,6 +1472,30 @@ function toast(msg, type='') {
   setTimeout(() => t.className = 'toast', 2800);
 }
 function fmt(n) { return n ? n.toLocaleString('ko-KR')+'韩元' : '-'; }
+
+/* ───── 排序순서 위/아래 이동 범용 헬퍼 ─────
+   기존에는 관리자가 직접 숫자를 입력해서 순서를 정했지만, 음수 입력·순서 값 중복(동률)
+   문제가 있었음. 이제는 목록에 표시된 순서 그대로 위/아래 버튼으로만 이동시키고,
+   숫자는 화면에 노출/입력하지 않음. list는 각 load...() 함수가 마지막으로 불러온
+   배열(이미 sort_order로 정렬됨)을 그대로 넘기면 됨. */
+async function moveSortItem(list, id, dir, table, onDone) {
+  const idx = list.findIndex(x => String(x.id) === String(id));
+  if (idx < 0) return;
+  const swapIdx = dir === 'up' ? idx - 1 : idx + 1;
+  if (swapIdx < 0 || swapIdx >= list.length) return;
+  const a = list[idx], b = list[swapIdx];
+  const [{ error: e1 }, { error: e2 }] = await Promise.all([
+    sb.from(table).update({ sort_order: b.sort_order }).eq('id', a.id),
+    sb.from(table).update({ sort_order: a.sort_order }).eq('id', b.id),
+  ]);
+  if (e1 || e2) { toast('排序失败: ' + ((e1 || e2).message), 'error'); return; }
+  onDone();
+}
+// 새 항목 저장 시 자동으로 맨 뒤 순서를 부여(입력 불필요, 충돌 없음)
+function nextSortOrder(list) { return list.length ? Math.max(...list.map(x => x.sort_order || 0)) + 10 : 10; }
+function moveBtnsHTML(moveFnName, id, idx, len) {
+  return `<div class="move-btns"><button class="btn-move" ${idx===0?'disabled':''} onclick="${moveFnName}('${id}','up')">▲</button><button class="btn-move" ${idx===len-1?'disabled':''} onclick="${moveFnName}('${id}','down')">▼</button></div>`;
+}
 function dateStr(s) { return s ? s.slice(0,10) : '-'; }
 function linesToArr(s) { return s.split('\n').map(x=>x.trim()).filter(Boolean); }
 function arrToLines(a) { return (a||[]).join('\n'); }
@@ -1653,17 +1639,20 @@ async function loadDashboard() {
 
 /* 2026-07-20 确定: 定制游只需1个产品(设置)即可，因此拆分为单独的"定制游设置"面板。
    此列表(旅游产品)现在仅限1日游 — 沿用原有的可创建多个并管理的方式 */
+let TOUR_LIST = [];
 async function loadTours() {
   const { data } = await sb.from('tour_products').select('*').eq('product_type','day_tour').order('sort_order');
+  TOUR_LIST = data || [];
   document.getElementById('tours-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">加载失败</td></tr>'
     : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">暂无产品</td></tr>'
-    : data.map(p=>`<tr>
+    : data.map((p,i)=>`<tr>
         <td style="font-weight:700">${p.title_ko}</td><td>${fmt(p.price_krw)}</td><td>${p.duration_days}天</td>
         <td><span class="badge badge-${p.status}">${{live:'上线',draft:'草稿',pending:'审核中',archived:'归档'}[p.status]||p.status}</span></td>
-        <td>${p.sort_order}</td>
+        <td>${moveBtnsHTML('moveTOUR',p.id,i,data.length)}</td>
         <td><div class="act-btns"><button class="btn-edit" onclick="openTourModal('${p.id}')">编辑</button>
         <button class="btn-del" onclick="deleteTour('${p.id}')">删除</button></div></td></tr>`).join('');
 }
+function moveTOUR(id,dir){ moveSortItem(TOUR_LIST, id, dir, 'tour_products', loadTours); }
 
 /* ───── 定制游设置 (单一产品，无需列表/新增，直接在此面板编辑) ───── */
 let _pkgProductId = null;
@@ -1757,25 +1746,28 @@ async function uploadToInput(fileInput, targetId) {
 }
 
 /* ───── 酒店管理 (全局公用, tour_hotels) ───── */
+let HO_LIST = [];
 async function loadHotelPool() {
   const { data } = await sb.from('tour_hotels').select('*').order('sort_order');
+  HO_LIST = data || [];
   document.getElementById('hotels-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">加载失败 (若数据表不存在，请执行 lotocha_supabase_global_pools.sql )</td></tr>'
     : !data.length ? '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:20px">暂无酒店记录</td></tr>'
-    : data.map(h=>`<tr>
+    : data.map((h,i)=>`<tr>
         <td style="font-weight:700">${h.name}${h.grade?` (${h.grade})`:''}</td>
         <td>${h.price?fmt(h.price)+(h.per==='pax'?'/人':''):'基本包含'}</td>
         <td><span class="badge badge-${h.is_active?'live':'archived'}">${h.is_active?'启用':'禁用'}</span></td>
-        <td>${h.sort_order}</td>
+        <td>${moveBtnsHTML('moveHO',h.id,i,data.length)}</td>
         <td><div class="act-btns"><button class="btn-edit" onclick="openHotelPoolModal('${h.id}')">编辑</button>
         <button class="btn-del" onclick="deleteHotelPool('${h.id}')">删除</button></div></td></tr>`).join('');
 }
+function moveHO(id,dir){ moveSortItem(HO_LIST, id, dir, 'tour_hotels', loadHotelPool); }
 function openHotelPoolModal(id) {
   document.getElementById('hotel-modal-title').textContent = id ? '编辑酒店' : '添加酒店';
   const flds = ['ho-id','ho-name','ho-grade','ho-desc','ho-image'];
   if (!id) {
     flds.forEach(f=>document.getElementById(f).value='');
     document.getElementById('ho-price').value='0'; document.getElementById('ho-per').value='pax';
-    document.getElementById('ho-order').value='0'; document.getElementById('ho-active').value='1';
+    document.getElementById('ho-active').value='1';
   } else {
     sb.from('tour_hotels').select('*').eq('id',id).single().then(({data:h})=>{
       if (!h) return;
@@ -1786,7 +1778,6 @@ function openHotelPoolModal(id) {
       document.getElementById('ho-per').value=h.per||'pax';
       document.getElementById('ho-desc').value=h.desc_ko||'';
       document.getElementById('ho-image').value=h.image||'';
-      document.getElementById('ho-order').value=h.sort_order||0;
       document.getElementById('ho-active').value=h.is_active?'1':'0';
     });
   }
@@ -1806,10 +1797,10 @@ async function saveHotelPool() {
     per: document.getElementById('ho-per').value,
     desc_ko: document.getElementById('ho-desc').value.trim()||null,
     image: document.getElementById('ho-image').value.trim()||null,
-    sort_order: parseInt(document.getElementById('ho-order').value)||0,
     is_active: document.getElementById('ho-active').value==='1',
     updated_at: new Date().toISOString(),
   };
+  if (!id) payload.sort_order = nextSortOrder(HO_LIST);
   const { error } = id ? await sb.from('tour_hotels').update(payload).eq('id',id) : await sb.from('tour_hotels').insert(payload);
   if (error) { toast('保存失败: '+error.message,'error'); return; }
   toast(id?'已修改':'已添加','success'); closeHotelPoolModal(); loadHotelPool();
@@ -1822,25 +1813,28 @@ async function deleteHotelPool(id) {
 }
 
 /* ───── 航班管理 (全局公用, tour_flights) ───── */
+let FL_LIST = [];
 async function loadFlightPool() {
   const { data } = await sb.from('tour_flights').select('*').order('sort_order');
+  FL_LIST = data || [];
   document.getElementById('flights-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">加载失败 (若数据表不存在，请执行 lotocha_supabase_global_pools.sql )</td></tr>'
     : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">暂无航班记录</td></tr>'
-    : data.map(f=>`<tr>
+    : data.map((f,i)=>`<tr>
         <td style="font-weight:700">${f.name}</td>
         <td>${f.location||'-'}</td>
         <td>${f.time_desc||'-'}</td>
         <td><span class="badge badge-${f.is_active?'live':'archived'}">${f.is_active?'启用':'禁用'}</span></td>
-        <td>${f.sort_order}</td>
+        <td>${moveBtnsHTML('moveFL',f.id,i,data.length)}</td>
         <td><div class="act-btns"><button class="btn-edit" onclick="openFlightPoolModal('${f.id}')">编辑</button>
         <button class="btn-del" onclick="deleteFlightPool('${f.id}')">删除</button></div></td></tr>`).join('');
 }
+function moveFL(id,dir){ moveSortItem(FL_LIST, id, dir, 'tour_flights', loadFlightPool); }
 function openFlightPoolModal(id) {
   document.getElementById('flight-modal-title').textContent = id ? '编辑航班' : '添加航班';
   const flds = ['fl2-id','fl2-name','fl2-location','fl2-time','fl2-desc','fl2-image'];
   if (!id) {
     flds.forEach(f=>document.getElementById(f).value='');
-    document.getElementById('fl2-order').value='0'; document.getElementById('fl2-active').value='1';
+    document.getElementById('fl2-active').value='1';
   } else {
     sb.from('tour_flights').select('*').eq('id',id).single().then(({data:f})=>{
       if (!f) return;
@@ -1850,7 +1844,6 @@ function openFlightPoolModal(id) {
       document.getElementById('fl2-time').value=f.time_desc||'';
       document.getElementById('fl2-desc').value=f.desc_ko||'';
       document.getElementById('fl2-image').value=f.image||'';
-      document.getElementById('fl2-order').value=f.sort_order||0;
       document.getElementById('fl2-active').value=f.is_active?'1':'0';
     });
   }
@@ -1869,10 +1862,10 @@ async function saveFlightPool() {
     time_desc: document.getElementById('fl2-time').value.trim()||null,
     desc_ko: document.getElementById('fl2-desc').value.trim()||null,
     image: document.getElementById('fl2-image').value.trim()||null,
-    sort_order: parseInt(document.getElementById('fl2-order').value)||0,
     is_active: document.getElementById('fl2-active').value==='1',
     updated_at: new Date().toISOString(),
   };
+  if (!id) payload.sort_order = nextSortOrder(FL_LIST);
   const { error } = id ? await sb.from('tour_flights').update(payload).eq('id',id) : await sb.from('tour_flights').insert(payload);
   if (error) { toast('保存失败: '+error.message,'error'); return; }
   toast(id?'已修改':'已添加','success'); closeFlightPoolModal(); loadFlightPool();
@@ -1887,20 +1880,23 @@ async function deleteFlightPool(id) {
 /* ───── 景点管理 (全局公用, tour_attractions — 供定制游"自由安排行程"使用。与助手页面的景区guide_attractions是不同的表) ───── */
 const ATTR_POOL_CAT_LABELS = {large:'大型',feature:'特色',local:'人文'};
 const SLOT_TYPE_LABELS = {full_day:'全天',half_day:'半天',evening:'晚上/夜间',pm_evening:'下午+晚上',pm_evening_nextam:'下午+晚上+次日上午'};
+let ATP_LIST = [];
 async function loadAttractionPool() {
   const { data } = await sb.from('tour_attractions').select('*').order('sort_order');
+  ATP_LIST = data || [];
   document.getElementById('attractions-tbody').innerHTML = !data ? '<tr><td colspan="7" style="color:var(--red)">加载失败 (若数据表不存在，请执行 lotocha_supabase_global_pools.sql / lotocha_supabase_pricing_model.sql )</td></tr>'
     : !data.length ? '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:20px">暂无景点记录</td></tr>'
-    : data.map(a=>`<tr>
+    : data.map((a,i)=>`<tr>
         <td style="font-family:monospace;font-size:12px">${a.key}</td>
         <td style="font-weight:700">${a.label}</td>
         <td>${SLOT_TYPE_LABELS[a.slot_type]||a.slot_type||'-'}</td>
         <td>${a.price ? a.price+'人民币' : '免费'}</td>
         <td><span class="badge badge-${a.is_active?'live':'archived'}">${a.is_active?'启用':'禁用'}</span></td>
-        <td>${a.sort_order}</td>
+        <td>${moveBtnsHTML('moveATP',a.id,i,data.length)}</td>
         <td><div class="act-btns"><button class="btn-edit" onclick="openAttractionPoolModal('${a.id}')">编辑</button>
         <button class="btn-del" onclick="deleteAttractionPool('${a.id}')">删除</button></div></td></tr>`).join('');
 }
+function moveATP(id,dir){ moveSortItem(ATP_LIST, id, dir, 'tour_attractions', loadAttractionPool); }
 function openAttractionPoolModal(id) {
   document.getElementById('attraction-modal-title').textContent = id ? '编辑景点' : '添加景点';
   const flds = ['atp-id','atp-key','atp-label','atp-desc','atp-image'];
@@ -1908,7 +1904,7 @@ function openAttractionPoolModal(id) {
     flds.forEach(f=>document.getElementById(f).value='');
     document.getElementById('atp-slot').value='half_day';
     document.getElementById('atp-price').value='0';
-    document.getElementById('atp-order').value='0'; document.getElementById('atp-active').value='1';
+    document.getElementById('atp-active').value='1';
   } else {
     sb.from('tour_attractions').select('*').eq('id',id).single().then(({data:a})=>{
       if (!a) return;
@@ -1919,7 +1915,6 @@ function openAttractionPoolModal(id) {
       document.getElementById('atp-price').value=a.price||0;
       document.getElementById('atp-desc').value=a.desc_ko||'';
       document.getElementById('atp-image').value=a.image||'';
-      document.getElementById('atp-order').value=a.sort_order||0;
       document.getElementById('atp-active').value=a.is_active?'1':'0';
     });
   }
@@ -1942,10 +1937,10 @@ async function saveAttractionPool() {
     price: parseInt(document.getElementById('atp-price').value)||0,
     desc_ko: document.getElementById('atp-desc').value.trim()||null,
     image: document.getElementById('atp-image').value.trim()||null,
-    sort_order: parseInt(document.getElementById('atp-order').value)||0,
     is_active: document.getElementById('atp-active').value==='1',
     updated_at: new Date().toISOString(),
   };
+  if (!id) payload.sort_order = nextSortOrder(ATP_LIST);
   const { error } = id ? await sb.from('tour_attractions').update(payload).eq('id',id) : await sb.from('tour_attractions').insert(payload);
   if (error) { toast('保存失败: '+error.message,'error'); return; }
   toast(id?'已修改':'已添加','success'); closeAttractionPoolModal(); loadAttractionPool();
@@ -1958,25 +1953,28 @@ async function deleteAttractionPool(id) {
 }
 
 /* ───── 附加服务管理 (全局公用, tour_addon_services — 按摩等不占用时段的项目) ───── */
+let ADDON_LIST = [];
 async function loadAddonSvc() {
   const { data } = await sb.from('tour_addon_services').select('*').order('sort_order');
+  ADDON_LIST = data || [];
   document.getElementById('addonsvc-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">加载失败 (若数据表不存在，请执行 lotocha_supabase_pricing_model.sql )</td></tr>'
     : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">暂无项目记录</td></tr>'
-    : data.map(a=>`<tr>
+    : data.map((a,i)=>`<tr>
         <td style="font-weight:700">${a.name}</td>
         <td>${a.duration_min?a.duration_min+'分钟':'-'}</td>
         <td>${a.price?a.price+'人民币':'免费'}</td>
         <td><span class="badge badge-${a.is_active?'live':'archived'}">${a.is_active?'启用':'禁用'}</span></td>
-        <td>${a.sort_order}</td>
+        <td>${moveBtnsHTML('moveADDON',a.id,i,data.length)}</td>
         <td><div class="act-btns"><button class="btn-edit" onclick="openAddonModal('${a.id}')">编辑</button>
         <button class="btn-del" onclick="deleteAddon('${a.id}')">删除</button></div></td></tr>`).join('');
 }
+function moveADDON(id,dir){ moveSortItem(ADDON_LIST, id, dir, 'tour_addon_services', loadAddonSvc); }
 function openAddonModal(id) {
   document.getElementById('addon-modal-title').textContent = id ? '编辑附加服务' : '添加附加服务';
   const flds = ['addon-id','addon-name','addon-duration','addon-price','addon-note'];
   if (!id) {
     flds.forEach(f=>document.getElementById(f).value='');
-    document.getElementById('addon-order').value='0'; document.getElementById('addon-active').value='1';
+    document.getElementById('addon-active').value='1';
   } else {
     sb.from('tour_addon_services').select('*').eq('id',id).single().then(({data:a})=>{
       if (!a) return;
@@ -1985,7 +1983,6 @@ function openAddonModal(id) {
       document.getElementById('addon-duration').value=a.duration_min||'';
       document.getElementById('addon-price').value=a.price||0;
       document.getElementById('addon-note').value=a.note||'';
-      document.getElementById('addon-order').value=a.sort_order||0;
       document.getElementById('addon-active').value=a.is_active?'1':'0';
     });
   }
@@ -2004,10 +2001,10 @@ async function saveAddon() {
     duration_min: parseInt(document.getElementById('addon-duration').value)||null,
     price: parseInt(document.getElementById('addon-price').value)||0,
     note: document.getElementById('addon-note').value.trim()||null,
-    sort_order: parseInt(document.getElementById('addon-order').value)||0,
     is_active: document.getElementById('addon-active').value==='1',
     updated_at: new Date().toISOString(),
   };
+  if (!id) payload.sort_order = nextSortOrder(ADDON_LIST);
   const { error } = id ? await sb.from('tour_addon_services').update(payload).eq('id',id) : await sb.from('tour_addon_services').insert(payload);
   if (error) { toast('保存失败: '+error.message,'error'); return; }
   toast(id?'已修改':'已添加','success'); closeAddonModal(); loadAddonSvc();
@@ -2090,25 +2087,28 @@ async function saveMargin() {
 }
 
 /* ── 年龄折扣 (tour_age_discounts) ── */
+let AGEDISC_LIST = [];
 async function loadAgeDiscounts() {
   const { data } = await sb.from('tour_age_discounts').select('*').order('sort_order');
+  AGEDISC_LIST = data || [];
   document.getElementById('agediscount-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">加载失败 (lotocha_supabase_pricing_model2.sql )</td></tr>'
     : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">暂无项目记录</td></tr>'
-    : data.map(r=>`<tr>
+    : data.map((r,i)=>`<tr>
         <td style="font-weight:700">${r.label}</td>
         <td>${r.min_age!=null?r.min_age+'岁以上':''}${r.min_age!=null&&r.max_age!=null?' · ':''}${r.max_age!=null?r.max_age+'岁以下':''}</td>
         <td>${r.discount_krw.toLocaleString()}韩元</td>
         <td><span class="badge badge-${r.is_active?'live':'archived'}">${r.is_active?'启用':'禁用'}</span></td>
-        <td>${r.sort_order}</td>
+        <td>${moveBtnsHTML('moveAGEDISC',r.id,i,data.length)}</td>
         <td><div class="act-btns"><button class="btn-edit" onclick="openAgeDiscModal('${r.id}')">编辑</button>
         <button class="btn-del" onclick="deleteAgeDisc('${r.id}')">删除</button></div></td></tr>`).join('');
 }
+function moveAGEDISC(id,dir){ moveSortItem(AGEDISC_LIST, id, dir, 'tour_age_discounts', loadAgeDiscounts); }
 function openAgeDiscModal(id) {
   document.getElementById('agedisc-modal-title').textContent = id ? '编辑年龄折扣' : '添加年龄折扣';
   const flds = ['agedisc-id','agedisc-label','agedisc-minage','agedisc-maxage','agedisc-krw'];
   if (!id) {
     flds.forEach(f=>document.getElementById(f).value='');
-    document.getElementById('agedisc-order').value='0'; document.getElementById('agedisc-active').value='1';
+    document.getElementById('agedisc-active').value='1';
   } else {
     sb.from('tour_age_discounts').select('*').eq('id',id).single().then(({data:r})=>{
       if (!r) return;
@@ -2117,7 +2117,6 @@ function openAgeDiscModal(id) {
       document.getElementById('agedisc-minage').value=r.min_age??'';
       document.getElementById('agedisc-maxage').value=r.max_age??'';
       document.getElementById('agedisc-krw').value=r.discount_krw||0;
-      document.getElementById('agedisc-order').value=r.sort_order||0;
       document.getElementById('agedisc-active').value=r.is_active?'1':'0';
     });
   }
@@ -2138,10 +2137,10 @@ async function saveAgeDisc() {
     min_age: minRaw==='' ? null : parseInt(minRaw),
     max_age: maxRaw==='' ? null : parseInt(maxRaw),
     discount_krw: parseInt(document.getElementById('agedisc-krw').value)||0,
-    sort_order: parseInt(document.getElementById('agedisc-order').value)||0,
     is_active: document.getElementById('agedisc-active').value==='1',
     updated_at: new Date().toISOString(),
   };
+  if (!id) payload.sort_order = nextSortOrder(AGEDISC_LIST);
   const { error } = id ? await sb.from('tour_age_discounts').update(payload).eq('id',id) : await sb.from('tour_age_discounts').insert(payload);
   if (error) { toast('保存失败: '+error.message,'error'); return; }
   toast(id?'已修改':'已添加','success'); closeAgeDiscModal(); loadAgeDiscounts();
@@ -2257,7 +2256,7 @@ function openTourModal(id, presetType) {
     const type = presetType || 'day_tour';
     applyModalTypeLock(type);
     document.getElementById('t-status').value='live';
-    document.getElementById('t-days').value='1'; document.getElementById('t-order').value='0';
+    document.getElementById('t-days').value='1';
     updateItinHint();
   } else {
     sb.from('tour_products').select('*').eq('id',id).single().then(({data:p})=>{
@@ -2271,7 +2270,6 @@ function openTourModal(id, presetType) {
       document.getElementById('t-price-krw').value=p.price_krw||'';
       document.getElementById('t-price-cny').value=p.price_cny||'';
       document.getElementById('t-days').value=p.duration_days||1;
-      document.getElementById('t-order').value=p.sort_order||0;
       document.getElementById('t-status').value=p.status||'live';
       document.getElementById('t-images').value=arrToLines(p.images);
       document.getElementById('t-highlights').value=arrToLines(p.highlights);
@@ -2319,7 +2317,7 @@ async function saveTour() {
     price_krw: parseInt(document.getElementById('t-price-krw').value)||null,
     price_cny: parseFloat(document.getElementById('t-price-cny').value)||null,
     duration_days: parseInt(document.getElementById('t-days').value)||1,
-    sort_order: parseInt(document.getElementById('t-order').value)||0,
+    sort_order: id ? undefined : (document.getElementById('t-type').value === 'day_tour' ? nextSortOrder(TOUR_LIST) : 0),
     status: document.getElementById('t-status').value,
     is_active: document.getElementById('t-status').value === 'live',
     images: linesToArr(document.getElementById('t-images').value),
@@ -2357,16 +2355,30 @@ async function deleteTour(id) {
   toast('已删除'); loadTours();
 }
 
+let SPOTS_LIST = [];
+/* 향도지점은 '景区+区域'별로 순서가 따로 매겨지므로, 위/아래 이동도 같은 景区+区域 안에서만 이루어져야 함 */
+function spotScope(attrId, zoneId) { return SPOTS_LIST.filter(x=>x.attr_id===attrId && (x.zone_id||'')===(zoneId||'')); }
+function moveSpot(id, dir) {
+  const s = SPOTS_LIST.find(x=>String(x.id)===String(id));
+  if (!s) return;
+  moveSortItem(spotScope(s.attr_id, s.zone_id), id, dir, 'guide_spots', loadSpots);
+}
 async function loadSpots() {
   const { data } = await sb.from('guide_spots').select('*').order('attr_id').order('zone_id').order('sort_order');
-  document.getElementById('spots-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">加载失败</td></tr>'
-    : data.map(s=>`<tr>
+  SPOTS_LIST = data || [];
+  document.getElementById('spots-tbody').innerHTML = !data ? '<tr><td colspan="7" style="color:var(--red)">加载失败</td></tr>'
+    : data.map(s=>{
+        const scope = spotScope(s.attr_id, s.zone_id);
+        const idx = scope.findIndex(x=>x.id===s.id);
+        return `<tr>
         <td>${ATTR_LABELS[s.attr_id]||s.attr_id}</td>
         <td style="color:#666">${zoneLabel(s.attr_id, s.zone_id)}</td>
         <td style="font-weight:700">${s.name_ko}</td><td>${s.type}</td>
         <td><span class="badge badge-${s.status}">${{live:'上线',draft:'草稿',pending:'审核中'}[s.status]||s.status}</span></td>
+        <td>${moveBtnsHTML('moveSpot',s.id,idx,scope.length)}</td>
         <td><div class="act-btns"><button class="btn-edit" onclick="openSpotModal('${s.id}')">编辑</button>
-        <button class="btn-del" onclick="deleteSpot('${s.id}')">删除</button></div></td></tr>`).join('');
+        <button class="btn-del" onclick="deleteSpot('${s.id}')">删除</button></div></td></tr>`;
+      }).join('');
 }
 function populateZoneSelect(attrId, selected) {
   const sel = document.getElementById('s-zone');
@@ -2383,7 +2395,7 @@ function openSpotModal(id) {
     ['s-id','s-id-orig','s-name-ko','s-name-cn','s-lat','s-lon','s-gaode','s-video-url','s-desc','s-tip','s-hours','s-price'].forEach(f=>document.getElementById(f).value='');
     document.getElementById('s-attr').value='forest'; document.getElementById('s-type').value='landmark';
     populateZoneSelect('forest', '');
-    document.getElementById('s-order').value='0'; document.getElementById('s-status').value='live';
+    document.getElementById('s-status').value='live';
     setThumbWidget('s-img', []);
   } else {
     sb.from('guide_spots').select('*').eq('id',id).single().then(({data:s})=>{
@@ -2395,7 +2407,7 @@ function openSpotModal(id) {
       document.getElementById('s-lon').value=s.lon||''; document.getElementById('s-gaode').value=s.gaode_uri||'';
       setThumbWidget('s-img', s.images); document.getElementById('s-video-url').value=s.video_url||''; document.getElementById('s-desc').value=s.desc_ko||'';
       document.getElementById('s-tip').value=s.tip_ko||''; document.getElementById('s-hours').value=s.hours||'';
-      document.getElementById('s-price').value=s.price||''; document.getElementById('s-order').value=s.sort_order||0;
+      document.getElementById('s-price').value=s.price||'';
       document.getElementById('s-status').value=s.status||'live';
     });
   }
@@ -2424,10 +2436,10 @@ async function saveSpot() {
     tip_ko: document.getElementById('s-tip').value.trim()||null,
     hours: document.getElementById('s-hours').value.trim()||null,
     price: document.getElementById('s-price').value.trim()||null,
-    sort_order: parseInt(document.getElementById('s-order').value)||0,
     status: document.getElementById('s-status').value,
     updated_at: new Date().toISOString(),
   };
+  if (!origId) payload.sort_order = nextSortOrder(spotScope(payload.attr_id, payload.zone_id));
   const { error } = origId ? await sb.from('guide_spots').update(payload).eq('id',origId) : await sb.from('guide_spots').insert(payload);
   if (error) { toast('保存失败: '+error.message,'error'); return; }
   toast(origId?'已修改':'已添加','success'); closeSpotModal(); loadSpots();
@@ -2500,16 +2512,19 @@ async function deleteUser(id) {
 
 const CAT_LABELS = {restaurant:'餐厅',cafe:'咖啡厅',hotel:'酒店/住宿',shop:'购物',attraction:'景点游览',transport:'交通',etc:'其他'};
 
+let PLACES_LIST = [];
+function movePlace(id,dir){ moveSortItem(PLACES_LIST, id, dir, 'local_places', loadPlaces); }
 async function loadPlaces() {
   const { data } = await sb.from('local_places').select('*').order('sort_order');
+  PLACES_LIST = data || [];
   document.getElementById('places-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">加载失败 (数据表不存在或出错)</td></tr>'
     : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">暂无商户记录</td></tr>'
-    : data.map(p=>`<tr>
+    : data.map((p,i)=>`<tr>
         <td><span class="badge ${p.category==='restaurant'?'badge-day':p.category==='hotel'?'badge-pkg':'badge-draft'}">${CAT_LABELS[p.category]||p.category}</span></td>
         <td style="font-weight:700">${p.name_ko}</td>
         <td>${p.area||'-'}</td>
         <td><span class="badge ${p.is_active?'badge-live':'badge-archived'}">${p.is_active?'启用':'禁用'}</span></td>
-        <td>${p.sort_order}</td>
+        <td>${moveBtnsHTML('movePlace',p.id,i,data.length)}</td>
         <td><div class="act-btns">
           <button class="btn-edit" onclick="openPlaceModal('${p.id}')">编辑</button>
           <button class="btn-del" onclick="deletePlace('${p.id}')">删除</button>
@@ -2523,7 +2538,6 @@ function openPlaceModal(id) {
     flds.forEach(f=>document.getElementById(f).value='');
     document.getElementById('pl-cat').value='restaurant';
     document.getElementById('pl-area').value='市内';
-    document.getElementById('pl-order').value='0';
     document.getElementById('pl-active').value='1';
     setThumbWidget('pl-img', []);
   } else {
@@ -2545,7 +2559,6 @@ function openPlaceModal(id) {
       setThumbWidget('pl-img', p.images);
       document.getElementById('pl-desc').value=p.desc_ko||'';
       document.getElementById('pl-tags').value=(p.tags||[]).join(', ');
-      document.getElementById('pl-order').value=p.sort_order||0;
       document.getElementById('pl-active').value=p.is_active?'1':'0';
     });
   }
@@ -2576,10 +2589,10 @@ async function savePlace() {
     images: thumbGetArr('pl-img'),
     desc_ko: document.getElementById('pl-desc').value.trim()||null,
     tags: tagsRaw ? tagsRaw.split(',').map(t=>t.trim()).filter(Boolean) : [],
-    sort_order: parseInt(document.getElementById('pl-order').value)||0,
     is_active: document.getElementById('pl-active').value==='1',
     updated_at: new Date().toISOString(),
   };
+  if (!id) payload.sort_order = nextSortOrder(PLACES_LIST);
   const { error } = id ? await sb.from('local_places').update(payload).eq('id',id) : await sb.from('local_places').insert(payload);
   if (error) { toast('保存失败: '+error.message,'error'); return; }
   toast(id?'已修改':'已添加','success'); closePlaceModal(); loadPlaces();
@@ -2592,12 +2605,15 @@ async function deletePlace(id) {
 }
 
 /* ───── 演出·门票 (guide_shows_tickets) ───── */
+let ST_LIST = [];
+function moveST(id,dir){ moveSortItem(ST_LIST, id, dir, 'guide_shows_tickets', loadST); }
 async function loadST() {
   const { data } = await sb.from('guide_shows_tickets').select('*').order('sort_order');
+  ST_LIST = data || [];
   document.getElementById('st-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">加载失败</td></tr>'
-    : data.map(s=>`<tr>
+    : data.map((s,i)=>`<tr>
         <td>${s.kind==='show'?'演出':'门票'}</td><td style="font-weight:700">${s.title_ko}</td><td>${s.price_info||''}</td>
-        <td><span class="badge ${s.is_active?'badge-live':'badge-draft'}">${s.is_active?'启用':'禁用'}</span></td><td>${s.sort_order}</td>
+        <td><span class="badge ${s.is_active?'badge-live':'badge-draft'}">${s.is_active?'启用':'禁用'}</span></td><td>${moveBtnsHTML('moveST',s.id,i,data.length)}</td>
         <td><div class="act-btns"><button class="btn-edit" onclick="openSTModal('${s.id}')">编辑</button>
         <button class="btn-del" onclick="deleteST('${s.id}')">删除</button></div></td></tr>`).join('');
 }
@@ -2607,14 +2623,13 @@ function openSTModal(id) {
   if (!id) {
     document.getElementById('st-kind').value='show'; document.getElementById('st-active').value='1';
     ['st-title','st-subtitle','st-time','st-price','st-links'].forEach(f=>document.getElementById(f).value='');
-    document.getElementById('st-order').value='0';
   } else {
     sb.from('guide_shows_tickets').select('*').eq('id',id).single().then(({data:s})=>{
       if (!s) return;
       document.getElementById('st-kind').value=s.kind; document.getElementById('st-active').value=s.is_active?'1':'0';
       document.getElementById('st-title').value=s.title_ko||''; document.getElementById('st-subtitle').value=s.subtitle_ko||'';
       document.getElementById('st-time').value=s.time_info||''; document.getElementById('st-price').value=s.price_info||'';
-      document.getElementById('st-links').value=linksToLines(s.links); document.getElementById('st-order').value=s.sort_order||0;
+      document.getElementById('st-links').value=linksToLines(s.links);
     });
   }
   document.getElementById('st-modal-bg').classList.add('open');
@@ -2631,9 +2646,9 @@ async function saveST() {
     time_info: document.getElementById('st-time').value.trim()||'',
     price_info: document.getElementById('st-price').value.trim()||'',
     links: linesToLinks(document.getElementById('st-links').value),
-    sort_order: parseInt(document.getElementById('st-order').value)||0,
     is_active: document.getElementById('st-active').value==='1',
   };
+  if (!id) payload.sort_order = nextSortOrder(ST_LIST);
   const { error } = id ? await sb.from('guide_shows_tickets').update(payload).eq('id',id) : await sb.from('guide_shows_tickets').insert(payload);
   if (error) { toast('保存失败: '+error.message,'error'); return; }
   toast(id?'已修改':'已添加','success'); closeSTModal(); loadST();
@@ -2646,12 +2661,15 @@ async function deleteST(id) {
 }
 
 /* ───── 支付方式 (guide_payment_methods) ───── */
+let PM_LIST = [];
+function movePM(id,dir){ moveSortItem(PM_LIST, id, dir, 'guide_payment_methods', loadPM); }
 async function loadPM() {
   const { data } = await sb.from('guide_payment_methods').select('*').order('sort_order');
+  PM_LIST = data || [];
   document.getElementById('pm-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">加载失败</td></tr>'
-    : data.map(m=>`<tr>
+    : data.map((m,i)=>`<tr>
         <td>${m.method_key}</td><td style="font-weight:700">${m.logo_emoji||''} ${m.name_ko}</td>
-        <td><span class="badge ${m.is_active?'badge-live':'badge-draft'}">${m.is_active?'启用':'禁用'}</span></td><td>${m.sort_order}</td>
+        <td><span class="badge ${m.is_active?'badge-live':'badge-draft'}">${m.is_active?'启用':'禁用'}</span></td><td>${moveBtnsHTML('movePM',m.id,i,data.length)}</td>
         <td><div class="act-btns"><button class="btn-edit" onclick="openPMModal('${m.id}')">编辑</button>
         <button class="btn-del" onclick="deletePM('${m.id}')">删除</button></div></td></tr>`).join('');
 }
@@ -2661,7 +2679,6 @@ function openPMModal(id) {
   if (!id) {
     document.getElementById('pm-active').value='1';
     ['pm-key','pm-name','pm-subtitle','pm-emoji','pm-bg','pm-steps','pm-note','pm-link-label','pm-link-url'].forEach(f=>document.getElementById(f).value='');
-    document.getElementById('pm-order').value='0';
   } else {
     sb.from('guide_payment_methods').select('*').eq('id',id).single().then(({data:m})=>{
       if (!m) return;
@@ -2670,7 +2687,6 @@ function openPMModal(id) {
       document.getElementById('pm-emoji').value=m.logo_emoji||''; document.getElementById('pm-bg').value=m.logo_bg||'';
       document.getElementById('pm-steps').value=arrToLines(m.steps); document.getElementById('pm-note').value=m.note_html||'';
       document.getElementById('pm-link-label').value=m.link_label||''; document.getElementById('pm-link-url').value=m.link_url||'';
-      document.getElementById('pm-order').value=m.sort_order||0;
     });
   }
   document.getElementById('pm-modal-bg').classList.add('open');
@@ -2690,9 +2706,9 @@ async function savePM() {
     note_html: document.getElementById('pm-note').value.trim()||'',
     link_label: document.getElementById('pm-link-label').value.trim()||'',
     link_url: document.getElementById('pm-link-url').value.trim()||'',
-    sort_order: parseInt(document.getElementById('pm-order').value)||0,
     is_active: document.getElementById('pm-active').value==='1',
   };
+  if (!origId) payload.sort_order = nextSortOrder(PM_LIST);
   const { error } = origId ? await sb.from('guide_payment_methods').update(payload).eq('id',origId) : await sb.from('guide_payment_methods').insert(payload);
   if (error) { toast('保存失败: '+error.message,'error'); return; }
   toast(origId?'已修改':'已添加','success'); closePMModal(); loadPM();
@@ -2704,29 +2720,35 @@ async function deletePM(id) {
   toast('已删除'); loadPM();
 }
 
-/* ───── 安全·应急 (guide_emergency_info) ───── */
+/* ───── 安全·应急 (guide_emergency_info) — section별로 순서가 따로 매겨짐 ───── */
 const EI_SECTION_LABEL = {phone:'紧急电话', hospital:'医院·领事馆', connectivity:'网络·VPN'};
+let EI_LIST = [];
+function eiScope(section) { return EI_LIST.filter(x=>x.section===section); }
+function moveEI(id,dir){ const e=EI_LIST.find(x=>String(x.id)===String(id)); if(!e) return; moveSortItem(eiScope(e.section), id, dir, 'guide_emergency_info', loadEI); }
 async function loadEI() {
   const { data } = await sb.from('guide_emergency_info').select('*').order('section').order('sort_order');
+  EI_LIST = data || [];
   document.getElementById('ei-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">加载失败</td></tr>'
-    : data.map(e=>`<tr>
+    : data.map(e=>{
+        const scope = eiScope(e.section); const idx = scope.findIndex(x=>x.id===e.id);
+        return `<tr>
         <td>${EI_SECTION_LABEL[e.section]||e.section}</td><td style="font-weight:700">${e.label}</td><td>${e.value}</td>
-        <td><span class="badge ${e.is_active?'badge-live':'badge-draft'}">${e.is_active?'启用':'禁用'}</span></td><td>${e.sort_order}</td>
+        <td><span class="badge ${e.is_active?'badge-live':'badge-draft'}">${e.is_active?'启用':'禁用'}</span></td><td>${moveBtnsHTML('moveEI',e.id,idx,scope.length)}</td>
         <td><div class="act-btns"><button class="btn-edit" onclick="openEIModal('${e.id}')">编辑</button>
-        <button class="btn-del" onclick="deleteEI('${e.id}')">删除</button></div></td></tr>`).join('');
+        <button class="btn-del" onclick="deleteEI('${e.id}')">删除</button></div></td></tr>`;
+      }).join('');
 }
 function openEIModal(id) {
   document.getElementById('ei-modal-title').textContent = id ? '编辑项目' : '添加项目';
   document.getElementById('ei-id').value = id||'';
   if (!id) {
     document.getElementById('ei-section').value='phone'; document.getElementById('ei-active').value='1';
-    document.getElementById('ei-label').value=''; document.getElementById('ei-value').value=''; document.getElementById('ei-order').value='0';
+    document.getElementById('ei-label').value=''; document.getElementById('ei-value').value='';
   } else {
     sb.from('guide_emergency_info').select('*').eq('id',id).single().then(({data:e})=>{
       if (!e) return;
       document.getElementById('ei-section').value=e.section; document.getElementById('ei-active').value=e.is_active?'1':'0';
       document.getElementById('ei-label').value=e.label||''; document.getElementById('ei-value').value=e.value||'';
-      document.getElementById('ei-order').value=e.sort_order||0;
     });
   }
   document.getElementById('ei-modal-bg').classList.add('open');
@@ -2737,11 +2759,12 @@ async function saveEI() {
   const label = document.getElementById('ei-label').value.trim();
   const value = document.getElementById('ei-value').value.trim();
   if (!label || !value) { toast('请输入标签和值','error'); return; }
+  const section = document.getElementById('ei-section').value;
   const payload = {
-    section: document.getElementById('ei-section').value, label, value,
-    sort_order: parseInt(document.getElementById('ei-order').value)||0,
+    section, label, value,
     is_active: document.getElementById('ei-active').value==='1',
   };
+  if (!id) payload.sort_order = nextSortOrder(eiScope(section));
   const { error } = id ? await sb.from('guide_emergency_info').update(payload).eq('id',id) : await sb.from('guide_emergency_info').insert(payload);
   if (error) { toast('保存失败: '+error.message,'error'); return; }
   toast(id?'已修改':'已添加','success'); closeEIModal(); loadEI();
@@ -2753,15 +2776,22 @@ async function deleteEI(id) {
   toast('已删除'); loadEI();
 }
 
-/* ───── 当地会话 (guide_phrases) ───── */
+/* ───── 当地会话 (guide_phrases) — category별로 순서가 따로 매겨짐 ───── */
+let PH_LIST = [];
+function phScope(cat) { return PH_LIST.filter(x=>x.category===cat); }
+function movePH(id,dir){ const p=PH_LIST.find(x=>String(x.id)===String(id)); if(!p) return; moveSortItem(phScope(p.category), id, dir, 'guide_phrases', loadPH); }
 async function loadPH() {
   const { data } = await sb.from('guide_phrases').select('*').order('category').order('sort_order');
+  PH_LIST = data || [];
   document.getElementById('ph-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">加载失败</td></tr>'
-    : data.map(p=>`<tr>
+    : data.map(p=>{
+        const scope = phScope(p.category); const idx = scope.findIndex(x=>x.id===p.id);
+        return `<tr>
         <td>${p.category}</td><td style="font-weight:700">${p.phrase_cn}</td><td>${p.phrase_ko}</td>
-        <td><span class="badge ${p.is_active?'badge-live':'badge-draft'}">${p.is_active?'启用':'禁用'}</span></td><td>${p.sort_order}</td>
+        <td><span class="badge ${p.is_active?'badge-live':'badge-draft'}">${p.is_active?'启用':'禁用'}</span></td><td>${moveBtnsHTML('movePH',p.id,idx,scope.length)}</td>
         <td><div class="act-btns"><button class="btn-edit" onclick="openPHModal('${p.id}')">编辑</button>
-        <button class="btn-del" onclick="deletePH('${p.id}')">删除</button></div></td></tr>`).join('');
+        <button class="btn-del" onclick="deletePH('${p.id}')">删除</button></div></td></tr>`;
+      }).join('');
 }
 function openPHModal(id) {
   document.getElementById('ph-modal-title').textContent = id ? '编辑短语' : '添加短语';
@@ -2769,13 +2799,12 @@ function openPHModal(id) {
   if (!id) {
     document.getElementById('ph-active').value='1';
     ['ph-category','ph-cn','ph-py','ph-ko'].forEach(f=>document.getElementById(f).value='');
-    document.getElementById('ph-order').value='0';
   } else {
     sb.from('guide_phrases').select('*').eq('id',id).single().then(({data:p})=>{
       if (!p) return;
       document.getElementById('ph-category').value=p.category||''; document.getElementById('ph-active').value=p.is_active?'1':'0';
       document.getElementById('ph-cn').value=p.phrase_cn||''; document.getElementById('ph-py').value=p.pinyin||'';
-      document.getElementById('ph-ko').value=p.phrase_ko||''; document.getElementById('ph-order').value=p.sort_order||0;
+      document.getElementById('ph-ko').value=p.phrase_ko||'';
     });
   }
   document.getElementById('ph-modal-bg').classList.add('open');
@@ -2786,12 +2815,13 @@ async function savePH() {
   const cn = document.getElementById('ph-cn').value.trim();
   const ko = document.getElementById('ph-ko').value.trim();
   if (!cn || !ko) { toast('请输入中文和韩语','error'); return; }
+  const category = document.getElementById('ph-category').value.trim()||'基本';
   const payload = {
-    category: document.getElementById('ph-category').value.trim()||'基本',
+    category,
     phrase_cn: cn, pinyin: document.getElementById('ph-py').value.trim()||'', phrase_ko: ko,
-    sort_order: parseInt(document.getElementById('ph-order').value)||0,
     is_active: document.getElementById('ph-active').value==='1',
   };
+  if (!id) payload.sort_order = nextSortOrder(phScope(category));
   const { error } = id ? await sb.from('guide_phrases').update(payload).eq('id',id) : await sb.from('guide_phrases').insert(payload);
   if (error) { toast('保存失败: '+error.message,'error'); return; }
   toast(id?'已修改':'已添加','success'); closePHModal(); loadPH();
@@ -2803,27 +2833,34 @@ async function deletePH(id) {
   toast('已删除'); loadPH();
 }
 
-/* ───── 旅行贴士 (guide_tips) ───── */
+/* ───── 旅行贴士 (guide_tips) — 景区(attr_id)별로 순서가 따로 매겨짐 ───── */
+let TP_LIST = [];
+function tpScope(attrId) { return TP_LIST.filter(x=>x.attr_id===attrId); }
+function moveTP(id,dir){ const t=TP_LIST.find(x=>String(x.id)===String(id)); if(!t) return; moveSortItem(tpScope(t.attr_id), id, dir, 'guide_tips', loadTP); }
 async function loadTP() {
   const { data } = await sb.from('guide_tips').select('*').order('attr_id').order('sort_order');
+  TP_LIST = data || [];
   document.getElementById('tp-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">加载失败</td></tr>'
-    : data.map(t=>`<tr>
+    : data.map(t=>{
+        const scope = tpScope(t.attr_id); const idx = scope.findIndex(x=>x.id===t.id);
+        return `<tr>
         <td>${ATTR_LABELS[t.attr_id]||t.attr_id}</td><td style="font-weight:700">${t.tip_text}</td>
-        <td><span class="badge ${t.is_active?'badge-live':'badge-draft'}">${t.is_active?'启用':'禁用'}</span></td><td>${t.sort_order}</td>
+        <td><span class="badge ${t.is_active?'badge-live':'badge-draft'}">${t.is_active?'启用':'禁用'}</span></td><td>${moveBtnsHTML('moveTP',t.id,idx,scope.length)}</td>
         <td><div class="act-btns"><button class="btn-edit" onclick="openTPModal('${t.id}')">编辑</button>
-        <button class="btn-del" onclick="deleteTP('${t.id}')">删除</button></div></td></tr>`).join('');
+        <button class="btn-del" onclick="deleteTP('${t.id}')">删除</button></div></td></tr>`;
+      }).join('');
 }
 function openTPModal(id) {
   document.getElementById('tp-modal-title').textContent = id ? '编辑贴士' : '添加贴士';
   document.getElementById('tp-id').value = id||'';
   if (!id) {
     document.getElementById('tp-attr').value='forest'; document.getElementById('tp-active').value='1';
-    document.getElementById('tp-text').value=''; document.getElementById('tp-order').value='0';
+    document.getElementById('tp-text').value='';
   } else {
     sb.from('guide_tips').select('*').eq('id',id).single().then(({data:t})=>{
       if (!t) return;
       document.getElementById('tp-attr').value=t.attr_id; document.getElementById('tp-active').value=t.is_active?'1':'0';
-      document.getElementById('tp-text').value=t.tip_text||''; document.getElementById('tp-order').value=t.sort_order||0;
+      document.getElementById('tp-text').value=t.tip_text||'';
     });
   }
   document.getElementById('tp-modal-bg').classList.add('open');
@@ -2833,11 +2870,12 @@ async function saveTP() {
   const id = document.getElementById('tp-id').value;
   const text = document.getElementById('tp-text').value.trim();
   if (!text) { toast('请输入内容','error'); return; }
+  const attrId = document.getElementById('tp-attr').value;
   const payload = {
-    attr_id: document.getElementById('tp-attr').value, tip_text: text,
-    sort_order: parseInt(document.getElementById('tp-order').value)||0,
+    attr_id: attrId, tip_text: text,
     is_active: document.getElementById('tp-active').value==='1',
   };
+  if (!id) payload.sort_order = nextSortOrder(tpScope(attrId));
   const { error } = id ? await sb.from('guide_tips').update(payload).eq('id',id) : await sb.from('guide_tips').insert(payload);
   if (error) { toast('保存失败: '+error.message,'error'); return; }
   toast(id?'已修改':'已添加','success'); closeTPModal(); loadTP();
@@ -2850,23 +2888,26 @@ async function deleteTP(id) {
 }
 
 /* ───── 地区 (guide_regions) ───── */
+let RG_LIST = [];
 async function loadRG() {
   const { data } = await sb.from('guide_regions').select('*').order('sort_order');
+  RG_LIST = data || [];
   document.getElementById('rg-tbody').innerHTML = !data ? '<tr><td colspan="4" style="color:var(--red)">加载失败</td></tr>'
-    : data.map(r=>`<tr>
+    : data.map((r,i)=>`<tr>
         <td style="font-weight:700">${r.name_ko}</td>
-        <td><span class="badge ${r.is_active?'badge-live':'badge-draft'}">${r.is_active?'启用':'禁用'}</span></td><td>${r.sort_order}</td>
+        <td><span class="badge ${r.is_active?'badge-live':'badge-draft'}">${r.is_active?'启用':'禁用'}</span></td><td>${moveBtnsHTML('moveRG',r.id,i,data.length)}</td>
         <td><div class="act-btns"><button class="btn-edit" onclick="openRGModal('${r.id}')">编辑</button>
         <button class="btn-del" onclick="deleteRG('${r.id}')">删除</button></div></td></tr>`).join('');
 }
+function moveRG(id,dir){ moveSortItem(RG_LIST, id, dir, 'guide_regions', loadRG); }
 function openRGModal(id) {
   document.getElementById('rg-modal-title').textContent = id ? '编辑地区' : '添加地区';
   document.getElementById('rg-id').value = id||'';
-  if (!id) { document.getElementById('rg-name').value=''; document.getElementById('rg-order').value='0'; document.getElementById('rg-active').value='1'; }
+  if (!id) { document.getElementById('rg-name').value=''; document.getElementById('rg-active').value='1'; }
   else {
     sb.from('guide_regions').select('*').eq('id',id).single().then(({data:r})=>{
       if (!r) return;
-      document.getElementById('rg-name').value=r.name_ko||''; document.getElementById('rg-order').value=r.sort_order||0;
+      document.getElementById('rg-name').value=r.name_ko||'';
       document.getElementById('rg-active').value=r.is_active?'1':'0';
     });
   }
@@ -2877,7 +2918,8 @@ async function saveRG() {
   const id = document.getElementById('rg-id').value;
   const name = document.getElementById('rg-name').value.trim();
   if (!name) { toast('请输入名称','error'); return; }
-  const payload = { name_ko:name, sort_order: parseInt(document.getElementById('rg-order').value)||0, is_active: document.getElementById('rg-active').value==='1' };
+  const payload = { name_ko:name, is_active: document.getElementById('rg-active').value==='1' };
+  if (!id) payload.sort_order = nextSortOrder(RG_LIST);
   const { error } = id ? await sb.from('guide_regions').update(payload).eq('id',id) : await sb.from('guide_regions').insert(payload);
   if (error) { toast('保存失败: '+error.message,'error'); return; }
   toast(id?'已修改':'已添加','success'); closeRGModal(); loadRG(); loadCategoryData();
@@ -2890,24 +2932,27 @@ async function deleteRG(id) {
 }
 
 /* ───── 商户分类 (guide_place_categories) ───── */
+let PC_LIST = [];
+function movePC(id,dir){ moveSortItem(PC_LIST, id, dir, 'guide_place_categories', loadPC); }
 async function loadPC() {
   const { data } = await sb.from('guide_place_categories').select('*').order('sort_order');
+  PC_LIST = data || [];
   document.getElementById('pc-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">加载失败</td></tr>'
-    : data.map(c=>`<tr>
+    : data.map((c,i)=>`<tr>
         <td>${c.cat_key}</td><td style="font-weight:700">${c.icon||''} ${c.name_ko}</td>
-        <td><span class="badge ${c.is_active?'badge-live':'badge-draft'}">${c.is_active?'启用':'禁用'}</span></td><td>${c.sort_order}</td>
+        <td><span class="badge ${c.is_active?'badge-live':'badge-draft'}">${c.is_active?'启用':'禁用'}</span></td><td>${moveBtnsHTML('movePC',c.id,i,data.length)}</td>
         <td><div class="act-btns"><button class="btn-edit" onclick="openPCModal('${c.id}')">编辑</button>
         <button class="btn-del" onclick="deletePC('${c.id}')">删除</button></div></td></tr>`).join('');
 }
 function openPCModal(id) {
   document.getElementById('pc-modal-title').textContent = id ? '编辑分类' : '添加分类';
   document.getElementById('pc-id-orig').value = id||'';
-  if (!id) { ['pc-key','pc-name','pc-icon'].forEach(f=>document.getElementById(f).value=''); document.getElementById('pc-order').value='0'; document.getElementById('pc-active').value='1'; }
+  if (!id) { ['pc-key','pc-name','pc-icon'].forEach(f=>document.getElementById(f).value=''); document.getElementById('pc-active').value='1'; }
   else {
     sb.from('guide_place_categories').select('*').eq('id',id).single().then(({data:c})=>{
       if (!c) return;
       document.getElementById('pc-key').value=c.cat_key||''; document.getElementById('pc-name').value=c.name_ko||'';
-      document.getElementById('pc-icon').value=c.icon||''; document.getElementById('pc-order').value=c.sort_order||0;
+      document.getElementById('pc-icon').value=c.icon||'';
       document.getElementById('pc-active').value=c.is_active?'1':'0';
     });
   }
@@ -2920,7 +2965,8 @@ async function savePC() {
   const name = document.getElementById('pc-name').value.trim();
   if (!key || !name) { toast('请输入key和名称','error'); return; }
   const payload = { cat_key:key, name_ko:name, icon: document.getElementById('pc-icon').value.trim()||'📍',
-    sort_order: parseInt(document.getElementById('pc-order').value)||0, is_active: document.getElementById('pc-active').value==='1' };
+    is_active: document.getElementById('pc-active').value==='1' };
+  if (!origId) payload.sort_order = nextSortOrder(PC_LIST);
   const { error } = origId ? await sb.from('guide_place_categories').update(payload).eq('id',origId) : await sb.from('guide_place_categories').insert(payload);
   if (error) { toast('保存失败: '+error.message,'error'); return; }
   toast(origId?'已修改':'已添加','success'); closePCModal(); loadPC(); loadCategoryData();
@@ -2933,13 +2979,16 @@ async function deletePC(id) {
 }
 
 /* ───── 景区 (guide_attractions) ───── */
+let GA_LIST = [];
+function moveGA(id,dir){ moveSortItem(GA_LIST, id, dir, 'guide_attractions', loadGA); }
 async function loadGA() {
   const { data } = await sb.from('guide_attractions').select('*').order('sort_order');
+  GA_LIST = data || [];
   document.getElementById('ga-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">加载失败</td></tr>'
-    : data.map(a=>`<tr>
+    : data.map((a,i)=>`<tr>
         <td>${a.attr_key}</td><td style="font-weight:700">${a.icon||''} ${a.name_ko}</td>
         <td>${a.is_protected?'🔒 受保护':'-'}</td>
-        <td><span class="badge ${a.is_active?'badge-live':'badge-draft'}">${a.is_active?'启用':'禁用'}</span></td><td>${a.sort_order}</td>
+        <td><span class="badge ${a.is_active?'badge-live':'badge-draft'}">${a.is_active?'启用':'禁用'}</span></td><td>${moveBtnsHTML('moveGA',a.id,i,data.length)}</td>
         <td><div class="act-btns"><button class="btn-edit" onclick="openGAModal('${a.id}')">编辑</button>
         ${a.is_protected?'':`<button class="btn-del" onclick="deleteGA('${a.id}')">删除</button>`}</div></td></tr>`).join('');
 }
@@ -2951,13 +3000,13 @@ function openGAModal(id) {
   if (!id) {
     ['ga-name','ga-icon'].forEach(f=>document.getElementById(f).value='');
     document.getElementById('ga-key').value = genAttrKey();
-    document.getElementById('ga-order').value='0'; document.getElementById('ga-active').value='1';
+    document.getElementById('ga-active').value='1';
   }
   else {
     sb.from('guide_attractions').select('*').eq('id',id).single().then(({data:a})=>{
       if (!a) return;
       document.getElementById('ga-key').value=a.attr_key||''; document.getElementById('ga-name').value=a.name_ko||'';
-      document.getElementById('ga-icon').value=a.icon||''; document.getElementById('ga-order').value=a.sort_order||0;
+      document.getElementById('ga-icon').value=a.icon||'';
       document.getElementById('ga-active').value=a.is_active?'1':'0';
     });
   }
@@ -2970,7 +3019,8 @@ async function saveGA() {
   const name = document.getElementById('ga-name').value.trim();
   if (!key || !name) { toast('请输入key和名称','error'); return; }
   const payload = { attr_key:key, name_ko:name, icon: document.getElementById('ga-icon').value.trim()||'📍',
-    sort_order: parseInt(document.getElementById('ga-order').value)||0, is_active: document.getElementById('ga-active').value==='1' };
+    is_active: document.getElementById('ga-active').value==='1' };
+  if (!origId) payload.sort_order = nextSortOrder(GA_LIST);
   const { error } = origId ? await sb.from('guide_attractions').update(payload).eq('id',origId) : await sb.from('guide_attractions').insert(payload);
   if (error) { toast('保存失败: '+error.message,'error'); return; }
   toast(origId?'已修改':'已添加','success'); closeGAModal(); loadGA(); loadCategoryData();
@@ -3037,26 +3087,28 @@ async function saveMapConfig() {
 }
 
 /* -- 推荐行程 (plan steps) -- */
+let PS_LIST = [];
+function movePS(id,dir){ moveSortItem(PS_LIST, id, dir, 'guide_plan_steps', loadPlanSteps); }
 async function loadPlanSteps() {
   const { data } = await sb.from('guide_plan_steps').select('*').eq('attr_id', AD_CURRENT_ATTR).order('sort_order');
+  PS_LIST = data || [];
   document.getElementById('planstep-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">加载失败</td></tr>'
     : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">暂无步骤</td></tr>'
-    : data.map(s=>`<tr>
+    : data.map((s,i)=>`<tr>
         <td style="font-weight:700">${s.time_hhmm}</td><td>${s.title}</td><td style="color:#666">${s.desc_ko||''}</td>
-        <td style="color:var(--red)">${s.warn_ko||''}</td><td>${s.sort_order}</td>
+        <td style="color:var(--red)">${s.warn_ko||''}</td><td>${moveBtnsHTML('movePS',s.id,i,data.length)}</td>
         <td><div class="act-btns"><button class="btn-edit" onclick="openPlanStepModal('${s.id}')">编辑</button>
         <button class="btn-del" onclick="deletePlanStep('${s.id}')">删除</button></div></td></tr>`).join('');
 }
 function openPlanStepModal(id) {
   document.getElementById('planstep-modal-title').textContent = id ? '编辑步骤' : '添加步骤';
   document.getElementById('ps-id').value = id || '';
-  if (!id) { ['ps-time','ps-title','ps-desc','ps-warn'].forEach(f=>document.getElementById(f).value=''); document.getElementById('ps-order').value='0'; }
+  if (!id) { ['ps-time','ps-title','ps-desc','ps-warn'].forEach(f=>document.getElementById(f).value=''); }
   else {
     sb.from('guide_plan_steps').select('*').eq('id',id).single().then(({data:s})=>{
       if (!s) return;
       document.getElementById('ps-time').value=s.time_hhmm||''; document.getElementById('ps-title').value=s.title||'';
       document.getElementById('ps-desc').value=s.desc_ko||''; document.getElementById('ps-warn').value=s.warn_ko||'';
-      document.getElementById('ps-order').value=s.sort_order||0;
     });
   }
   document.getElementById('planstep-modal-bg').classList.add('open');
@@ -3071,8 +3123,8 @@ async function savePlanStep() {
     attr_id: AD_CURRENT_ATTR, time_hhmm: time, title,
     desc_ko: document.getElementById('ps-desc').value.trim()||null,
     warn_ko: document.getElementById('ps-warn').value.trim()||null,
-    sort_order: parseInt(document.getElementById('ps-order').value)||0,
   };
+  if (!id) payload.sort_order = nextSortOrder(PS_LIST);
   const { error } = id ? await sb.from('guide_plan_steps').update(payload).eq('id',id) : await sb.from('guide_plan_steps').insert(payload);
   if (error) { toast('保存失败: '+error.message,'error'); return; }
   toast(id?'已修改':'已添加'); closePlanStepModal(); loadPlanSteps();
@@ -3084,26 +3136,32 @@ async function deletePlanStep(id) {
   toast('已删除'); loadPlanSteps();
 }
 
-/* -- 雨天备选 (rain items) -- */
+/* -- 雨天备选 (rain items) — 类型(推荐替代/需避开)별로 순서가 따로 매겨짐 -- */
 const RAIN_KIND_LABEL = {plan:'推荐替代', avoid:'需避开'};
+let RI_LIST = [];
+function riScope(kind) { return RI_LIST.filter(x=>x.kind===kind); }
+function moveRI(id,dir){ const r=RI_LIST.find(x=>String(x.id)===String(id)); if(!r) return; moveSortItem(riScope(r.kind), id, dir, 'guide_rain_items', loadRainItems); }
 async function loadRainItems() {
   const { data } = await sb.from('guide_rain_items').select('*').eq('attr_id', AD_CURRENT_ATTR).order('kind').order('sort_order');
+  RI_LIST = data || [];
   document.getElementById('rainitem-tbody').innerHTML = !data ? '<tr><td colspan="4" style="color:var(--red)">加载失败</td></tr>'
     : !data.length ? '<tr><td colspan="4" style="text-align:center;color:#aaa;padding:20px">暂无项目</td></tr>'
-    : data.map(r=>`<tr>
-        <td>${RAIN_KIND_LABEL[r.kind]||r.kind}</td><td>${r.item_text}</td><td>${r.sort_order}</td>
+    : data.map(r=>{
+        const scope = riScope(r.kind); const idx = scope.findIndex(x=>x.id===r.id);
+        return `<tr>
+        <td>${RAIN_KIND_LABEL[r.kind]||r.kind}</td><td>${r.item_text}</td><td>${moveBtnsHTML('moveRI',r.id,idx,scope.length)}</td>
         <td><div class="act-btns"><button class="btn-edit" onclick="openRainItemModal('${r.id}')">编辑</button>
-        <button class="btn-del" onclick="deleteRainItem('${r.id}')">删除</button></div></td></tr>`).join('');
+        <button class="btn-del" onclick="deleteRainItem('${r.id}')">删除</button></div></td></tr>`;
+      }).join('');
 }
 function openRainItemModal(id) {
   document.getElementById('rainitem-modal-title').textContent = id ? '编辑项目' : '添加项目';
   document.getElementById('ri-id').value = id || '';
-  if (!id) { document.getElementById('ri-text').value=''; document.getElementById('ri-kind').value='plan'; document.getElementById('ri-order').value='0'; }
+  if (!id) { document.getElementById('ri-text').value=''; document.getElementById('ri-kind').value='plan'; }
   else {
     sb.from('guide_rain_items').select('*').eq('id',id).single().then(({data:r})=>{
       if (!r) return;
       document.getElementById('ri-kind').value=r.kind; document.getElementById('ri-text').value=r.item_text||'';
-      document.getElementById('ri-order').value=r.sort_order||0;
     });
   }
   document.getElementById('rainitem-modal-bg').classList.add('open');
@@ -3113,7 +3171,9 @@ async function saveRainItem() {
   const id = document.getElementById('ri-id').value;
   const text = document.getElementById('ri-text').value.trim();
   if (!text) { toast('请输入内容','error'); return; }
-  const payload = { attr_id: AD_CURRENT_ATTR, kind: document.getElementById('ri-kind').value, item_text: text, sort_order: parseInt(document.getElementById('ri-order').value)||0 };
+  const kind = document.getElementById('ri-kind').value;
+  const payload = { attr_id: AD_CURRENT_ATTR, kind, item_text: text };
+  if (!id) payload.sort_order = nextSortOrder(riScope(kind));
   const { error } = id ? await sb.from('guide_rain_items').update(payload).eq('id',id) : await sb.from('guide_rain_items').insert(payload);
   if (error) { toast('保存失败: '+error.message,'error'); return; }
   toast(id?'已修改':'已添加'); closeRainItemModal(); loadRainItems();
@@ -3126,24 +3186,26 @@ async function deleteRainItem(id) {
 }
 
 /* -- 最后交通 (last transport) -- */
+let LT_LIST = [];
+function moveLT(id,dir){ moveSortItem(LT_LIST, id, dir, 'guide_last_transport', loadLastT); }
 async function loadLastT() {
   const { data } = await sb.from('guide_last_transport').select('*').eq('attr_id', AD_CURRENT_ATTR).order('sort_order');
+  LT_LIST = data || [];
   document.getElementById('lastt-tbody').innerHTML = !data ? '<tr><td colspan="4" style="color:var(--red)">加载失败</td></tr>'
     : !data.length ? '<tr><td colspan="4" style="text-align:center;color:#aaa;padding:20px">暂无项目</td></tr>'
-    : data.map(t=>`<tr>
-        <td style="font-weight:700">${t.name}</td><td>${t.last_time}</td><td>${t.sort_order}</td>
+    : data.map((t,i)=>`<tr>
+        <td style="font-weight:700">${t.name}</td><td>${t.last_time}</td><td>${moveBtnsHTML('moveLT',t.id,i,data.length)}</td>
         <td><div class="act-btns"><button class="btn-edit" onclick="openLastTModal('${t.id}')">编辑</button>
         <button class="btn-del" onclick="deleteLastT('${t.id}')">删除</button></div></td></tr>`).join('');
 }
 function openLastTModal(id) {
   document.getElementById('lastt-modal-title').textContent = id ? '编辑项目' : '添加项目';
   document.getElementById('lt-id').value = id || '';
-  if (!id) { document.getElementById('lt-name').value=''; document.getElementById('lt-time').value=''; document.getElementById('lt-order').value='0'; }
+  if (!id) { document.getElementById('lt-name').value=''; document.getElementById('lt-time').value=''; }
   else {
     sb.from('guide_last_transport').select('*').eq('id',id).single().then(({data:t})=>{
       if (!t) return;
       document.getElementById('lt-name').value=t.name||''; document.getElementById('lt-time').value=t.last_time||'';
-      document.getElementById('lt-order').value=t.sort_order||0;
     });
   }
   document.getElementById('lastt-modal-bg').classList.add('open');
@@ -3154,7 +3216,8 @@ async function saveLastT() {
   const name = document.getElementById('lt-name').value.trim();
   const time = document.getElementById('lt-time').value.trim();
   if (!name || !time) { toast('请输入名称和时间','error'); return; }
-  const payload = { attr_id: AD_CURRENT_ATTR, name, last_time: time, sort_order: parseInt(document.getElementById('lt-order').value)||0 };
+  const payload = { attr_id: AD_CURRENT_ATTR, name, last_time: time };
+  if (!id) payload.sort_order = nextSortOrder(LT_LIST);
   const { error } = id ? await sb.from('guide_last_transport').update(payload).eq('id',id) : await sb.from('guide_last_transport').insert(payload);
   if (error) { toast('保存失败: '+error.message,'error'); return; }
   toast(id?'已修改':'已添加'); closeLastTModal(); loadLastT();
@@ -3168,29 +3231,36 @@ async function deleteLastT(id) {
 
 /* -- 到达方式 (transport options) -- */
 const TO_ORIGIN_LABEL = {wulingyuan:'武陵源', city:'市区', airport:'机场'};
+let TO_LIST = [];
+function toScope(origin) { return TO_LIST.filter(x=>x.origin===origin); }
+function moveTO(id,dir){ const o=TO_LIST.find(x=>String(x.id)===String(id)); if(!o) return; moveSortItem(toScope(o.origin), id, dir, 'guide_transport_options', loadTransOpt); }
 async function loadTransOpt() {
   const { data } = await sb.from('guide_transport_options').select('*').eq('attr_id', AD_CURRENT_ATTR).order('origin').order('sort_order');
+  TO_LIST = data || [];
   document.getElementById('transopt-tbody').innerHTML = !data ? '<tr><td colspan="8" style="color:var(--red)">加载失败</td></tr>'
     : !data.length ? '<tr><td colspan="8" style="text-align:center;color:#aaa;padding:20px">暂无方式</td></tr>'
-    : data.map(o=>`<tr>
+    : data.map(o=>{
+        const scope = toScope(o.origin); const idx = scope.findIndex(x=>x.id===o.id);
+        return `<tr>
         <td>${TO_ORIGIN_LABEL[o.origin]||o.origin}</td><td>${o.icon||''}</td><td style="font-weight:700">${o.name}</td>
-        <td style="color:#666">${o.detail||''}</td><td>${o.price||''}</td><td>${o.badge_txt||''}</td><td>${o.sort_order}</td>
+        <td style="color:#666">${o.detail||''}</td><td>${o.price||''}</td><td>${o.badge_txt||''}</td><td>${moveBtnsHTML('moveTO',o.id,idx,scope.length)}</td>
         <td><div class="act-btns"><button class="btn-edit" onclick="openTransOptModal('${o.id}')">编辑</button>
-        <button class="btn-del" onclick="deleteTransOpt('${o.id}')">删除</button></div></td></tr>`).join('');
+        <button class="btn-del" onclick="deleteTransOpt('${o.id}')">删除</button></div></td></tr>`;
+      }).join('');
 }
 function openTransOptModal(id) {
   document.getElementById('transopt-modal-title').textContent = id ? '编辑方式' : '添加方式';
   document.getElementById('to-id').value = id || '';
   if (!id) {
     ['to-icon','to-name','to-detail','to-price','to-badgetxt'].forEach(f=>document.getElementById(f).value='');
-    document.getElementById('to-origin').value='wulingyuan'; document.getElementById('to-badge').value='b-green'; document.getElementById('to-order').value='0';
+    document.getElementById('to-origin').value='wulingyuan'; document.getElementById('to-badge').value='b-green';
   } else {
     sb.from('guide_transport_options').select('*').eq('id',id).single().then(({data:o})=>{
       if (!o) return;
       document.getElementById('to-origin').value=o.origin; document.getElementById('to-icon').value=o.icon||'';
       document.getElementById('to-name').value=o.name||''; document.getElementById('to-detail').value=o.detail||'';
       document.getElementById('to-price').value=o.price||''; document.getElementById('to-badge').value=o.badge||'b-green';
-      document.getElementById('to-badgetxt').value=o.badge_txt||''; document.getElementById('to-order').value=o.sort_order||0;
+      document.getElementById('to-badgetxt').value=o.badge_txt||'';
     });
   }
   document.getElementById('transopt-modal-bg').classList.add('open');
@@ -3200,15 +3270,16 @@ async function saveTransOpt() {
   const id = document.getElementById('to-id').value;
   const name = document.getElementById('to-name').value.trim();
   if (!name) { toast('请输入名称','error'); return; }
+  const origin = document.getElementById('to-origin').value;
   const payload = {
-    attr_id: AD_CURRENT_ATTR, origin: document.getElementById('to-origin').value,
+    attr_id: AD_CURRENT_ATTR, origin,
     icon: document.getElementById('to-icon').value.trim()||'🚕', name,
     detail: document.getElementById('to-detail').value.trim()||null,
     price: document.getElementById('to-price').value.trim()||null,
     badge: document.getElementById('to-badge').value,
     badge_txt: document.getElementById('to-badgetxt').value.trim()||null,
-    sort_order: parseInt(document.getElementById('to-order').value)||0,
   };
+  if (!id) payload.sort_order = nextSortOrder(toScope(origin));
   const { error } = id ? await sb.from('guide_transport_options').update(payload).eq('id',id) : await sb.from('guide_transport_options').insert(payload);
   if (error) { toast('保存失败: '+error.message,'error'); return; }
   toast(id?'已修改':'已添加'); closeTransOptModal(); loadTransOpt();
@@ -3221,26 +3292,28 @@ async function deleteTransOpt(id) {
 }
 
 /* -- 区域·接驳车 (zones) -- */
+let AZ_LIST = [];
+function moveAZ(id,dir){ moveSortItem(AZ_LIST, id, dir, 'guide_zones', loadADZones); }
 async function loadADZones() {
   const { data } = await sb.from('guide_zones').select('*').eq('attr_id', AD_CURRENT_ATTR).order('sort_order');
+  AZ_LIST = data || [];
   document.getElementById('adzone-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">加载失败</td></tr>'
     : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">暂无区域(该景区在向导页不显示区域选择栏)</td></tr>'
-    : data.map(z=>`<tr>
+    : data.map((z,i)=>`<tr>
         <td>${z.zone_key}</td><td style="font-weight:700">${z.name_ko}</td><td>${z.icon||''}</td>
-        <td style="color:#666;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${z.shuttle_info||''}</td><td>${z.sort_order}</td>
+        <td style="color:#666;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${z.shuttle_info||''}</td><td>${moveBtnsHTML('moveAZ',z.id,i,data.length)}</td>
         <td><div class="act-btns"><button class="btn-edit" onclick="openZoneModal('${z.id}')">编辑</button>
         <button class="btn-del" onclick="deleteADZone('${z.id}')">删除</button></div></td></tr>`).join('');
 }
 function openZoneModal(id) {
   document.getElementById('adzone-modal-title').textContent = id ? '编辑区域' : '添加区域';
   document.getElementById('az-id').value = id || '';
-  if (!id) { ['az-key','az-name','az-icon','az-shuttle'].forEach(f=>document.getElementById(f).value=''); document.getElementById('az-order').value='0'; }
+  if (!id) { ['az-key','az-name','az-icon','az-shuttle'].forEach(f=>document.getElementById(f).value=''); }
   else {
     sb.from('guide_zones').select('*').eq('id',id).single().then(({data:z})=>{
       if (!z) return;
       document.getElementById('az-key').value=z.zone_key||''; document.getElementById('az-name').value=z.name_ko||'';
       document.getElementById('az-icon').value=z.icon||''; document.getElementById('az-shuttle').value=z.shuttle_info||'';
-      document.getElementById('az-order').value=z.sort_order||0;
     });
   }
   document.getElementById('adzone-modal-bg').classList.add('open');
@@ -3255,8 +3328,8 @@ async function saveADZone() {
     attr_id: AD_CURRENT_ATTR, zone_key: key, name_ko: name,
     icon: document.getElementById('az-icon').value.trim()||'📍',
     shuttle_info: document.getElementById('az-shuttle').value.trim()||null,
-    sort_order: parseInt(document.getElementById('az-order').value)||0,
   };
+  if (!id) payload.sort_order = nextSortOrder(AZ_LIST);
   const { error } = id ? await sb.from('guide_zones').update(payload).eq('id',id) : await sb.from('guide_zones').insert(payload);
   if (error) { toast('保存失败: '+error.message,'error'); return; }
   toast(id?'已修改':'已添加'); closeADZoneModal(); loadADZones();
