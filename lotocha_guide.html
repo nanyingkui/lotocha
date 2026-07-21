@@ -307,13 +307,8 @@ body{font-family:-apple-system,'Noto Sans KR',system-ui,sans-serif;background:va
 <div class="wrap">
 <div class="page on" id="page-map">
   <div id="zone-section" style="display:none">
-    <div class="stitle">구역 선택 — 국가삼림공원</div>
-    <div class="zone-bar">
-      <button class="zone-btn on" onclick="selectZone('south')" id="zone-south">🅿️ 남문·화랑</button>
-      <button class="zone-btn" onclick="selectZone('yuanjia')" id="zone-yuanjia">🏔️ 원가계</button>
-      <button class="zone-btn" onclick="selectZone('tianzi')" id="zone-tianzi">🌅 천자산</button>
-      <button class="zone-btn" onclick="selectZone('yangjiajie')" id="zone-yangjiajie">🔄 양가계</button>
-    </div>
+    <div class="stitle" id="zone-section-title">구역 선택</div>
+    <div class="zone-bar" id="zone-bar"></div>
     <div class="shuttle-box" id="shuttle-box"></div>
   </div>
   <div id="map-wrap">
@@ -468,7 +463,7 @@ const SUPA_KEY = 'sb_publishable_oxeR92SfBDMzYAvcNitbPw_Vf0u1y0K';
 let sb = null;
 try { sb = window.supabase.createClient(SUPA_URL, SUPA_KEY); } catch(e) { console.warn('Supabase init failed', e); }
 
-const ATTRS = {
+const ATTRS_FALLBACK = {
   forest:{name:'국가삼림공원',icon:'🌲',center:[29.3387,110.5358],zoom:13,
     gaode:'https://uri.amap.com/search?keyword=张家界国家森林公园&city=张家界',
     gaodeNav:'https://uri.amap.com/navigation?to=110.5358,29.3387,张家界国家森林公园南门&mode=car&src=lotocha&coordinate=gaode&callnative=1',
@@ -536,8 +531,21 @@ const ATTRS = {
     tips:['🌡️ 동굴 내부는 서늘합니다(약 17°C). 겉옷 준비.','🚣 지하 유람선 포함, 방수 신발 추천.','🚗 대협곡과는 약 30km(40분~1시간) 떨어져 있어, 같은 날 묶어 가려면 이동시간을 고려하세요.'],
   },
 };
+// 실제 렌더링에 쓰이는 값은 아래 ATTRS(변경 가능) — 페이지 로드 시 loadAttrDetails()가
+// Supabase 데이터로 이 내용을 덮어씁니다. DB에 데이터가 없거나 로드 실패 시 위 하드코딩 값이 그대로 사용됩니다.
+let ATTRS = JSON.parse(JSON.stringify(ATTRS_FALLBACK));
 
-const TRANSPORT = {
+const ZONES_FALLBACK = {
+  forest: [
+    {zone_key:'south', name_ko:'남문·화랑', icon:'🅿️', shuttle_info:'🚌 <b>셔틀:</b> 양가계 환승센터 10~15분 | <b>막차 18:30</b>'},
+    {zone_key:'yuanjia', name_ko:'원가계', icon:'🏔️', shuttle_info:'🛗 <b>백룡엘리베이터</b> | <b>막차 18:00</b>'},
+    {zone_key:'tianzi', name_ko:'천자산', icon:'🌅', shuttle_info:'🚡 <b>천자산 케이블카</b> | <b>막차 18:00</b>'},
+    {zone_key:'yangjiajie', name_ko:'양가계', icon:'🔄', shuttle_info:'🔄 <b>환승 허브</b> | 막차 <b>18:30</b>'},
+  ],
+};
+let ZONES = JSON.parse(JSON.stringify(ZONES_FALLBACK));
+
+const TRANSPORT_FALLBACK = {
   wulingyuan:{
     forest:[{icon:'🚶',name:'도보',detail:'무릉원 숙소 → 남문. 15~25분.',price:'무료',badge:'b-green',badgeTxt:'가까움'},{icon:'🚕',name:'택시',detail:'5~10분.',price:'¥10~15',badge:'b-green',badgeTxt:'빠름'}],
     tianmen:[{icon:'🚕',name:'택시',detail:'약 45분.',price:'¥100~130',badge:'b-gold',badgeTxt:'추천'},{icon:'🚌',name:'버스+환승',detail:'1시간 20분.',price:'¥25',badge:'b-green',badgeTxt:'저렴'}],
@@ -557,6 +565,29 @@ const TRANSPORT = {
     canyon:[{icon:'🚕',name:'공항 → 대협곡 직행',detail:'약 1시간 20분.',price:'¥180~220',badge:'b-gold',badgeTxt:'직행'},{icon:'🚕',name:'로투차 공항 픽업',detail:'투어 예약 시 포함.',price:'투어 포함',badge:'b-green',badgeTxt:'추천'}],
   },
 };
+let TRANSPORT = JSON.parse(JSON.stringify(TRANSPORT_FALLBACK));
+
+/* ───── 景区 상세 콘텐츠(지도설정/추천일정/비오는날/마지막교통편/오는방법/구역) Supabase 로드 ─────
+   관리자 페이지 "景区详情设置"에서 관리. 데이터 없으면 위 *_FALLBACK 값 그대로 사용 */
+async function loadAttrDetails(){
+  if(!sb) return;
+  try{
+    const [{data:mapCfg},{data:steps},{data:rain},{data:lastT},{data:transOpt},{data:zones}] = await Promise.all([
+      sb.from('guide_attr_map_config').select('*'),
+      sb.from('guide_plan_steps').select('*').eq('is_active',true).order('attr_id').order('sort_order'),
+      sb.from('guide_rain_items').select('*').eq('is_active',true).order('attr_id').order('sort_order'),
+      sb.from('guide_last_transport').select('*').eq('is_active',true).order('attr_id').order('sort_order'),
+      sb.from('guide_transport_options').select('*').eq('is_active',true).order('attr_id').order('origin').order('sort_order'),
+      sb.from('guide_zones').select('*').eq('is_active',true).order('attr_id').order('sort_order'),
+    ]);
+    if(mapCfg&&mapCfg.length){ mapCfg.forEach(c=>{ if(ATTRS[c.attr_id]){ ATTRS[c.attr_id].center=[c.center_lat,c.center_lng]; ATTRS[c.attr_id].zoom=c.zoom||13; ATTRS[c.attr_id].gaode=c.gaode_search_url||ATTRS[c.attr_id].gaode; ATTRS[c.attr_id].gaodeNav=c.gaode_nav_url||ATTRS[c.attr_id].gaodeNav; } }); }
+    if(steps&&steps.length){ const byAttr={}; steps.forEach(s=>{ (byAttr[s.attr_id]=byAttr[s.attr_id]||[]).push({time:s.time_hhmm,name:s.title,desc:s.desc_ko||'',warn:s.warn_ko||''}); }); Object.keys(byAttr).forEach(id=>{ if(ATTRS[id]) ATTRS[id].plan=byAttr[id]; }); }
+    if(rain&&rain.length){ const byAttr={}; rain.forEach(r=>{ byAttr[r.attr_id]=byAttr[r.attr_id]||{plan:[],avoid:[]}; byAttr[r.attr_id][r.kind].push({item:r.item_text}); }); Object.keys(byAttr).forEach(id=>{ if(ATTRS[id]){ ATTRS[id].rainPlan=byAttr[id].plan; ATTRS[id].rainAvoid=byAttr[id].avoid; } }); }
+    if(lastT&&lastT.length){ const byAttr={}; lastT.forEach(t=>{ (byAttr[t.attr_id]=byAttr[t.attr_id]||[]).push({name:t.name,time:t.last_time}); }); Object.keys(byAttr).forEach(id=>{ if(ATTRS[id]) ATTRS[id].lastTransport=byAttr[id]; }); }
+    if(transOpt&&transOpt.length){ const byOrigin={}; transOpt.forEach(o=>{ byOrigin[o.origin]=byOrigin[o.origin]||{}; (byOrigin[o.origin][o.attr_id]=byOrigin[o.origin][o.attr_id]||[]).push({icon:o.icon,name:o.name,detail:o.detail,price:o.price,badge:o.badge,badgeTxt:o.badge_txt}); }); Object.keys(byOrigin).forEach(origin=>{ TRANSPORT[origin]=Object.assign({},TRANSPORT[origin],byOrigin[origin]); }); }
+    if(zones&&zones.length){ const byAttr={}; zones.forEach(z=>{ (byAttr[z.attr_id]=byAttr[z.attr_id]||[]).push({zone_key:z.zone_key,name_ko:z.name_ko,icon:z.icon,shuttle_info:z.shuttle_info}); }); ZONES = byAttr; }
+  }catch(e){ console.warn('景区详情 로드 실패, 기본값 사용', e); }
+}
 
 const PHRASES_FALLBACK = [
   {cat:'🚕 교통',items:[
@@ -720,7 +751,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   initMap(); updateClock(); setInterval(updateClock,15000);
   loadPhrases(); startGPS();
   loadShowsTickets(); loadPaymentMethods(); loadEmergencyInfo(); loadTips();
-  await loadSpotsData();
+  await Promise.all([loadSpotsData(), loadAttrDetails()]);
   selectAttr('forest'); selectTab('map');
   await loadPlaceCategories();
   loadPlaces();
@@ -880,14 +911,22 @@ async function fetchWeather(){
   }catch(e){console.warn('날씨 로드 실패',e);}
 }
 
+function renderZoneBar(id){
+  const zones=ZONES[id]||[];
+  const section=document.getElementById('zone-section');
+  if(!zones.length){ section.style.display='none'; return; }
+  section.style.display='block';
+  document.getElementById('zone-section-title').textContent=`구역 선택 — ${ATTRS[id].name}`;
+  document.getElementById('zone-bar').innerHTML=zones.map((z,i)=>`<button class="zone-btn${i===0?' on':''}" onclick="selectZone('${z.zone_key}')" id="zone-${z.zone_key}">${z.icon||'📍'} ${z.name_ko}</button>`).join('');
+  currentZone=zones[0].zone_key;
+  renderShuttleInfo(currentZone);
+}
 function selectAttr(id){
   currentAttr=id;
   document.querySelectorAll('.attr-btn').forEach(b=>b.classList.remove('on'));
   document.getElementById('attr-'+id).classList.add('on');
-  currentZone='south';
   if(map){const a=ATTRS[id];map.setView(a.center,a.zoom);renderMapSpots();}
-  document.getElementById('zone-section').style.display=id==='forest'?'block':'none';
-  if(id==='forest'){document.querySelectorAll('.zone-btn').forEach(b=>b.classList.remove('on'));const zb=document.getElementById('zone-south');if(zb)zb.classList.add('on');renderShuttleInfo('south');}
+  renderZoneBar(id);
   renderLastTransport();
   renderZoneSpots();renderSmartPlan();renderRainPlan();renderPlanTips();
   startCountdown();
@@ -931,7 +970,7 @@ function initMap(){map=L.map('map',{zoomControl:false,attributionControl:false})
 function renderMapSpots(){
   mapMarkers.forEach(m=>map.removeLayer(m));mapMarkers=[];
   const attrData=spotsData[currentAttr];if(!attrData)return;
-  const zone=currentAttr==='forest'?currentZone:Object.keys(attrData.zones||{})[0];
+  const zone=(ZONES[currentAttr]&&ZONES[currentAttr].length)?currentZone:Object.keys(attrData.zones||{})[0];
   const spots=((attrData.zones||{})[zone]||{}).spots||[];
   spots.forEach((s,i)=>{
     if(!s.lat||!s.lon)return;
@@ -941,10 +980,10 @@ function renderMapSpots(){
   });
 }
 function selectZone(id){currentZone=id;document.querySelectorAll('.zone-btn').forEach(b=>b.classList.remove('on'));document.getElementById('zone-'+id).classList.add('on');renderZoneSpots();renderMapSpots();renderShuttleInfo(id);}
-function renderShuttleInfo(zone){const info={south:'🚌 <b>셔틀:</b> 양가계 환승센터 10~15분 | <b>막차 18:30</b>',yuanjia:'🛗 <b>백룡엘리베이터</b> | <b>막차 18:00</b>',tianzi:'🚡 <b>천자산 케이블카</b> | <b>막차 18:00</b>',yangjiajie:'🔄 <b>환승 허브</b> | 막차 <b>18:30</b>'};const el=document.getElementById('shuttle-box');if(el)el.innerHTML=info[zone]||'';}
+function renderShuttleInfo(zone){const z=(ZONES[currentAttr]||[]).find(z=>z.zone_key===zone);const el=document.getElementById('shuttle-box');if(el)el.innerHTML=(z&&z.shuttle_info)||'';}
 function renderZoneSpots(){
   const attrData=spotsData[currentAttr];
-  const zone=currentAttr==='forest'?currentZone:(attrData?Object.keys(attrData.zones||{})[0]:'south');
+  const zone=(ZONES[currentAttr]&&ZONES[currentAttr].length)?currentZone:(attrData?Object.keys(attrData.zones||{})[0]:'south');
   const spots=attrData?((attrData.zones||{})[zone]||{}).spots||[]:[];
   document.getElementById('spot-section-title').textContent=`📍 ${ATTRS[currentAttr].name} 스팟`;
   document.getElementById('spot-list').innerHTML=spots.length?spots.map((s,i)=>{

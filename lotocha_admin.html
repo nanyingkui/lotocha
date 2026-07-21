@@ -199,6 +199,9 @@ textarea.field-input{min-height:80px;resize:vertical}
           <button class="sb-item" data-panel="spots" onclick="showPanel('spots',this)">
             <span class="icon">📍</span>向导地点
           </button>
+          <button class="sb-item" data-panel="attrdetail" onclick="showPanel('attrdetail',this)">
+            <span class="icon">🗺️</span>景区详情设置
+          </button>
           <button class="sb-item" data-panel="places" onclick="showPanel('places',this)">
             <span class="icon">🏪</span>本地商户
           </button>
@@ -379,6 +382,78 @@ textarea.field-input{min-height:80px;resize:vertical}
         <div class="table-head"><h3>全部地点</h3><button class="btn-add" onclick="openSpotModal()">+ 添加地点</button></div>
         <table><thead><tr><th>景区</th><th>区域</th><th>地点名</th><th>类型</th><th>状态</th><th>操作</th></tr></thead>
         <tbody id="spots-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- 景区详情设置 -->
+    <div class="panel" id="panel-attrdetail">
+      <div class="page-title">🗺️ 景区详情设置</div>
+      <div class="page-sub">以下内容会直接显示在向导页面的"스팟"和"도우미"标签页中(地图定位、推荐行程、下雨备选方案、最后交通提醒、各出发地的交通方式、区域/接驳车信息)。先在上面选择景区，再切换下面的标签页编辑对应内容。</div>
+      <div class="subtab-bar" id="ad-attr-bar"></div>
+      <div class="subtab-bar" style="margin-top:-6px">
+        <button class="subtab-btn active" data-adtab="mapcfg" onclick="showADSubtab('mapcfg',this)">地图设置</button>
+        <button class="subtab-btn" data-adtab="plan" onclick="showADSubtab('plan',this)">推荐行程</button>
+        <button class="subtab-btn" data-adtab="rain" onclick="showADSubtab('rain',this)">雨天备选</button>
+        <button class="subtab-btn" data-adtab="lastt" onclick="showADSubtab('lastt',this)">最后交通</button>
+        <button class="subtab-btn" data-adtab="transopt" onclick="showADSubtab('transopt',this)">到达方式</button>
+        <button class="subtab-btn" data-adtab="zones" onclick="showADSubtab('zones',this)">区域·接驳车</button>
+      </div>
+
+      <div class="pricing-subtab active" id="adt-mapcfg">
+        <div class="page-sub">地图中心坐标、缩放级别、高德地图搜索/导航链接 — 每个景区各1条记录。</div>
+        <div class="field-row">
+          <div class="field-group"><label class="field-label">纬度 (center_lat)</label><input type="number" id="mc-lat" class="field-input" step="0.000001"></div>
+          <div class="field-group"><label class="field-label">经度 (center_lng)</label><input type="number" id="mc-lng" class="field-input" step="0.000001"></div>
+        </div>
+        <div class="field-group"><label class="field-label">缩放级别 (zoom)</label><input type="number" id="mc-zoom" class="field-input" value="13"></div>
+        <div class="field-group"><label class="field-label">高德地图搜索链接</label><input type="text" id="mc-gaode" class="field-input" placeholder="https://uri.amap.com/search?keyword=..."></div>
+        <div class="field-group"><label class="field-label">高德地图导航链接</label><input type="text" id="mc-gaodenav" class="field-input" placeholder="https://uri.amap.com/navigation?to=..."></div>
+        <button class="btn-save" onclick="saveMapConfig()">保存</button>
+      </div>
+
+      <div class="pricing-subtab" id="adt-plan">
+        <div class="page-sub">向导页面"도우미"标签页里"추천 일정"的时间轴步骤，按时间顺序排列。</div>
+        <div class="table-wrap">
+          <div class="table-head"><h3>全部步骤</h3><button class="btn-add" onclick="openPlanStepModal()">+ 添加步骤</button></div>
+          <table><thead><tr><th>时间</th><th>标题</th><th>说明</th><th>警告</th><th>排序</th><th>操作</th></tr></thead>
+          <tbody id="planstep-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div class="pricing-subtab" id="adt-rain">
+        <div class="page-sub">下雨天推荐替代活动("推荐") / 应避开的项目("避开")两类。</div>
+        <div class="table-wrap">
+          <div class="table-head"><h3>全部项目</h3><button class="btn-add" onclick="openRainItemModal()">+ 添加项目</button></div>
+          <table><thead><tr><th>类型</th><th>内容</th><th>排序</th><th>操作</th></tr></thead>
+          <tbody id="rainitem-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div class="pricing-subtab" id="adt-lastt">
+        <div class="page-sub">向导页面顶部"오늘 마지막 교통편"倒计时用的项目(交通工具名称+当天最晚时间)。</div>
+        <div class="table-wrap">
+          <div class="table-head"><h3>全部项目</h3><button class="btn-add" onclick="openLastTModal()">+ 添加项目</button></div>
+          <table><thead><tr><th>名称</th><th>最晚时间</th><th>排序</th><th>操作</th></tr></thead>
+          <tbody id="lastt-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div class="pricing-subtab" id="adt-transopt">
+        <div class="page-sub">从武陵源/市区/机场三个出发地前往该景区的交通方式、耗时、价格。</div>
+        <div class="table-wrap">
+          <div class="table-head"><h3>全部方式</h3><button class="btn-add" onclick="openTransOptModal()">+ 添加方式</button></div>
+          <table><thead><tr><th>出发地</th><th>图标</th><th>名称</th><th>详情</th><th>价格</th><th>标签</th><th>排序</th><th>操作</th></tr></thead>
+          <tbody id="transopt-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div class="pricing-subtab" id="adt-zones">
+        <div class="page-sub">该景区内部的区域划分(目前仅国家森林公园使用) — 设置了区域时，向导地点地图上方会显示区域选择按钮和接驳车信息；不设置区域则自动隐藏。</div>
+        <div class="table-wrap">
+          <div class="table-head"><h3>全部区域</h3><button class="btn-add" onclick="openZoneModal()">+ 添加区域</button></div>
+          <table><thead><tr><th>key</th><th>名称</th><th>图标</th><th>接驳车信息</th><th>排序</th><th>操作</th></tr></thead>
+          <tbody id="adzone-tbody"></tbody></table>
+        </div>
       </div>
     </div>
 
@@ -1195,6 +1270,126 @@ textarea.field-input{min-height:80px;resize:vertical}
   </div>
 </div>
 
+<!-- 推荐行程 步骤弹窗 -->
+<div class="modal-bg" id="planstep-modal-bg">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="planstep-modal-title">添加步骤</h3>
+      <button class="modal-close" onclick="closePlanStepModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="ps-id">
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">时间 (HH:MM) *</label><input type="text" id="ps-time" class="field-input" placeholder="09:00"></div>
+        <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="ps-order" class="field-input" value="0"></div>
+      </div>
+      <div class="field-group"><label class="field-label">标题 *</label><input type="text" id="ps-title" class="field-input" placeholder="南门入场·购票"></div>
+      <div class="field-group"><label class="field-label">说明</label><input type="text" id="ps-desc" class="field-input" placeholder="请携带护照"></div>
+      <div class="field-group"><label class="field-label">警告(红色警示文字，没有则留空)</label><input type="text" id="ps-warn" class="field-input" placeholder="旺季排队60分钟"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closePlanStepModal()">取消</button>
+      <button class="btn-save" onclick="savePlanStep()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 雨天备选项目弹窗 -->
+<div class="modal-bg" id="rainitem-modal-bg">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="rainitem-modal-title">添加项目</h3>
+      <button class="modal-close" onclick="closeRainItemModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="ri-id">
+      <div class="field-group"><label class="field-label">类型 *</label>
+        <select id="ri-kind" class="field-input"><option value="plan">推荐(下雨天的替代活动)</option><option value="avoid">避开(下雨天有风险/关闭)</option></select></div>
+      <div class="field-group"><label class="field-label">内容 *</label><input type="text" id="ri-text" class="field-input" placeholder="🦎 黄龙洞 — 室内洞穴"></div>
+      <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="ri-order" class="field-input" value="0"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeRainItemModal()">取消</button>
+      <button class="btn-save" onclick="saveRainItem()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 最后交通项目弹窗 -->
+<div class="modal-bg" id="lastt-modal-bg">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="lastt-modal-title">添加项目</h3>
+      <button class="modal-close" onclick="closeLastTModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="lt-id">
+      <div class="field-group"><label class="field-label">名称 *</label><input type="text" id="lt-name" class="field-input" placeholder="百龙电梯"></div>
+      <div class="field-group"><label class="field-label">最晚时间 (HH:MM) *</label><input type="text" id="lt-time" class="field-input" placeholder="18:00"></div>
+      <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="lt-order" class="field-input" value="0"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeLastTModal()">取消</button>
+      <button class="btn-save" onclick="saveLastT()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 到达方式弹窗 -->
+<div class="modal-bg" id="transopt-modal-bg">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="transopt-modal-title">添加方式</h3>
+      <button class="modal-close" onclick="closeTransOptModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="to-id">
+      <div class="field-group"><label class="field-label">出发地 *</label>
+        <select id="to-origin" class="field-input"><option value="wulingyuan">武陵源</option><option value="city">市区</option><option value="airport">机场</option></select></div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">图标表情符号</label><input type="text" id="to-icon" class="field-input" placeholder="🚕"></div>
+        <div class="field-group"><label class="field-label">名称 *</label><input type="text" id="to-name" class="field-input" placeholder="出租车"></div>
+      </div>
+      <div class="field-group"><label class="field-label">详情(耗时等)</label><input type="text" id="to-detail" class="field-input" placeholder="约45分钟"></div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">价格</label><input type="text" id="to-price" class="field-input" placeholder="¥100~130"></div>
+        <div class="field-group"><label class="field-label">标签颜色</label>
+          <select id="to-badge" class="field-input"><option value="b-green">绿色(推荐/便宜)</option><option value="b-gold">金色(普通)</option><option value="b-red">红色(贵/需注意)</option></select></div>
+      </div>
+      <div class="field-group"><label class="field-label">标签文字</label><input type="text" id="to-badgetxt" class="field-input" placeholder="推荐"></div>
+      <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="to-order" class="field-input" value="0"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeTransOptModal()">取消</button>
+      <button class="btn-save" onclick="saveTransOpt()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 区域·接驳车弹窗 -->
+<div class="modal-bg" id="adzone-modal-bg">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="adzone-modal-title">添加区域</h3>
+      <button class="modal-close" onclick="closeADZoneModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="az-id">
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">key（系统内部标识，英文/数字）*</label><input type="text" id="az-key" class="field-input" placeholder="south"></div>
+        <div class="field-group"><label class="field-label">图标表情符号</label><input type="text" id="az-icon" class="field-input" placeholder="🅿️"></div>
+      </div>
+      <div class="field-group"><label class="field-label">名称 *</label><input type="text" id="az-name" class="field-input" placeholder="南门·画廊"></div>
+      <div class="field-group"><label class="field-label">接驳车信息(可使用HTML标签)</label><input type="text" id="az-shuttle" class="field-input" placeholder="🚌 <b>接驳车:</b> 杨家界换乘中心10~15分钟 | <b>末班18:30</b>"></div>
+      <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="az-order" class="field-input" value="0"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeADZoneModal()">取消</button>
+      <button class="btn-save" onclick="saveADZone()">保存</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1407,7 +1602,8 @@ function showPanel(id, btn) {
     hotels:loadHotelPool,flights:loadFlightPool,attractions:loadAttractionPool,
     addonsvc:loadAddonSvc,
     showstickets:loadST,paymethods:loadPM,emergency:loadEI,phrases:loadPH,tips:loadTP,
-    regions:loadRG,placecats:loadPC,guideattr:loadGA};
+    regions:loadRG,placecats:loadPC,guideattr:loadGA,
+    attrdetail:initADPanel};
   if (loaders[id]) loaders[id]();
 }
 
@@ -2179,7 +2375,7 @@ function populateZoneSelect(attrId, selected) {
 function onSpotAttrChange() { populateZoneSelect(document.getElementById('s-attr').value, ''); }
 function openSpotModal(id) {
   document.getElementById('spot-modal-title').textContent = id ? '编辑地点' : '添加地点';
-  populateCategorySelects(); // s-attr/tp-attr 옵션을 ATTRACTIONS_LIST(DB) 기준으로 최신화
+  populateCategorySelects(); // s-attr/tp-attr 选项按ATTRACTIONS_LIST(DB)实时更新
   if (!id) {
     ['s-id','s-id-orig','s-name-ko','s-name-cn','s-lat','s-lon','s-gaode','s-video-url','s-desc','s-tip','s-hours','s-price'].forEach(f=>document.getElementById(f).value='');
     document.getElementById('s-attr').value='forest'; document.getElementById('s-type').value='landmark';
@@ -2781,6 +2977,290 @@ async function deleteGA(id) {
   const { error } = await sb.from('guide_attractions').delete().eq('id',id);
   if (error) { toast('删除失败: '+error.message,'error'); return; }
   toast('已删除'); loadGA(); loadCategoryData();
+}
+
+/* ───── 景区详情设置 (guide_attr_map_config / guide_plan_steps / guide_rain_items / guide_last_transport / guide_transport_options / guide_zones) ───── */
+let AD_CURRENT_ATTR = null;
+async function initADPanel() {
+  const { data } = await sb.from('guide_attractions').select('attr_key,name_ko,icon').eq('is_protected', true).order('sort_order');
+  const attrs = (data && data.length) ? data : ATTRACTIONS_LIST.filter(a=>a.is_protected);
+  if (!attrs.length) { document.getElementById('ad-attr-bar').innerHTML = '<span style="color:#999">暂无受保护景区</span>'; return; }
+  if (!AD_CURRENT_ATTR || !attrs.some(a=>a.attr_key===AD_CURRENT_ATTR)) AD_CURRENT_ATTR = attrs[0].attr_key;
+  document.getElementById('ad-attr-bar').innerHTML = attrs.map(a=>`<button class="subtab-btn${a.attr_key===AD_CURRENT_ATTR?' active':''}" onclick="selectADAttr('${a.attr_key}',this)">${a.icon||''} ${a.name_ko}</button>`).join('');
+  const activeTab = document.querySelector('#panel-attrdetail .pricing-subtab.active');
+  showADSubtab(activeTab ? activeTab.id.replace('adt-','') : 'mapcfg');
+}
+function selectADAttr(key, btn) {
+  AD_CURRENT_ATTR = key;
+  document.getElementById('ad-attr-bar').querySelectorAll('.subtab-btn').forEach(b=>b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const activeTab = document.querySelector('#panel-attrdetail .pricing-subtab.active');
+  showADSubtab(activeTab ? activeTab.id.replace('adt-','') : 'mapcfg');
+}
+function showADSubtab(id, btn) {
+  document.querySelectorAll('#panel-attrdetail .subtab-btn[data-adtab]').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#panel-attrdetail .pricing-subtab').forEach(p=>p.classList.remove('active'));
+  const targetBtn = btn || document.querySelector(`#panel-attrdetail .subtab-btn[data-adtab="${id}"]`);
+  if (targetBtn) targetBtn.classList.add('active');
+  document.getElementById('adt-'+id).classList.add('active');
+  const loaders = { mapcfg: loadMapConfig, plan: loadPlanSteps, rain: loadRainItems, lastt: loadLastT, transopt: loadTransOpt, zones: loadADZones };
+  if (loaders[id]) loaders[id]();
+}
+
+/* -- 地图设置 (每个景区一条记录) -- */
+async function loadMapConfig() {
+  const { data } = await sb.from('guide_attr_map_config').select('*').eq('attr_id', AD_CURRENT_ATTR).maybeSingle();
+  document.getElementById('mc-lat').value = data && data.center_lat!=null ? data.center_lat : '';
+  document.getElementById('mc-lng').value = data && data.center_lng!=null ? data.center_lng : '';
+  document.getElementById('mc-zoom').value = data && data.zoom!=null ? data.zoom : 13;
+  document.getElementById('mc-gaode').value = (data && data.gaode_search_url) || '';
+  document.getElementById('mc-gaodenav').value = (data && data.gaode_nav_url) || '';
+}
+async function saveMapConfig() {
+  const payload = {
+    attr_id: AD_CURRENT_ATTR,
+    center_lat: parseFloat(document.getElementById('mc-lat').value)||null,
+    center_lng: parseFloat(document.getElementById('mc-lng').value)||null,
+    zoom: parseInt(document.getElementById('mc-zoom').value)||13,
+    gaode_search_url: document.getElementById('mc-gaode').value.trim()||null,
+    gaode_nav_url: document.getElementById('mc-gaodenav').value.trim()||null,
+    updated_at: new Date().toISOString(),
+  };
+  const { error } = await sb.from('guide_attr_map_config').upsert(payload);
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast('已保存');
+}
+
+/* -- 推荐行程 (plan steps) -- */
+async function loadPlanSteps() {
+  const { data } = await sb.from('guide_plan_steps').select('*').eq('attr_id', AD_CURRENT_ATTR).order('sort_order');
+  document.getElementById('planstep-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">加载失败</td></tr>'
+    : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">暂无步骤</td></tr>'
+    : data.map(s=>`<tr>
+        <td style="font-weight:700">${s.time_hhmm}</td><td>${s.title}</td><td style="color:#666">${s.desc_ko||''}</td>
+        <td style="color:var(--red)">${s.warn_ko||''}</td><td>${s.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openPlanStepModal('${s.id}')">编辑</button>
+        <button class="btn-del" onclick="deletePlanStep('${s.id}')">删除</button></div></td></tr>`).join('');
+}
+function openPlanStepModal(id) {
+  document.getElementById('planstep-modal-title').textContent = id ? '编辑步骤' : '添加步骤';
+  document.getElementById('ps-id').value = id || '';
+  if (!id) { ['ps-time','ps-title','ps-desc','ps-warn'].forEach(f=>document.getElementById(f).value=''); document.getElementById('ps-order').value='0'; }
+  else {
+    sb.from('guide_plan_steps').select('*').eq('id',id).single().then(({data:s})=>{
+      if (!s) return;
+      document.getElementById('ps-time').value=s.time_hhmm||''; document.getElementById('ps-title').value=s.title||'';
+      document.getElementById('ps-desc').value=s.desc_ko||''; document.getElementById('ps-warn').value=s.warn_ko||'';
+      document.getElementById('ps-order').value=s.sort_order||0;
+    });
+  }
+  document.getElementById('planstep-modal-bg').classList.add('open');
+}
+function closePlanStepModal(e) { if (e && e.target !== document.getElementById('planstep-modal-bg')) return; document.getElementById('planstep-modal-bg').classList.remove('open'); }
+async function savePlanStep() {
+  const id = document.getElementById('ps-id').value;
+  const time = document.getElementById('ps-time').value.trim();
+  const title = document.getElementById('ps-title').value.trim();
+  if (!time || !title) { toast('请输入时间和标题','error'); return; }
+  const payload = {
+    attr_id: AD_CURRENT_ATTR, time_hhmm: time, title,
+    desc_ko: document.getElementById('ps-desc').value.trim()||null,
+    warn_ko: document.getElementById('ps-warn').value.trim()||null,
+    sort_order: parseInt(document.getElementById('ps-order').value)||0,
+  };
+  const { error } = id ? await sb.from('guide_plan_steps').update(payload).eq('id',id) : await sb.from('guide_plan_steps').insert(payload);
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast(id?'已修改':'已添加'); closePlanStepModal(); loadPlanSteps();
+}
+async function deletePlanStep(id) {
+  if (!confirm('确定要删除吗？')) return;
+  const { error } = await sb.from('guide_plan_steps').delete().eq('id',id);
+  if (error) { toast('删除失败: '+error.message,'error'); return; }
+  toast('已删除'); loadPlanSteps();
+}
+
+/* -- 雨天备选 (rain items) -- */
+const RAIN_KIND_LABEL = {plan:'推荐替代', avoid:'需避开'};
+async function loadRainItems() {
+  const { data } = await sb.from('guide_rain_items').select('*').eq('attr_id', AD_CURRENT_ATTR).order('kind').order('sort_order');
+  document.getElementById('rainitem-tbody').innerHTML = !data ? '<tr><td colspan="4" style="color:var(--red)">加载失败</td></tr>'
+    : !data.length ? '<tr><td colspan="4" style="text-align:center;color:#aaa;padding:20px">暂无项目</td></tr>'
+    : data.map(r=>`<tr>
+        <td>${RAIN_KIND_LABEL[r.kind]||r.kind}</td><td>${r.item_text}</td><td>${r.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openRainItemModal('${r.id}')">编辑</button>
+        <button class="btn-del" onclick="deleteRainItem('${r.id}')">删除</button></div></td></tr>`).join('');
+}
+function openRainItemModal(id) {
+  document.getElementById('rainitem-modal-title').textContent = id ? '编辑项目' : '添加项目';
+  document.getElementById('ri-id').value = id || '';
+  if (!id) { document.getElementById('ri-text').value=''; document.getElementById('ri-kind').value='plan'; document.getElementById('ri-order').value='0'; }
+  else {
+    sb.from('guide_rain_items').select('*').eq('id',id).single().then(({data:r})=>{
+      if (!r) return;
+      document.getElementById('ri-kind').value=r.kind; document.getElementById('ri-text').value=r.item_text||'';
+      document.getElementById('ri-order').value=r.sort_order||0;
+    });
+  }
+  document.getElementById('rainitem-modal-bg').classList.add('open');
+}
+function closeRainItemModal(e) { if (e && e.target !== document.getElementById('rainitem-modal-bg')) return; document.getElementById('rainitem-modal-bg').classList.remove('open'); }
+async function saveRainItem() {
+  const id = document.getElementById('ri-id').value;
+  const text = document.getElementById('ri-text').value.trim();
+  if (!text) { toast('请输入内容','error'); return; }
+  const payload = { attr_id: AD_CURRENT_ATTR, kind: document.getElementById('ri-kind').value, item_text: text, sort_order: parseInt(document.getElementById('ri-order').value)||0 };
+  const { error } = id ? await sb.from('guide_rain_items').update(payload).eq('id',id) : await sb.from('guide_rain_items').insert(payload);
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast(id?'已修改':'已添加'); closeRainItemModal(); loadRainItems();
+}
+async function deleteRainItem(id) {
+  if (!confirm('确定要删除吗？')) return;
+  const { error } = await sb.from('guide_rain_items').delete().eq('id',id);
+  if (error) { toast('删除失败: '+error.message,'error'); return; }
+  toast('已删除'); loadRainItems();
+}
+
+/* -- 最后交通 (last transport) -- */
+async function loadLastT() {
+  const { data } = await sb.from('guide_last_transport').select('*').eq('attr_id', AD_CURRENT_ATTR).order('sort_order');
+  document.getElementById('lastt-tbody').innerHTML = !data ? '<tr><td colspan="4" style="color:var(--red)">加载失败</td></tr>'
+    : !data.length ? '<tr><td colspan="4" style="text-align:center;color:#aaa;padding:20px">暂无项目</td></tr>'
+    : data.map(t=>`<tr>
+        <td style="font-weight:700">${t.name}</td><td>${t.last_time}</td><td>${t.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openLastTModal('${t.id}')">编辑</button>
+        <button class="btn-del" onclick="deleteLastT('${t.id}')">删除</button></div></td></tr>`).join('');
+}
+function openLastTModal(id) {
+  document.getElementById('lastt-modal-title').textContent = id ? '编辑项目' : '添加项目';
+  document.getElementById('lt-id').value = id || '';
+  if (!id) { document.getElementById('lt-name').value=''; document.getElementById('lt-time').value=''; document.getElementById('lt-order').value='0'; }
+  else {
+    sb.from('guide_last_transport').select('*').eq('id',id).single().then(({data:t})=>{
+      if (!t) return;
+      document.getElementById('lt-name').value=t.name||''; document.getElementById('lt-time').value=t.last_time||'';
+      document.getElementById('lt-order').value=t.sort_order||0;
+    });
+  }
+  document.getElementById('lastt-modal-bg').classList.add('open');
+}
+function closeLastTModal(e) { if (e && e.target !== document.getElementById('lastt-modal-bg')) return; document.getElementById('lastt-modal-bg').classList.remove('open'); }
+async function saveLastT() {
+  const id = document.getElementById('lt-id').value;
+  const name = document.getElementById('lt-name').value.trim();
+  const time = document.getElementById('lt-time').value.trim();
+  if (!name || !time) { toast('请输入名称和时间','error'); return; }
+  const payload = { attr_id: AD_CURRENT_ATTR, name, last_time: time, sort_order: parseInt(document.getElementById('lt-order').value)||0 };
+  const { error } = id ? await sb.from('guide_last_transport').update(payload).eq('id',id) : await sb.from('guide_last_transport').insert(payload);
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast(id?'已修改':'已添加'); closeLastTModal(); loadLastT();
+}
+async function deleteLastT(id) {
+  if (!confirm('确定要删除吗？')) return;
+  const { error } = await sb.from('guide_last_transport').delete().eq('id',id);
+  if (error) { toast('删除失败: '+error.message,'error'); return; }
+  toast('已删除'); loadLastT();
+}
+
+/* -- 到达方式 (transport options) -- */
+const TO_ORIGIN_LABEL = {wulingyuan:'武陵源', city:'市区', airport:'机场'};
+async function loadTransOpt() {
+  const { data } = await sb.from('guide_transport_options').select('*').eq('attr_id', AD_CURRENT_ATTR).order('origin').order('sort_order');
+  document.getElementById('transopt-tbody').innerHTML = !data ? '<tr><td colspan="8" style="color:var(--red)">加载失败</td></tr>'
+    : !data.length ? '<tr><td colspan="8" style="text-align:center;color:#aaa;padding:20px">暂无方式</td></tr>'
+    : data.map(o=>`<tr>
+        <td>${TO_ORIGIN_LABEL[o.origin]||o.origin}</td><td>${o.icon||''}</td><td style="font-weight:700">${o.name}</td>
+        <td style="color:#666">${o.detail||''}</td><td>${o.price||''}</td><td>${o.badge_txt||''}</td><td>${o.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openTransOptModal('${o.id}')">编辑</button>
+        <button class="btn-del" onclick="deleteTransOpt('${o.id}')">删除</button></div></td></tr>`).join('');
+}
+function openTransOptModal(id) {
+  document.getElementById('transopt-modal-title').textContent = id ? '编辑方式' : '添加方式';
+  document.getElementById('to-id').value = id || '';
+  if (!id) {
+    ['to-icon','to-name','to-detail','to-price','to-badgetxt'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('to-origin').value='wulingyuan'; document.getElementById('to-badge').value='b-green'; document.getElementById('to-order').value='0';
+  } else {
+    sb.from('guide_transport_options').select('*').eq('id',id).single().then(({data:o})=>{
+      if (!o) return;
+      document.getElementById('to-origin').value=o.origin; document.getElementById('to-icon').value=o.icon||'';
+      document.getElementById('to-name').value=o.name||''; document.getElementById('to-detail').value=o.detail||'';
+      document.getElementById('to-price').value=o.price||''; document.getElementById('to-badge').value=o.badge||'b-green';
+      document.getElementById('to-badgetxt').value=o.badge_txt||''; document.getElementById('to-order').value=o.sort_order||0;
+    });
+  }
+  document.getElementById('transopt-modal-bg').classList.add('open');
+}
+function closeTransOptModal(e) { if (e && e.target !== document.getElementById('transopt-modal-bg')) return; document.getElementById('transopt-modal-bg').classList.remove('open'); }
+async function saveTransOpt() {
+  const id = document.getElementById('to-id').value;
+  const name = document.getElementById('to-name').value.trim();
+  if (!name) { toast('请输入名称','error'); return; }
+  const payload = {
+    attr_id: AD_CURRENT_ATTR, origin: document.getElementById('to-origin').value,
+    icon: document.getElementById('to-icon').value.trim()||'🚕', name,
+    detail: document.getElementById('to-detail').value.trim()||null,
+    price: document.getElementById('to-price').value.trim()||null,
+    badge: document.getElementById('to-badge').value,
+    badge_txt: document.getElementById('to-badgetxt').value.trim()||null,
+    sort_order: parseInt(document.getElementById('to-order').value)||0,
+  };
+  const { error } = id ? await sb.from('guide_transport_options').update(payload).eq('id',id) : await sb.from('guide_transport_options').insert(payload);
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast(id?'已修改':'已添加'); closeTransOptModal(); loadTransOpt();
+}
+async function deleteTransOpt(id) {
+  if (!confirm('确定要删除吗？')) return;
+  const { error } = await sb.from('guide_transport_options').delete().eq('id',id);
+  if (error) { toast('删除失败: '+error.message,'error'); return; }
+  toast('已删除'); loadTransOpt();
+}
+
+/* -- 区域·接驳车 (zones) -- */
+async function loadADZones() {
+  const { data } = await sb.from('guide_zones').select('*').eq('attr_id', AD_CURRENT_ATTR).order('sort_order');
+  document.getElementById('adzone-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">加载失败</td></tr>'
+    : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">暂无区域(该景区在向导页不显示区域选择栏)</td></tr>'
+    : data.map(z=>`<tr>
+        <td>${z.zone_key}</td><td style="font-weight:700">${z.name_ko}</td><td>${z.icon||''}</td>
+        <td style="color:#666;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${z.shuttle_info||''}</td><td>${z.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openZoneModal('${z.id}')">编辑</button>
+        <button class="btn-del" onclick="deleteADZone('${z.id}')">删除</button></div></td></tr>`).join('');
+}
+function openZoneModal(id) {
+  document.getElementById('adzone-modal-title').textContent = id ? '编辑区域' : '添加区域';
+  document.getElementById('az-id').value = id || '';
+  if (!id) { ['az-key','az-name','az-icon','az-shuttle'].forEach(f=>document.getElementById(f).value=''); document.getElementById('az-order').value='0'; }
+  else {
+    sb.from('guide_zones').select('*').eq('id',id).single().then(({data:z})=>{
+      if (!z) return;
+      document.getElementById('az-key').value=z.zone_key||''; document.getElementById('az-name').value=z.name_ko||'';
+      document.getElementById('az-icon').value=z.icon||''; document.getElementById('az-shuttle').value=z.shuttle_info||'';
+      document.getElementById('az-order').value=z.sort_order||0;
+    });
+  }
+  document.getElementById('adzone-modal-bg').classList.add('open');
+}
+function closeADZoneModal(e) { if (e && e.target !== document.getElementById('adzone-modal-bg')) return; document.getElementById('adzone-modal-bg').classList.remove('open'); }
+async function saveADZone() {
+  const id = document.getElementById('az-id').value;
+  const key = document.getElementById('az-key').value.trim();
+  const name = document.getElementById('az-name').value.trim();
+  if (!key || !name) { toast('请输入key和名称','error'); return; }
+  const payload = {
+    attr_id: AD_CURRENT_ATTR, zone_key: key, name_ko: name,
+    icon: document.getElementById('az-icon').value.trim()||'📍',
+    shuttle_info: document.getElementById('az-shuttle').value.trim()||null,
+    sort_order: parseInt(document.getElementById('az-order').value)||0,
+  };
+  const { error } = id ? await sb.from('guide_zones').update(payload).eq('id',id) : await sb.from('guide_zones').insert(payload);
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast(id?'已修改':'已添加'); closeADZoneModal(); loadADZones();
+}
+async function deleteADZone(id) {
+  if (!confirm('确定要删除吗？')) return;
+  const { error } = await sb.from('guide_zones').delete().eq('id',id);
+  if (error) { toast('删除失败: '+error.message,'error'); return; }
+  toast('已删除'); loadADZones();
 }
 
 // 会话自动恢复
