@@ -127,8 +127,6 @@ textarea.field-input{min-height:80px;resize:vertical}
 .dyn-row select{flex:1;min-width:60px;padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;font-family:inherit;outline:none}
 .dyn-row label.chk{display:flex;align-items:center;gap:4px;font-size:11px;color:#555;white-space:nowrap;flex-shrink:0}
 .dyn-row .btn-rm{background:#ffebee;color:var(--red);border:none;border-radius:6px;padding:5px 8px;font-size:13px;cursor:pointer;flex-shrink:0;font-weight:700}
-#t-tiers-list .ti-agediscount{display:none}
-#t-tiers-list.pkg-mode .ti-agediscount{display:block}
 .btn-add-row{background:#e8eaf6;color:#3949ab;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px}
 
 /* ── 썸네일 2매 업로드 위젯 ── */
@@ -608,7 +606,9 @@ textarea.field-input{min-height:80px;resize:vertical}
           <div id="t-tiers-list"></div>
           <button type="button" class="btn-add-row" onclick="addTier()">+ 연령 추가</button>
         </div>
-        <div class="field-hint">key: adult/child/senior/teen/infant 등 영문 ID | 최소인원: 출발 기준 포함 여부<br>맞춤투어는 가격을 비워두면 실시간 계산되며, 오른쪽 "할인 연동" 드롭다운으로 이 가격 분류에 연령 할인을 지정할 수 있습니다.</div>
+        <div class="field-hint">key: adult/child/senior/teen/infant 등 영문 ID | 최소인원: 출발 기준 포함 여부<br>
+          <b>맞춤투어는 이제 이 목록을 2줄로만 관리하세요</b> — ① 가격을 비워둔 통합 "인원"(만 3세 이상, 실시간 계산) 1줄 + ② 가격을 고정 입력한 "영유아"(만 3세 미만) 1줄. 성인/경로/어린이를 따로 나누지 않습니다.
+          연령 할인(경로 등)은 고객이 예약 화면에서 인원 선택 시 직접 신고한 인원수 기준으로 견적 맨 마지막에 자동 차감되며, "맞춤투어 설정 · 가격" 화면의 "연령 할인" 탭에서 관리합니다.</div>
       </div>
 
       <!-- 옵션 -->
@@ -1201,7 +1201,6 @@ textarea.field-input{min-height:80px;resize:vertical}
 const SUPA_URL = 'https://qbzoepglovwlarjssqjg.supabase.co';
 const SUPA_KEY = 'sb_publishable_oxeR92SfBDMzYAvcNitbPw_Vf0u1y0K';
 let sb, currentUser, userRole;
-let AGE_DISCOUNTS_ADMIN = []; // 연령별 가격 행의 "할인 연동" 드롭다운용 캐시 (tour_age_discounts)
 try { sb = window.supabase.createClient(SUPA_URL, SUPA_KEY); } catch(e) {}
 
 const ATTR_LABELS = {forest:'삼림공원', tianmen:'천문산', canyon:'협곡'};
@@ -1493,14 +1492,11 @@ function renderTierRow(t={}) {
   const idx = Date.now() + Math.random();
   const d = document.createElement('div');
   d.className = 'dyn-row'; d.dataset.idx = idx;
-  const ageOpts = `<option value="">해당없음 (일반가)</option>` +
-    AGE_DISCOUNTS_ADMIN.map(a => `<option value="${a.id}" ${t.age_discount_id===a.id?'selected':''}>${a.label} (-${(a.discount_krw||0).toLocaleString()}원)</option>`).join('');
   d.innerHTML = `
     <input type="text" placeholder="key" value="${t.key||''}" style="flex:1;max-width:80px">
     <input type="text" placeholder="라벨" value="${t.label||''}" style="flex:2">
     <input type="number" placeholder="가격 (맞춤투어는 비워두면 실시간 계산)" value="${t.price||''}" style="flex:1;max-width:90px">
     <label class="chk"><input type="checkbox" ${t.counts_min?'checked':''}> 최소인원</label>
-    <select class="ti-agediscount" style="flex:2;max-width:180px" title="이 가격 분류에 연령 할인을 연동합니다 (맞춤투어, 가격 비워둔 경우만 적용)">${ageOpts}</select>
     <button class="btn-rm" onclick="this.parentNode.remove()">✕</button>`;
   return d;
 }
@@ -1521,8 +1517,7 @@ function addOpt()    { document.getElementById('t-opts-list').appendChild(render
 function collectTiers() {
   return [...document.querySelectorAll('#t-tiers-list .dyn-row')].map(r=>{
     const ins = r.querySelectorAll('input');
-    const sel = r.querySelector('.ti-agediscount');
-    return {key:ins[0].value.trim(),label:ins[1].value.trim(),price:parseInt(ins[2].value)||0,counts_min:ins[3].checked,age_discount_id:sel && sel.value ? sel.value : null};
+    return {key:ins[0].value.trim(),label:ins[1].value.trim(),price:parseInt(ins[2].value)||0,counts_min:ins[3].checked};
   }).filter(t=>t.key&&t.label);
 }
 function collectOpts() {
@@ -2048,9 +2043,6 @@ function openTourModal(id, presetType) {
   const clear = () => ['t-id','t-title-ko','t-title-cn','t-subtitle','t-desc','t-price-krw','t-price-cny','t-images','t-highlights','t-includes','t-excludes','t-itinerary'].forEach(f=>document.getElementById(f).value='');
   document.getElementById('t-tiers-list').innerHTML = '';
   document.getElementById('t-opts-list').innerHTML = '';
-  /* 연령 할인 목록을 최신 상태로 가져와둔다 (연령별 가격 행의 "할인 연동" 드롭다운에 사용) */
-  const agePromise = sb.from('tour_age_discounts').select('*').eq('is_active', true).order('sort_order')
-    .then(({ data }) => { AGE_DISCOUNTS_ADMIN = data || []; });
   if (!id) {
     clear();
     const type = presetType || 'day_tour';
@@ -2058,9 +2050,8 @@ function openTourModal(id, presetType) {
     document.getElementById('t-status').value='live';
     document.getElementById('t-days').value='1'; document.getElementById('t-order').value='0';
     updateItinHint();
-    agePromise.then(() => {}); // 새 상품은 티어를 아직 안 넣었으니 목록만 최신화해두면 됨
   } else {
-    Promise.all([sb.from('tour_products').select('*').eq('id',id).single(), agePromise]).then(([{data:p}])=>{
+    sb.from('tour_products').select('*').eq('id',id).single().then(({data:p})=>{
       if (!p) return;
       document.getElementById('t-id').value=p.id;
       applyModalTypeLock(p.product_type);

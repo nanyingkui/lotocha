@@ -525,6 +525,7 @@ let _pkgDays = [];     // [{day:1, full:{type,key}|null, am:{type,key}|null, pm:
 let _pickerOpen = null; // {day, slot} 현재 펼쳐진 선택 패널 (slot: 'full'|'am'|'pm'|'evening'|'combo')
 let _pkgCombos = [];    // [{day, key}] — 오후+저녁(당일치기)/오후+저녁+익일오전 슬롯 명소 (day = 시작일)
 let _addons = {};       // {addonId: count} — 부가서비스(마사지 등, 슬롯 미점유)
+let _ageCounts = {};    // {age_discount_id: count} — 맞춤투어 통합 인원 중 연령 우대 대상 인원수 (2026-07-21: 견적 맨 끝에서 일괄 차감)
 let _classicOpen = false; // 클래식 일정 보기 팝업 열림 여부
 let _classicItinerary = []; // 현재 열린 상품의 참고용 추천 일정 원본 (itinerary 필드, 복사 전용)
 
@@ -556,7 +557,7 @@ async function loadGlobalPools() {
     sb.from('tour_addon_services').select('*').eq('is_active', true).order('sort_order'),
     sb.from('tour_pricing_settings').select('*'),
     sb.from('tour_margin_settings').select('*').eq('id', 1).maybeSingle(),
-    sb.from('tour_age_discounts').select('*').eq('is_active', true),
+    sb.from('tour_age_discounts').select('*').eq('is_active', true).order('sort_order'),
     sb.from('tour_cost_buffers').select('*').eq('is_active', true),
   ]);
   GLOBAL_HOTELS = (hRes.data || []).map(normHotel);
@@ -590,6 +591,7 @@ function openModal(id) {
   _pickerOpen = null;
   _pkgCombos = [];
   _addons = {};
+  _ageCounts = {};
   _classicOpen = false;
 
   const tiers   = Array.isArray(p.price_tiers)  ? p.price_tiers  : [];
@@ -663,8 +665,58 @@ function openModal(id) {
       `}
     </div>`;
 
-  /* ── 인원 선택 ── */
-  if (tiers.length) {
+  /* ── 인원 선택 ──
+     맞춤투어(package): 영유아를 제외한 모든 인원을 통합 "인원" 1개로 카운트하고,
+     연령 우대(60세 이상/70세 이상/12세 이하 등)는 별도 작은 카운터로 신고받아
+     최종 견적 맨 마지막에 한 번에 차감 (2026-07-21 확정 — 미리 각 티어에 할인가를
+     녹여서 보여주면 "얼마나 할인받는지"가 안 보여서, 정가 → 할인 차감 순서로 표시) */
+  const mainTier = isPkg ? tiers.find(t => !t.price) : null;
+  const fixedTiers = isPkg ? tiers.filter(t => t.price) : [];
+  if (isPkg) {
+    const activeAgeDiscounts = AGE_DISCOUNTS.filter(a => a.is_active !== false);
+    html += `
+    <div class="booking-section">
+      <div class="booking-section-title">👥 인원 선택</div>
+      <div class="min-pax-note">⚠️ 최소 2인 이상 출발 (영유아 제외)</div>
+      ${mainTier ? `
+      <div class="pax-row">
+        <div class="pax-info">
+          <div class="pax-label">${mainTier.label}</div>
+          <div class="pax-price">📊 날짜·인원 선택 시 실시간 계산</div>
+        </div>
+        <div class="pax-counter">
+          <button class="counter-btn" onclick="changePax('${mainTier.key}',-1,event)">−</button>
+          <span class="counter-val" id="cnt-${mainTier.key}">0</span>
+          <button class="counter-btn" onclick="changePax('${mainTier.key}',1,event)">+</button>
+        </div>
+      </div>` : ''}
+      ${fixedTiers.map(t => `
+      <div class="pax-row">
+        <div class="pax-info">
+          <div class="pax-label">${t.label}</div>
+          <div class="pax-price">${fmtFull(t.price)} / 인</div>
+        </div>
+        <div class="pax-counter">
+          <button class="counter-btn" onclick="changePax('${t.key}',-1,event)">−</button>
+          <span class="counter-val" id="cnt-${t.key}">0</span>
+          <button class="counter-btn" onclick="changePax('${t.key}',1,event)">+</button>
+        </div>
+      </div>`).join('')}
+      ${activeAgeDiscounts.length ? `
+      <div class="age-disc-box" style="margin-top:10px;padding-top:10px;border-top:1px dashed #ddd">
+        <div class="min-pax-note" style="margin-bottom:4px">🎁 연령 우대 대상이 있으신가요? (선택 — 위 인원 중 해당하는 분만 아래에 입력하면 견적 하단에서 자동 할인됩니다)</div>
+        ${activeAgeDiscounts.map(a => `
+        <div class="pax-row" style="padding:5px 0">
+          <div class="pax-info"><div class="pax-label" style="font-size:14px">${a.label}</div></div>
+          <div class="pax-counter">
+            <button class="counter-btn" onclick="changeAgeCount('${a.id}',-1)">−</button>
+            <span class="counter-val" id="cnt-age-${a.id}">0</span>
+            <button class="counter-btn" onclick="changeAgeCount('${a.id}',1)">+</button>
+          </div>
+        </div>`).join('')}
+      </div>` : ''}
+    </div>`;
+  } else if (tiers.length) {
     html += `
     <div class="booking-section">
       <div class="booking-section-title">👥 인원 선택</div>
@@ -673,7 +725,7 @@ function openModal(id) {
         <div class="pax-row">
           <div class="pax-info">
             <div class="pax-label">${t.label}</div>
-            <div class="pax-price">${isPkg && !t.price ? '📊 날짜·인원 선택 시 실시간 계산' : fmtFull(t.price) + ' / 인'}</div>
+            <div class="pax-price">${fmtFull(t.price)} / 인</div>
           </div>
           <div class="pax-counter">
             <button class="counter-btn" onclick="changePax('${t.key}',-1,event)">−</button>
@@ -851,6 +903,14 @@ function changePax(key, delta, e) {
   _pax[key] = Math.max(0, (_pax[key] || 0) + delta);
   const el = document.getElementById('cnt-' + key);
   if (el) el.textContent = _pax[key];
+  updatePriceSummary();
+}
+
+/* ───── 연령 우대 신고 인원 (맞춤투어 통합 인원 중 해당자 수, 견적 맨 끝에서 일괄 차감) ───── */
+function changeAgeCount(id, delta) {
+  _ageCounts[id] = Math.max(0, (_ageCounts[id] || 0) + delta);
+  const el = document.getElementById('cnt-age-' + id);
+  if (el) el.textContent = _ageCounts[id];
   updatePriceSummary();
 }
 
@@ -1251,13 +1311,6 @@ function sumAttractionCost() {
   _pkgCombos.forEach(c => { const a = ATTRACTION_POOL[c.key]; if (a) sum += a.price || 0; });
   return sum;
 }
-/* 연령별 할인 — 관리자가 "연령별 가격" 행마다 직접 지정한 할인(age_discount_id)을 그대로 적용
-   (2026-07-21: 라벨 텍스트 추측 방식에서 관리자 직접 연동 방식으로 변경) */
-function ageDiscountForTier(t) {
-  if (!t.age_discount_id) return 0;
-  const d = AGE_DISCOUNTS.find(x => x.id === t.age_discount_id);
-  return d ? (d.discount_krw || 0) : 0;
-}
 function computePkgCost(totalPax) {
   if (!totalPax) return null;
   if (!_date || !_returnDate) return { needDates: true };
@@ -1310,10 +1363,12 @@ function updatePriceSummary() {
 
   let totalPax = 0;
   let minPax = 0;
+  let mainPax = 0; // 영유아(고정가) 등을 제외한 통합 인원 — 실시간 원가 계산·연령 우대 차감의 기준
   tiers.forEach(t => {
     const cnt = _pax[t.key] || 0;
     totalPax += cnt;
     if (cnt > 0 && t.counts_min) minPax += cnt;
+    if (!t.price) mainPax += cnt;
   });
 
   if (totalPax === 0) {
@@ -1323,8 +1378,9 @@ function updatePriceSummary() {
   }
 
   /* 맞춤투어는 기존 원가(차량·가이드·호텔·명소·식사·부가서비스·자연손모)를 실시간 조합해
-     계산 — 단, admin이 해당 티어에 고정 가격을 직접 입력한 경우 그 값을 그대로 사용 */
-  const pkgCost = isPkg ? computePkgCost(totalPax) : null;
+     계산 — 단, admin이 해당 티어에 고정 가격을 직접 입력한 경우(예: 영유아) 그 값을 그대로 사용.
+     연령 우대는 여기서는 반영하지 않고, 견적 맨 마지막에 한 번에 차감(아래 참고) */
+  const pkgCost = isPkg ? computePkgCost(mainPax) : null;
 
   let total = 0;
   let lines = [];
@@ -1340,8 +1396,7 @@ function updatePriceSummary() {
         lines.push(`<div class="price-line"><span>${t.label} × ${cnt}인</span><span>문의</span></div>`);
         return;
       }
-      const unit = Math.max(0, pkgCost.perPerson - ageDiscountForTier(t));
-      const sub = unit * cnt;
+      const sub = pkgCost.perPerson * cnt;
       total += sub;
       lines.push(`<div class="price-line"><span>${t.label} × ${cnt}인 (실시간 견적)</span><span>${fmtFull(sub)}</span></div>`);
     } else {
@@ -1368,6 +1423,22 @@ function updatePriceSummary() {
     lines.push(`<div class="price-line"><span>${hotel.name || hotel.label}${hotel.per==='pax' ? ' × '+cnt+'인' : ''}</span><span>+ ${fmtFull(sub)}</span></div>`);
   }
 
+  /* 연령 우대 할인 — 고객이 신고한 인원수만큼, 견적 맨 마지막에 한 번에 차감 (통합 인원수를 넘지 않도록 clamp) */
+  let ageLines = '';
+  if (isPkg && pkgCost && !pkgCost.inquiryOnly && !pkgCost.needDates) {
+    let remaining = mainPax;
+    AGE_DISCOUNTS.forEach(a => {
+      const raw = _ageCounts[a.id] || 0;
+      const cnt = Math.max(0, Math.min(raw, remaining));
+      if (cnt > 0) {
+        const sub = cnt * (a.discount_krw || 0);
+        total = Math.max(0, total - sub);
+        ageLines += `<div class="price-line"><span>🎁 ${a.label} × ${cnt}인 우대</span><span>− ${fmtFull(sub)}</span></div>`;
+        remaining -= cnt;
+      }
+    });
+  }
+
   const warn = minPax < 2
     ? '<div class="min-warn">⚠️ 최소 2인 이상 출발 (영유아 제외)</div>'
     : '';
@@ -1377,6 +1448,7 @@ function updatePriceSummary() {
 
   document.getElementById('price-summary').innerHTML = `
     ${lines.join('')}
+    ${ageLines ? `<div class="price-divider"></div>${ageLines}` : ''}
     <div class="price-divider"></div>
     <div class="price-total-row"><span>예상 총 금액</span><span>${fmtFull(total)}</span></div>
     ${warn}${pkgNote}`;
@@ -1414,9 +1486,10 @@ function buildMsg(p) {
 
   let total = 0;
   let totalPax = 0;
+  let mainPax = 0;
   let hasPax = false;
-  tiers.forEach(t => { totalPax += _pax[t.key] || 0; });
-  const pkgCost = isPkg ? computePkgCost(totalPax) : null;
+  tiers.forEach(t => { totalPax += _pax[t.key] || 0; if (!t.price) mainPax += _pax[t.key] || 0; });
+  const pkgCost = isPkg ? computePkgCost(mainPax) : null;
 
   tiers.forEach(t => {
     const cnt = _pax[t.key] || 0;
@@ -1428,8 +1501,7 @@ function buildMsg(p) {
         } else if (!pkgCost || pkgCost.inquiryOnly) {
           msg += `  ${t.label} × ${cnt}인 = 문의\n`;
         } else {
-          const unit = Math.max(0, pkgCost.perPerson - ageDiscountForTier(t));
-          const sub = unit * cnt;
+          const sub = pkgCost.perPerson * cnt;
           total += sub;
           msg += `  ${t.label} × ${cnt}인 = ${fmtFull(sub)} (실시간 견적)\n`;
         }
@@ -1442,6 +1514,21 @@ function buildMsg(p) {
   });
 
   if (!hasPax) msg += `  (미선택)\n`;
+
+  if (isPkg && pkgCost && !pkgCost.inquiryOnly && !pkgCost.needDates) {
+    let remaining = mainPax;
+    let ageMsg = '';
+    AGE_DISCOUNTS.forEach(a => {
+      const cnt = Math.max(0, Math.min(_ageCounts[a.id] || 0, remaining));
+      if (cnt > 0) {
+        const sub = cnt * (a.discount_krw || 0);
+        total = Math.max(0, total - sub);
+        ageMsg += `  🎁 ${a.label} × ${cnt}인 우대 = − ${fmtFull(sub)}\n`;
+        remaining -= cnt;
+      }
+    });
+    if (ageMsg) msg += `🎁 연령 우대 할인:\n` + ageMsg;
+  }
 
   const selOpts = options.filter(o => _opts[o.key]);
   if (selOpts.length) {
@@ -1520,7 +1607,7 @@ function quickInquire(id) {
   const p = allProducts.find(x => x.id === id);
   if (!p) return;
   _modalProductId = id;
-  _pax = {}; _opts = {}; _date = ''; _returnDate = ''; _arrTime = ''; _depTime = ''; _hotel = null; _arrFlightInfo = ''; _depFlightInfo = ''; _mealNote = ''; _pkgDays = []; _pkgCombos = []; _addons = {};
+  _pax = {}; _opts = {}; _date = ''; _returnDate = ''; _arrTime = ''; _depTime = ''; _hotel = null; _arrFlightInfo = ''; _depFlightInfo = ''; _mealNote = ''; _pkgDays = []; _pkgCombos = []; _addons = {}; _ageCounts = {};
   sendInquiry('kakao', buildMsg(p));
 }
 
