@@ -388,8 +388,11 @@ textarea.field-input{min-height:80px;resize:vertical}
     <!-- 景区详情设置 -->
     <div class="panel" id="panel-attrdetail">
       <div class="page-title">🗺️ 景区详情设置</div>
-      <div class="page-sub">以下内容会直接显示在向导页面的"스팟"和"도우미"标签页中(地图定位、推荐行程、下雨备选方案、最后交通提醒、各出发地的交通方式、区域/接驳车信息)。先在上面选择景区，再切换下面的标签页编辑对应内容。</div>
-      <div class="subtab-bar" id="ad-attr-bar"></div>
+      <div class="page-sub">以下内容会直接显示在向导页面的"스팟"和"도우미"标签页中(地图定位、推荐行程、下雨备选方案、最后交通提醒、各出发地的交通方式、区域/接驳车信息)。先在上面选择景区，再切换下面的标签页编辑对应内容；新增的景区保存地图设置后即可在向导页面正常显示为独立标签。</div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div class="subtab-bar" id="ad-attr-bar" style="flex:1"></div>
+        <button class="btn-add" onclick="openGAModal()">+ 添加景区</button>
+      </div>
       <div class="subtab-bar" style="margin-top:-6px">
         <button class="subtab-btn active" data-adtab="mapcfg" onclick="showADSubtab('mapcfg',this)">地图设置</button>
         <button class="subtab-btn" data-adtab="plan" onclick="showADSubtab('plan',this)">推荐行程</button>
@@ -615,7 +618,7 @@ textarea.field-input{min-height:80px;resize:vertical}
     <!-- 景区管理 -->
     <div class="panel" id="panel-guideattr">
       <div class="page-title">🏔️ 景区</div>
-      <div class="page-sub">国家森林公园/天门山/黄龙洞/大峡谷这4个已固定关联地图、GPS、区域、行程功能，无法删除。新增的景区仅用于标签/筛选用途，不会自动反映到地图标签页。</div>
+      <div class="page-sub">国家森林公园/天门山/黄龙洞/大峡谷这4个是受保护景区(🔒)，无法删除。新增的景区默认没有地图/行程数据，需要到"景区详情设置"面板配置地图定位后，才会在向导页面显示为可用的独立标签。</div>
       <div class="table-wrap">
         <div class="table-head"><h3>全部景区</h3><button class="btn-add" onclick="openGAModal()">+ 添加景区</button></div>
         <table><thead><tr><th>键</th><th>名称</th><th>受保护</th><th>状态</th><th>顺序</th><th>操作</th></tr></thead>
@@ -1261,7 +1264,7 @@ textarea.field-input{min-height:80px;resize:vertical}
       </div>
       <div class="field-group"><label class="field-label">状态</label>
         <select id="ga-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
-      <div class="field-hint">⚠️ 新增的景区不会自动反映到地图/GPS/区域标签页，仅用于标签/筛选用途。</div>
+      <div class="field-hint">💡 保存后请到"景区详情设置"面板为该景区配置地图定位，配置完成后会自动出现在向导页面的地图标签页。</div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeGAModal()">取消</button>
@@ -2971,20 +2974,22 @@ async function saveGA() {
   const { error } = origId ? await sb.from('guide_attractions').update(payload).eq('id',origId) : await sb.from('guide_attractions').insert(payload);
   if (error) { toast('保存失败: '+error.message,'error'); return; }
   toast(origId?'已修改':'已添加','success'); closeGAModal(); loadGA(); loadCategoryData();
+  if (document.getElementById('panel-attrdetail').classList.contains('active')) initADPanel();
 }
 async function deleteGA(id) {
   if (!confirm('确定要删除吗？(受保护的景区无法删除)')) return;
   const { error } = await sb.from('guide_attractions').delete().eq('id',id);
   if (error) { toast('删除失败: '+error.message,'error'); return; }
   toast('已删除'); loadGA(); loadCategoryData();
+  if (document.getElementById('panel-attrdetail').classList.contains('active')) initADPanel();
 }
 
 /* ───── 景区详情设置 (guide_attr_map_config / guide_plan_steps / guide_rain_items / guide_last_transport / guide_transport_options / guide_zones) ───── */
 let AD_CURRENT_ATTR = null;
 async function initADPanel() {
-  const { data } = await sb.from('guide_attractions').select('attr_key,name_ko,icon').eq('is_protected', true).order('sort_order');
-  const attrs = (data && data.length) ? data : ATTRACTIONS_LIST.filter(a=>a.is_protected);
-  if (!attrs.length) { document.getElementById('ad-attr-bar').innerHTML = '<span style="color:#999">暂无受保护景区</span>'; return; }
+  const { data } = await sb.from('guide_attractions').select('attr_key,name_ko,icon').eq('is_active', true).order('sort_order');
+  const attrs = (data && data.length) ? data : ATTRACTIONS_LIST;
+  if (!attrs.length) { document.getElementById('ad-attr-bar').innerHTML = '<span style="color:#999">暂无景区，请先点击右侧"+ 添加景区"</span>'; return; }
   if (!AD_CURRENT_ATTR || !attrs.some(a=>a.attr_key===AD_CURRENT_ATTR)) AD_CURRENT_ATTR = attrs[0].attr_key;
   document.getElementById('ad-attr-bar').innerHTML = attrs.map(a=>`<button class="subtab-btn${a.attr_key===AD_CURRENT_ATTR?' active':''}" onclick="selectADAttr('${a.attr_key}',this)">${a.icon||''} ${a.name_ko}</button>`).join('');
   const activeTab = document.querySelector('#panel-attrdetail .pricing-subtab.active');

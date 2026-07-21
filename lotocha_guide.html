@@ -534,6 +534,17 @@ const ATTRS_FALLBACK = {
 // 실제 렌더링에 쓰이는 값은 아래 ATTRS(변경 가능) — 페이지 로드 시 loadAttrDetails()가
 // Supabase 데이터로 이 내용을 덮어씁니다. DB에 데이터가 없거나 로드 실패 시 위 하드코딩 값이 그대로 사용됩니다.
 let ATTRS = JSON.parse(JSON.stringify(ATTRS_FALLBACK));
+// 상단 경관지 탭 표시 순서. DB(guide_attractions) 로드 성공 시 sort_order 기준으로 갱신됨.
+let ATTR_ORDER = ['forest','tianmen','huanglongdong','canyon'];
+function renderAttrBar(){
+  const bar = document.querySelector('.attr-bar');
+  if(!bar) return;
+  const cur = ATTR_ORDER.includes(currentAttr) ? currentAttr : ATTR_ORDER[0];
+  bar.innerHTML = ATTR_ORDER.filter(id=>ATTRS[id]).map(id=>{
+    const a = ATTRS[id];
+    return `<button class="attr-btn${id===cur?' on':''}" onclick="selectAttr('${id}')" id="attr-${id}">${a.icon||'📍'} ${a.name}</button>`;
+  }).join('');
+}
 
 const ZONES_FALLBACK = {
   forest: [
@@ -572,7 +583,8 @@ let TRANSPORT = JSON.parse(JSON.stringify(TRANSPORT_FALLBACK));
 async function loadAttrDetails(){
   if(!sb) return;
   try{
-    const [{data:mapCfg},{data:steps},{data:rain},{data:lastT},{data:transOpt},{data:zones}] = await Promise.all([
+    const [{data:attrsList},{data:mapCfg},{data:steps},{data:rain},{data:lastT},{data:transOpt},{data:zones}] = await Promise.all([
+      sb.from('guide_attractions').select('*').eq('is_active',true).order('sort_order'),
       sb.from('guide_attr_map_config').select('*'),
       sb.from('guide_plan_steps').select('*').eq('is_active',true).order('attr_id').order('sort_order'),
       sb.from('guide_rain_items').select('*').eq('is_active',true).order('attr_id').order('sort_order'),
@@ -580,12 +592,30 @@ async function loadAttrDetails(){
       sb.from('guide_transport_options').select('*').eq('is_active',true).order('attr_id').order('origin').order('sort_order'),
       sb.from('guide_zones').select('*').eq('is_active',true).order('attr_id').order('sort_order'),
     ]);
+    // 관리자 페이지에서 새 경관지를 추가하면 여기서 자동으로 ATTRS에 뼈대 항목을 만들어
+    // 지도 탭에 바로 나타나게 함(지도 정보가 없으면 장가계 시내 중심 좌표를 임시로 사용).
+    if(attrsList&&attrsList.length){
+      ATTR_ORDER = attrsList.map(a=>a.attr_key);
+      attrsList.forEach(a=>{
+        if(!ATTRS[a.attr_key]){
+          ATTRS[a.attr_key] = {
+            name:a.name_ko, icon:a.icon||'📍', center:[29.117,110.480], zoom:12,
+            gaode:'https://uri.amap.com/search?keyword='+encodeURIComponent('张家界'+a.name_ko),
+            gaodeNav:'', lastTransport:[], plan:[], rainPlan:[], rainAvoid:[], tips:[],
+          };
+        } else {
+          ATTRS[a.attr_key].name = a.name_ko;
+          ATTRS[a.attr_key].icon = a.icon || ATTRS[a.attr_key].icon;
+        }
+      });
+    }
     if(mapCfg&&mapCfg.length){ mapCfg.forEach(c=>{ if(ATTRS[c.attr_id]){ ATTRS[c.attr_id].center=[c.center_lat,c.center_lng]; ATTRS[c.attr_id].zoom=c.zoom||13; ATTRS[c.attr_id].gaode=c.gaode_search_url||ATTRS[c.attr_id].gaode; ATTRS[c.attr_id].gaodeNav=c.gaode_nav_url||ATTRS[c.attr_id].gaodeNav; } }); }
     if(steps&&steps.length){ const byAttr={}; steps.forEach(s=>{ (byAttr[s.attr_id]=byAttr[s.attr_id]||[]).push({time:s.time_hhmm,name:s.title,desc:s.desc_ko||'',warn:s.warn_ko||''}); }); Object.keys(byAttr).forEach(id=>{ if(ATTRS[id]) ATTRS[id].plan=byAttr[id]; }); }
     if(rain&&rain.length){ const byAttr={}; rain.forEach(r=>{ byAttr[r.attr_id]=byAttr[r.attr_id]||{plan:[],avoid:[]}; byAttr[r.attr_id][r.kind].push({item:r.item_text}); }); Object.keys(byAttr).forEach(id=>{ if(ATTRS[id]){ ATTRS[id].rainPlan=byAttr[id].plan; ATTRS[id].rainAvoid=byAttr[id].avoid; } }); }
     if(lastT&&lastT.length){ const byAttr={}; lastT.forEach(t=>{ (byAttr[t.attr_id]=byAttr[t.attr_id]||[]).push({name:t.name,time:t.last_time}); }); Object.keys(byAttr).forEach(id=>{ if(ATTRS[id]) ATTRS[id].lastTransport=byAttr[id]; }); }
     if(transOpt&&transOpt.length){ const byOrigin={}; transOpt.forEach(o=>{ byOrigin[o.origin]=byOrigin[o.origin]||{}; (byOrigin[o.origin][o.attr_id]=byOrigin[o.origin][o.attr_id]||[]).push({icon:o.icon,name:o.name,detail:o.detail,price:o.price,badge:o.badge,badgeTxt:o.badge_txt}); }); Object.keys(byOrigin).forEach(origin=>{ TRANSPORT[origin]=Object.assign({},TRANSPORT[origin],byOrigin[origin]); }); }
     if(zones&&zones.length){ const byAttr={}; zones.forEach(z=>{ (byAttr[z.attr_id]=byAttr[z.attr_id]||[]).push({zone_key:z.zone_key,name_ko:z.name_ko,icon:z.icon,shuttle_info:z.shuttle_info}); }); ZONES = byAttr; }
+    renderAttrBar();
   }catch(e){ console.warn('景区详情 로드 실패, 기본값 사용', e); }
 }
 
@@ -752,7 +782,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   loadPhrases(); startGPS();
   loadShowsTickets(); loadPaymentMethods(); loadEmergencyInfo(); loadTips();
   await Promise.all([loadSpotsData(), loadAttrDetails()]);
-  selectAttr('forest'); selectTab('map');
+  selectAttr(ATTR_ORDER[0]); selectTab('map');
   await loadPlaceCategories();
   loadPlaces();
   logVisit(); loadVisitorCount();
