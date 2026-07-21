@@ -1251,19 +1251,12 @@ function sumAttractionCost() {
   _pkgCombos.forEach(c => { const a = ATTRACTION_POOL[c.key]; if (a) sum += a.price || 0; });
   return sum;
 }
-/* 연령별 할인 — 개별 나이 입력 UI가 없어, 티어 키/라벨로 근사 매칭 (관리자가 직접 tier 가격을 넣으면 이 로직은 적용되지 않음) */
+/* 연령별 할인 — 관리자가 "연령별 가격" 행마다 직접 지정한 할인(age_discount_id)을 그대로 적용
+   (2026-07-21: 라벨 텍스트 추측 방식에서 관리자 직접 연동 방식으로 변경) */
 function ageDiscountForTier(t) {
-  const key = (t.key || '').toLowerCase();
-  const label = t.label || '';
-  if (key.includes('senior') || label.includes('경로') || label.includes('시니어')) {
-    const d = AGE_DISCOUNTS.find(x => x.min_age != null);
-    return d ? (d.discount_krw || 0) : 0;
-  }
-  if (key.includes('child') || label.includes('어린이') || label.includes('소아')) {
-    const d = AGE_DISCOUNTS.find(x => x.max_age != null);
-    return d ? (d.discount_krw || 0) : 0;
-  }
-  return 0;
+  if (!t.age_discount_id) return 0;
+  const d = AGE_DISCOUNTS.find(x => x.id === t.age_discount_id);
+  return d ? (d.discount_krw || 0) : 0;
 }
 function computePkgCost(totalPax) {
   if (!totalPax) return null;
