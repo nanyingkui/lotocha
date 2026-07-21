@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>관리자 — 로투차</title>
+<title>管理员 — Lotocha</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--navy:#1a2a5e;--gold:#f5a623;--bg:#f0f2f7;--white:#fff;--red:#e53935;--green:#2e7d32;--border:#e0e7f0}
 body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--navy);min-height:100vh}
 
-/* ── 로그인 ── */
+/* ── 登录 ── */
 #login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
 .login-box{background:var(--white);border-radius:20px;padding:36px 32px;width:100%;max-width:400px;box-shadow:0 4px 24px rgba(26,42,94,.12)}
 .login-logo{text-align:center;margin-bottom:24px}
@@ -26,7 +26,7 @@ body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:v
 .btn-primary:disabled{opacity:.6;cursor:not-allowed}
 .login-err{background:#fff3f3;border-radius:8px;padding:10px 12px;font-size:12px;color:var(--red);margin-top:12px;display:none}
 
-/* ── 앱 레이아웃 ── */
+/* ── 应用布局 ── */
 #app{display:none}
 .sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--navy);overflow-y:auto;z-index:100}
 .sb-logo{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
@@ -52,13 +52,13 @@ body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:v
 .page-title{font-size:20px;font-weight:900;color:var(--navy);margin-bottom:4px}
 .page-sub{font-size:13px;color:#888;margin-bottom:20px}
 
-/* ── 통계 카드 ── */
+/* ── 统计卡片 ── */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:24px}
 .stat-card{background:var(--white);border-radius:14px;padding:16px 18px;box-shadow:0 2px 8px rgba(26,42,94,.06)}
 .stat-label{font-size:11px;color:#888;font-weight:700;margin-bottom:6px}
 .stat-value{font-size:28px;font-weight:900;color:var(--navy)}
 
-/* ── 테이블 ── */
+/* ── 表格 ── */
 .table-wrap{background:var(--white);border-radius:14px;box-shadow:0 2px 8px rgba(26,42,94,.06);overflow:hidden;margin-bottom:20px}
 .subtab-bar{display:flex;gap:6px;margin-bottom:16px;border-bottom:1.5px solid #eee;flex-wrap:wrap}
 .subtab-btn{background:none;border:none;padding:10px 14px;font-size:13px;font-weight:700;color:#999;cursor:pointer;font-family:inherit;border-bottom:2.5px solid transparent;margin-bottom:-1.5px}
@@ -90,7 +90,7 @@ tr:hover td{background:#fafbfe}
 .btn-approve{background:#e8f5e9;color:var(--green);border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
 .btn-reject{background:#ffebee;color:var(--red);border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
 
-/* ── 모달 ── */
+/* ── 弹窗 ── */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
 .modal-bg.open{display:flex}
 .modal{background:var(--white);border-radius:16px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto}
@@ -109,7 +109,7 @@ textarea.field-input{min-height:80px;resize:vertical}
 .btn-save{background:var(--navy);color:var(--gold);border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:900;cursor:pointer;font-family:inherit}
 .btn-cancel{background:#f0f0f0;color:#666;border:none;border-radius:8px;padding:10px 20px;font-size:13px;cursor:pointer;font-family:inherit}
 
-/* ── 토스트 ── */
+/* ── 提示条 ── */
 .toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:#fff;border-radius:10px;padding:12px 18px;font-size:13px;font-weight:700;z-index:2000;opacity:0;transition:opacity .3s;pointer-events:none}
 .toast.show{opacity:1}
 .toast.success{background:var(--green)}
@@ -118,7 +118,7 @@ textarea.field-input{min-height:80px;resize:vertical}
 .panel{display:none}
 .panel.active{display:block}
 
-/* ── 동적 row 에디터 ── */
+/* ── 动态row编辑器 ── */
 .dyn-section{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px}
 .dyn-section-title{font-size:11px;font-weight:700;color:#888;margin-bottom:8px}
 .dyn-row{display:flex;gap:6px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
@@ -129,7 +129,7 @@ textarea.field-input{min-height:80px;resize:vertical}
 .dyn-row .btn-rm{background:#ffebee;color:var(--red);border:none;border-radius:6px;padding:5px 8px;font-size:13px;cursor:pointer;flex-shrink:0;font-weight:700}
 .btn-add-row{background:#e8eaf6;color:#3949ab;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px}
 
-/* ── 썸네일 2매 업로드 위젯 ── */
+/* ── 缩略图2张上传组件 ── */
 .thumb-wrap{display:flex;gap:10px}
 .thumb-slot{width:110px;height:110px;border-radius:10px;position:relative;flex-shrink:0;overflow:hidden}
 .thumb-slot.empty{border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;cursor:pointer;color:#999;font-size:11px;font-weight:700;background:#f8f9fc;transition:border-color .2s,color .2s}
@@ -143,7 +143,7 @@ textarea.field-input{min-height:80px;resize:vertical}
 .dyn-row-head span{flex:2;min-width:60px}
 .dyn-row-head span.sm{flex:1;min-width:60px}
 
-/* 항공편 row (필드가 많아 줄바꿈에 의존하지 않는 고정 3줄 레이아웃) */
+/* 航班row(字段较多，不依赖换行的固定3行布局) */
 .flight-row{background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px;margin-bottom:8px}
 .flight-row-line{display:flex;gap:6px;margin-bottom:6px}
 .flight-row-line:last-child{margin-bottom:0}
@@ -154,1043 +154,1043 @@ textarea.field-input{min-height:80px;resize:vertical}
 </head>
 <body>
 
-<!-- 로그인 -->
+<!-- 登录 -->
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">
       <div class="emoji">🏔️</div>
-      <h1>로투차 관리자</h1>
+      <h1>Lotocha 管理员</h1>
       <p>LocalTour China Admin</p>
     </div>
     <div class="form-group">
-      <label class="form-label">이메일</label>
-      <input type="email" id="login-email" class="form-input" placeholder="관리자 이메일">
+      <label class="form-label">邮箱</label>
+      <input type="email" id="login-email" class="form-input" placeholder="管理员邮箱">
     </div>
     <div class="form-group">
-      <label class="form-label">비밀번호</label>
+      <label class="form-label">密码</label>
       <input type="password" id="login-pw" class="form-input" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
-    <button class="btn-primary" id="login-btn" onclick="doLogin()">로그인</button>
+    <button class="btn-primary" id="login-btn" onclick="doLogin()">登录</button>
     <div class="login-err" id="login-err"></div>
   </div>
 </div>
 
-<!-- 앱 -->
+<!-- 应用 -->
 <div id="app">
   <div class="sidebar" id="sidebar">
     <div class="sb-logo">
       <div class="emoji">🏔️</div>
-      <h2>로투차 Admin</h2>
+      <h2>Lotocha Admin</h2>
       <p id="sb-role">-</p>
     </div>
     <nav class="sb-nav">
       <div class="sb-group" data-group="content">
-        <button class="sb-group-header" onclick="toggleSbGroup(this)"><span>콘텐츠</span><span class="sb-group-arrow">▾</span></button>
+        <button class="sb-group-header" onclick="toggleSbGroup(this)"><span>内容</span><span class="sb-group-arrow">▾</span></button>
         <div class="sb-group-body">
           <button class="sb-item active" data-panel="dashboard" onclick="showPanel('dashboard',this)">
-            <span class="icon">📊</span>대시보드
+            <span class="icon">📊</span>仪表盘
           </button>
           <button class="sb-item" data-panel="tours" onclick="showPanel('tours',this)">
-            <span class="icon">🌅</span>1일투어 상품
+            <span class="icon">🌅</span>1日游产品
           </button>
           <button class="sb-item" data-panel="pkgsettings" onclick="showPanel('pkgsettings',this)">
-            <span class="icon">🧭</span>맞춤투어 설정 · 가격
+            <span class="icon">🧭</span>定制游设置·价格
           </button>
           <button class="sb-item" data-panel="spots" onclick="showPanel('spots',this)">
-            <span class="icon">📍</span>가이드 스팟
+            <span class="icon">📍</span>向导地点
           </button>
           <button class="sb-item" data-panel="places" onclick="showPanel('places',this)">
-            <span class="icon">🏪</span>현지 업체
+            <span class="icon">🏪</span>本地商户
           </button>
         </div>
       </div>
       <div class="sb-group" data-group="tourdata">
-        <button class="sb-group-header" onclick="toggleSbGroup(this)"><span>맞춤투어 공용 데이터</span><span class="sb-group-arrow">▾</span></button>
+        <button class="sb-group-header" onclick="toggleSbGroup(this)"><span>定制游公用数据</span><span class="sb-group-arrow">▾</span></button>
         <div class="sb-group-body">
           <button class="sb-item" data-panel="hotels" onclick="showPanel('hotels',this)">
-            <span class="icon">🏨</span>호텔 관리
+            <span class="icon">🏨</span>酒店管理
           </button>
           <button class="sb-item" data-panel="flights" onclick="showPanel('flights',this)">
-            <span class="icon">✈️</span>항공편 관리
+            <span class="icon">✈️</span>航班管理
           </button>
           <button class="sb-item" data-panel="attractions" onclick="showPanel('attractions',this)">
-            <span class="icon">🗺️</span>명소 관리
+            <span class="icon">🗺️</span>景点管理
           </button>
           <button class="sb-item" data-panel="addonsvc" onclick="showPanel('addonsvc',this)">
-            <span class="icon">💆</span>부가서비스 관리
+            <span class="icon">💆</span>附加服务管理
           </button>
         </div>
       </div>
       <div class="sb-group" data-group="guide">
-        <button class="sb-group-header" onclick="toggleSbGroup(this)"><span>가이드 콘텐츠</span><span class="sb-group-arrow">▾</span></button>
+        <button class="sb-group-header" onclick="toggleSbGroup(this)"><span>向导内容</span><span class="sb-group-arrow">▾</span></button>
         <div class="sb-group-body">
           <button class="sb-item" data-panel="showstickets" onclick="showPanel('showstickets',this)">
-            <span class="icon">🎭</span>공연 · 입장권
+            <span class="icon">🎭</span>演出·门票
           </button>
           <button class="sb-item" data-panel="paymethods" onclick="showPanel('paymethods',this)">
-            <span class="icon">💳</span>결제 방법
+            <span class="icon">💳</span>支付方式
           </button>
           <button class="sb-item" data-panel="emergency" onclick="showPanel('emergency',this)">
-            <span class="icon">🛟</span>안전 · 응급
+            <span class="icon">🛟</span>安全·应急
           </button>
           <button class="sb-item" data-panel="phrases" onclick="showPanel('phrases',this)">
-            <span class="icon">💬</span>현지 회화
+            <span class="icon">💬</span>当地会话
           </button>
           <button class="sb-item" data-panel="tips" onclick="showPanel('tips',this)">
-            <span class="icon">💡</span>여행 팁
+            <span class="icon">💡</span>旅行贴士
           </button>
         </div>
       </div>
       <div class="sb-group" data-group="category">
-        <button class="sb-group-header" onclick="toggleSbGroup(this)"><span>카테고리 관리</span><span class="sb-group-arrow">▾</span></button>
+        <button class="sb-group-header" onclick="toggleSbGroup(this)"><span>分类管理</span><span class="sb-group-arrow">▾</span></button>
         <div class="sb-group-body">
           <button class="sb-item" data-panel="regions" onclick="showPanel('regions',this)">
-            <span class="icon">🗺️</span>지역
+            <span class="icon">🗺️</span>地区
           </button>
           <button class="sb-item" data-panel="placecats" onclick="showPanel('placecats',this)">
-            <span class="icon">🏷️</span>업체 카테고리
+            <span class="icon">🏷️</span>商户分类
           </button>
           <button class="sb-item" data-panel="guideattr" onclick="showPanel('guideattr',this)">
-            <span class="icon">🏔️</span>경관지
+            <span class="icon">🏔️</span>景区
           </button>
         </div>
       </div>
       <div class="sb-group" data-group="ops">
-        <button class="sb-group-header" onclick="toggleSbGroup(this)"><span>운영</span><span class="sb-group-arrow">▾</span></button>
+        <button class="sb-group-header" onclick="toggleSbGroup(this)"><span>运营</span><span class="sb-group-arrow">▾</span></button>
         <div class="sb-group-body">
           <button class="sb-item" data-panel="reviews" onclick="showPanel('reviews',this)">
-            <span class="icon">💬</span>리뷰 관리
+            <span class="icon">💬</span>评论管理
             <span class="sb-badge" id="review-badge" style="display:none">0</span>
           </button>
           <button class="sb-item" data-panel="stats" onclick="showPanel('stats',this)">
-            <span class="icon">📈</span>방문 통계
+            <span class="icon">📈</span>访问统计
           </button>
         </div>
       </div>
       <div class="sb-group" data-group="admin" id="sb-group-users" style="display:none">
-        <button class="sb-group-header" onclick="toggleSbGroup(this)"><span>관리자</span><span class="sb-group-arrow">▾</span></button>
+        <button class="sb-group-header" onclick="toggleSbGroup(this)"><span>管理员</span><span class="sb-group-arrow">▾</span></button>
         <div class="sb-group-body">
           <button class="sb-item" id="sb-users-btn" data-panel="users" onclick="showPanel('users',this)">
-            <span class="icon">👥</span>사용자 관리
+            <span class="icon">👥</span>用户管理
           </button>
         </div>
       </div>
     </nav>
     <div class="sb-footer">
       <div class="sb-user" id="sb-email"></div>
-      <button class="sb-logout" onclick="doLogout()">로그아웃</button>
+      <button class="sb-logout" onclick="doLogout()">退出登录</button>
     </div>
   </div>
 
   <div class="main">
-    <!-- 대시보드 -->
+    <!-- 仪表盘 -->
     <div class="panel active" id="panel-dashboard">
-      <div class="page-title">📊 대시보드</div>
-      <div class="page-sub">로투차 운영 현황</div>
+      <div class="page-title">📊 仪表盘</div>
+      <div class="page-sub">Lotocha 运营概况</div>
       <div class="stats-grid">
-        <div class="stat-card"><div class="stat-label">총 방문자</div><div class="stat-value" id="stat-visits">-</div></div>
-        <div class="stat-card"><div class="stat-label">투어 상품</div><div class="stat-value" id="stat-tours">-</div></div>
-        <div class="stat-card"><div class="stat-label">가이드 스팟</div><div class="stat-value" id="stat-spots">-</div></div>
-        <div class="stat-card"><div class="stat-label" style="color:var(--red)">미승인 리뷰</div><div class="stat-value" id="stat-reviews" style="color:var(--red)">-</div></div>
+        <div class="stat-card"><div class="stat-label">总访客数</div><div class="stat-value" id="stat-visits">-</div></div>
+        <div class="stat-card"><div class="stat-label">旅游产品</div><div class="stat-value" id="stat-tours">-</div></div>
+        <div class="stat-card"><div class="stat-label">向导地点</div><div class="stat-value" id="stat-spots">-</div></div>
+        <div class="stat-card"><div class="stat-label" style="color:var(--red)">待审核评论</div><div class="stat-value" id="stat-reviews" style="color:var(--red)">-</div></div>
       </div>
       <div class="table-wrap">
-        <div class="table-head"><h3>⏳ 미승인 리뷰</h3></div>
-        <table><thead><tr><th>경관지</th><th>닉네임</th><th>평점</th><th>내용</th><th>작성일</th><th>액션</th></tr></thead>
+        <div class="table-head"><h3>⏳ 待审核评论</h3></div>
+        <table><thead><tr><th>景区</th><th>昵称</th><th>评分</th><th>内容</th><th>发布日期</th><th>操作</th></tr></thead>
         <tbody id="dash-reviews"></tbody></table>
       </div>
     </div>
 
-    <!-- 투어 상품 (1일투어 전용) -->
+    <!-- 旅游产品 (仅限1日游) -->
     <div class="panel" id="panel-tours">
-      <div class="page-title">🌅 1일투어 상품</div>
-      <div class="page-sub">1일투어 상품 관리 (여러 개 등록 가능). 맞춤투어는 별도 "맞춤투어 설정" 메뉴에서 관리합니다.</div>
+      <div class="page-title">🌅 1日游产品</div>
+      <div class="page-sub">1日游产品管理(可注册多个)。定制游请在另外的"定制游设置"菜单中管理。</div>
       <div class="table-wrap">
-        <div class="table-head"><h3>전체 상품</h3><button class="btn-add" onclick="openTourModal(null,'day_tour')">+ 상품 추가</button></div>
-        <table><thead><tr><th>상품명</th><th>가격</th><th>기간</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <div class="table-head"><h3>全部产品</h3><button class="btn-add" onclick="openTourModal(null,'day_tour')">+ 添加产品</button></div>
+        <table><thead><tr><th>产品名</th><th>价格</th><th>时长</th><th>状态</th><th>顺序</th><th>操作</th></tr></thead>
         <tbody id="tours-tbody"></tbody></table>
       </div>
     </div>
 
-    <!-- 맞춤투어 설정 (단일 상품 + 그 상품 전용 가격 인프라) -->
+    <!-- 定制游设置 (单一产品+该产品专属价格基础设置) -->
     <div class="panel" id="panel-pkgsettings">
-      <div class="page-title">🧭 맞춤투어 설정 · 가격</div>
-      <div class="page-sub">맞춤투어는 고객이 출발일·귀국일을 직접 선택해 일정을 짜므로, 상품은 1개면 충분합니다. 아래에서 그 1개 상품의 제목·설명·포함사항과, 이 상품에만 적용되는 원가 단가·환율·이윤·연령 할인·자연손모를 한 곳에서 관리하세요. (1일투어에는 이 가격 설정이 전혀 적용되지 않습니다)</div>
+      <div class="page-title">🧭 定制游设置·价格</div>
+      <div class="page-sub">定制游由客人自行选择出发日期和回国日期来安排行程，因此只需要1个产品即可。请在下方统一管理这1个产品的标题、说明、包含事项，以及仅适用于该产品的成本单价、汇率、利润、年龄折扣、自然损耗。(此价格设置完全不适用于1日游)</div>
       <div id="pkgsettings-body"></div>
 
-      <div class="page-title" style="font-size:18px;margin-top:28px">💰 맞춤투어 가격 인프라</div>
+      <div class="page-title" style="font-size:18px;margin-top:28px">💰 定制游价格基础设置</div>
       <div class="subtab-bar">
-        <button class="subtab-btn active" data-subtab="rates" onclick="showPricingSubtab('rates',this)">원가 단가 · 환율</button>
-        <button class="subtab-btn" data-subtab="margin" onclick="showPricingSubtab('margin',this)">이윤 설정</button>
-        <button class="subtab-btn" data-subtab="agediscount" onclick="showPricingSubtab('agediscount',this)">연령 할인</button>
-        <button class="subtab-btn" data-subtab="costbuffer" onclick="showPricingSubtab('costbuffer',this)">자연손모 · 기타원가</button>
+        <button class="subtab-btn active" data-subtab="rates" onclick="showPricingSubtab('rates',this)">成本单价·汇率</button>
+        <button class="subtab-btn" data-subtab="margin" onclick="showPricingSubtab('margin',this)">利润设置</button>
+        <button class="subtab-btn" data-subtab="agediscount" onclick="showPricingSubtab('agediscount',this)">年龄折扣</button>
+        <button class="subtab-btn" data-subtab="costbuffer" onclick="showPricingSubtab('costbuffer',this)">自然损耗·其他成本</button>
       </div>
 
       <div class="pricing-subtab active" id="pst-rates">
-        <div class="page-sub">값이 비어있는(고객센터 문의) 항목은 고정 단가가 없다는 뜻입니다. exchange_rate는 위안→원 환율입니다.</div>
+        <div class="page-sub">值为空(显示为"请咨询客服")的项目表示没有固定单价。exchange_rate 为人民币→韩元汇率。</div>
         <div class="table-wrap">
-          <div class="table-head"><h3>전체 항목</h3></div>
-          <table><thead><tr><th>항목</th><th>단가</th><th>단위</th><th>비고</th><th>액션</th></tr></thead>
+          <div class="table-head"><h3>全部项目</h3></div>
+          <table><thead><tr><th>项目</th><th>单价</th><th>单位</th><th>备注</th><th>操作</th></tr></thead>
           <tbody id="pricing-tbody"></tbody></table>
         </div>
       </div>
 
       <div class="pricing-subtab" id="pst-margin">
-        <div class="page-sub">인당(모든 인원 각각 고정 마진) 또는 주문당(예약 1건당 고정 마진) 중 선택하고, 금액(원) 또는 원가 대비 비율(%) 중 선택합니다.</div>
+        <div class="page-sub">请选择按人(每位客人各自加收固定利润)或按订单(每笔预订加收固定利润)，并选择金额(韩元)或按成本比例(%)。</div>
         <div class="field-row">
-          <div class="field-group"><label class="field-label">기준</label>
+          <div class="field-group"><label class="field-label">基准</label>
             <select id="mg-mode" class="field-input">
-              <option value="per_person">인당</option>
-              <option value="per_order">주문당</option>
+              <option value="per_person">每人</option>
+              <option value="per_order">按订单</option>
             </select></div>
-          <div class="field-group"><label class="field-label">방식</label>
+          <div class="field-group"><label class="field-label">方式</label>
             <select id="mg-type" class="field-input">
-              <option value="amount">고정 금액 (원)</option>
-              <option value="percent">원가 대비 비율 (%)</option>
+              <option value="amount">固定金额(韩元)</option>
+              <option value="percent">按成本比例 (%)</option>
             </select></div>
         </div>
-        <div class="field-group"><label class="field-label">값</label><input type="number" id="mg-value" class="field-input"></div>
-        <button class="btn-save" onclick="saveMargin()">저장</button>
+        <div class="field-group"><label class="field-label">值</label><input type="number" id="mg-value" class="field-input"></div>
+        <button class="btn-save" onclick="saveMargin()">保存</button>
       </div>
 
       <div class="pricing-subtab" id="pst-agediscount">
-        <div class="page-sub">장가계 관광지 경로할인 등, 연령대별 1인당 원화 고정 할인액. 위 상품 편집 화면의 "연령별 가격" 행에서 어느 할인을 연동할지 직접 지정합니다.</div>
+        <div class="page-sub">张家界景区老年优惠等，各年龄段每人的韩元固定折扣金额。客人在预订页面选择人数时会自主申报符合条件的人数，系统在报价最后自动扣减，此处只需管理折扣金额本身。</div>
         <div class="table-wrap">
-          <div class="table-head"><h3>전체 항목</h3><button class="btn-add" onclick="openAgeDiscModal()">+ 항목 추가</button></div>
-          <table><thead><tr><th>구간</th><th>연령 범위</th><th>1인당 할인액</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+          <div class="table-head"><h3>全部项目</h3><button class="btn-add" onclick="openAgeDiscModal()">+ 添加项目</button></div>
+          <table><thead><tr><th>区间</th><th>年龄范围</th><th>每人折扣金额</th><th>状态</th><th>顺序</th><th>操作</th></tr></thead>
           <tbody id="agediscount-tbody"></tbody></table>
         </div>
       </div>
 
       <div class="pricing-subtab" id="pst-costbuffer">
-        <div class="page-sub">자연손모 등 견적에 반영할 기타 원가 항목 (이름·금액·통화·단위 자유 설정)</div>
+        <div class="page-sub">自然损耗等需计入报价的其他成本项目(名称/金额/币种/单位可自由设置)</div>
         <div class="table-wrap">
-          <div class="table-head"><h3>전체 항목</h3><button class="btn-add" onclick="openCostBufferModal()">+ 항목 추가</button></div>
-          <table><thead><tr><th>항목명</th><th>금액</th><th>통화</th><th>기준</th><th>상태</th><th>액션</th></tr></thead>
+          <div class="table-head"><h3>全部项目</h3><button class="btn-add" onclick="openCostBufferModal()">+ 添加项目</button></div>
+          <table><thead><tr><th>项目名称</th><th>金额</th><th>货币</th><th>基准</th><th>状态</th><th>操作</th></tr></thead>
           <tbody id="costbuffer-tbody"></tbody></table>
         </div>
       </div>
     </div>
 
-    <!-- 스팟 -->
+    <!-- 地点 -->
     <div class="panel" id="panel-spots">
-      <div class="page-title">📍 가이드 스팟</div>
-      <div class="page-sub">스팟 정보 관리</div>
+      <div class="page-title">📍 向导地点</div>
+      <div class="page-sub">地点信息管理。"景区"是大分类(例: 黄龙洞+大峡谷)，"区域"是其中的具体位置(例: 黄龙洞溶洞 / 大峡谷玻璃桥) — 即使景区相同，区域不同实际上就是不同的地点。</div>
       <div class="table-wrap">
-        <div class="table-head"><h3>전체 스팟</h3><button class="btn-add" onclick="openSpotModal()">+ 스팟 추가</button></div>
-        <table><thead><tr><th>경관지</th><th>스팟명</th><th>타입</th><th>상태</th><th>액션</th></tr></thead>
+        <div class="table-head"><h3>全部地点</h3><button class="btn-add" onclick="openSpotModal()">+ 添加地点</button></div>
+        <table><thead><tr><th>景区</th><th>区域</th><th>地点名</th><th>类型</th><th>状态</th><th>操作</th></tr></thead>
         <tbody id="spots-tbody"></tbody></table>
       </div>
     </div>
 
-    <!-- 리뷰 -->
+    <!-- 评论 -->
     <div class="panel" id="panel-reviews">
-      <div class="page-title">💬 리뷰 관리</div>
-      <div class="page-sub">방문자 리뷰 승인/삭제</div>
+      <div class="page-title">💬 评论管理</div>
+      <div class="page-sub">访客评论审核/删除</div>
       <div class="table-wrap">
-        <div class="table-head"><h3>미승인 리뷰</h3></div>
-        <table><thead><tr><th>경관지</th><th>닉네임</th><th>평점</th><th>내용</th><th>작성일</th><th>액션</th></tr></thead>
+        <div class="table-head"><h3>待审核评论</h3></div>
+        <table><thead><tr><th>景区</th><th>昵称</th><th>评分</th><th>内容</th><th>发布日期</th><th>操作</th></tr></thead>
         <tbody id="reviews-pending"></tbody></table>
       </div>
       <div class="table-wrap">
-        <div class="table-head"><h3>승인된 리뷰 (최근 20개)</h3></div>
-        <table><thead><tr><th>경관지</th><th>닉네임</th><th>평점</th><th>내용</th><th>작성일</th><th>액션</th></tr></thead>
+        <div class="table-head"><h3>已批准的评论 (最近20条)</h3></div>
+        <table><thead><tr><th>景区</th><th>昵称</th><th>评分</th><th>内容</th><th>发布日期</th><th>操作</th></tr></thead>
         <tbody id="reviews-approved"></tbody></table>
       </div>
     </div>
 
-    <!-- 통계 -->
+    <!-- 统计 -->
     <div class="panel" id="panel-stats">
-      <div class="page-title">📈 방문 통계</div>
-      <div class="page-sub">페이지별 방문 현황</div>
+      <div class="page-title">📈 访问统计</div>
+      <div class="page-sub">各页面访问情况</div>
       <div class="stats-grid" id="stats-detail"></div>
     </div>
 
-    <!-- 현지 업체 -->
+    <!-- 本地商户 -->
     <div class="panel" id="panel-places">
-      <div class="page-title">🏪 현지 업체</div>
-      <div class="page-sub">식당·카페·호텔·쇼핑 등 현지 업체 관리</div>
+      <div class="page-title">🏪 本地商户</div>
+      <div class="page-sub">餐厅/咖啡厅/酒店/购物等本地商户管理</div>
       <div class="table-wrap">
-        <div class="table-head"><h3>전체 업체</h3><button class="btn-add" onclick="openPlaceModal()">+ 업체 추가</button></div>
-        <table><thead><tr><th>카테고리</th><th>업체명</th><th>지역</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <div class="table-head"><h3>全部商户</h3><button class="btn-add" onclick="openPlaceModal()">+ 添加商户</button></div>
+        <table><thead><tr><th>分类</th><th>商户名</th><th>地区</th><th>状态</th><th>顺序</th><th>操作</th></tr></thead>
         <tbody id="places-tbody"></tbody></table>
       </div>
     </div>
 
-    <!-- 호텔 관리 (전역 공용) -->
+    <!-- 酒店管理(全局公用) -->
     <div class="panel" id="panel-hotels">
-      <div class="page-title">🏨 호텔 관리</div>
-      <div class="page-sub">맞춤투어 전체 상품에 공통으로 표시되는 추천 호텔 목록</div>
+      <div class="page-title">🏨 酒店管理</div>
+      <div class="page-sub">定制游所有产品通用显示的推荐酒店列表</div>
       <div class="table-wrap">
-        <div class="table-head"><h3>전체 호텔</h3><button class="btn-add" onclick="openHotelPoolModal()">+ 호텔 추가</button></div>
-        <table><thead><tr><th>호텔명/등급</th><th>추가요금</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <div class="table-head"><h3>全部酒店</h3><button class="btn-add" onclick="openHotelPoolModal()">+ 添加酒店</button></div>
+        <table><thead><tr><th>酒店名/等级</th><th>附加费用</th><th>状态</th><th>顺序</th><th>操作</th></tr></thead>
         <tbody id="hotels-tbody"></tbody></table>
       </div>
     </div>
 
-    <!-- 항공편 관리 (전역 공용) -->
+    <!-- 航班管理 (全局公用) -->
     <div class="panel" id="panel-flights">
-      <div class="page-title">✈️ 항공편 관리</div>
-      <div class="page-sub">맞춤투어 전체 상품에 공통으로 표시되는 한국→장가계 항공편 목록</div>
+      <div class="page-title">✈️ 航班管理</div>
+      <div class="page-sub">定制游所有产品通用显示的韩国→张家界航班列表</div>
       <div class="table-wrap">
-        <div class="table-head"><h3>전체 항공편</h3><button class="btn-add" onclick="openFlightPoolModal()">+ 항공편 추가</button></div>
-        <table><thead><tr><th>노선명</th><th>출발지역</th><th>시간</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <div class="table-head"><h3>全部航班</h3><button class="btn-add" onclick="openFlightPoolModal()">+ 添加航班</button></div>
+        <table><thead><tr><th>航线名</th><th>出发地区</th><th>时间</th><th>状态</th><th>顺序</th><th>操作</th></tr></thead>
         <tbody id="flights-tbody"></tbody></table>
       </div>
     </div>
 
-    <!-- 명소 관리 (전역 공용) -->
+    <!-- 景点管理 (全局公用) -->
     <div class="panel" id="panel-attractions">
-      <div class="page-title">🗺️ 명소 관리</div>
-      <div class="page-sub">맞춤투어 "일정 직접 짜기"에서 쓰이는 명소 풀 (슬롯 타입별로 자유 조합). ※ 도우미 페이지의 "경관지"(위 카테고리 관리)와는 다른 목록입니다.</div>
+      <div class="page-title">🗺️ 景点管理</div>
+      <div class="page-sub">定制游"自由安排行程"中使用的景点库(可按时间段类型自由组合)。※ 与助手页面的"景区"(上方分类管理)是不同的列表。</div>
       <div class="table-wrap">
-        <div class="table-head"><h3>전체 명소</h3><button class="btn-add" onclick="openAttractionPoolModal()">+ 명소 추가</button></div>
-        <table><thead><tr><th>key</th><th>라벨</th><th>슬롯 타입</th><th>1인당 요금</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <div class="table-head"><h3>全部景点</h3><button class="btn-add" onclick="openAttractionPoolModal()">+ 添加景点</button></div>
+        <table><thead><tr><th>key</th><th>标签</th><th>时段 类型</th><th>1每人 费用</th><th>状态</th><th>顺序</th><th>操作</th></tr></thead>
         <tbody id="attractions-tbody"></tbody></table>
       </div>
     </div>
 
-    <!-- 부가서비스 관리 (전역 공용, 마사지 등 슬롯 미점유 항목) -->
+    <!-- 附加服务管理 (全局公用, 按摩等不占用时段的项目) -->
     <div class="panel" id="panel-addonsvc">
-      <div class="page-title">💆 부가서비스 관리</div>
-      <div class="page-sub">마사지 등 시간대 슬롯을 점유하지 않는 개인별 추가 항목. 요금에는 차량·기사·가이드비가 이미 포함되어 있습니다.</div>
+      <div class="page-title">💆 附加服务管理</div>
+      <div class="page-sub">按摩等不占用时间段插槽的个人附加项目。费用中已包含车辆/司机/导游费。</div>
       <div class="table-wrap">
-        <div class="table-head"><h3>전체 항목</h3><button class="btn-add" onclick="openAddonModal()">+ 항목 추가</button></div>
-        <table><thead><tr><th>항목명</th><th>소요시간</th><th>1인당 요금</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <div class="table-head"><h3>全部项目</h3><button class="btn-add" onclick="openAddonModal()">+ 添加项目</button></div>
+        <table><thead><tr><th>项目名称</th><th>所需时长</th><th>1每人 费用</th><th>状态</th><th>顺序</th><th>操作</th></tr></thead>
         <tbody id="addonsvc-tbody"></tbody></table>
       </div>
     </div>
 
-    <!-- 공연·입장권 -->
+    <!-- 演出·门票 -->
     <div class="panel" id="panel-showstickets">
-      <div class="page-title">🎭 공연 · 입장권</div>
-      <div class="page-sub">가이드 페이지 도우미 탭 — 공연·입장권 카드 관리</div>
+      <div class="page-title">🎭 演出·门票</div>
+      <div class="page-sub">向导页面帮助标签页 — 演出/门票卡片管理</div>
       <div class="table-wrap">
-        <div class="table-head"><h3>전체 항목</h3><button class="btn-add" onclick="openSTModal()">+ 항목 추가</button></div>
-        <table><thead><tr><th>구분</th><th>제목</th><th>가격</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <div class="table-head"><h3>全部项目</h3><button class="btn-add" onclick="openSTModal()">+ 添加项目</button></div>
+        <table><thead><tr><th>分类</th><th>标题</th><th>价格</th><th>状态</th><th>顺序</th><th>操作</th></tr></thead>
         <tbody id="st-tbody"></tbody></table>
       </div>
     </div>
 
-    <!-- 결제 방법 -->
+    <!-- 支付方式 -->
     <div class="panel" id="panel-paymethods">
-      <div class="page-title">💳 결제 방법</div>
-      <div class="page-sub">가이드 페이지 도우미 탭 — 결제 방법 카드 관리</div>
+      <div class="page-title">💳 支付方式</div>
+      <div class="page-sub">向导页面帮助标签页 — 支付方式卡片管理</div>
       <div class="table-wrap">
-        <div class="table-head"><h3>전체 항목</h3><button class="btn-add" onclick="openPMModal()">+ 항목 추가</button></div>
-        <table><thead><tr><th>키</th><th>이름</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <div class="table-head"><h3>全部项目</h3><button class="btn-add" onclick="openPMModal()">+ 添加项目</button></div>
+        <table><thead><tr><th>键</th><th>名称</th><th>状态</th><th>顺序</th><th>操作</th></tr></thead>
         <tbody id="pm-tbody"></tbody></table>
       </div>
     </div>
 
-    <!-- 안전·응급 -->
+    <!-- 安全·应急 -->
     <div class="panel" id="panel-emergency">
-      <div class="page-title">🛟 안전 · 응급</div>
-      <div class="page-sub">가이드 페이지 도우미 탭 — 긴급전화·병원·인터넷 정보 관리</div>
+      <div class="page-title">🛟 安全·应急</div>
+      <div class="page-sub">向导页面帮助标签页 — 紧急电话/医院/网络信息管理</div>
       <div class="table-wrap">
-        <div class="table-head"><h3>전체 항목</h3><button class="btn-add" onclick="openEIModal()">+ 항목 추가</button></div>
-        <table><thead><tr><th>구분</th><th>라벨</th><th>값</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <div class="table-head"><h3>全部项目</h3><button class="btn-add" onclick="openEIModal()">+ 添加项目</button></div>
+        <table><thead><tr><th>分类</th><th>标签</th><th>值</th><th>状态</th><th>顺序</th><th>操作</th></tr></thead>
         <tbody id="ei-tbody"></tbody></table>
       </div>
     </div>
 
-    <!-- 현지 회화 -->
+    <!-- 当地会话 -->
     <div class="panel" id="panel-phrases">
-      <div class="page-title">💬 현지 회화</div>
-      <div class="page-sub">가이드 페이지 도우미 탭 — 회화 카드 관리</div>
+      <div class="page-title">💬 当地会话</div>
+      <div class="page-sub">向导页面帮助标签页 — 会话卡片管理</div>
       <div class="table-wrap">
-        <div class="table-head"><h3>전체 문구</h3><button class="btn-add" onclick="openPHModal()">+ 문구 추가</button></div>
-        <table><thead><tr><th>카테고리</th><th>중국어</th><th>한국어</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <div class="table-head"><h3>全部短语</h3><button class="btn-add" onclick="openPHModal()">+ 添加短语</button></div>
+        <table><thead><tr><th>分类</th><th>中文</th><th>韩语</th><th>状态</th><th>顺序</th><th>操作</th></tr></thead>
         <tbody id="ph-tbody"></tbody></table>
       </div>
     </div>
 
-    <!-- 여행 팁 -->
+    <!-- 旅行贴士 -->
     <div class="panel" id="panel-tips">
-      <div class="page-title">💡 여행 팁</div>
-      <div class="page-sub">가이드 페이지 도우미 탭 — 구역별 여행 팁 관리</div>
+      <div class="page-title">💡 旅行贴士</div>
+      <div class="page-sub">向导页面帮助标签页 — 各区域旅行贴士管理</div>
       <div class="table-wrap">
-        <div class="table-head"><h3>전체 팁</h3><button class="btn-add" onclick="openTPModal()">+ 팁 추가</button></div>
-        <table><thead><tr><th>경관지</th><th>내용</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <div class="table-head"><h3>全部贴士</h3><button class="btn-add" onclick="openTPModal()">+ 添加贴士</button></div>
+        <table><thead><tr><th>景区</th><th>内容</th><th>状态</th><th>顺序</th><th>操作</th></tr></thead>
         <tbody id="tp-tbody"></tbody></table>
       </div>
     </div>
 
-    <!-- 지역 관리 -->
+    <!-- 地区管理 -->
     <div class="panel" id="panel-regions">
-      <div class="page-title">🗺️ 지역</div>
-      <div class="page-sub">현지 업체 필터용 지역 목록 관리</div>
+      <div class="page-title">🗺️ 地区</div>
+      <div class="page-sub">本地商户筛选用地区列表管理</div>
       <div class="table-wrap">
-        <div class="table-head"><h3>전체 지역</h3><button class="btn-add" onclick="openRGModal()">+ 지역 추가</button></div>
-        <table><thead><tr><th>이름</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <div class="table-head"><h3>全部地区</h3><button class="btn-add" onclick="openRGModal()">+ 添加地区</button></div>
+        <table><thead><tr><th>名称</th><th>状态</th><th>顺序</th><th>操作</th></tr></thead>
         <tbody id="rg-tbody"></tbody></table>
       </div>
     </div>
 
-    <!-- 업체 카테고리 관리 -->
+    <!-- 商户分类管理 -->
     <div class="panel" id="panel-placecats">
-      <div class="page-title">🏷️ 업체 카테고리</div>
-      <div class="page-sub">현지 업체 분류 목록 관리</div>
+      <div class="page-title">🏷️ 商户分类</div>
+      <div class="page-sub">本地商户分类列表管理</div>
       <div class="table-wrap">
-        <div class="table-head"><h3>전체 카테고리</h3><button class="btn-add" onclick="openPCModal()">+ 카테고리 추가</button></div>
-        <table><thead><tr><th>키</th><th>이름</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <div class="table-head"><h3>全部分类</h3><button class="btn-add" onclick="openPCModal()">+ 添加分类</button></div>
+        <table><thead><tr><th>键</th><th>名称</th><th>状态</th><th>顺序</th><th>操作</th></tr></thead>
         <tbody id="pc-tbody"></tbody></table>
       </div>
     </div>
 
-    <!-- 경관지 관리 -->
+    <!-- 景区管理 -->
     <div class="panel" id="panel-guideattr">
-      <div class="page-title">🏔️ 경관지</div>
-      <div class="page-sub">국가삼림공원·천문산·황룡동+대협곡은 지도·GPS·구역·일정 기능에 고정 연결되어 삭제할 수 없습니다. 새로 추가하는 경관지는 태그·필터 용도로만 사용되며, 지도 탭에 자동 반영되지 않습니다.</div>
+      <div class="page-title">🏔️ 景区</div>
+      <div class="page-sub">国家森林公园/天门山/黄龙洞+大峡谷已固定关联地图、GPS、区域、行程功能，无法删除。新增的景区仅用于标签/筛选用途，不会自动反映到地图标签页。</div>
       <div class="table-wrap">
-        <div class="table-head"><h3>전체 경관지</h3><button class="btn-add" onclick="openGAModal()">+ 경관지 추가</button></div>
-        <table><thead><tr><th>키</th><th>이름</th><th>보호됨</th><th>상태</th><th>순서</th><th>액션</th></tr></thead>
+        <div class="table-head"><h3>全部景区</h3><button class="btn-add" onclick="openGAModal()">+ 添加景区</button></div>
+        <table><thead><tr><th>键</th><th>名称</th><th>受保护</th><th>状态</th><th>顺序</th><th>操作</th></tr></thead>
         <tbody id="ga-tbody"></tbody></table>
       </div>
     </div>
 
-    <!-- 사용자 관리 -->
+    <!-- 用户管理 -->
     <div class="panel" id="panel-users">
-      <div class="page-title">👥 사용자 관리</div>
-      <div class="page-sub">관리자 계정 승인 및 권한 관리</div>
+      <div class="page-title">👥 用户管理</div>
+      <div class="page-sub">管理员账号审批及权限管理</div>
       <div class="table-wrap">
-        <div class="table-head"><h3>관리자 목록</h3></div>
-        <table><thead><tr><th>이메일</th><th>이름</th><th>역할</th><th>승인</th><th>가입일</th><th>액션</th></tr></thead>
+        <div class="table-head"><h3>管理员列表</h3></div>
+        <table><thead><tr><th>邮箱</th><th>名称</th><th>角色</th><th>审批</th><th>注册日期</th><th>操作</th></tr></thead>
         <tbody id="users-tbody"></tbody></table>
       </div>
     </div>
   </div>
 </div>
 
-<!-- 투어 모달 -->
+<!-- 旅游产品弹窗 -->
 <div class="modal-bg" id="tour-modal-bg">
   <div class="modal">
     <div class="modal-head">
-      <h3 id="tour-modal-title">투어 상품 추가</h3>
+      <h3 id="tour-modal-title">添加旅游产品</h3>
       <button class="modal-close" onclick="closeTourModal()">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="t-id">
       <div class="field-row" id="t-type-row">
-        <div class="field-group" id="t-type-group"><label class="field-label">타입 *</label>
-          <select id="t-type" class="field-input" onchange="updateItinHint()"><option value="day_tour">1일투어</option><option value="package">맞춤투어</option></select></div>
-        <div class="field-group"><label class="field-label">상태</label>
-          <select id="t-status" class="field-input"><option value="live">라이브</option><option value="draft">초안</option><option value="archived">보관</option></select></div>
+        <div class="field-group" id="t-type-group"><label class="field-label">类型 *</label>
+          <select id="t-type" class="field-input" onchange="updateItinHint()"><option value="day_tour">1日游</option><option value="package">定制游</option></select></div>
+        <div class="field-group"><label class="field-label">状态</label>
+          <select id="t-status" class="field-input"><option value="live">上线</option><option value="draft">草稿</option><option value="archived">归档</option></select></div>
       </div>
-      <div class="field-group"><label class="field-label">상품명 (한국어) *</label><input type="text" id="t-title-ko" class="field-input"></div>
-      <div class="field-group"><label class="field-label">상품명 (중국어)</label><input type="text" id="t-title-cn" class="field-input"></div>
-      <div class="field-group"><label class="field-label">부제</label><input type="text" id="t-subtitle" class="field-input"></div>
-      <div class="field-group"><label class="field-label">설명</label><textarea id="t-desc" class="field-input"></textarea></div>
+      <div class="field-group"><label class="field-label">产品名(韩语) *</label><input type="text" id="t-title-ko" class="field-input"></div>
+      <div class="field-group"><label class="field-label">产品名(中文)</label><input type="text" id="t-title-cn" class="field-input"></div>
+      <div class="field-group"><label class="field-label">副标题</label><input type="text" id="t-subtitle" class="field-input"></div>
+      <div class="field-group"><label class="field-label">说明</label><textarea id="t-desc" class="field-input"></textarea></div>
       <div class="field-row" id="t-price-row">
-        <div class="field-group"><label class="field-label">가격 (원)</label><input type="number" id="t-price-krw" class="field-input" placeholder="89000"></div>
-        <div class="field-group"><label class="field-label">가격 (위안)</label><input type="number" id="t-price-cny" class="field-input" placeholder="480"></div>
+        <div class="field-group"><label class="field-label">价格(韩元)</label><input type="number" id="t-price-krw" class="field-input" placeholder="89000"></div>
+        <div class="field-group"><label class="field-label">价格(人民币)</label><input type="number" id="t-price-cny" class="field-input" placeholder="480"></div>
       </div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">일수</label><input type="number" id="t-days" class="field-input" value="1">
+        <div class="field-group"><label class="field-label">天数</label><input type="number" id="t-days" class="field-input" value="1">
           <div class="field-hint" id="t-days-hint"></div></div>
-        <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="t-order" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="t-order" class="field-input" value="0"></div>
       </div>
-      <div class="field-group"><label class="field-label">대표 이미지 URL (줄바꿈 구분)</label>
+      <div class="field-group"><label class="field-label">主图 URL(以换行分隔)</label>
         <textarea id="t-images" class="field-input" placeholder="https://...jpg"></textarea>
-        <button type="button" class="btn-add-row" style="margin-top:6px" onclick="document.getElementById('t-img-file').click()">📎 이미지 업로드</button>
+        <button type="button" class="btn-add-row" style="margin-top:6px" onclick="document.getElementById('t-img-file').click()">📎 图片上传</button>
         <input type="file" id="t-img-file" accept="*/*" multiple style="display:none" onchange="uploadMedia(this,'t-images')">
-        <div class="field-hint">파일 형식 무제한 | 여러 파일 동시 선택 가능</div>
+        <div class="field-hint">文件格式不限 | 可同时选择多个文件</div>
       </div>
-      <div class="field-group"><label class="field-label">하이라이트 (줄바꿈 구분)</label><textarea id="t-highlights" class="field-input" placeholder="원가계 기둥군&#10;천자산 케이블카"></textarea></div>
-      <div class="field-group"><label class="field-label">포함 사항 (줄바꿈 구분)</label><textarea id="t-includes" class="field-input"></textarea></div>
-      <div class="field-group"><label class="field-label">불포함 사항 (줄바꿈 구분)</label><textarea id="t-excludes" class="field-input"></textarea></div>
+      <div class="field-group"><label class="field-label">亮点(以换行分隔)</label><textarea id="t-highlights" class="field-input" placeholder="袁家界石柱群&#10;天子山索道"></textarea></div>
+      <div class="field-group"><label class="field-label">包含事项(以换行分隔)</label><textarea id="t-includes" class="field-input"></textarea></div>
+      <div class="field-group"><label class="field-label">不含事项(以换行分隔)</label><textarea id="t-excludes" class="field-input"></textarea></div>
 
-      <!-- 연령별 가격 -->
+      <!-- 年龄价格档 -->
       <div class="field-group">
-        <label class="field-label">연령별 가격 (price_tiers)</label>
+        <label class="field-label">年龄价格档(price_tiers)</label>
         <div class="dyn-section">
           <div id="t-tiers-list"></div>
-          <button type="button" class="btn-add-row" onclick="addTier()">+ 연령 추가</button>
+          <button type="button" class="btn-add-row" onclick="addTier()">+ 添加年龄档</button>
         </div>
-        <div class="field-hint">key: adult/child/senior/teen/infant 등 영문 ID | 최소인원: 출발 기준 포함 여부<br>
-          <b>맞춤투어는 이제 이 목록을 2줄로만 관리하세요</b> — ① 가격을 비워둔 통합 "인원"(만 3세 이상, 실시간 계산) 1줄 + ② 가격을 고정 입력한 "영유아"(만 3세 미만) 1줄. 성인/경로/어린이를 따로 나누지 않습니다.
-          연령 할인(경로 등)은 고객이 예약 화면에서 인원 선택 시 직접 신고한 인원수 기준으로 견적 맨 마지막에 자동 차감되며, "맞춤투어 설정 · 가격" 화면의 "연령 할인" 탭에서 관리합니다.</div>
+        <div class="field-hint">key: adult/child/senior/teen/infant 等英文ID ｜ 最少人数: 是否计入出发所需最低人数<br>
+          <b>定制游现在请只用2行来管理此列表</b> — ① 价格留空的统一"人数"(满3岁以上，实时计算) 1行 + ② 价格固定输入的"婴幼儿"(未满3岁) 1行。不再将成人/老人/儿童分开设置。
+          年龄折扣(老年优惠等)会根据客人在预订页面选择人数时自主申报的人数，在报价的最后自动扣减，可在"定制游设置·价格"页面的"年龄折扣"标签页中管理。</div>
       </div>
 
-      <!-- 옵션 -->
+      <!-- 选项 -->
       <div class="field-group">
-        <label class="field-label">선택 옵션 (tour_options)</label>
+        <label class="field-label">可选项目(tour_options)</label>
         <div class="dyn-section">
           <div id="t-opts-list"></div>
-          <button type="button" class="btn-add-row" onclick="addOpt()">+ 옵션 추가</button>
+          <button type="button" class="btn-add-row" onclick="addOpt()">+ 添加选项</button>
         </div>
-        <div class="field-hint">선택그룹: 같은 값을 입력한 옵션끼리는 라디오(단일선택)로 묶임 (예: 식사 업그레이드는 group=meal). 비워두면 기존처럼 체크박스 다중선택. 같은 그룹의 첫 항목이 고객 화면에서 기본 선택됨. ※ 숙박/항공편은 모든 맞춤투어 상품에 공통 적용되며 좌측 메뉴의 "호텔 관리"/"항공편 관리"에서 한번만 관리하면 됩니다</div>
+        <div class="field-hint">选择分组: 输入相同值的选项会以单选按钮(仅可选1项)形式归为一组(例如: 餐食升级设为group=meal)。留空则和以往一样为多选(复选框)。同组中的第1项会在客户页面中默认被选中。※ 住宿/航班对所有定制游产品通用，只需在左侧菜单的"酒店管理"/"航班管理"中统一管理一次即可</div>
       </div>
 
-      <!-- 일정 (참고용) -->
+      <!-- 行程(仅供参考) -->
       <div class="field-group">
-        <label class="field-label" id="t-itin-label">일정 (itinerary, 참고용)</label>
-        <textarea id="t-itinerary" class="field-input" placeholder="09:00|호텔 픽업 후 출발&#10;09:30|황룡동 입장 및 유람선 체험&#10;11:00|점심 식사"></textarea>
-        <div class="field-hint" id="t-itin-hint">한 줄에 "시간|내용" 형식으로 입력 (줄바꿈 구분)</div>
+        <label class="field-label" id="t-itin-label">行程(itinerary，仅供参考)</label>
+        <textarea id="t-itinerary" class="field-input" placeholder="09:00|酒店接送后出发&#10;09:30|黄龙洞入场及游船体验&#10;11:00|午餐"></textarea>
+        <div class="field-hint" id="t-itin-hint">每行按"时间|内容"格式输入(以换行分隔)</div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeTourModal()">취소</button>
-      <button class="btn-save" onclick="saveTour()">저장</button>
+      <button class="btn-cancel" onclick="closeTourModal()">取消</button>
+      <button class="btn-save" onclick="saveTour()">保存</button>
     </div>
   </div>
 </div>
 
-<!-- 스팟 모달 -->
+<!-- 地点弹窗 -->
 <div class="modal-bg" id="spot-modal-bg">
   <div class="modal">
     <div class="modal-head">
-      <h3 id="spot-modal-title">스팟 추가</h3>
+      <h3 id="spot-modal-title">添加地点</h3>
       <button class="modal-close" onclick="closeSpotModal()">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="s-id-orig">
       <div class="field-row">
-        <div class="field-group"><label class="field-label">스팟 ID *</label><input type="text" id="s-id" class="field-input" placeholder="forest_south_1"><div class="field-hint">영문_소문자</div></div>
-        <div class="field-group"><label class="field-label">경관지 *</label>
-          <select id="s-attr" class="field-input"><option value="forest">삼림공원</option><option value="tianmen">천문산</option><option value="canyon">협곡</option></select></div>
+        <div class="field-group"><label class="field-label">地点 ID *</label><input type="text" id="s-id" class="field-input" placeholder="forest_south_1"><div class="field-hint">英文_小写字母</div></div>
+        <div class="field-group"><label class="field-label">景区 *</label>
+          <select id="s-attr" class="field-input"><option value="forest">森林公园</option><option value="tianmen">天门山</option><option value="canyon">峡谷</option></select></div>
       </div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">구역</label><input type="text" id="s-zone" class="field-input" placeholder="south"></div>
-        <div class="field-group"><label class="field-label">타입 *</label>
+        <div class="field-group"><label class="field-label">区域</label><input type="text" id="s-zone" class="field-input" placeholder="south"></div>
+        <div class="field-group"><label class="field-label">类型 *</label>
           <select id="s-type" class="field-input">
-            <option value="landmark">랜드마크</option><option value="transport">교통/탑승</option><option value="viewpoint">전망대</option>
-            <option value="toilet">화장실</option><option value="food">음식</option><option value="rest">휴식</option>
-            <option value="ticket">티켓</option><option value="info">정보</option><option value="danger">주의</option>
+            <option value="landmark">地标</option><option value="transport">交通/搭乘</option><option value="viewpoint">观景台</option>
+            <option value="toilet">厕所</option><option value="food">美食</option><option value="rest">休息</option>
+            <option value="ticket">票务</option><option value="info">信息</option><option value="danger">注意</option>
           </select></div>
       </div>
-      <div class="field-group"><label class="field-label">스팟명 (한국어) *</label><input type="text" id="s-name-ko" class="field-input"></div>
-      <div class="field-group"><label class="field-label">스팟명 (중국어)</label><input type="text" id="s-name-cn" class="field-input"></div>
+      <div class="field-group"><label class="field-label">地点名(韩语) *</label><input type="text" id="s-name-ko" class="field-input"></div>
+      <div class="field-group"><label class="field-label">地点名(中文)</label><input type="text" id="s-name-cn" class="field-input"></div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">위도 (lat)</label><input type="number" id="s-lat" class="field-input" step="0.0000001"></div>
-        <div class="field-group"><label class="field-label">경도 (lon)</label><input type="number" id="s-lon" class="field-input" step="0.0000001"></div>
+        <div class="field-group"><label class="field-label">纬度 (lat)</label><input type="number" id="s-lat" class="field-input" step="0.0000001"></div>
+        <div class="field-group"><label class="field-label">经度 (lon)</label><input type="number" id="s-lon" class="field-input" step="0.0000001"></div>
       </div>
-      <div class="field-group"><label class="field-label">고덕지도 딥링크</label><input type="text" id="s-gaode" class="field-input" placeholder="androidamap://..."><div class="field-hint">고덕지도 앱 → 장소 공유 → 링크 복사</div></div>
-      <div class="field-group"><label class="field-label">썸네일 (최대 2장)</label>
+      <div class="field-group"><label class="field-label">高德地图深链接</label><input type="text" id="s-gaode" class="field-input" placeholder="androidamap://..."><div class="field-hint">高德地图App → 分享位置 → 复制链接</div></div>
+      <div class="field-group"><label class="field-label">缩略图(最多2张)</label>
         <div class="thumb-wrap" id="s-img-wrap"></div>
         <input type="hidden" id="s-img-data" value="[]">
       </div>
-      <div class="field-group"><label class="field-label">영상 URL (유튜브·빌리빌리·직접 링크)</label>
-        <input type="text" id="s-video-url" class="field-input" placeholder="https://youtu.be/xxxxx 또는 https://bilibili.com/video/BVxxxx">
-        <div class="field-hint">가이드 페이지에서 스팟 클릭 시 영상 펼쳐서 표시 (경로 안내용)</div>
+      <div class="field-group"><label class="field-label">视频 URL(YouTube·哔哩哔哩·直接链接)</label>
+        <input type="text" id="s-video-url" class="field-input" placeholder="https://youtu.be/xxxxx 或 https://bilibili.com/video/BVxxxx">
+        <div class="field-hint">在向导页面点击该地点时展开显示视频(用于路线指引)</div>
       </div>
-      <div class="field-group"><label class="field-label">설명</label><textarea id="s-desc" class="field-input"></textarea></div>
-      <div class="field-group"><label class="field-label">팁</label><input type="text" id="s-tip" class="field-input"></div>
+      <div class="field-group"><label class="field-label">说明</label><textarea id="s-desc" class="field-input"></textarea></div>
+      <div class="field-group"><label class="field-label">贴士</label><input type="text" id="s-tip" class="field-input"></div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">운영시간</label><input type="text" id="s-hours" class="field-input" placeholder="07:00–18:00"></div>
-        <div class="field-group"><label class="field-label">가격 정보</label><input type="text" id="s-price" class="field-input" placeholder="무료 / ¥245"></div>
+        <div class="field-group"><label class="field-label">营业时间</label><input type="text" id="s-hours" class="field-input" placeholder="07:00–18:00"></div>
+        <div class="field-group"><label class="field-label">价格信息</label><input type="text" id="s-price" class="field-input" placeholder="免费 / ¥245"></div>
       </div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="s-order" class="field-input" value="0"></div>
-        <div class="field-group"><label class="field-label">상태</label>
-          <select id="s-status" class="field-input"><option value="live">라이브</option><option value="draft">초안</option></select></div>
+        <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="s-order" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">状态</label>
+          <select id="s-status" class="field-input"><option value="live">上线</option><option value="draft">草稿</option></select></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeSpotModal()">취소</button>
-      <button class="btn-save" onclick="saveSpot()">저장</button>
+      <button class="btn-cancel" onclick="closeSpotModal()">取消</button>
+      <button class="btn-save" onclick="saveSpot()">保存</button>
     </div>
   </div>
 </div>
 
-<!-- 현지 업체 모달 -->
+<!-- 本地商户弹窗 -->
 <div class="modal-bg" id="place-modal-bg">
   <div class="modal">
     <div class="modal-head">
-      <h3 id="place-modal-title">업체 추가</h3>
+      <h3 id="place-modal-title">添加商户</h3>
       <button class="modal-close" onclick="closePlaceModal()">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="pl-id">
       <div class="field-row">
-        <div class="field-group"><label class="field-label">카테고리 *</label>
+        <div class="field-group"><label class="field-label">分类 *</label>
           <select id="pl-cat" class="field-input">
-            <option value="restaurant">식당</option>
-            <option value="cafe">카페</option>
-            <option value="hotel">호텔/숙소</option>
-            <option value="shop">쇼핑</option>
-            <option value="attraction">볼거리</option>
-            <option value="transport">교통</option>
-            <option value="etc">기타</option>
+            <option value="restaurant">餐厅</option>
+            <option value="cafe">咖啡厅</option>
+            <option value="hotel">酒店/住宿</option>
+            <option value="shop">购物</option>
+            <option value="attraction">景点游览</option>
+            <option value="transport">交通</option>
+            <option value="etc">其他</option>
           </select></div>
-        <div class="field-group"><label class="field-label">지역</label>
+        <div class="field-group"><label class="field-label">地区</label>
           <select id="pl-area" class="field-input">
-            <option value="시내">시내</option>
-            <option value="무릉원">무릉원</option>
-            <option value="천문산">천문산</option>
-            <option value="황룡동">황룡동</option>
-            <option value="기타">기타</option>
+            <option value="市内">市内</option>
+            <option value="武陵源">武陵源</option>
+            <option value="天门山">天门山</option>
+            <option value="黄龙洞">黄龙洞</option>
+            <option value="其他">其他</option>
           </select></div>
       </div>
-      <div class="field-group"><label class="field-label">업체명 (한국어) *</label><input type="text" id="pl-name-ko" class="field-input"></div>
-      <div class="field-group"><label class="field-label">업체명 (중국어)</label><input type="text" id="pl-name-cn" class="field-input"></div>
-      <div class="field-group"><label class="field-label">주소</label><input type="text" id="pl-address" class="field-input"></div>
+      <div class="field-group"><label class="field-label">商户名(韩语) *</label><input type="text" id="pl-name-ko" class="field-input"></div>
+      <div class="field-group"><label class="field-label">商户名(中文)</label><input type="text" id="pl-name-cn" class="field-input"></div>
+      <div class="field-group"><label class="field-label">地址</label><input type="text" id="pl-address" class="field-input"></div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">전화번호</label><input type="text" id="pl-phone" class="field-input"></div>
-        <div class="field-group"><label class="field-label">위챗 ID</label><input type="text" id="pl-wechat" class="field-input"></div>
+        <div class="field-group"><label class="field-label">电话号码</label><input type="text" id="pl-phone" class="field-input"></div>
+        <div class="field-group"><label class="field-label">微信 ID</label><input type="text" id="pl-wechat" class="field-input"></div>
       </div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">운영시간</label><input type="text" id="pl-hours" class="field-input" placeholder="09:00–22:00"></div>
-        <div class="field-group"><label class="field-label">가격대</label><input type="text" id="pl-price-range" class="field-input" placeholder="1인 30,000원~"></div>
+        <div class="field-group"><label class="field-label">营业时间</label><input type="text" id="pl-hours" class="field-input" placeholder="09:00–22:00"></div>
+        <div class="field-group"><label class="field-label">价格区间</label><input type="text" id="pl-price-range" class="field-input" placeholder="1人 30,000韩元起"></div>
       </div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">위도</label><input type="number" id="pl-lat" class="field-input" step="0.0000001"></div>
-        <div class="field-group"><label class="field-label">경도</label><input type="number" id="pl-lon" class="field-input" step="0.0000001"></div>
+        <div class="field-group"><label class="field-label">纬度</label><input type="number" id="pl-lat" class="field-input" step="0.0000001"></div>
+        <div class="field-group"><label class="field-label">经度</label><input type="number" id="pl-lon" class="field-input" step="0.0000001"></div>
       </div>
-      <div class="field-group"><label class="field-label">고덕지도 딥링크</label><input type="text" id="pl-gaode" class="field-input" placeholder="androidamap://..."></div>
-      <div class="field-group"><label class="field-label">썸네일 (최대 2장)</label>
+      <div class="field-group"><label class="field-label">高德地图深链接</label><input type="text" id="pl-gaode" class="field-input" placeholder="androidamap://..."></div>
+      <div class="field-group"><label class="field-label">缩略图(最多2张)</label>
         <div class="thumb-wrap" id="pl-img-wrap"></div>
         <input type="hidden" id="pl-img-data" value="[]">
       </div>
-      <div class="field-group"><label class="field-label">설명</label><textarea id="pl-desc" class="field-input"></textarea></div>
-      <div class="field-group"><label class="field-label">태그 (쉼표 구분)</label><input type="text" id="pl-tags" class="field-input" placeholder="한국어메뉴, 카드가능, 주차가능"></div>
+      <div class="field-group"><label class="field-label">说明</label><textarea id="pl-desc" class="field-input"></textarea></div>
+      <div class="field-group"><label class="field-label">标签(逗号分隔)</label><input type="text" id="pl-tags" class="field-input" placeholder="韩语菜单, 可刷卡, 可停车"></div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="pl-order" class="field-input" value="0"></div>
-        <div class="field-group"><label class="field-label">상태</label>
-          <select id="pl-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+        <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="pl-order" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">状态</label>
+          <select id="pl-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closePlaceModal()">취소</button>
-      <button class="btn-save" onclick="savePlace()">저장</button>
+      <button class="btn-cancel" onclick="closePlaceModal()">取消</button>
+      <button class="btn-save" onclick="savePlace()">保存</button>
     </div>
   </div>
 </div>
 
-<!-- 호텔 모달 (전역 공용) -->
+<!-- 酒店弹窗(全局公用) -->
 <div class="modal-bg" id="hotel-modal-bg">
   <div class="modal">
     <div class="modal-head">
-      <h3 id="hotel-modal-title">호텔 추가</h3>
+      <h3 id="hotel-modal-title">添加酒店</h3>
       <button class="modal-close" onclick="closeHotelPoolModal()">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="ho-id">
       <div class="field-row">
-        <div class="field-group"><label class="field-label">호텔명 *</label><input type="text" id="ho-name" class="field-input" placeholder="예: 일반 숙소"></div>
-        <div class="field-group"><label class="field-label">등급</label><input type="text" id="ho-grade" class="field-input" placeholder="예: 3성급 추천"></div>
+        <div class="field-group"><label class="field-label">酒店名 *</label><input type="text" id="ho-name" class="field-input" placeholder="例: 普通住宿"></div>
+        <div class="field-group"><label class="field-label">等级</label><input type="text" id="ho-grade" class="field-input" placeholder="例: 推荐3星级"></div>
       </div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">추가요금(원)</label><input type="number" id="ho-price" class="field-input" value="0"></div>
-        <div class="field-group"><label class="field-label">단위</label>
-          <select id="ho-per" class="field-input"><option value="pax">인당</option><option value="group">그룹</option></select></div>
+        <div class="field-group"><label class="field-label">附加费用(韩元)</label><input type="number" id="ho-price" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">单位</label>
+          <select id="ho-per" class="field-input"><option value="pax">每人</option><option value="group">团队</option></select></div>
       </div>
-      <div class="field-group"><label class="field-label">설명</label><textarea id="ho-desc" class="field-input" placeholder="등급/위치 등"></textarea></div>
-      <div class="field-group"><label class="field-label">이미지 URL</label>
+      <div class="field-group"><label class="field-label">说明</label><textarea id="ho-desc" class="field-input" placeholder="等级/位置等"></textarea></div>
+      <div class="field-group"><label class="field-label">图片 URL</label>
         <input type="text" id="ho-image" class="field-input">
-        <button type="button" class="btn-add-row" style="margin-top:6px" onclick="document.getElementById('ho-img-file').click()">📎 이미지 업로드</button>
+        <button type="button" class="btn-add-row" style="margin-top:6px" onclick="document.getElementById('ho-img-file').click()">📎 图片上传</button>
         <input type="file" id="ho-img-file" accept="image/*" style="display:none" onchange="uploadToInput(this,'ho-image')">
       </div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="ho-order" class="field-input" value="0"></div>
-        <div class="field-group"><label class="field-label">상태</label>
-          <select id="ho-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+        <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="ho-order" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">状态</label>
+          <select id="ho-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeHotelPoolModal()">취소</button>
-      <button class="btn-save" onclick="saveHotelPool()">저장</button>
+      <button class="btn-cancel" onclick="closeHotelPoolModal()">取消</button>
+      <button class="btn-save" onclick="saveHotelPool()">保存</button>
     </div>
   </div>
 </div>
 
-<!-- 항공편 모달 (전역 공용) -->
+<!-- 航班弹窗(全局公用) -->
 <div class="modal-bg" id="flight-modal-bg">
   <div class="modal">
     <div class="modal-head">
-      <h3 id="flight-modal-title">항공편 추가</h3>
+      <h3 id="flight-modal-title">添加航班</h3>
       <button class="modal-close" onclick="closeFlightPoolModal()">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="fl2-id">
-      <div class="field-group"><label class="field-label">노선명 *</label><input type="text" id="fl2-name" class="field-input" placeholder="예: 인천→장가계 대한항공"></div>
+      <div class="field-group"><label class="field-label">航线名 *</label><input type="text" id="fl2-name" class="field-input" placeholder="例: 仁川→张家界 大韩航空"></div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">출발지역</label><input type="text" id="fl2-location" class="field-input" placeholder="예: 인천"></div>
-        <div class="field-group"><label class="field-label">시간</label><input type="text" id="fl2-time" class="field-input" placeholder="예: 오전 출발·약 3시간30분"></div>
+        <div class="field-group"><label class="field-label">出发地区</label><input type="text" id="fl2-location" class="field-input" placeholder="例: 仁川"></div>
+        <div class="field-group"><label class="field-label">时间</label><input type="text" id="fl2-time" class="field-input" placeholder="例: 上午出发·约3小时30分钟"></div>
       </div>
-      <div class="field-group"><label class="field-label">설명</label><textarea id="fl2-desc" class="field-input"></textarea></div>
-      <div class="field-group"><label class="field-label">이미지 URL</label>
+      <div class="field-group"><label class="field-label">说明</label><textarea id="fl2-desc" class="field-input"></textarea></div>
+      <div class="field-group"><label class="field-label">图片 URL</label>
         <input type="text" id="fl2-image" class="field-input">
-        <button type="button" class="btn-add-row" style="margin-top:6px" onclick="document.getElementById('fl2-img-file').click()">📎 이미지 업로드</button>
+        <button type="button" class="btn-add-row" style="margin-top:6px" onclick="document.getElementById('fl2-img-file').click()">📎 图片上传</button>
         <input type="file" id="fl2-img-file" accept="image/*" style="display:none" onchange="uploadToInput(this,'fl2-image')">
       </div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="fl2-order" class="field-input" value="0"></div>
-        <div class="field-group"><label class="field-label">상태</label>
-          <select id="fl2-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+        <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="fl2-order" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">状态</label>
+          <select id="fl2-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeFlightPoolModal()">취소</button>
-      <button class="btn-save" onclick="saveFlightPool()">저장</button>
+      <button class="btn-cancel" onclick="closeFlightPoolModal()">取消</button>
+      <button class="btn-save" onclick="saveFlightPool()">保存</button>
     </div>
   </div>
 </div>
 
-<!-- 명소 모달 (전역 공용) -->
+<!-- 景点弹窗(全局公用) -->
 <div class="modal-bg" id="attraction-modal-bg">
   <div class="modal">
     <div class="modal-head">
-      <h3 id="attraction-modal-title">명소 추가</h3>
+      <h3 id="attraction-modal-title">添加景点</h3>
       <button class="modal-close" onclick="closeAttractionPoolModal()">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="atp-id">
       <div class="field-row">
-        <div class="field-group"><label class="field-label">key (영문) *</label><input type="text" id="atp-key" class="field-input" placeholder="예: tianmen"></div>
-        <div class="field-group"><label class="field-label">라벨 *</label><input type="text" id="atp-label" class="field-input" placeholder="예: 천문산"></div>
+        <div class="field-group"><label class="field-label">key (英文) *</label><input type="text" id="atp-key" class="field-input" placeholder="例: tianmen"></div>
+        <div class="field-group"><label class="field-label">标签 *</label><input type="text" id="atp-label" class="field-input" placeholder="例: 天门山"></div>
       </div>
-      <div class="field-group"><label class="field-label">슬롯 타입 *</label>
+      <div class="field-group"><label class="field-label">时段类型 *</label>
         <select id="atp-slot" class="field-input">
-          <option value="full_day">하루종일 (오전+오후 모두 사용)</option>
-          <option value="half_day">반나절 (오전 또는 오후, 자유 교체)</option>
-          <option value="evening">저녁/야간 전용</option>
-          <option value="pm_evening">오후+저녁 결합 (당일치기)</option>
-          <option value="pm_evening_nextam">오후+저녁+익일오전 결합</option>
+          <option value="full_day">全天 (上午+下午都可使用)</option>
+          <option value="half_day">半天 (上午或下午，可自由更换)</option>
+          <option value="evening">晚上/夜间 专用</option>
+          <option value="pm_evening">下午+晚上 组合 (当天往返)</option>
+          <option value="pm_evening_nextam">下午+晚上+次日上午 组合</option>
         </select>
-        <div class="field-hint">기존 일정 데이터에서 이 key를 참조하므로, 한번 저장한 key는 가능하면 바꾸지 마세요</div>
+        <div class="field-hint">现有行程数据会引用此key，已保存的key请尽量不要更改</div>
       </div>
-      <div class="field-group"><label class="field-label">1인당 요금 (위안)</label>
-        <input type="number" id="atp-price" class="field-input" value="0" placeholder="예: 260 (무료면 0)"></div>
-      <div class="field-group"><label class="field-label">설명</label><textarea id="atp-desc" class="field-input"></textarea></div>
-      <div class="field-group"><label class="field-label">이미지 URL</label>
+      <div class="field-group"><label class="field-label">每人费用(人民币)</label>
+        <input type="number" id="atp-price" class="field-input" value="0" placeholder="例: 260(免费请填0)"></div>
+      <div class="field-group"><label class="field-label">说明</label><textarea id="atp-desc" class="field-input"></textarea></div>
+      <div class="field-group"><label class="field-label">图片 URL</label>
         <input type="text" id="atp-image" class="field-input">
-        <button type="button" class="btn-add-row" style="margin-top:6px" onclick="document.getElementById('atp-img-file').click()">📎 이미지 업로드</button>
+        <button type="button" class="btn-add-row" style="margin-top:6px" onclick="document.getElementById('atp-img-file').click()">📎 图片上传</button>
         <input type="file" id="atp-img-file" accept="image/*" style="display:none" onchange="uploadToInput(this,'atp-image')">
       </div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="atp-order" class="field-input" value="0"></div>
-        <div class="field-group"><label class="field-label">상태</label>
-          <select id="atp-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+        <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="atp-order" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">状态</label>
+          <select id="atp-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeAttractionPoolModal()">취소</button>
-      <button class="btn-save" onclick="saveAttractionPool()">저장</button>
+      <button class="btn-cancel" onclick="closeAttractionPoolModal()">取消</button>
+      <button class="btn-save" onclick="saveAttractionPool()">保存</button>
     </div>
   </div>
 </div>
 
-<!-- 부가서비스 모달 (전역 공용) -->
+<!-- 附加服务弹窗(全局公用) -->
 <div class="modal-bg" id="addon-modal-bg">
   <div class="modal">
     <div class="modal-head">
-      <h3 id="addon-modal-title">부가서비스 추가</h3>
+      <h3 id="addon-modal-title">添加附加服务</h3>
       <button class="modal-close" onclick="closeAddonModal()">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="addon-id">
-      <div class="field-group"><label class="field-label">항목명 *</label><input type="text" id="addon-name" class="field-input" placeholder="예: 발마사지 60분"></div>
+      <div class="field-group"><label class="field-label">项目名 *</label><input type="text" id="addon-name" class="field-input" placeholder="例: 足底按摩60分钟"></div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">소요시간 (분)</label><input type="number" id="addon-duration" class="field-input" placeholder="예: 60"></div>
-        <div class="field-group"><label class="field-label">1인당 요금 (위안)</label><input type="number" id="addon-price" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">所需时长(分钟)</label><input type="number" id="addon-duration" class="field-input" placeholder="例: 60"></div>
+        <div class="field-group"><label class="field-label">每人费用(人民币)</label><input type="number" id="addon-price" class="field-input" value="0"></div>
       </div>
-      <div class="field-group"><label class="field-label">비고</label><input type="text" id="addon-note" class="field-input" placeholder="예: 차량·기사·가이드비 포함"></div>
+      <div class="field-group"><label class="field-label">备注</label><input type="text" id="addon-note" class="field-input" placeholder="例: 含车辆/司机/导游费"></div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="addon-order" class="field-input" value="0"></div>
-        <div class="field-group"><label class="field-label">상태</label>
-          <select id="addon-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+        <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="addon-order" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">状态</label>
+          <select id="addon-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeAddonModal()">취소</button>
-      <button class="btn-save" onclick="saveAddon()">저장</button>
+      <button class="btn-cancel" onclick="closeAddonModal()">取消</button>
+      <button class="btn-save" onclick="saveAddon()">保存</button>
     </div>
   </div>
 </div>
 
-<!-- 가격 설정 모달 (전역 공용, key 고정 — value/note만 수정) -->
+<!-- 价格设置弹窗 (全局公用, key固定 — 仅修改value/note) -->
 <div class="modal-bg" id="pricing-modal-bg">
   <div class="modal">
     <div class="modal-head">
-      <h3 id="pricing-modal-title">가격 설정 편집</h3>
+      <h3 id="pricing-modal-title">编辑价格设置</h3>
       <button class="modal-close" onclick="closePricingModal()">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="pr-key">
-      <div class="field-group"><label class="field-label">단가 (비워두면 "고객센터 문의")</label><input type="number" id="pr-value" class="field-input" placeholder="예: 500"></div>
-      <div class="field-group"><label class="field-label">비고</label><input type="text" id="pr-note" class="field-input"></div>
+      <div class="field-group"><label class="field-label">单价(留空则显示为"请咨询客服")</label><input type="number" id="pr-value" class="field-input" placeholder="例: 500"></div>
+      <div class="field-group"><label class="field-label">备注</label><input type="text" id="pr-note" class="field-input"></div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closePricingModal()">취소</button>
-      <button class="btn-save" onclick="savePricing()">저장</button>
+      <button class="btn-cancel" onclick="closePricingModal()">取消</button>
+      <button class="btn-save" onclick="savePricing()">保存</button>
     </div>
   </div>
 </div>
 
-<!-- 연령 할인 모달 -->
+<!-- 年龄折扣弹窗 -->
 <div class="modal-bg" id="agedisc-modal-bg">
   <div class="modal">
     <div class="modal-head">
-      <h3 id="agedisc-modal-title">연령 할인 추가</h3>
+      <h3 id="agedisc-modal-title">添加年龄折扣</h3>
       <button class="modal-close" onclick="closeAgeDiscModal()">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="agedisc-id">
-      <div class="field-group"><label class="field-label">구간명 *</label><input type="text" id="agedisc-label" class="field-input" placeholder="예: 만 60세 이상"></div>
+      <div class="field-group"><label class="field-label">时段名 *</label><input type="text" id="agedisc-label" class="field-input" placeholder="例: 满60岁以上"></div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">최소 연령 (비우면 제한 없음)</label><input type="number" id="agedisc-minage" class="field-input"></div>
-        <div class="field-group"><label class="field-label">최대 연령 (비우면 제한 없음)</label><input type="number" id="agedisc-maxage" class="field-input"></div>
+        <div class="field-group"><label class="field-label">最小年龄(留空则不限)</label><input type="number" id="agedisc-minage" class="field-input"></div>
+        <div class="field-group"><label class="field-label">最大年龄(留空则不限)</label><input type="number" id="agedisc-maxage" class="field-input"></div>
       </div>
-      <div class="field-group"><label class="field-label">1인당 할인액 (원)</label><input type="number" id="agedisc-krw" class="field-input" value="0"></div>
+      <div class="field-group"><label class="field-label">每人折扣金额(韩元)</label><input type="number" id="agedisc-krw" class="field-input" value="0"></div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="agedisc-order" class="field-input" value="0"></div>
-        <div class="field-group"><label class="field-label">상태</label>
-          <select id="agedisc-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+        <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="agedisc-order" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">状态</label>
+          <select id="agedisc-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeAgeDiscModal()">취소</button>
-      <button class="btn-save" onclick="saveAgeDisc()">저장</button>
+      <button class="btn-cancel" onclick="closeAgeDiscModal()">取消</button>
+      <button class="btn-save" onclick="saveAgeDisc()">保存</button>
     </div>
   </div>
 </div>
 
-<!-- 자연손모 · 기타원가 모달 -->
+<!-- 自然损耗·其他成本弹窗 -->
 <div class="modal-bg" id="costbuffer-modal-bg">
   <div class="modal">
     <div class="modal-head">
-      <h3 id="costbuffer-modal-title">기타원가 추가</h3>
+      <h3 id="costbuffer-modal-title">添加其他成本</h3>
       <button class="modal-close" onclick="closeCostBufferModal()">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="costbuffer-id">
-      <div class="field-group"><label class="field-label">항목명 *</label><input type="text" id="costbuffer-name" class="field-input" placeholder="예: 자연손모"></div>
+      <div class="field-group"><label class="field-label">项目名 *</label><input type="text" id="costbuffer-name" class="field-input" placeholder="例: 自然损耗"></div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">금액</label><input type="number" id="costbuffer-amount" class="field-input" value="0"></div>
-        <div class="field-group"><label class="field-label">통화</label>
-          <select id="costbuffer-currency" class="field-input"><option value="CNY">위안 (CNY)</option><option value="KRW">원 (KRW)</option></select></div>
+        <div class="field-group"><label class="field-label">金额</label><input type="number" id="costbuffer-amount" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">货币</label>
+          <select id="costbuffer-currency" class="field-input"><option value="CNY">人民币 (CNY)</option><option value="KRW">韩元 (KRW)</option></select></div>
       </div>
-      <div class="field-group"><label class="field-label">기준</label>
-        <select id="costbuffer-perunit" class="field-input"><option value="order">주문당</option><option value="pax">인당</option></select></div>
-      <div class="field-group"><label class="field-label">비고</label><input type="text" id="costbuffer-note" class="field-input"></div>
-      <div class="field-group"><label class="field-label">상태</label>
-        <select id="costbuffer-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+      <div class="field-group"><label class="field-label">基准</label>
+        <select id="costbuffer-perunit" class="field-input"><option value="order">按订单</option><option value="pax">每人</option></select></div>
+      <div class="field-group"><label class="field-label">备注</label><input type="text" id="costbuffer-note" class="field-input"></div>
+      <div class="field-group"><label class="field-label">状态</label>
+        <select id="costbuffer-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeCostBufferModal()">취소</button>
-      <button class="btn-save" onclick="saveCostBuffer()">저장</button>
+      <button class="btn-cancel" onclick="closeCostBufferModal()">取消</button>
+      <button class="btn-save" onclick="saveCostBuffer()">保存</button>
     </div>
   </div>
 </div>
 
-<!-- 공연·입장권 모달 -->
+<!-- 演出·门票弹窗 -->
 <div class="modal-bg" id="st-modal-bg">
   <div class="modal">
     <div class="modal-head">
-      <h3 id="st-modal-title">항목 추가</h3>
+      <h3 id="st-modal-title">添加项目</h3>
       <button class="modal-close" onclick="closeSTModal()">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="st-id">
       <div class="field-row">
-        <div class="field-group"><label class="field-label">구분 *</label>
-          <select id="st-kind" class="field-input"><option value="show">공연</option><option value="ticket">입장권</option></select></div>
-        <div class="field-group"><label class="field-label">상태</label>
-          <select id="st-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+        <div class="field-group"><label class="field-label">分类 *</label>
+          <select id="st-kind" class="field-input"><option value="show">演出</option><option value="ticket">门票</option></select></div>
+        <div class="field-group"><label class="field-label">状态</label>
+          <select id="st-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
       </div>
-      <div class="field-group"><label class="field-label">제목 *</label><input type="text" id="st-title" class="field-input"></div>
-      <div class="field-group"><label class="field-label">부제/설명</label><input type="text" id="st-subtitle" class="field-input"></div>
+      <div class="field-group"><label class="field-label">标题 *</label><input type="text" id="st-title" class="field-input"></div>
+      <div class="field-group"><label class="field-label">副标题/说明</label><input type="text" id="st-subtitle" class="field-input"></div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">시간 정보</label><input type="text" id="st-time" class="field-input" placeholder="매일 19:30 (약 80분)"></div>
-        <div class="field-group"><label class="field-label">가격 정보</label><input type="text" id="st-price" class="field-input" placeholder="¥160~280"></div>
+        <div class="field-group"><label class="field-label">时间信息</label><input type="text" id="st-time" class="field-input" placeholder="每天19:30(约80分钟)"></div>
+        <div class="field-group"><label class="field-label">价格信息</label><input type="text" id="st-price" class="field-input" placeholder="¥160~280"></div>
       </div>
-      <div class="field-group"><label class="field-label">링크 (줄바꿈 구분, "라벨|URL" 형식)</label>
+      <div class="field-group"><label class="field-label">链接(以换行分隔，格式为"标签|URL")</label>
         <textarea id="st-links" class="field-input" placeholder="🎫 Trip.com|https://..."></textarea>
-        <div class="field-hint">한 줄에 하나씩, 라벨과 URL은 | 로 구분</div>
+        <div class="field-hint">每行一条，标签和URL用 | 分隔</div>
       </div>
-      <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="st-order" class="field-input" value="0"></div>
+      <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="st-order" class="field-input" value="0"></div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeSTModal()">취소</button>
-      <button class="btn-save" onclick="saveST()">저장</button>
+      <button class="btn-cancel" onclick="closeSTModal()">取消</button>
+      <button class="btn-save" onclick="saveST()">保存</button>
     </div>
   </div>
 </div>
 
-<!-- 결제 방법 모달 -->
+<!-- 支付方式弹窗 -->
 <div class="modal-bg" id="pm-modal-bg">
   <div class="modal">
     <div class="modal-head">
-      <h3 id="pm-modal-title">결제 방법 추가</h3>
+      <h3 id="pm-modal-title">添加支付方式</h3>
       <button class="modal-close" onclick="closePMModal()">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="pm-id-orig">
       <div class="field-row">
-        <div class="field-group"><label class="field-label">키 (영문, 고유값) *</label><input type="text" id="pm-key" class="field-input" placeholder="kakao"></div>
-        <div class="field-group"><label class="field-label">상태</label>
-          <select id="pm-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+        <div class="field-group"><label class="field-label">key (英文，唯一值) *</label><input type="text" id="pm-key" class="field-input" placeholder="kakao"></div>
+        <div class="field-group"><label class="field-label">状态</label>
+          <select id="pm-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
       </div>
-      <div class="field-group"><label class="field-label">이름 *</label><input type="text" id="pm-name" class="field-input"></div>
-      <div class="field-group"><label class="field-label">부제</label><input type="text" id="pm-subtitle" class="field-input"></div>
+      <div class="field-group"><label class="field-label">名称 *</label><input type="text" id="pm-name" class="field-input"></div>
+      <div class="field-group"><label class="field-label">副标题</label><input type="text" id="pm-subtitle" class="field-input"></div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">아이콘 이모지</label><input type="text" id="pm-emoji" class="field-input" placeholder="💛"></div>
-        <div class="field-group"><label class="field-label">배경색</label><input type="text" id="pm-bg" class="field-input" placeholder="#FEE500"></div>
+        <div class="field-group"><label class="field-label">图标表情符号</label><input type="text" id="pm-emoji" class="field-input" placeholder="💛"></div>
+        <div class="field-group"><label class="field-label">背景色</label><input type="text" id="pm-bg" class="field-input" placeholder="#FEE500"></div>
       </div>
-      <div class="field-group"><label class="field-label">단계 (줄바꿈 구분, HTML 태그 사용 가능)</label>
-        <textarea id="pm-steps" class="field-input" placeholder="카카오톡 → 하단 <b>···</b> → <b>카카오페이</b>"></textarea>
+      <div class="field-group"><label class="field-label">步骤(以换行分隔，可使用HTML标签)</label>
+        <textarea id="pm-steps" class="field-input" placeholder="카카오톡(Kakao Talk) → 底部 <b>···</b> → <b>카카오페이(Kakao Pay)</b>"></textarea>
       </div>
-      <div class="field-group"><label class="field-label">주의사항</label><input type="text" id="pm-note" class="field-input"></div>
+      <div class="field-group"><label class="field-label">注意事项</label><input type="text" id="pm-note" class="field-input"></div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">링크 라벨</label><input type="text" id="pm-link-label" class="field-input" placeholder="카카오페이 공식 →"></div>
-        <div class="field-group"><label class="field-label">링크 URL</label><input type="text" id="pm-link-url" class="field-input" placeholder="https://pay.kakao.com"></div>
+        <div class="field-group"><label class="field-label">链接标签</label><input type="text" id="pm-link-label" class="field-input" placeholder="Kakao Pay 官方 →"></div>
+        <div class="field-group"><label class="field-label">链接 URL</label><input type="text" id="pm-link-url" class="field-input" placeholder="https://pay.kakao.com"></div>
       </div>
-      <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="pm-order" class="field-input" value="0"></div>
+      <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="pm-order" class="field-input" value="0"></div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closePMModal()">취소</button>
-      <button class="btn-save" onclick="savePM()">저장</button>
+      <button class="btn-cancel" onclick="closePMModal()">取消</button>
+      <button class="btn-save" onclick="savePM()">保存</button>
     </div>
   </div>
 </div>
 
-<!-- 안전·응급 모달 -->
+<!-- 安全·应急弹窗 -->
 <div class="modal-bg" id="ei-modal-bg">
   <div class="modal">
     <div class="modal-head">
-      <h3 id="ei-modal-title">항목 추가</h3>
+      <h3 id="ei-modal-title">添加项目</h3>
       <button class="modal-close" onclick="closeEIModal()">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="ei-id">
       <div class="field-row">
-        <div class="field-group"><label class="field-label">구분 *</label>
-          <select id="ei-section" class="field-input"><option value="phone">긴급 전화</option><option value="hospital">병원·영사관</option><option value="connectivity">인터넷·VPN</option></select></div>
-        <div class="field-group"><label class="field-label">상태</label>
-          <select id="ei-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+        <div class="field-group"><label class="field-label">分类 *</label>
+          <select id="ei-section" class="field-input"><option value="phone">紧急电话</option><option value="hospital">医院·领事馆</option><option value="connectivity">网络·VPN</option></select></div>
+        <div class="field-group"><label class="field-label">状态</label>
+          <select id="ei-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
       </div>
-      <div class="field-group"><label class="field-label">라벨 *</label><input type="text" id="ei-label" class="field-input" placeholder="경찰"></div>
-      <div class="field-group"><label class="field-label">값 *</label><input type="text" id="ei-value" class="field-input" placeholder="110"></div>
-      <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="ei-order" class="field-input" value="0"></div>
+      <div class="field-group"><label class="field-label">标签 *</label><input type="text" id="ei-label" class="field-input" placeholder="警察"></div>
+      <div class="field-group"><label class="field-label">值 *</label><input type="text" id="ei-value" class="field-input" placeholder="110"></div>
+      <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="ei-order" class="field-input" value="0"></div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeEIModal()">취소</button>
-      <button class="btn-save" onclick="saveEI()">저장</button>
+      <button class="btn-cancel" onclick="closeEIModal()">取消</button>
+      <button class="btn-save" onclick="saveEI()">保存</button>
     </div>
   </div>
 </div>
 
-<!-- 현지 회화 모달 -->
+<!-- 当地会话弹窗 -->
 <div class="modal-bg" id="ph-modal-bg">
   <div class="modal">
     <div class="modal-head">
-      <h3 id="ph-modal-title">문구 추가</h3>
+      <h3 id="ph-modal-title">添加短语</h3>
       <button class="modal-close" onclick="closePHModal()">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="ph-id">
       <div class="field-row">
-        <div class="field-group"><label class="field-label">카테고리 *</label><input type="text" id="ph-category" class="field-input" placeholder="🚕 교통"></div>
-        <div class="field-group"><label class="field-label">상태</label>
-          <select id="ph-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+        <div class="field-group"><label class="field-label">分类 *</label><input type="text" id="ph-category" class="field-input" placeholder="🚕 交通"></div>
+        <div class="field-group"><label class="field-label">状态</label>
+          <select id="ph-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
       </div>
-      <div class="field-group"><label class="field-label">중국어 *</label><input type="text" id="ph-cn" class="field-input"></div>
-      <div class="field-group"><label class="field-label">병음</label><input type="text" id="ph-py" class="field-input"></div>
-      <div class="field-group"><label class="field-label">한국어 *</label><input type="text" id="ph-ko" class="field-input"></div>
-      <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="ph-order" class="field-input" value="0"></div>
+      <div class="field-group"><label class="field-label">中文 *</label><input type="text" id="ph-cn" class="field-input"></div>
+      <div class="field-group"><label class="field-label">拼音</label><input type="text" id="ph-py" class="field-input"></div>
+      <div class="field-group"><label class="field-label">韩语 *</label><input type="text" id="ph-ko" class="field-input"></div>
+      <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="ph-order" class="field-input" value="0"></div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closePHModal()">취소</button>
-      <button class="btn-save" onclick="savePH()">저장</button>
+      <button class="btn-cancel" onclick="closePHModal()">取消</button>
+      <button class="btn-save" onclick="savePH()">保存</button>
     </div>
   </div>
 </div>
 
-<!-- 여행 팁 모달 -->
+<!-- 旅行贴士弹窗 -->
 <div class="modal-bg" id="tp-modal-bg">
   <div class="modal">
     <div class="modal-head">
-      <h3 id="tp-modal-title">팁 추가</h3>
+      <h3 id="tp-modal-title">添加贴士</h3>
       <button class="modal-close" onclick="closeTPModal()">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="tp-id">
       <div class="field-row">
-        <div class="field-group"><label class="field-label">경관지 *</label>
-          <select id="tp-attr" class="field-input"><option value="forest">삼림공원</option><option value="tianmen">천문산</option><option value="canyon">협곡</option></select></div>
-        <div class="field-group"><label class="field-label">상태</label>
-          <select id="tp-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+        <div class="field-group"><label class="field-label">景区 *</label>
+          <select id="tp-attr" class="field-input"><option value="forest">森林公园</option><option value="tianmen">天门山</option><option value="canyon">峡谷</option></select></div>
+        <div class="field-group"><label class="field-label">状态</label>
+          <select id="tp-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
       </div>
-      <div class="field-group"><label class="field-label">내용 *</label><input type="text" id="tp-text" class="field-input" placeholder="👟 운동화 필수."></div>
-      <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="tp-order" class="field-input" value="0"></div>
+      <div class="field-group"><label class="field-label">内容 *</label><input type="text" id="tp-text" class="field-input" placeholder="👟 必须穿运动鞋。"></div>
+      <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="tp-order" class="field-input" value="0"></div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeTPModal()">취소</button>
-      <button class="btn-save" onclick="saveTP()">저장</button>
+      <button class="btn-cancel" onclick="closeTPModal()">取消</button>
+      <button class="btn-save" onclick="saveTP()">保存</button>
     </div>
   </div>
 </div>
 
-<!-- 지역 모달 -->
+<!-- 地区弹窗 -->
 <div class="modal-bg" id="rg-modal-bg">
   <div class="modal">
     <div class="modal-head">
-      <h3 id="rg-modal-title">지역 추가</h3>
+      <h3 id="rg-modal-title">添加地区</h3>
       <button class="modal-close" onclick="closeRGModal()">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="rg-id">
-      <div class="field-group"><label class="field-label">이름 *</label><input type="text" id="rg-name" class="field-input" placeholder="봉황고성"></div>
+      <div class="field-group"><label class="field-label">名称 *</label><input type="text" id="rg-name" class="field-input" placeholder="凤凰古城"></div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="rg-order" class="field-input" value="0"></div>
-        <div class="field-group"><label class="field-label">상태</label>
-          <select id="rg-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+        <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="rg-order" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">状态</label>
+          <select id="rg-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeRGModal()">취소</button>
-      <button class="btn-save" onclick="saveRG()">저장</button>
+      <button class="btn-cancel" onclick="closeRGModal()">取消</button>
+      <button class="btn-save" onclick="saveRG()">保存</button>
     </div>
   </div>
 </div>
 
-<!-- 업체 카테고리 모달 -->
+<!-- 商户分类弹窗 -->
 <div class="modal-bg" id="pc-modal-bg">
   <div class="modal">
     <div class="modal-head">
-      <h3 id="pc-modal-title">카테고리 추가</h3>
+      <h3 id="pc-modal-title">添加分类</h3>
       <button class="modal-close" onclick="closePCModal()">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="pc-id-orig">
-      <div class="field-group"><label class="field-label">키 (영문, 고유값) *</label><input type="text" id="pc-key" class="field-input" placeholder="bar"></div>
-      <div class="field-group"><label class="field-label">이름 *</label><input type="text" id="pc-name" class="field-input" placeholder="바/술집"></div>
+      <div class="field-group"><label class="field-label">key (英文，唯一值) *</label><input type="text" id="pc-key" class="field-input" placeholder="bar"></div>
+      <div class="field-group"><label class="field-label">名称 *</label><input type="text" id="pc-name" class="field-input" placeholder="酒吧"></div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">아이콘 이모지</label><input type="text" id="pc-icon" class="field-input" placeholder="🍺"></div>
-        <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="pc-order" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">图标表情符号</label><input type="text" id="pc-icon" class="field-input" placeholder="🍺"></div>
+        <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="pc-order" class="field-input" value="0"></div>
       </div>
-      <div class="field-group"><label class="field-label">상태</label>
-        <select id="pc-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
+      <div class="field-group"><label class="field-label">状态</label>
+        <select id="pc-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closePCModal()">취소</button>
-      <button class="btn-save" onclick="savePC()">저장</button>
+      <button class="btn-cancel" onclick="closePCModal()">取消</button>
+      <button class="btn-save" onclick="savePC()">保存</button>
     </div>
   </div>
 </div>
 
-<!-- 경관지 모달 -->
+<!-- 景区弹窗 -->
 <div class="modal-bg" id="ga-modal-bg">
   <div class="modal">
     <div class="modal-head">
-      <h3 id="ga-modal-title">경관지 추가</h3>
+      <h3 id="ga-modal-title">添加景区</h3>
       <button class="modal-close" onclick="closeGAModal()">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="ga-id-orig">
-      <div class="field-group"><label class="field-label">키 (영문, 고유값) *</label><input type="text" id="ga-key" class="field-input" placeholder="phoenix_town"></div>
-      <div class="field-group"><label class="field-label">이름 *</label><input type="text" id="ga-name" class="field-input" placeholder="봉황고성"></div>
+      <div class="field-group"><label class="field-label">key (英文，唯一值) *</label><input type="text" id="ga-key" class="field-input" placeholder="phoenix_town"></div>
+      <div class="field-group"><label class="field-label">名称 *</label><input type="text" id="ga-name" class="field-input" placeholder="凤凰古城"></div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">아이콘 이모지</label><input type="text" id="ga-icon" class="field-input" placeholder="🏯"></div>
-        <div class="field-group"><label class="field-label">정렬 순서</label><input type="number" id="ga-order" class="field-input" value="0"></div>
+        <div class="field-group"><label class="field-label">图标表情符号</label><input type="text" id="ga-icon" class="field-input" placeholder="🏯"></div>
+        <div class="field-group"><label class="field-label">排序顺序</label><input type="number" id="ga-order" class="field-input" value="0"></div>
       </div>
-      <div class="field-group"><label class="field-label">상태</label>
-        <select id="ga-active" class="field-input"><option value="1">활성</option><option value="0">비활성</option></select></div>
-      <div class="field-hint">⚠️ 새로 추가하는 경관지는 지도·GPS·구역 탭에 자동 반영되지 않으며, 태그·필터 용도로만 쓰입니다.</div>
+      <div class="field-group"><label class="field-label">状态</label>
+        <select id="ga-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
+      <div class="field-hint">⚠️ 新增的景区不会自动反映到地图/GPS/区域标签页，仅用于标签/筛选用途。</div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeGAModal()">취소</button>
-      <button class="btn-save" onclick="saveGA()">저장</button>
+      <button class="btn-cancel" onclick="closeGAModal()">取消</button>
+      <button class="btn-save" onclick="saveGA()">保存</button>
     </div>
   </div>
 </div>
@@ -1203,13 +1203,24 @@ const SUPA_KEY = 'sb_publishable_oxeR92SfBDMzYAvcNitbPw_Vf0u1y0K';
 let sb, currentUser, userRole;
 try { sb = window.supabase.createClient(SUPA_URL, SUPA_KEY); } catch(e) {}
 
-const ATTR_LABELS = {forest:'삼림공원', tianmen:'천문산', canyon:'협곡'};
+const ATTR_LABELS = {forest:'森林公园', tianmen:'天门山', canyon:'峡谷'};
+/* 向导地点 "区域(zone_id)" 标签 — 与实际向导页面(lotocha_guide.html)的区域名保持一致。
+   即使景区(attr)相同，区域不同实际上就是不同地点，因此在列表中按区域分类显示 */
+const ZONE_LABELS = {
+  forest: {south:'南门·十里画廊', yuanjia:'袁家界·百龙电梯', tianzi:'天子山·索道', yangjiajie:'杨家界换乘中心'},
+  tianmen: {base:'缆车下站·市区', summit:'山顶·天门洞·玻璃栈道'},
+  canyon: {huanglongdong:'黄龙洞溶洞', bridge:'大峡谷玻璃桥'},
+};
+function zoneLabel(attrId, zoneId) {
+  if (!zoneId) return '-';
+  return (ZONE_LABELS[attrId] && ZONE_LABELS[attrId][zoneId]) || zoneId;
+}
 const STORAGE_BUCKET = 'lotocha-media';
 
-/* ───── 카테고리 데이터 (지역 / 업체 카테고리 / 경관지) ───── */
-let REGIONS_LIST = [{name_ko:'시내'},{name_ko:'무릉원'},{name_ko:'천문산'},{name_ko:'황룡동'},{name_ko:'기타'}];
-let CATEGORIES_LIST = [{cat_key:'restaurant',name_ko:'식당'},{cat_key:'cafe',name_ko:'카페'},{cat_key:'hotel',name_ko:'호텔/숙소'},{cat_key:'shop',name_ko:'쇼핑'},{cat_key:'attraction',name_ko:'볼거리'},{cat_key:'transport',name_ko:'교통'},{cat_key:'etc',name_ko:'기타'}];
-let ATTRACTIONS_LIST = [{attr_key:'forest',name_ko:'국가삼림공원',is_protected:true},{attr_key:'tianmen',name_ko:'천문산',is_protected:true},{attr_key:'canyon',name_ko:'황룡동+대협곡',is_protected:true}];
+/* ───── 分类数据 (地区 / 商户分类 / 景区) ───── */
+let REGIONS_LIST = [{name_ko:'市内'},{name_ko:'武陵源'},{name_ko:'天门山'},{name_ko:'黄龙洞'},{name_ko:'其他'}];
+let CATEGORIES_LIST = [{cat_key:'restaurant',name_ko:'餐厅'},{cat_key:'cafe',name_ko:'咖啡厅'},{cat_key:'hotel',name_ko:'酒店/住宿'},{cat_key:'shop',name_ko:'购物'},{cat_key:'attraction',name_ko:'景点游览'},{cat_key:'transport',name_ko:'交通'},{cat_key:'etc',name_ko:'其他'}];
+let ATTRACTIONS_LIST = [{attr_key:'forest',name_ko:'国家森林公园',is_protected:true},{attr_key:'tianmen',name_ko:'天门山',is_protected:true},{attr_key:'canyon',name_ko:'黄龙洞+大峡谷',is_protected:true}];
 
 async function loadCategoryData() {
   try {
@@ -1221,7 +1232,7 @@ async function loadCategoryData() {
     if (regions && regions.length) REGIONS_LIST = regions;
     if (cats && cats.length) { CATEGORIES_LIST = cats; Object.assign(CAT_LABELS, Object.fromEntries(cats.map(c=>[c.cat_key,c.name_ko]))); }
     if (attrs && attrs.length) { ATTRACTIONS_LIST = attrs; Object.assign(ATTR_LABELS, Object.fromEntries(attrs.map(a=>[a.attr_key,a.name_ko]))); }
-  } catch(e) { console.warn('카테고리 로드 실패', e); }
+  } catch(e) { console.warn('分类加载失败', e); }
   populateCategorySelects();
 }
 function populateCategorySelects() {
@@ -1240,7 +1251,7 @@ async function uploadMedia(fileInput, targetId) {
   if (!files.length) return;
   const ta = document.getElementById(targetId);
   let uploaded = 0, failed = 0;
-  toast(`업로드 중... (${files.length}개)`, '');
+  toast(`上传中... (${files.length}个)`, '');
   for (const file of files) {
     const ext = file.name.includes('.') ? file.name.split('.').pop() : 'bin';
     const path = `${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
@@ -1251,10 +1262,10 @@ async function uploadMedia(fileInput, targetId) {
     uploaded++;
   }
   fileInput.value = '';
-  if (failed === 0) toast(`✅ ${uploaded}개 업로드 완료`, 'success');
-  else toast(`⚠️ ${uploaded}개 완료, ${failed}개 실패`, 'error');
+  if (failed === 0) toast(`✅ ${uploaded}个上传完成`, 'success');
+  else toast(`⚠️ ${uploaded}个完成, ${failed}个失败`, 'error');
 }
-/* ── 썸네일 2매 업로드 위젯 (prefix 예: 's-img', 'pl-img') ── */
+/* ── 缩略图2张上传组件 (prefix 例: 's-img', 'pl-img') ── */
 function thumbGetArr(prefix) {
   try { return JSON.parse(document.getElementById(prefix+'-data').value || '[]'); } catch(e) { return []; }
 }
@@ -1267,7 +1278,7 @@ function renderThumbWidget(prefix) {
     if (url) {
       return `<div class="thumb-slot filled"><img src="${url}" alt=""><button type="button" class="thumb-remove" onclick="thumbRemove('${prefix}',${i})">✕</button></div>`;
     }
-    return `<div class="thumb-slot empty" onclick="document.getElementById('${prefix}-file-${i}').click()"><span class="thumb-plus">+</span><span>업로드</span><input type="file" id="${prefix}-file-${i}" accept="image/*" style="display:none" onchange="thumbUpload('${prefix}',${i},this)"></div>`;
+    return `<div class="thumb-slot empty" onclick="document.getElementById('${prefix}-file-${i}').click()"><span class="thumb-plus">+</span><span>上传</span><input type="file" id="${prefix}-file-${i}" accept="image/*" style="display:none" onchange="thumbUpload('${prefix}',${i},this)"></div>`;
   }).join('');
 }
 function setThumbWidget(prefix, arr) {
@@ -1278,16 +1289,16 @@ async function thumbUpload(prefix, idx, fileInput) {
   const file = fileInput.files[0];
   if (!file) return;
   const urls = thumbGetArr(prefix);
-  toast('업로드 중...', '');
+  toast('上传中...', '');
   const ext = file.name.includes('.') ? file.name.split('.').pop() : 'jpg';
   const path = `${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
   const { error } = await sb.storage.from(STORAGE_BUCKET).upload(path, file, {cacheControl:'31536000', upsert:false});
-  if (error) { toast('업로드 실패: '+error.message, 'error'); return; }
+  if (error) { toast('上传失败: '+error.message, 'error'); return; }
   const { data: urlData } = sb.storage.from(STORAGE_BUCKET).getPublicUrl(path);
   urls[idx] = urlData.publicUrl;
   document.getElementById(prefix+'-data').value = JSON.stringify(urls.filter(Boolean).slice(0,2));
   renderThumbWidget(prefix);
-  toast('✅ 업로드 완료', 'success');
+  toast('✅ 上传完成', 'success');
 }
 function thumbRemove(prefix, idx) {
   const urls = thumbGetArr(prefix);
@@ -1300,7 +1311,7 @@ function toast(msg, type='') {
   t.textContent = msg; t.className = 'toast show ' + type;
   setTimeout(() => t.className = 'toast', 2800);
 }
-function fmt(n) { return n ? n.toLocaleString('ko-KR')+'원' : '-'; }
+function fmt(n) { return n ? n.toLocaleString('ko-KR')+'韩元' : '-'; }
 function dateStr(s) { return s ? s.slice(0,10) : '-'; }
 function linesToArr(s) { return s.split('\n').map(x=>x.trim()).filter(Boolean); }
 function arrToLines(a) { return (a||[]).join('\n'); }
@@ -1314,7 +1325,7 @@ function linesToItin(s) {
 }
 function itinToLines(a) { return (a||[]).map(it=>`${it.time||''}|${it.desc||it.name||''}`).join('\n'); }
 
-/* 맞춤투어(패키지)용 일자별 일정: "일차|시간대|명소key" 줄 형식 ↔ {day,am,pm,evening[]} 구조 */
+/* 定制游(套餐)用的按天行程: "天数|时间段|景点key" 行格式 ↔ {day,am,pm,evening[]} 结构 */
 function linesToPkgItin(s) {
   const days = {};
   s.split('\n').map(x=>x.trim()).filter(Boolean).forEach(line=>{
@@ -1342,12 +1353,12 @@ async function doLogin() {
   const pw = document.getElementById('login-pw').value;
   const btn = document.getElementById('login-btn');
   const err = document.getElementById('login-err');
-  if (!email || !pw) { showErr('이메일과 비밀번호를 입력하세요'); return; }
-  btn.disabled = true; btn.textContent = '로그인 중...'; err.style.display='none';
+  if (!email || !pw) { showErr('请输入邮箱和密码'); return; }
+  btn.disabled = true; btn.textContent = '登录中...'; err.style.display='none';
   const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
   if (error) {
-    showErr('로그인 실패: ' + (error.message.includes('Invalid') ? '이메일 또는 비밀번호 오류' : error.message));
-    btn.disabled = false; btn.textContent = '로그인'; return;
+    showErr('登录失败: ' + (error.message.includes('Invalid') ? '邮箱或密码错误' : error.message));
+    btn.disabled = false; btn.textContent = '登录'; return;
   }
   await initApp(data.user);
 }
@@ -1355,7 +1366,7 @@ function showErr(msg) {
   const e = document.getElementById('login-err');
   e.textContent = msg; e.style.display = 'block';
   document.getElementById('login-btn').disabled = false;
-  document.getElementById('login-btn').textContent = '로그인';
+  document.getElementById('login-btn').textContent = '登录';
 }
 
 async function doLogout() {
@@ -1367,10 +1378,10 @@ async function doLogout() {
 async function initApp(user) {
   currentUser = user;
   const { data: adm } = await sb.from('admin_users').select('role,approved,display_name').eq('id', user.id).single();
-  if (!adm || !adm.approved) { showErr('관리자 승인이 필요합니다. 슈퍼어드민에게 문의하세요.'); await sb.auth.signOut(); return; }
+  if (!adm || !adm.approved) { showErr('需要管理员审批，请联系超级管理员。'); await sb.auth.signOut(); return; }
   userRole = adm.role;
   document.getElementById('sb-email').textContent = user.email;
-  document.getElementById('sb-role').textContent = {superadmin:'슈퍼어드민',admin:'어드민',editor:'에디터'}[userRole]||userRole;
+  document.getElementById('sb-role').textContent = {superadmin:'超级管理员',admin:'管理员',editor:'编辑者'}[userRole]||userRole;
   if (userRole === 'superadmin' || userRole === 'admin') {
     document.getElementById('sb-group-users').style.display = '';
   }
@@ -1400,7 +1411,7 @@ function showPanel(id, btn) {
   if (loaders[id]) loaders[id]();
 }
 
-/* 사이드바 그룹 접기/펼치기 — 상태를 기억해 다음 방문 때도 유지 */
+/* 侧边栏分组折叠/展开 — 记住状态，下次访问时保留 */
 function toggleSbGroup(headerBtn) {
   const grp = headerBtn.closest('.sb-group');
   if (!grp) return;
@@ -1433,29 +1444,29 @@ async function loadDashboard() {
   if ((r.count||0) > 0) { document.getElementById('review-badge').textContent=r.count; document.getElementById('review-badge').style.display=''; }
   const { data:rv } = await sb.from('guide_reviews').select('*').eq('approved',false).order('created_at',{ascending:false}).limit(5);
   const tb = document.getElementById('dash-reviews');
-  tb.innerHTML = !rv||!rv.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">미승인 리뷰 없음</td></tr>'
+  tb.innerHTML = !rv||!rv.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">暂无待审核评论</td></tr>'
     : rv.map(r=>`<tr><td>${ATTR_LABELS[r.attr_id]||r.attr_id}</td><td>${r.nickname}</td><td>${'⭐'.repeat(r.rating)}</td>
         <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.comment}</td>
         <td>${dateStr(r.created_at)}</td>
-        <td><div class="act-btns"><button class="btn-approve" onclick="approveReview('${r.id}')">승인</button>
-        <button class="btn-reject" onclick="deleteReview('${r.id}')">삭제</button></div></td></tr>`).join('');
+        <td><div class="act-btns"><button class="btn-approve" onclick="approveReview('${r.id}')">审批</button>
+        <button class="btn-reject" onclick="deleteReview('${r.id}')">删除</button></div></td></tr>`).join('');
 }
 
-/* 2026-07-20 확정: 맞춤투어는 상품이 1개(설정)면 충분하므로 별도 "맞춤투어 설정" 패널로 분리.
-   이 목록(투어 상품)은 이제 1일투어 전용 — 여러 개를 만들고 관리하는 기존 방식 그대로 유지 */
+/* 2026-07-20 确定: 定制游只需1个产品(设置)即可，因此拆分为单独的"定制游设置"面板。
+   此列表(旅游产品)现在仅限1日游 — 沿用原有的可创建多个并管理的方式 */
 async function loadTours() {
   const { data } = await sb.from('tour_products').select('*').eq('product_type','day_tour').order('sort_order');
-  document.getElementById('tours-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">로드 실패</td></tr>'
-    : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">상품 없음</td></tr>'
+  document.getElementById('tours-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">加载失败</td></tr>'
+    : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">暂无产品</td></tr>'
     : data.map(p=>`<tr>
-        <td style="font-weight:700">${p.title_ko}</td><td>${fmt(p.price_krw)}</td><td>${p.duration_days}일</td>
-        <td><span class="badge badge-${p.status}">${{live:'라이브',draft:'초안',pending:'검토중',archived:'보관'}[p.status]||p.status}</span></td>
+        <td style="font-weight:700">${p.title_ko}</td><td>${fmt(p.price_krw)}</td><td>${p.duration_days}天</td>
+        <td><span class="badge badge-${p.status}">${{live:'上线',draft:'草稿',pending:'审核中',archived:'归档'}[p.status]||p.status}</span></td>
         <td>${p.sort_order}</td>
-        <td><div class="act-btns"><button class="btn-edit" onclick="openTourModal('${p.id}')">편집</button>
-        <button class="btn-del" onclick="deleteTour('${p.id}')">삭제</button></div></td></tr>`).join('');
+        <td><div class="act-btns"><button class="btn-edit" onclick="openTourModal('${p.id}')">编辑</button>
+        <button class="btn-del" onclick="deleteTour('${p.id}')">删除</button></div></td></tr>`).join('');
 }
 
-/* ───── 맞춤투어 설정 (단일 상품, 목록/추가 없이 이 패널에서 바로 편집) ───── */
+/* ───── 定制游设置 (单一产品，无需列表/新增，直接在此面板编辑) ───── */
 let _pkgProductId = null;
 async function loadPkgSettings() {
   const { data } = await sb.from('tour_products').select('*').eq('product_type','package').order('created_at').limit(1);
@@ -1463,8 +1474,8 @@ async function loadPkgSettings() {
   const row = data && data[0];
   _pkgProductId = row ? row.id : null;
   if (!row) {
-    el.innerHTML = `<div class="min-pax-note" style="margin-bottom:12px">아직 맞춤투어 상품이 없습니다. 아래 버튼으로 1개를 만드세요 (딱 1개만 있으면 됩니다).</div>
-      <button class="btn-save" onclick="openTourModal(null,'package')">+ 맞춤투어 만들기</button>`;
+    el.innerHTML = `<div class="min-pax-note" style="margin-bottom:12px">目前还没有定制游产品。请用下方按钮创建1个(只需要1个即可)。</div>
+      <button class="btn-save" onclick="openTourModal(null,'package')">+ 创建定制游产品</button>`;
     return;
   }
   el.innerHTML = `
@@ -1472,17 +1483,17 @@ async function loadPkgSettings() {
       <div style="padding:20px">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
           <div>
-            <div style="font-size:18px;font-weight:900;color:var(--navy);margin-bottom:4px">${row.title_ko||'(제목없음)'}</div>
+            <div style="font-size:18px;font-weight:900;color:var(--navy);margin-bottom:4px">${row.title_ko||'(无标题)'}</div>
             <div style="font-size:14px;color:#888;margin-bottom:8px">${row.subtitle_ko||''}</div>
-            <span class="badge badge-${row.status}">${{live:'라이브',draft:'초안',pending:'검토중',archived:'보관'}[row.status]||row.status}</span>
+            <span class="badge badge-${row.status}">${{live:'上线',draft:'草稿',pending:'审核中',archived:'归档'}[row.status]||row.status}</span>
           </div>
-          <button class="btn-edit" onclick="openTourModal('${row.id}')">편집</button>
+          <button class="btn-edit" onclick="openTourModal('${row.id}')">编辑</button>
         </div>
         <div style="margin-top:16px;font-size:14px;color:#555;line-height:1.8">
-          <div>기본 일수(고객 날짜 선택 전 미리보기): <b>${row.duration_days||1}일</b></div>
-          <div>연령별 가격(price_tiers): <b>${Array.isArray(row.price_tiers)?row.price_tiers.length:0}개 설정됨</b></div>
-          <div>선택 옵션(tour_options): <b>${Array.isArray(row.tour_options)?row.tour_options.length:0}개 설정됨</b></div>
-          <div>참고용 클래식 일정: <b>${Array.isArray(row.itinerary)&&row.itinerary.length?row.itinerary.length+'일 등록됨':'없음'}</b></div>
+          <div>默认天数(客人选择日期前的预览): <b>${row.duration_days||1}天</b></div>
+          <div>年龄价格档(price_tiers): <b>${Array.isArray(row.price_tiers)?row.price_tiers.length:0}个已设置</b></div>
+          <div>可选项目(tour_options): <b>${Array.isArray(row.tour_options)?row.tour_options.length:0}个已设置</b></div>
+          <div>参考经典行程: <b>${Array.isArray(row.itinerary)&&row.itinerary.length?row.itinerary.length+'天已登记':'无'}</b></div>
         </div>
       </div>
     </div>`;
@@ -1494,9 +1505,9 @@ function renderTierRow(t={}) {
   d.className = 'dyn-row'; d.dataset.idx = idx;
   d.innerHTML = `
     <input type="text" placeholder="key" value="${t.key||''}" style="flex:1;max-width:80px">
-    <input type="text" placeholder="라벨" value="${t.label||''}" style="flex:2">
-    <input type="number" placeholder="가격 (맞춤투어는 비워두면 실시간 계산)" value="${t.price||''}" style="flex:1;max-width:90px">
-    <label class="chk"><input type="checkbox" ${t.counts_min?'checked':''}> 최소인원</label>
+    <input type="text" placeholder="标签" value="${t.label||''}" style="flex:2">
+    <input type="number" placeholder="价格(定制游留空则实时计算)" value="${t.price||''}" style="flex:1;max-width:90px">
+    <label class="chk"><input type="checkbox" ${t.counts_min?'checked':''}> 最少人数</label>
     <button class="btn-rm" onclick="this.parentNode.remove()">✕</button>`;
   return d;
 }
@@ -1505,10 +1516,10 @@ function renderOptRow(o={}) {
   d.className = 'dyn-row';
   d.innerHTML = `
     <input type="text" placeholder="key" value="${o.key||''}" style="flex:1;max-width:80px">
-    <input type="text" placeholder="라벨" value="${o.label||''}" style="flex:2">
-    <input type="number" placeholder="가격" value="${o.price||''}" style="flex:1;max-width:90px">
-    <select style="flex:1;max-width:70px"><option value="pax" ${o.per==='pax'?'selected':''}>인당</option><option value="group" ${o.per==='group'?'selected':''}>그룹</option></select>
-    <input type="text" placeholder="선택그룹(예:meal)" value="${o.group||''}" style="flex:1;max-width:120px" title="같은 값을 입력한 옵션끼리는 라디오(단일선택)로 묶입니다. 비워두면 기존처럼 다중선택(체크박스)">
+    <input type="text" placeholder="标签" value="${o.label||''}" style="flex:2">
+    <input type="number" placeholder="价格" value="${o.price||''}" style="flex:1;max-width:90px">
+    <select style="flex:1;max-width:70px"><option value="pax" ${o.per==='pax'?'selected':''}>每人</option><option value="group" ${o.per==='group'?'selected':''}>团队</option></select>
+    <input type="text" placeholder="选择分组(例: meal)" value="${o.group||''}" style="flex:1;max-width:120px" title="输入相同值的选项会以单选按钮(仅可选1项)形式归为一组。留空则和以往一样为多选(复选框)">
     <button class="btn-rm" onclick="this.parentNode.remove()">✕</button>`;
   return d;
 }
@@ -1530,37 +1541,37 @@ function collectOpts() {
     return o;
   }).filter(o=>o.key&&o.label);
 }
-/* 단일 텍스트 입력칸에 이미지 업로드 (호텔/항공편/명소 전역 풀 공용) */
+/* 单个文本输入框的图片上传(酒店/航班/景点全局库公用) */
 async function uploadToInput(fileInput, targetId) {
   const files = [...fileInput.files];
   if (!files.length) return;
   const file = files[0];
   const ext = file.name.includes('.') ? file.name.split('.').pop() : 'jpg';
   const path = `${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
-  toast('이미지 업로드 중...', '');
+  toast('图片上传中...', '');
   const { error } = await sb.storage.from(STORAGE_BUCKET).upload(path, file, {cacheControl:'31536000', upsert:false});
-  if (error) { toast('업로드 실패','error'); return; }
+  if (error) { toast('上传失败','error'); return; }
   const { data: urlData } = sb.storage.from(STORAGE_BUCKET).getPublicUrl(path);
   document.getElementById(targetId).value = urlData.publicUrl;
   fileInput.value = '';
-  toast('✅ 이미지 업로드 완료','success');
+  toast('✅ 图片上传完成','success');
 }
 
-/* ───── 호텔 관리 (전역 공용, tour_hotels) ───── */
+/* ───── 酒店管理 (全局公用, tour_hotels) ───── */
 async function loadHotelPool() {
   const { data } = await sb.from('tour_hotels').select('*').order('sort_order');
-  document.getElementById('hotels-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">로드 실패 (테이블이 없으면 lotocha_supabase_global_pools.sql 실행 필요)</td></tr>'
-    : !data.length ? '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:20px">등록된 호텔 없음</td></tr>'
+  document.getElementById('hotels-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">加载失败 (若数据表不存在，请执行 lotocha_supabase_global_pools.sql )</td></tr>'
+    : !data.length ? '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:20px">暂无酒店记录</td></tr>'
     : data.map(h=>`<tr>
         <td style="font-weight:700">${h.name}${h.grade?` (${h.grade})`:''}</td>
-        <td>${h.price?fmt(h.price)+(h.per==='pax'?'/인':''):'기본 포함'}</td>
-        <td><span class="badge badge-${h.is_active?'live':'archived'}">${h.is_active?'활성':'비활성'}</span></td>
+        <td>${h.price?fmt(h.price)+(h.per==='pax'?'/人':''):'基本包含'}</td>
+        <td><span class="badge badge-${h.is_active?'live':'archived'}">${h.is_active?'启用':'禁用'}</span></td>
         <td>${h.sort_order}</td>
-        <td><div class="act-btns"><button class="btn-edit" onclick="openHotelPoolModal('${h.id}')">편집</button>
-        <button class="btn-del" onclick="deleteHotelPool('${h.id}')">삭제</button></div></td></tr>`).join('');
+        <td><div class="act-btns"><button class="btn-edit" onclick="openHotelPoolModal('${h.id}')">编辑</button>
+        <button class="btn-del" onclick="deleteHotelPool('${h.id}')">删除</button></div></td></tr>`).join('');
 }
 function openHotelPoolModal(id) {
-  document.getElementById('hotel-modal-title').textContent = id ? '호텔 편집' : '호텔 추가';
+  document.getElementById('hotel-modal-title').textContent = id ? '编辑酒店' : '添加酒店';
   const flds = ['ho-id','ho-name','ho-grade','ho-desc','ho-image'];
   if (!id) {
     flds.forEach(f=>document.getElementById(f).value='');
@@ -1589,7 +1600,7 @@ function closeHotelPoolModal(e) {
 async function saveHotelPool() {
   const id = document.getElementById('ho-id').value;
   const name = document.getElementById('ho-name').value.trim();
-  if (!name) { toast('호텔명을 입력하세요','error'); return; }
+  if (!name) { toast('请输入酒店名称','error'); return; }
   const payload = {
     name, grade: document.getElementById('ho-grade').value.trim()||null,
     price: parseInt(document.getElementById('ho-price').value)||0,
@@ -1601,32 +1612,32 @@ async function saveHotelPool() {
     updated_at: new Date().toISOString(),
   };
   const { error } = id ? await sb.from('tour_hotels').update(payload).eq('id',id) : await sb.from('tour_hotels').insert(payload);
-  if (error) { toast('저장 실패: '+error.message,'error'); return; }
-  toast(id?'수정되었습니다':'추가되었습니다','success'); closeHotelPoolModal(); loadHotelPool();
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast(id?'已修改':'已添加','success'); closeHotelPoolModal(); loadHotelPool();
 }
 async function deleteHotelPool(id) {
-  if (!confirm('삭제하시겠습니까?')) return;
+  if (!confirm('确定要删除吗？')) return;
   const { error } = await sb.from('tour_hotels').delete().eq('id',id);
-  if (error) { toast('삭제 실패','error'); return; }
-  toast('삭제되었습니다'); loadHotelPool();
+  if (error) { toast('删除失败','error'); return; }
+  toast('已删除'); loadHotelPool();
 }
 
-/* ───── 항공편 관리 (전역 공용, tour_flights) ───── */
+/* ───── 航班管理 (全局公用, tour_flights) ───── */
 async function loadFlightPool() {
   const { data } = await sb.from('tour_flights').select('*').order('sort_order');
-  document.getElementById('flights-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">로드 실패 (테이블이 없으면 lotocha_supabase_global_pools.sql 실행 필요)</td></tr>'
-    : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">등록된 항공편 없음</td></tr>'
+  document.getElementById('flights-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">加载失败 (若数据表不存在，请执行 lotocha_supabase_global_pools.sql )</td></tr>'
+    : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">暂无航班记录</td></tr>'
     : data.map(f=>`<tr>
         <td style="font-weight:700">${f.name}</td>
         <td>${f.location||'-'}</td>
         <td>${f.time_desc||'-'}</td>
-        <td><span class="badge badge-${f.is_active?'live':'archived'}">${f.is_active?'활성':'비활성'}</span></td>
+        <td><span class="badge badge-${f.is_active?'live':'archived'}">${f.is_active?'启用':'禁用'}</span></td>
         <td>${f.sort_order}</td>
-        <td><div class="act-btns"><button class="btn-edit" onclick="openFlightPoolModal('${f.id}')">편집</button>
-        <button class="btn-del" onclick="deleteFlightPool('${f.id}')">삭제</button></div></td></tr>`).join('');
+        <td><div class="act-btns"><button class="btn-edit" onclick="openFlightPoolModal('${f.id}')">编辑</button>
+        <button class="btn-del" onclick="deleteFlightPool('${f.id}')">删除</button></div></td></tr>`).join('');
 }
 function openFlightPoolModal(id) {
-  document.getElementById('flight-modal-title').textContent = id ? '항공편 편집' : '항공편 추가';
+  document.getElementById('flight-modal-title').textContent = id ? '编辑航班' : '添加航班';
   const flds = ['fl2-id','fl2-name','fl2-location','fl2-time','fl2-desc','fl2-image'];
   if (!id) {
     flds.forEach(f=>document.getElementById(f).value='');
@@ -1653,7 +1664,7 @@ function closeFlightPoolModal(e) {
 async function saveFlightPool() {
   const id = document.getElementById('fl2-id').value;
   const name = document.getElementById('fl2-name').value.trim();
-  if (!name) { toast('노선명을 입력하세요','error'); return; }
+  if (!name) { toast('请输入航线名称','error'); return; }
   const payload = {
     name, location: document.getElementById('fl2-location').value.trim()||null,
     time_desc: document.getElementById('fl2-time').value.trim()||null,
@@ -1664,35 +1675,35 @@ async function saveFlightPool() {
     updated_at: new Date().toISOString(),
   };
   const { error } = id ? await sb.from('tour_flights').update(payload).eq('id',id) : await sb.from('tour_flights').insert(payload);
-  if (error) { toast('저장 실패: '+error.message,'error'); return; }
-  toast(id?'수정되었습니다':'추가되었습니다','success'); closeFlightPoolModal(); loadFlightPool();
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast(id?'已修改':'已添加','success'); closeFlightPoolModal(); loadFlightPool();
 }
 async function deleteFlightPool(id) {
-  if (!confirm('삭제하시겠습니까?')) return;
+  if (!confirm('确定要删除吗？')) return;
   const { error } = await sb.from('tour_flights').delete().eq('id',id);
-  if (error) { toast('삭제 실패','error'); return; }
-  toast('삭제되었습니다'); loadFlightPool();
+  if (error) { toast('删除失败','error'); return; }
+  toast('已删除'); loadFlightPool();
 }
 
-/* ───── 명소 관리 (전역 공용, tour_attractions — 맞춤투어 "일정 직접 짜기"용. 도우미 페이지 경관지(guide_attractions)와는 다른 테이블) ───── */
-const ATTR_POOL_CAT_LABELS = {large:'대형',feature:'특색',local:'인문'};
-const SLOT_TYPE_LABELS = {full_day:'하루종일',half_day:'반나절',evening:'저녁/야간',pm_evening:'오후+저녁',pm_evening_nextam:'오후+저녁+익일오전'};
+/* ───── 景点管理 (全局公用, tour_attractions — 供定制游"自由安排行程"使用。与助手页面的景区guide_attractions是不同的表) ───── */
+const ATTR_POOL_CAT_LABELS = {large:'大型',feature:'特色',local:'人文'};
+const SLOT_TYPE_LABELS = {full_day:'全天',half_day:'半天',evening:'晚上/夜间',pm_evening:'下午+晚上',pm_evening_nextam:'下午+晚上+次日上午'};
 async function loadAttractionPool() {
   const { data } = await sb.from('tour_attractions').select('*').order('sort_order');
-  document.getElementById('attractions-tbody').innerHTML = !data ? '<tr><td colspan="7" style="color:var(--red)">로드 실패 (테이블이 없으면 lotocha_supabase_global_pools.sql / lotocha_supabase_pricing_model.sql 실행 필요)</td></tr>'
-    : !data.length ? '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:20px">등록된 명소 없음</td></tr>'
+  document.getElementById('attractions-tbody').innerHTML = !data ? '<tr><td colspan="7" style="color:var(--red)">加载失败 (若数据表不存在，请执行 lotocha_supabase_global_pools.sql / lotocha_supabase_pricing_model.sql )</td></tr>'
+    : !data.length ? '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:20px">暂无景点记录</td></tr>'
     : data.map(a=>`<tr>
         <td style="font-family:monospace;font-size:12px">${a.key}</td>
         <td style="font-weight:700">${a.label}</td>
         <td>${SLOT_TYPE_LABELS[a.slot_type]||a.slot_type||'-'}</td>
-        <td>${a.price ? a.price+'위안' : '무료'}</td>
-        <td><span class="badge badge-${a.is_active?'live':'archived'}">${a.is_active?'활성':'비활성'}</span></td>
+        <td>${a.price ? a.price+'人民币' : '免费'}</td>
+        <td><span class="badge badge-${a.is_active?'live':'archived'}">${a.is_active?'启用':'禁用'}</span></td>
         <td>${a.sort_order}</td>
-        <td><div class="act-btns"><button class="btn-edit" onclick="openAttractionPoolModal('${a.id}')">편집</button>
-        <button class="btn-del" onclick="deleteAttractionPool('${a.id}')">삭제</button></div></td></tr>`).join('');
+        <td><div class="act-btns"><button class="btn-edit" onclick="openAttractionPoolModal('${a.id}')">编辑</button>
+        <button class="btn-del" onclick="deleteAttractionPool('${a.id}')">删除</button></div></td></tr>`).join('');
 }
 function openAttractionPoolModal(id) {
-  document.getElementById('attraction-modal-title').textContent = id ? '명소 편집' : '명소 추가';
+  document.getElementById('attraction-modal-title').textContent = id ? '编辑景点' : '添加景点';
   const flds = ['atp-id','atp-key','atp-label','atp-desc','atp-image'];
   if (!id) {
     flds.forEach(f=>document.getElementById(f).value='');
@@ -1723,9 +1734,9 @@ async function saveAttractionPool() {
   const id = document.getElementById('atp-id').value;
   const key = document.getElementById('atp-key').value.trim();
   const label = document.getElementById('atp-label').value.trim();
-  if (!key || !label) { toast('key와 라벨을 입력하세요','error'); return; }
+  if (!key || !label) { toast('请输入key和标签','error'); return; }
   const slotType = document.getElementById('atp-slot').value;
-  /* cat은 하위호환용 — slot_type 기준으로 대략 매핑해 자동 채움 */
+  /* cat 为向后兼容用 — 根据slot_type大致映射自动填充 */
   const catMap = {full_day:'large', half_day:'feature', evening:'local', pm_evening:'large', pm_evening_nextam:'large'};
   const payload = {
     key, label, cat: catMap[slotType]||'feature', slot_type: slotType,
@@ -1737,32 +1748,32 @@ async function saveAttractionPool() {
     updated_at: new Date().toISOString(),
   };
   const { error } = id ? await sb.from('tour_attractions').update(payload).eq('id',id) : await sb.from('tour_attractions').insert(payload);
-  if (error) { toast('저장 실패: '+error.message,'error'); return; }
-  toast(id?'수정되었습니다':'추가되었습니다','success'); closeAttractionPoolModal(); loadAttractionPool();
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast(id?'已修改':'已添加','success'); closeAttractionPoolModal(); loadAttractionPool();
 }
 async function deleteAttractionPool(id) {
-  if (!confirm('삭제하시겠습니까?')) return;
+  if (!confirm('确定要删除吗？')) return;
   const { error } = await sb.from('tour_attractions').delete().eq('id',id);
-  if (error) { toast('삭제 실패','error'); return; }
-  toast('삭제되었습니다'); loadAttractionPool();
+  if (error) { toast('删除失败','error'); return; }
+  toast('已删除'); loadAttractionPool();
 }
 
-/* ───── 부가서비스 관리 (전역 공용, tour_addon_services — 마사지 등 슬롯 미점유 항목) ───── */
+/* ───── 附加服务管理 (全局公用, tour_addon_services — 按摩等不占用时段的项目) ───── */
 async function loadAddonSvc() {
   const { data } = await sb.from('tour_addon_services').select('*').order('sort_order');
-  document.getElementById('addonsvc-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">로드 실패 (테이블이 없으면 lotocha_supabase_pricing_model.sql 실행 필요)</td></tr>'
-    : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">등록된 항목 없음</td></tr>'
+  document.getElementById('addonsvc-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">加载失败 (若数据表不存在，请执行 lotocha_supabase_pricing_model.sql )</td></tr>'
+    : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">暂无项目记录</td></tr>'
     : data.map(a=>`<tr>
         <td style="font-weight:700">${a.name}</td>
-        <td>${a.duration_min?a.duration_min+'분':'-'}</td>
-        <td>${a.price?a.price+'위안':'무료'}</td>
-        <td><span class="badge badge-${a.is_active?'live':'archived'}">${a.is_active?'활성':'비활성'}</span></td>
+        <td>${a.duration_min?a.duration_min+'分钟':'-'}</td>
+        <td>${a.price?a.price+'人民币':'免费'}</td>
+        <td><span class="badge badge-${a.is_active?'live':'archived'}">${a.is_active?'启用':'禁用'}</span></td>
         <td>${a.sort_order}</td>
-        <td><div class="act-btns"><button class="btn-edit" onclick="openAddonModal('${a.id}')">편집</button>
-        <button class="btn-del" onclick="deleteAddon('${a.id}')">삭제</button></div></td></tr>`).join('');
+        <td><div class="act-btns"><button class="btn-edit" onclick="openAddonModal('${a.id}')">编辑</button>
+        <button class="btn-del" onclick="deleteAddon('${a.id}')">删除</button></div></td></tr>`).join('');
 }
 function openAddonModal(id) {
-  document.getElementById('addon-modal-title').textContent = id ? '부가서비스 편집' : '부가서비스 추가';
+  document.getElementById('addon-modal-title').textContent = id ? '编辑附加服务' : '添加附加服务';
   const flds = ['addon-id','addon-name','addon-duration','addon-price','addon-note'];
   if (!id) {
     flds.forEach(f=>document.getElementById(f).value='');
@@ -1788,7 +1799,7 @@ function closeAddonModal(e) {
 async function saveAddon() {
   const id = document.getElementById('addon-id').value;
   const name = document.getElementById('addon-name').value.trim();
-  if (!name) { toast('항목명을 입력하세요','error'); return; }
+  if (!name) { toast('请输入项目名称','error'); return; }
   const payload = {
     name,
     duration_min: parseInt(document.getElementById('addon-duration').value)||null,
@@ -1799,27 +1810,27 @@ async function saveAddon() {
     updated_at: new Date().toISOString(),
   };
   const { error } = id ? await sb.from('tour_addon_services').update(payload).eq('id',id) : await sb.from('tour_addon_services').insert(payload);
-  if (error) { toast('저장 실패: '+error.message,'error'); return; }
-  toast(id?'수정되었습니다':'추가되었습니다','success'); closeAddonModal(); loadAddonSvc();
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast(id?'已修改':'已添加','success'); closeAddonModal(); loadAddonSvc();
 }
 async function deleteAddon(id) {
-  if (!confirm('삭제하시겠습니까?')) return;
+  if (!confirm('确定要删除吗？')) return;
   const { error } = await sb.from('tour_addon_services').delete().eq('id',id);
-  if (error) { toast('삭제 실패','error'); return; }
-  toast('삭제되었습니다'); loadAddonSvc();
+  if (error) { toast('删除失败','error'); return; }
+  toast('已删除'); loadAddonSvc();
 }
 
-/* ───── 가격 설정 (전역 공용, tour_pricing_settings — key는 고정, value/note만 수정) ───── */
+/* ───── 价格设置 (全局公用, tour_pricing_settings — key固定不变，仅修改value/note) ───── */
 async function loadPricing() {
   const { data } = await sb.from('tour_pricing_settings').select('*').order('sort_order');
-  document.getElementById('pricing-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">로드 실패 (테이블이 없으면 lotocha_supabase_pricing_model.sql 실행 필요)</td></tr>'
-    : !data.length ? '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:20px">등록된 항목 없음</td></tr>'
+  document.getElementById('pricing-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">加载失败 (若数据表不存在，请执行 lotocha_supabase_pricing_model.sql )</td></tr>'
+    : !data.length ? '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:20px">暂无项目记录</td></tr>'
     : data.map(r=>`<tr>
         <td style="font-weight:700">${r.label}</td>
-        <td>${r.value===null?'<span style="color:var(--red)">고객센터 문의</span>':r.value}</td>
+        <td>${r.value===null?'<span style="color:var(--red)">请咨询客服</span>':r.value}</td>
         <td>${r.unit||'-'}</td>
         <td style="color:#888;font-size:13px">${r.note||''}</td>
-        <td><div class="act-btns"><button class="btn-edit" onclick="openPricingModal('${r.key}')">편집</button></div></td></tr>`).join('');
+        <td><div class="act-btns"><button class="btn-edit" onclick="openPricingModal('${r.key}')">编辑</button></div></td></tr>`).join('');
 }
 function openPricingModal(key) {
   sb.from('tour_pricing_settings').select('*').eq('key',key).single().then(({data:r})=>{
@@ -1844,11 +1855,11 @@ async function savePricing() {
     updated_at: new Date().toISOString(),
   };
   const { error } = await sb.from('tour_pricing_settings').update(payload).eq('key',key);
-  if (error) { toast('저장 실패: '+error.message,'error'); return; }
-  toast('수정되었습니다','success'); closePricingModal(); loadPricing();
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast('已修改','success'); closePricingModal(); loadPricing();
 }
 
-/* ───── 가격 설정 페이지 내 서브탭 (원가단가/이윤/연령할인/자연손모를 한 곳에서 관리) ───── */
+/* ───── 价格设置页面内子标签页 (成本单价/利润/年龄折扣/自然损耗统一管理) ───── */
 function showPricingSubtab(id, btn) {
   document.querySelectorAll('#panel-pkgsettings .subtab-btn').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('#panel-pkgsettings .pricing-subtab').forEach(p=>p.classList.remove('active'));
@@ -1858,7 +1869,7 @@ function showPricingSubtab(id, btn) {
   if (loaders[id]) loaders[id]();
 }
 
-/* ── 이윤 설정 (단일 레코드, tour_margin_settings) ── */
+/* ── 利润设置 (单一记录, tour_margin_settings) ── */
 async function loadMargin() {
   const { data } = await sb.from('tour_margin_settings').select('*').eq('id',1).single();
   if (!data) return;
@@ -1875,26 +1886,26 @@ async function saveMargin() {
     updated_at: new Date().toISOString(),
   };
   const { error } = await sb.from('tour_margin_settings').upsert(payload);
-  if (error) { toast('저장 실패: '+error.message,'error'); return; }
-  toast('저장되었습니다','success');
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast('已保存','success');
 }
 
-/* ── 연령별 할인 (tour_age_discounts) ── */
+/* ── 年龄折扣 (tour_age_discounts) ── */
 async function loadAgeDiscounts() {
   const { data } = await sb.from('tour_age_discounts').select('*').order('sort_order');
-  document.getElementById('agediscount-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">로드 실패 (lotocha_supabase_pricing_model2.sql 실행 필요)</td></tr>'
-    : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">등록된 항목 없음</td></tr>'
+  document.getElementById('agediscount-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">加载失败 (lotocha_supabase_pricing_model2.sql )</td></tr>'
+    : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">暂无项目记录</td></tr>'
     : data.map(r=>`<tr>
         <td style="font-weight:700">${r.label}</td>
-        <td>${r.min_age!=null?r.min_age+'세 이상':''}${r.min_age!=null&&r.max_age!=null?' · ':''}${r.max_age!=null?r.max_age+'세 이하':''}</td>
-        <td>${r.discount_krw.toLocaleString()}원</td>
-        <td><span class="badge badge-${r.is_active?'live':'archived'}">${r.is_active?'활성':'비활성'}</span></td>
+        <td>${r.min_age!=null?r.min_age+'岁以上':''}${r.min_age!=null&&r.max_age!=null?' · ':''}${r.max_age!=null?r.max_age+'岁以下':''}</td>
+        <td>${r.discount_krw.toLocaleString()}韩元</td>
+        <td><span class="badge badge-${r.is_active?'live':'archived'}">${r.is_active?'启用':'禁用'}</span></td>
         <td>${r.sort_order}</td>
-        <td><div class="act-btns"><button class="btn-edit" onclick="openAgeDiscModal('${r.id}')">편집</button>
-        <button class="btn-del" onclick="deleteAgeDisc('${r.id}')">삭제</button></div></td></tr>`).join('');
+        <td><div class="act-btns"><button class="btn-edit" onclick="openAgeDiscModal('${r.id}')">编辑</button>
+        <button class="btn-del" onclick="deleteAgeDisc('${r.id}')">删除</button></div></td></tr>`).join('');
 }
 function openAgeDiscModal(id) {
-  document.getElementById('agedisc-modal-title').textContent = id ? '연령 할인 편집' : '연령 할인 추가';
+  document.getElementById('agedisc-modal-title').textContent = id ? '编辑年龄折扣' : '添加年龄折扣';
   const flds = ['agedisc-id','agedisc-label','agedisc-minage','agedisc-maxage','agedisc-krw'];
   if (!id) {
     flds.forEach(f=>document.getElementById(f).value='');
@@ -1920,7 +1931,7 @@ function closeAgeDiscModal(e) {
 async function saveAgeDisc() {
   const id = document.getElementById('agedisc-id').value;
   const label = document.getElementById('agedisc-label').value.trim();
-  if (!label) { toast('구간명을 입력하세요','error'); return; }
+  if (!label) { toast('请输入时段名称','error'); return; }
   const minRaw = document.getElementById('agedisc-minage').value.trim();
   const maxRaw = document.getElementById('agedisc-maxage').value.trim();
   const payload = {
@@ -1933,32 +1944,32 @@ async function saveAgeDisc() {
     updated_at: new Date().toISOString(),
   };
   const { error } = id ? await sb.from('tour_age_discounts').update(payload).eq('id',id) : await sb.from('tour_age_discounts').insert(payload);
-  if (error) { toast('저장 실패: '+error.message,'error'); return; }
-  toast(id?'수정되었습니다':'추가되었습니다','success'); closeAgeDiscModal(); loadAgeDiscounts();
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast(id?'已修改':'已添加','success'); closeAgeDiscModal(); loadAgeDiscounts();
 }
 async function deleteAgeDisc(id) {
-  if (!confirm('삭제하시겠습니까?')) return;
+  if (!confirm('确定要删除吗？')) return;
   const { error } = await sb.from('tour_age_discounts').delete().eq('id',id);
-  if (error) { toast('삭제 실패','error'); return; }
-  toast('삭제되었습니다'); loadAgeDiscounts();
+  if (error) { toast('删除失败','error'); return; }
+  toast('已删除'); loadAgeDiscounts();
 }
 
-/* ── 자연손모 · 기타원가 (tour_cost_buffers) ── */
+/* ── 自然损耗·其他成本 (tour_cost_buffers) ── */
 async function loadCostBuffers() {
   const { data } = await sb.from('tour_cost_buffers').select('*').order('sort_order');
-  document.getElementById('costbuffer-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">로드 실패 (lotocha_supabase_pricing_model2.sql 실행 필요)</td></tr>'
-    : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">등록된 항목 없음</td></tr>'
+  document.getElementById('costbuffer-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">加载失败 (lotocha_supabase_pricing_model2.sql )</td></tr>'
+    : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">暂无项目记录</td></tr>'
     : data.map(r=>`<tr>
         <td style="font-weight:700">${r.name}</td>
         <td>${Number(r.amount).toLocaleString()}</td>
         <td>${r.currency}</td>
-        <td>${r.per_unit==='pax'?'인당':'주문당'}</td>
-        <td><span class="badge badge-${r.is_active?'live':'archived'}">${r.is_active?'활성':'비활성'}</span></td>
-        <td><div class="act-btns"><button class="btn-edit" onclick="openCostBufferModal('${r.id}')">편집</button>
-        <button class="btn-del" onclick="deleteCostBuffer('${r.id}')">삭제</button></div></td></tr>`).join('');
+        <td>${r.per_unit==='pax'?'每人':'按订单'}</td>
+        <td><span class="badge badge-${r.is_active?'live':'archived'}">${r.is_active?'启用':'禁用'}</span></td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openCostBufferModal('${r.id}')">编辑</button>
+        <button class="btn-del" onclick="deleteCostBuffer('${r.id}')">删除</button></div></td></tr>`).join('');
 }
 function openCostBufferModal(id) {
-  document.getElementById('costbuffer-modal-title').textContent = id ? '기타원가 편집' : '기타원가 추가';
+  document.getElementById('costbuffer-modal-title').textContent = id ? '编辑其他成本' : '添加其他成本';
   const flds = ['costbuffer-id','costbuffer-name','costbuffer-amount','costbuffer-note'];
   if (!id) {
     flds.forEach(f=>document.getElementById(f).value='');
@@ -1986,7 +1997,7 @@ function closeCostBufferModal(e) {
 async function saveCostBuffer() {
   const id = document.getElementById('costbuffer-id').value;
   const name = document.getElementById('costbuffer-name').value.trim();
-  if (!name) { toast('항목명을 입력하세요','error'); return; }
+  if (!name) { toast('请输入项目名称','error'); return; }
   const payload = {
     name,
     amount: parseFloat(document.getElementById('costbuffer-amount').value)||0,
@@ -1997,41 +2008,40 @@ async function saveCostBuffer() {
     updated_at: new Date().toISOString(),
   };
   const { error } = id ? await sb.from('tour_cost_buffers').update(payload).eq('id',id) : await sb.from('tour_cost_buffers').insert(payload);
-  if (error) { toast('저장 실패: '+error.message,'error'); return; }
-  toast(id?'수정되었습니다':'추가되었습니다','success'); closeCostBufferModal(); loadCostBuffers();
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast(id?'已修改':'已添加','success'); closeCostBufferModal(); loadCostBuffers();
 }
 async function deleteCostBuffer(id) {
-  if (!confirm('삭제하시겠습니까?')) return;
+  if (!confirm('确定要删除吗？')) return;
   const { error } = await sb.from('tour_cost_buffers').delete().eq('id',id);
-  if (error) { toast('삭제 실패','error'); return; }
-  toast('삭제되었습니다'); loadCostBuffers();
+  if (error) { toast('删除失败','error'); return; }
+  toast('已删除'); loadCostBuffers();
 }
 
-/* 일정 입력 힌트 (패키지는 명소 풀(tour_attractions)에서 key 목록을 동적으로 불러와 표시) */
+/* 行程输入提示(套餐会从景点库tour_attractions动态加载key列表显示) */
 async function updateItinHint() {
   const isPkg = document.getElementById('t-type').value === 'package';
   document.getElementById('t-days-hint').textContent = isPkg
-    ? '맞춤투어는 고객이 출발일·귀국일을 직접 선택해 실제 박수/일수를 정합니다. 여기 입력하는 일수는 날짜를 고르기 전 화면에 보여주는 기본값일 뿐입니다. (맞춤투어 상품은 1개만 있으면 충분)'
-    : '1일투어는 고정 일수입니다 (보통 1)';
-  document.getElementById('t-itin-label').textContent = isPkg ? '일정 (itinerary, 참고용 추천 일정)' : '일정 (itinerary, 참고용)';
+    ? '定制游由客人自行选择出发日期与回国日期来决定实际住宿晚数/天数。这里输入的天数只是选择日期前显示的默认值。(定制游产品只需1个即可)'
+    : '1日游为固定天数(通常为1)';
+  document.getElementById('t-itin-label').textContent = isPkg ? '行程(itinerary，参考推荐行程)' : '行程(itinerary，仅供参考)';
   document.getElementById('t-itinerary').placeholder = isPkg
     ? '1|am|tianmen\n1|evening|qiqilou\n2|am|grand_canyon\n2|pm|huanglong\n3|evening|supermarket\n3|evening|cafe'
-    : '09:00|호텔 픽업 후 출발\n09:30|황룡동 입장 및 유람선 체험\n11:00|점심 식사';
+    : '09:00|酒店接送后出发\n09:30|黄龙洞入场及游船体验\n11:00|午餐';
   if (!isPkg) {
-    document.getElementById('t-itin-hint').innerHTML = '한 줄에 "시간|내용" 형식으로 입력 (줄바꿈 구분)';
+    document.getElementById('t-itin-hint').innerHTML = '每行按"时间|内容"格式输入(以换行分隔)';
     return;
   }
-  document.getElementById('t-itin-hint').innerHTML = '한 줄에 "일차|시간대|명소key" 형식 (시간대: am/pm/evening). 대형은 am 또는 pm 중 1개만, 같은 날 대형 중복 불가 / 특색은 am·pm 자유 / 인문은 시간대 무관·중복 가능. 명소 key 목록 불러오는 중...';
+  document.getElementById('t-itin-hint').innerHTML = '每行格式为"天数|时间段|景点key"(时间段: am/pm/evening)。大型景点am或pm只能选1个，同一天不可重复安排大型景点 / 特色景点am·pm可自由安排 / 人文景点不限时间段且可重复。正在加载景点key列表...';
   const { data } = await sb.from('tour_attractions').select('key,label,cat').order('sort_order');
   if (!data) return;
   const byCat = {large:[],feature:[],local:[]};
   data.forEach(a=>{ (byCat[a.cat]||byCat.feature).push(`${a.key}(${a.label})`); });
-  document.getElementById('t-itin-hint').innerHTML = `한 줄에 "일차|시간대|명소key" 형식 (시간대: am/pm/evening). 대형은 am 또는 pm 중 1개만, 같은 날 대형 중복 불가 / 특색은 am·pm 자유 / 인문은 시간대 무관·중복 가능.<br>대형: ${byCat.large.join(', ')||'(없음)'}<br>특색: ${byCat.feature.join(', ')||'(없음)'}<br>인문: ${byCat.local.join(', ')||'(없음)'}<br>※ key 목록은 좌측 메뉴 "명소 관리"에서 추가/수정할 수 있습니다`;
+  document.getElementById('t-itin-hint').innerHTML = `每行格式为"天数|时间段|景点key"(时间段: am/pm/evening)。大型景点am或pm只能选1个，同一天不可重复安排大型景点 / 特色景点am·pm可自由安排 / 人文景点不限时间段且可重复。<br>大型: ${byCat.large.join(', ')||'(无)'}<br>特色: ${byCat.feature.join(', ')||'(无)'}<br>人文: ${byCat.local.join(', ')||'(无)'}<br>※ key列表可在左侧菜单"景点管理"中新增/修改`;
 }
 
-/* 타입 선택창을 아예 없애고 상황에 맞게 잠금 — 1일투어 목록에서 열면 day_tour로,
-   맞춤투어 설정에서 열면 package로 고정. 관리자가 실수로 타입을 바꿔 중복 상품이
-   생기는 것을 원천 차단 (2026-07-21 확정) */
+/* 干脆去掉类型选择框，按情况锁定 — 从1日游列表打开则锁定为day_tour，
+   从定制游设置打开则锁定为package。从根源上防止管理员误改类型导致产生重复产品 (2026-07-21 确定) */
 function applyModalTypeLock(type) {
   document.getElementById('t-type').value = type;
   document.getElementById('t-type-group').style.display = 'none';
@@ -2039,7 +2049,7 @@ function applyModalTypeLock(type) {
   document.getElementById('t-tiers-list').classList.toggle('pkg-mode', type === 'package');
 }
 function openTourModal(id, presetType) {
-  document.getElementById('tour-modal-title').textContent = id ? '투어 상품 편집' : '투어 상품 추가';
+  document.getElementById('tour-modal-title').textContent = id ? '编辑旅游产品' : '添加旅游产品';
   const clear = () => ['t-id','t-title-ko','t-title-cn','t-subtitle','t-desc','t-price-krw','t-price-cny','t-images','t-highlights','t-includes','t-excludes','t-itinerary'].forEach(f=>document.getElementById(f).value='');
   document.getElementById('t-tiers-list').innerHTML = '';
   document.getElementById('t-opts-list').innerHTML = '';
@@ -2082,10 +2092,10 @@ function closeTourModal(e) {
   if (e && e.target !== document.getElementById('tour-modal-bg')) return;
   document.getElementById('tour-modal-bg').classList.remove('open');
 }
-/* "선택 옵션(tour_options)"에 "부가서비스 관리(tour_addon_services)"와 겹치는 항목이 있는지 검사
-   (예: 마사지를 부가서비스로 이미 관리하는데 선택 옵션에도 또 넣어서 고객 화면에 중복 표시되는 문제 방지) */
+/* 检查"可选项目(tour_options)"中是否有与"附加服务管理(tour_addon_services)"重复的项目
+   (例如: 按摩已作为附加服务管理，却又加进可选项目，导致客户页面重复显示的问题) */
 function normOptLabel(s) {
-  return (s||'').replace(/[0-9]/g,'').replace(/(분|원|위안|시간)/g,'').replace(/\s+/g,'').trim();
+  return (s||'').replace(/[0-9]/g,'').replace(/(分钟|韩元|人民币|时间)/g,'').replace(/\s+/g,'').trim();
 }
 async function findOverlappingAddonOptions(tourOptions) {
   if (!tourOptions || !tourOptions.length) return [];
@@ -2124,42 +2134,43 @@ async function saveTour() {
     tour_options: collectOpts(),
     updated_at: new Date().toISOString(),
   };
-  if (!payload.title_ko) { toast('상품명을 입력하세요','error'); return; }
+  if (!payload.title_ko) { toast('请输入产品名称','error'); return; }
   if (!id && payload.product_type === 'package') {
     const { data: existing } = await sb.from('tour_products').select('id').eq('product_type','package').limit(1);
-    if (existing && existing.length) { toast('맞춤투어 상품은 이미 존재합니다 (1개만 허용)','error'); return; }
+    if (existing && existing.length) { toast('定制游产品已存在(仅允许1个)','error'); return; }
   }
   if (payload.product_type === 'package' && payload.tour_options.length) {
     const overlaps = await findOverlappingAddonOptions(payload.tour_options);
     if (overlaps.length) {
-      const ok = confirm(`다음 "선택 옵션" 항목이 이미 "부가서비스 관리"에 등록되어 있어 고객 화면에 중복 표시될 수 있습니다:\n\n${overlaps.join(', ')}\n\n부가서비스로 이미 관리 중이라면 여기 "선택 옵션"에서는 삭제하는 것을 권장합니다. 그래도 저장하시겠습니까?`);
+      const ok = confirm(`以下"可选项目"已经在"附加服务管理"中登记，可能会在客户页面重复显示：\n\n${overlaps.join(', ')}\n\n如果已经作为附加服务在管理，建议在此处的"可选项目"中删除。仍要保存吗？`);
       if (!ok) return;
     }
   }
   const { error } = id ? await sb.from('tour_products').update(payload).eq('id',id) : await sb.from('tour_products').insert(payload);
-  if (error) { toast('저장 실패: '+error.message,'error'); return; }
-  toast(id?'수정되었습니다':'추가되었습니다','success'); closeTourModal();
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast(id?'已修改':'已添加','success'); closeTourModal();
   if (payload.product_type === 'package') loadPkgSettings(); else loadTours();
 }
 async function deleteTour(id) {
-  if (!confirm('삭제하시겠습니까?')) return;
+  if (!confirm('确定要删除吗？')) return;
   const { error } = await sb.from('tour_products').delete().eq('id',id);
-  if (error) { toast('삭제 실패','error'); return; }
-  toast('삭제되었습니다'); loadTours();
+  if (error) { toast('删除失败','error'); return; }
+  toast('已删除'); loadTours();
 }
 
 async function loadSpots() {
-  const { data } = await sb.from('guide_spots').select('*').order('attr_id').order('sort_order');
-  document.getElementById('spots-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">로드 실패</td></tr>'
+  const { data } = await sb.from('guide_spots').select('*').order('attr_id').order('zone_id').order('sort_order');
+  document.getElementById('spots-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">加载失败</td></tr>'
     : data.map(s=>`<tr>
         <td>${ATTR_LABELS[s.attr_id]||s.attr_id}</td>
+        <td style="color:#666">${zoneLabel(s.attr_id, s.zone_id)}</td>
         <td style="font-weight:700">${s.name_ko}</td><td>${s.type}</td>
-        <td><span class="badge badge-${s.status}">${{live:'라이브',draft:'초안',pending:'검토중'}[s.status]||s.status}</span></td>
-        <td><div class="act-btns"><button class="btn-edit" onclick="openSpotModal('${s.id}')">편집</button>
-        <button class="btn-del" onclick="deleteSpot('${s.id}')">삭제</button></div></td></tr>`).join('');
+        <td><span class="badge badge-${s.status}">${{live:'上线',draft:'草稿',pending:'审核中'}[s.status]||s.status}</span></td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openSpotModal('${s.id}')">编辑</button>
+        <button class="btn-del" onclick="deleteSpot('${s.id}')">删除</button></div></td></tr>`).join('');
 }
 function openSpotModal(id) {
-  document.getElementById('spot-modal-title').textContent = id ? '스팟 편집' : '스팟 추가';
+  document.getElementById('spot-modal-title').textContent = id ? '编辑地点' : '添加地点';
   if (!id) {
     ['s-id','s-id-orig','s-zone','s-name-ko','s-name-cn','s-lat','s-lon','s-gaode','s-video-url','s-desc','s-tip','s-hours','s-price'].forEach(f=>document.getElementById(f).value='');
     document.getElementById('s-attr').value='forest'; document.getElementById('s-type').value='landmark';
@@ -2188,7 +2199,7 @@ function closeSpotModal(e) {
 async function saveSpot() {
   const origId = document.getElementById('s-id-orig').value;
   const newId = document.getElementById('s-id').value.trim();
-  if (!newId || !document.getElementById('s-name-ko').value.trim()) { toast('ID와 스팟명을 입력하세요','error'); return; }
+  if (!newId || !document.getElementById('s-name-ko').value.trim()) { toast('请输入ID和地点名称','error'); return; }
   const payload = {
     id: newId, attr_id: document.getElementById('s-attr').value,
     zone_id: document.getElementById('s-zone').value.trim()||null,
@@ -2209,14 +2220,14 @@ async function saveSpot() {
     updated_at: new Date().toISOString(),
   };
   const { error } = origId ? await sb.from('guide_spots').update(payload).eq('id',origId) : await sb.from('guide_spots').insert(payload);
-  if (error) { toast('저장 실패: '+error.message,'error'); return; }
-  toast(origId?'수정되었습니다':'추가되었습니다','success'); closeSpotModal(); loadSpots();
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast(origId?'已修改':'已添加','success'); closeSpotModal(); loadSpots();
 }
 async function deleteSpot(id) {
-  if (!confirm('삭제하시겠습니까?')) return;
+  if (!confirm('确定要删除吗？')) return;
   const { error } = await sb.from('guide_spots').delete().eq('id',id);
-  if (error) { toast('삭제 실패','error'); return; }
-  toast('삭제되었습니다'); loadSpots();
+  if (error) { toast('删除失败','error'); return; }
+  toast('已删除'); loadSpots();
 }
 
 async function loadReviews() {
@@ -2225,25 +2236,25 @@ async function loadReviews() {
     sb.from('guide_reviews').select('*').eq('approved',true).order('created_at',{ascending:false}).limit(20),
   ]);
   const rows = (data, approve) => !data||!data.length
-    ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:16px">없음</td></tr>'
+    ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:16px">无</td></tr>'
     : data.map(r=>`<tr><td>${ATTR_LABELS[r.attr_id]||r.attr_id}</td><td>${r.nickname}</td><td>${'⭐'.repeat(r.rating)}</td>
         <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.comment}</td>
         <td>${dateStr(r.created_at)}</td>
-        <td><div class="act-btns">${approve?`<button class="btn-approve" onclick="approveReview('${r.id}')">승인</button>`:''}
-        <button class="btn-reject" onclick="deleteReview('${r.id}')">삭제</button></div></td></tr>`).join('');
+        <td><div class="act-btns">${approve?`<button class="btn-approve" onclick="approveReview('${r.id}')">审批</button>`:''}
+        <button class="btn-reject" onclick="deleteReview('${r.id}')">删除</button></div></td></tr>`).join('');
   document.getElementById('reviews-pending').innerHTML = rows(p.data, true);
   document.getElementById('reviews-approved').innerHTML = rows(a.data, false);
 }
 async function approveReview(id) {
   const { error } = await sb.from('guide_reviews').update({approved:true}).eq('id',id);
-  if (error) { toast('실패','error'); return; }
-  toast('승인되었습니다','success'); loadReviews(); loadDashboard();
+  if (error) { toast('失败','error'); return; }
+  toast('已批准','success'); loadReviews(); loadDashboard();
 }
 async function deleteReview(id) {
-  if (!confirm('리뷰를 삭제하시겠습니까?')) return;
+  if (!confirm('确定要删除该评论吗？')) return;
   const { error } = await sb.from('guide_reviews').delete().eq('id',id);
-  if (error) { toast('실패','error'); return; }
-  toast('삭제되었습니다'); loadReviews(); loadDashboard();
+  if (error) { toast('失败','error'); return; }
+  toast('已删除'); loadReviews(); loadDashboard();
 }
 
 async function loadStats() {
@@ -2252,57 +2263,57 @@ async function loadStats() {
   (data||[]).forEach(r => { const k=r.attr_id||r.page; counts[k]=(counts[k]||0)+1; });
   document.getElementById('stats-detail').innerHTML = Object.entries(counts)
     .map(([k,v])=>`<div class="stat-card"><div class="stat-label">${ATTR_LABELS[k]||k}</div><div class="stat-value">${v.toLocaleString()}</div></div>`).join('')
-    || '<div style="color:#aaa;padding:20px">데이터 없음</div>';
+    || '<div style="color:#aaa;padding:20px">暂无数据</div>';
 }
 
 async function loadUsers() {
   const { data } = await sb.from('admin_users').select('*').order('created_at');
-  document.getElementById('users-tbody').innerHTML = !data ? '<tr><td colspan="6">로드 실패</td></tr>'
+  document.getElementById('users-tbody').innerHTML = !data ? '<tr><td colspan="6">加载失败</td></tr>'
     : data.map(u=>`<tr><td>${u.email}</td><td>${u.display_name||'-'}</td>
-        <td><span class="badge badge-${u.role==='superadmin'?'live':u.role==='admin'?'pending':'draft'}">${{superadmin:'슈퍼어드민',admin:'어드민',editor:'에디터'}[u.role]||u.role}</span></td>
-        <td>${u.approved?'✅':'⏳ 미승인'}</td><td>${dateStr(u.created_at)}</td>
+        <td><span class="badge badge-${u.role==='superadmin'?'live':u.role==='admin'?'pending':'draft'}">${{superadmin:'超级管理员',admin:'管理员',editor:'编辑者'}[u.role]||u.role}</span></td>
+        <td>${u.approved?'✅':'⏳ 待审核'}</td><td>${dateStr(u.created_at)}</td>
         <td><div class="act-btns">
-          ${!u.approved?`<button class="btn-approve" onclick="approveUser('${u.id}')">승인</button>`:''}
-          ${u.role!=='superadmin'?`<button class="btn-del" onclick="deleteUser('${u.id}')">삭제</button>`:''}
+          ${!u.approved?`<button class="btn-approve" onclick="approveUser('${u.id}')">审批</button>`:''}
+          ${u.role!=='superadmin'?`<button class="btn-del" onclick="deleteUser('${u.id}')">删除</button>`:''}
         </div></td></tr>`).join('');
 }
 async function approveUser(id) {
   const { error } = await sb.from('admin_users').update({approved:true,approved_by:currentUser.id,approved_at:new Date().toISOString()}).eq('id',id);
-  if (error) { toast('실패','error'); return; }
-  toast('승인되었습니다','success'); loadUsers();
+  if (error) { toast('失败','error'); return; }
+  toast('已批准','success'); loadUsers();
 }
 async function deleteUser(id) {
-  if (!confirm('삭제하시겠습니까?')) return;
+  if (!confirm('确定要删除吗？')) return;
   const { error } = await sb.from('admin_users').delete().eq('id',id);
-  if (error) { toast('실패','error'); return; }
-  toast('삭제되었습니다'); loadUsers();
+  if (error) { toast('失败','error'); return; }
+  toast('已删除'); loadUsers();
 }
 
-const CAT_LABELS = {restaurant:'식당',cafe:'카페',hotel:'호텔/숙소',shop:'쇼핑',attraction:'볼거리',transport:'교통',etc:'기타'};
+const CAT_LABELS = {restaurant:'餐厅',cafe:'咖啡厅',hotel:'酒店/住宿',shop:'购物',attraction:'景点游览',transport:'交通',etc:'其他'};
 
 async function loadPlaces() {
   const { data } = await sb.from('local_places').select('*').order('sort_order');
-  document.getElementById('places-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">로드 실패 (테이블이 없거나 오류)</td></tr>'
-    : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">등록된 업체 없음</td></tr>'
+  document.getElementById('places-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">加载失败 (数据表不存在或出错)</td></tr>'
+    : !data.length ? '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">暂无商户记录</td></tr>'
     : data.map(p=>`<tr>
         <td><span class="badge ${p.category==='restaurant'?'badge-day':p.category==='hotel'?'badge-pkg':'badge-draft'}">${CAT_LABELS[p.category]||p.category}</span></td>
         <td style="font-weight:700">${p.name_ko}</td>
         <td>${p.area||'-'}</td>
-        <td><span class="badge ${p.is_active?'badge-live':'badge-archived'}">${p.is_active?'활성':'비활성'}</span></td>
+        <td><span class="badge ${p.is_active?'badge-live':'badge-archived'}">${p.is_active?'启用':'禁用'}</span></td>
         <td>${p.sort_order}</td>
         <td><div class="act-btns">
-          <button class="btn-edit" onclick="openPlaceModal('${p.id}')">편집</button>
-          <button class="btn-del" onclick="deletePlace('${p.id}')">삭제</button>
+          <button class="btn-edit" onclick="openPlaceModal('${p.id}')">编辑</button>
+          <button class="btn-del" onclick="deletePlace('${p.id}')">删除</button>
         </div></td></tr>`).join('');
 }
 
 function openPlaceModal(id) {
-  document.getElementById('place-modal-title').textContent = id ? '업체 편집' : '업체 추가';
+  document.getElementById('place-modal-title').textContent = id ? '编辑商户' : '添加商户';
   const flds = ['pl-id','pl-name-ko','pl-name-cn','pl-address','pl-phone','pl-wechat','pl-hours','pl-price-range','pl-lat','pl-lon','pl-gaode','pl-desc','pl-tags'];
   if (!id) {
     flds.forEach(f=>document.getElementById(f).value='');
     document.getElementById('pl-cat').value='restaurant';
-    document.getElementById('pl-area').value='시내';
+    document.getElementById('pl-area').value='市内';
     document.getElementById('pl-order').value='0';
     document.getElementById('pl-active').value='1';
     setThumbWidget('pl-img', []);
@@ -2311,7 +2322,7 @@ function openPlaceModal(id) {
       if (!p) return;
       document.getElementById('pl-id').value=p.id;
       document.getElementById('pl-cat').value=p.category||'restaurant';
-      document.getElementById('pl-area').value=p.area||'시내';
+      document.getElementById('pl-area').value=p.area||'市内';
       document.getElementById('pl-name-ko').value=p.name_ko||'';
       document.getElementById('pl-name-cn').value=p.name_cn||'';
       document.getElementById('pl-address').value=p.address||'';
@@ -2338,7 +2349,7 @@ function closePlaceModal(e) {
 async function savePlace() {
   const id = document.getElementById('pl-id').value;
   const name = document.getElementById('pl-name-ko').value.trim();
-  if (!name) { toast('업체명을 입력하세요','error'); return; }
+  if (!name) { toast('请输入商户名称','error'); return; }
   const tagsRaw = document.getElementById('pl-tags').value;
   const payload = {
     category: document.getElementById('pl-cat').value,
@@ -2361,28 +2372,28 @@ async function savePlace() {
     updated_at: new Date().toISOString(),
   };
   const { error } = id ? await sb.from('local_places').update(payload).eq('id',id) : await sb.from('local_places').insert(payload);
-  if (error) { toast('저장 실패: '+error.message,'error'); return; }
-  toast(id?'수정되었습니다':'추가되었습니다','success'); closePlaceModal(); loadPlaces();
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast(id?'已修改':'已添加','success'); closePlaceModal(); loadPlaces();
 }
 async function deletePlace(id) {
-  if (!confirm('삭제하시겠습니까?')) return;
+  if (!confirm('确定要删除吗？')) return;
   const { error } = await sb.from('local_places').delete().eq('id',id);
-  if (error) { toast('삭제 실패','error'); return; }
-  toast('삭제되었습니다'); loadPlaces();
+  if (error) { toast('删除失败','error'); return; }
+  toast('已删除'); loadPlaces();
 }
 
-/* ───── 공연·입장권 (guide_shows_tickets) ───── */
+/* ───── 演出·门票 (guide_shows_tickets) ───── */
 async function loadST() {
   const { data } = await sb.from('guide_shows_tickets').select('*').order('sort_order');
-  document.getElementById('st-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">로드 실패</td></tr>'
+  document.getElementById('st-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">加载失败</td></tr>'
     : data.map(s=>`<tr>
-        <td>${s.kind==='show'?'공연':'입장권'}</td><td style="font-weight:700">${s.title_ko}</td><td>${s.price_info||''}</td>
-        <td><span class="badge ${s.is_active?'badge-live':'badge-draft'}">${s.is_active?'활성':'비활성'}</span></td><td>${s.sort_order}</td>
-        <td><div class="act-btns"><button class="btn-edit" onclick="openSTModal('${s.id}')">편집</button>
-        <button class="btn-del" onclick="deleteST('${s.id}')">삭제</button></div></td></tr>`).join('');
+        <td>${s.kind==='show'?'演出':'门票'}</td><td style="font-weight:700">${s.title_ko}</td><td>${s.price_info||''}</td>
+        <td><span class="badge ${s.is_active?'badge-live':'badge-draft'}">${s.is_active?'启用':'禁用'}</span></td><td>${s.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openSTModal('${s.id}')">编辑</button>
+        <button class="btn-del" onclick="deleteST('${s.id}')">删除</button></div></td></tr>`).join('');
 }
 function openSTModal(id) {
-  document.getElementById('st-modal-title').textContent = id ? '항목 편집' : '항목 추가';
+  document.getElementById('st-modal-title').textContent = id ? '编辑项目' : '添加项目';
   document.getElementById('st-id').value = id||'';
   if (!id) {
     document.getElementById('st-kind').value='show'; document.getElementById('st-active').value='1';
@@ -2403,7 +2414,7 @@ function closeSTModal(e) { if (e && e.target !== document.getElementById('st-mod
 async function saveST() {
   const id = document.getElementById('st-id').value;
   const title = document.getElementById('st-title').value.trim();
-  if (!title) { toast('제목을 입력하세요','error'); return; }
+  if (!title) { toast('请输入标题','error'); return; }
   const payload = {
     kind: document.getElementById('st-kind').value,
     title_ko: title,
@@ -2415,28 +2426,28 @@ async function saveST() {
     is_active: document.getElementById('st-active').value==='1',
   };
   const { error } = id ? await sb.from('guide_shows_tickets').update(payload).eq('id',id) : await sb.from('guide_shows_tickets').insert(payload);
-  if (error) { toast('저장 실패: '+error.message,'error'); return; }
-  toast(id?'수정되었습니다':'추가되었습니다','success'); closeSTModal(); loadST();
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast(id?'已修改':'已添加','success'); closeSTModal(); loadST();
 }
 async function deleteST(id) {
-  if (!confirm('삭제하시겠습니까?')) return;
+  if (!confirm('确定要删除吗？')) return;
   const { error } = await sb.from('guide_shows_tickets').delete().eq('id',id);
-  if (error) { toast('삭제 실패','error'); return; }
-  toast('삭제되었습니다'); loadST();
+  if (error) { toast('删除失败','error'); return; }
+  toast('已删除'); loadST();
 }
 
-/* ───── 결제 방법 (guide_payment_methods) ───── */
+/* ───── 支付方式 (guide_payment_methods) ───── */
 async function loadPM() {
   const { data } = await sb.from('guide_payment_methods').select('*').order('sort_order');
-  document.getElementById('pm-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">로드 실패</td></tr>'
+  document.getElementById('pm-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">加载失败</td></tr>'
     : data.map(m=>`<tr>
         <td>${m.method_key}</td><td style="font-weight:700">${m.logo_emoji||''} ${m.name_ko}</td>
-        <td><span class="badge ${m.is_active?'badge-live':'badge-draft'}">${m.is_active?'활성':'비활성'}</span></td><td>${m.sort_order}</td>
-        <td><div class="act-btns"><button class="btn-edit" onclick="openPMModal('${m.id}')">편집</button>
-        <button class="btn-del" onclick="deletePM('${m.id}')">삭제</button></div></td></tr>`).join('');
+        <td><span class="badge ${m.is_active?'badge-live':'badge-draft'}">${m.is_active?'启用':'禁用'}</span></td><td>${m.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openPMModal('${m.id}')">编辑</button>
+        <button class="btn-del" onclick="deletePM('${m.id}')">删除</button></div></td></tr>`).join('');
 }
 function openPMModal(id) {
-  document.getElementById('pm-modal-title').textContent = id ? '결제 방법 편집' : '결제 방법 추가';
+  document.getElementById('pm-modal-title').textContent = id ? '编辑支付方式' : '添加支付方式';
   document.getElementById('pm-id-orig').value = id||'';
   if (!id) {
     document.getElementById('pm-active').value='1';
@@ -2460,7 +2471,7 @@ async function savePM() {
   const origId = document.getElementById('pm-id-orig').value;
   const key = document.getElementById('pm-key').value.trim();
   const name = document.getElementById('pm-name').value.trim();
-  if (!key || !name) { toast('키와 이름을 입력하세요','error'); return; }
+  if (!key || !name) { toast('请输入key和名称','error'); return; }
   const payload = {
     method_key: key, name_ko: name,
     subtitle_ko: document.getElementById('pm-subtitle').value.trim()||'',
@@ -2474,29 +2485,29 @@ async function savePM() {
     is_active: document.getElementById('pm-active').value==='1',
   };
   const { error } = origId ? await sb.from('guide_payment_methods').update(payload).eq('id',origId) : await sb.from('guide_payment_methods').insert(payload);
-  if (error) { toast('저장 실패: '+error.message,'error'); return; }
-  toast(origId?'수정되었습니다':'추가되었습니다','success'); closePMModal(); loadPM();
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast(origId?'已修改':'已添加','success'); closePMModal(); loadPM();
 }
 async function deletePM(id) {
-  if (!confirm('삭제하시겠습니까?')) return;
+  if (!confirm('确定要删除吗？')) return;
   const { error } = await sb.from('guide_payment_methods').delete().eq('id',id);
-  if (error) { toast('삭제 실패','error'); return; }
-  toast('삭제되었습니다'); loadPM();
+  if (error) { toast('删除失败','error'); return; }
+  toast('已删除'); loadPM();
 }
 
-/* ───── 안전·응급 (guide_emergency_info) ───── */
-const EI_SECTION_LABEL = {phone:'긴급 전화', hospital:'병원·영사관', connectivity:'인터넷·VPN'};
+/* ───── 安全·应急 (guide_emergency_info) ───── */
+const EI_SECTION_LABEL = {phone:'紧急电话', hospital:'医院·领事馆', connectivity:'网络·VPN'};
 async function loadEI() {
   const { data } = await sb.from('guide_emergency_info').select('*').order('section').order('sort_order');
-  document.getElementById('ei-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">로드 실패</td></tr>'
+  document.getElementById('ei-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">加载失败</td></tr>'
     : data.map(e=>`<tr>
         <td>${EI_SECTION_LABEL[e.section]||e.section}</td><td style="font-weight:700">${e.label}</td><td>${e.value}</td>
-        <td><span class="badge ${e.is_active?'badge-live':'badge-draft'}">${e.is_active?'활성':'비활성'}</span></td><td>${e.sort_order}</td>
-        <td><div class="act-btns"><button class="btn-edit" onclick="openEIModal('${e.id}')">편집</button>
-        <button class="btn-del" onclick="deleteEI('${e.id}')">삭제</button></div></td></tr>`).join('');
+        <td><span class="badge ${e.is_active?'badge-live':'badge-draft'}">${e.is_active?'启用':'禁用'}</span></td><td>${e.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openEIModal('${e.id}')">编辑</button>
+        <button class="btn-del" onclick="deleteEI('${e.id}')">删除</button></div></td></tr>`).join('');
 }
 function openEIModal(id) {
-  document.getElementById('ei-modal-title').textContent = id ? '항목 편집' : '항목 추가';
+  document.getElementById('ei-modal-title').textContent = id ? '编辑项目' : '添加项目';
   document.getElementById('ei-id').value = id||'';
   if (!id) {
     document.getElementById('ei-section').value='phone'; document.getElementById('ei-active').value='1';
@@ -2516,35 +2527,35 @@ async function saveEI() {
   const id = document.getElementById('ei-id').value;
   const label = document.getElementById('ei-label').value.trim();
   const value = document.getElementById('ei-value').value.trim();
-  if (!label || !value) { toast('라벨과 값을 입력하세요','error'); return; }
+  if (!label || !value) { toast('请输入标签和值','error'); return; }
   const payload = {
     section: document.getElementById('ei-section').value, label, value,
     sort_order: parseInt(document.getElementById('ei-order').value)||0,
     is_active: document.getElementById('ei-active').value==='1',
   };
   const { error } = id ? await sb.from('guide_emergency_info').update(payload).eq('id',id) : await sb.from('guide_emergency_info').insert(payload);
-  if (error) { toast('저장 실패: '+error.message,'error'); return; }
-  toast(id?'수정되었습니다':'추가되었습니다','success'); closeEIModal(); loadEI();
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast(id?'已修改':'已添加','success'); closeEIModal(); loadEI();
 }
 async function deleteEI(id) {
-  if (!confirm('삭제하시겠습니까?')) return;
+  if (!confirm('确定要删除吗？')) return;
   const { error } = await sb.from('guide_emergency_info').delete().eq('id',id);
-  if (error) { toast('삭제 실패','error'); return; }
-  toast('삭제되었습니다'); loadEI();
+  if (error) { toast('删除失败','error'); return; }
+  toast('已删除'); loadEI();
 }
 
-/* ───── 현지 회화 (guide_phrases) ───── */
+/* ───── 当地会话 (guide_phrases) ───── */
 async function loadPH() {
   const { data } = await sb.from('guide_phrases').select('*').order('category').order('sort_order');
-  document.getElementById('ph-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">로드 실패</td></tr>'
+  document.getElementById('ph-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">加载失败</td></tr>'
     : data.map(p=>`<tr>
         <td>${p.category}</td><td style="font-weight:700">${p.phrase_cn}</td><td>${p.phrase_ko}</td>
-        <td><span class="badge ${p.is_active?'badge-live':'badge-draft'}">${p.is_active?'활성':'비활성'}</span></td><td>${p.sort_order}</td>
-        <td><div class="act-btns"><button class="btn-edit" onclick="openPHModal('${p.id}')">편집</button>
-        <button class="btn-del" onclick="deletePH('${p.id}')">삭제</button></div></td></tr>`).join('');
+        <td><span class="badge ${p.is_active?'badge-live':'badge-draft'}">${p.is_active?'启用':'禁用'}</span></td><td>${p.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openPHModal('${p.id}')">编辑</button>
+        <button class="btn-del" onclick="deletePH('${p.id}')">删除</button></div></td></tr>`).join('');
 }
 function openPHModal(id) {
-  document.getElementById('ph-modal-title').textContent = id ? '문구 편집' : '문구 추가';
+  document.getElementById('ph-modal-title').textContent = id ? '编辑短语' : '添加短语';
   document.getElementById('ph-id').value = id||'';
   if (!id) {
     document.getElementById('ph-active').value='1';
@@ -2565,36 +2576,36 @@ async function savePH() {
   const id = document.getElementById('ph-id').value;
   const cn = document.getElementById('ph-cn').value.trim();
   const ko = document.getElementById('ph-ko').value.trim();
-  if (!cn || !ko) { toast('중국어와 한국어를 입력하세요','error'); return; }
+  if (!cn || !ko) { toast('请输入中文和韩语','error'); return; }
   const payload = {
-    category: document.getElementById('ph-category').value.trim()||'기본',
+    category: document.getElementById('ph-category').value.trim()||'基本',
     phrase_cn: cn, pinyin: document.getElementById('ph-py').value.trim()||'', phrase_ko: ko,
     sort_order: parseInt(document.getElementById('ph-order').value)||0,
     is_active: document.getElementById('ph-active').value==='1',
   };
   const { error } = id ? await sb.from('guide_phrases').update(payload).eq('id',id) : await sb.from('guide_phrases').insert(payload);
-  if (error) { toast('저장 실패: '+error.message,'error'); return; }
-  toast(id?'수정되었습니다':'추가되었습니다','success'); closePHModal(); loadPH();
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast(id?'已修改':'已添加','success'); closePHModal(); loadPH();
 }
 async function deletePH(id) {
-  if (!confirm('삭제하시겠습니까?')) return;
+  if (!confirm('确定要删除吗？')) return;
   const { error } = await sb.from('guide_phrases').delete().eq('id',id);
-  if (error) { toast('삭제 실패','error'); return; }
-  toast('삭제되었습니다'); loadPH();
+  if (error) { toast('删除失败','error'); return; }
+  toast('已删除'); loadPH();
 }
 
-/* ───── 여행 팁 (guide_tips) ───── */
+/* ───── 旅行贴士 (guide_tips) ───── */
 async function loadTP() {
   const { data } = await sb.from('guide_tips').select('*').order('attr_id').order('sort_order');
-  document.getElementById('tp-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">로드 실패</td></tr>'
+  document.getElementById('tp-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">加载失败</td></tr>'
     : data.map(t=>`<tr>
         <td>${ATTR_LABELS[t.attr_id]||t.attr_id}</td><td style="font-weight:700">${t.tip_text}</td>
-        <td><span class="badge ${t.is_active?'badge-live':'badge-draft'}">${t.is_active?'활성':'비활성'}</span></td><td>${t.sort_order}</td>
-        <td><div class="act-btns"><button class="btn-edit" onclick="openTPModal('${t.id}')">편집</button>
-        <button class="btn-del" onclick="deleteTP('${t.id}')">삭제</button></div></td></tr>`).join('');
+        <td><span class="badge ${t.is_active?'badge-live':'badge-draft'}">${t.is_active?'启用':'禁用'}</span></td><td>${t.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openTPModal('${t.id}')">编辑</button>
+        <button class="btn-del" onclick="deleteTP('${t.id}')">删除</button></div></td></tr>`).join('');
 }
 function openTPModal(id) {
-  document.getElementById('tp-modal-title').textContent = id ? '팁 편집' : '팁 추가';
+  document.getElementById('tp-modal-title').textContent = id ? '编辑贴士' : '添加贴士';
   document.getElementById('tp-id').value = id||'';
   if (!id) {
     document.getElementById('tp-attr').value='forest'; document.getElementById('tp-active').value='1';
@@ -2612,35 +2623,35 @@ function closeTPModal(e) { if (e && e.target !== document.getElementById('tp-mod
 async function saveTP() {
   const id = document.getElementById('tp-id').value;
   const text = document.getElementById('tp-text').value.trim();
-  if (!text) { toast('내용을 입력하세요','error'); return; }
+  if (!text) { toast('请输入内容','error'); return; }
   const payload = {
     attr_id: document.getElementById('tp-attr').value, tip_text: text,
     sort_order: parseInt(document.getElementById('tp-order').value)||0,
     is_active: document.getElementById('tp-active').value==='1',
   };
   const { error } = id ? await sb.from('guide_tips').update(payload).eq('id',id) : await sb.from('guide_tips').insert(payload);
-  if (error) { toast('저장 실패: '+error.message,'error'); return; }
-  toast(id?'수정되었습니다':'추가되었습니다','success'); closeTPModal(); loadTP();
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast(id?'已修改':'已添加','success'); closeTPModal(); loadTP();
 }
 async function deleteTP(id) {
-  if (!confirm('삭제하시겠습니까?')) return;
+  if (!confirm('确定要删除吗？')) return;
   const { error } = await sb.from('guide_tips').delete().eq('id',id);
-  if (error) { toast('삭제 실패','error'); return; }
-  toast('삭제되었습니다'); loadTP();
+  if (error) { toast('删除失败','error'); return; }
+  toast('已删除'); loadTP();
 }
 
-/* ───── 지역 (guide_regions) ───── */
+/* ───── 地区 (guide_regions) ───── */
 async function loadRG() {
   const { data } = await sb.from('guide_regions').select('*').order('sort_order');
-  document.getElementById('rg-tbody').innerHTML = !data ? '<tr><td colspan="4" style="color:var(--red)">로드 실패</td></tr>'
+  document.getElementById('rg-tbody').innerHTML = !data ? '<tr><td colspan="4" style="color:var(--red)">加载失败</td></tr>'
     : data.map(r=>`<tr>
         <td style="font-weight:700">${r.name_ko}</td>
-        <td><span class="badge ${r.is_active?'badge-live':'badge-draft'}">${r.is_active?'활성':'비활성'}</span></td><td>${r.sort_order}</td>
-        <td><div class="act-btns"><button class="btn-edit" onclick="openRGModal('${r.id}')">편집</button>
-        <button class="btn-del" onclick="deleteRG('${r.id}')">삭제</button></div></td></tr>`).join('');
+        <td><span class="badge ${r.is_active?'badge-live':'badge-draft'}">${r.is_active?'启用':'禁用'}</span></td><td>${r.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openRGModal('${r.id}')">编辑</button>
+        <button class="btn-del" onclick="deleteRG('${r.id}')">删除</button></div></td></tr>`).join('');
 }
 function openRGModal(id) {
-  document.getElementById('rg-modal-title').textContent = id ? '지역 편집' : '지역 추가';
+  document.getElementById('rg-modal-title').textContent = id ? '编辑地区' : '添加地区';
   document.getElementById('rg-id').value = id||'';
   if (!id) { document.getElementById('rg-name').value=''; document.getElementById('rg-order').value='0'; document.getElementById('rg-active').value='1'; }
   else {
@@ -2656,31 +2667,31 @@ function closeRGModal(e) { if (e && e.target !== document.getElementById('rg-mod
 async function saveRG() {
   const id = document.getElementById('rg-id').value;
   const name = document.getElementById('rg-name').value.trim();
-  if (!name) { toast('이름을 입력하세요','error'); return; }
+  if (!name) { toast('请输入名称','error'); return; }
   const payload = { name_ko:name, sort_order: parseInt(document.getElementById('rg-order').value)||0, is_active: document.getElementById('rg-active').value==='1' };
   const { error } = id ? await sb.from('guide_regions').update(payload).eq('id',id) : await sb.from('guide_regions').insert(payload);
-  if (error) { toast('저장 실패: '+error.message,'error'); return; }
-  toast(id?'수정되었습니다':'추가되었습니다','success'); closeRGModal(); loadRG(); loadCategoryData();
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast(id?'已修改':'已添加','success'); closeRGModal(); loadRG(); loadCategoryData();
 }
 async function deleteRG(id) {
-  if (!confirm('삭제하시겠습니까?')) return;
+  if (!confirm('确定要删除吗？')) return;
   const { error } = await sb.from('guide_regions').delete().eq('id',id);
-  if (error) { toast('삭제 실패','error'); return; }
-  toast('삭제되었습니다'); loadRG(); loadCategoryData();
+  if (error) { toast('删除失败','error'); return; }
+  toast('已删除'); loadRG(); loadCategoryData();
 }
 
-/* ───── 업체 카테고리 (guide_place_categories) ───── */
+/* ───── 商户分类 (guide_place_categories) ───── */
 async function loadPC() {
   const { data } = await sb.from('guide_place_categories').select('*').order('sort_order');
-  document.getElementById('pc-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">로드 실패</td></tr>'
+  document.getElementById('pc-tbody').innerHTML = !data ? '<tr><td colspan="5" style="color:var(--red)">加载失败</td></tr>'
     : data.map(c=>`<tr>
         <td>${c.cat_key}</td><td style="font-weight:700">${c.icon||''} ${c.name_ko}</td>
-        <td><span class="badge ${c.is_active?'badge-live':'badge-draft'}">${c.is_active?'활성':'비활성'}</span></td><td>${c.sort_order}</td>
-        <td><div class="act-btns"><button class="btn-edit" onclick="openPCModal('${c.id}')">편집</button>
-        <button class="btn-del" onclick="deletePC('${c.id}')">삭제</button></div></td></tr>`).join('');
+        <td><span class="badge ${c.is_active?'badge-live':'badge-draft'}">${c.is_active?'启用':'禁用'}</span></td><td>${c.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openPCModal('${c.id}')">编辑</button>
+        <button class="btn-del" onclick="deletePC('${c.id}')">删除</button></div></td></tr>`).join('');
 }
 function openPCModal(id) {
-  document.getElementById('pc-modal-title').textContent = id ? '카테고리 편집' : '카테고리 추가';
+  document.getElementById('pc-modal-title').textContent = id ? '编辑分类' : '添加分类';
   document.getElementById('pc-id-orig').value = id||'';
   if (!id) { ['pc-key','pc-name','pc-icon'].forEach(f=>document.getElementById(f).value=''); document.getElementById('pc-order').value='0'; document.getElementById('pc-active').value='1'; }
   else {
@@ -2698,33 +2709,33 @@ async function savePC() {
   const origId = document.getElementById('pc-id-orig').value;
   const key = document.getElementById('pc-key').value.trim();
   const name = document.getElementById('pc-name').value.trim();
-  if (!key || !name) { toast('키와 이름을 입력하세요','error'); return; }
+  if (!key || !name) { toast('请输入key和名称','error'); return; }
   const payload = { cat_key:key, name_ko:name, icon: document.getElementById('pc-icon').value.trim()||'📍',
     sort_order: parseInt(document.getElementById('pc-order').value)||0, is_active: document.getElementById('pc-active').value==='1' };
   const { error } = origId ? await sb.from('guide_place_categories').update(payload).eq('id',origId) : await sb.from('guide_place_categories').insert(payload);
-  if (error) { toast('저장 실패: '+error.message,'error'); return; }
-  toast(origId?'수정되었습니다':'추가되었습니다','success'); closePCModal(); loadPC(); loadCategoryData();
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast(origId?'已修改':'已添加','success'); closePCModal(); loadPC(); loadCategoryData();
 }
 async function deletePC(id) {
-  if (!confirm('삭제하시겠습니까?')) return;
+  if (!confirm('确定要删除吗？')) return;
   const { error } = await sb.from('guide_place_categories').delete().eq('id',id);
-  if (error) { toast('삭제 실패','error'); return; }
-  toast('삭제되었습니다'); loadPC(); loadCategoryData();
+  if (error) { toast('删除失败','error'); return; }
+  toast('已删除'); loadPC(); loadCategoryData();
 }
 
-/* ───── 경관지 (guide_attractions) ───── */
+/* ───── 景区 (guide_attractions) ───── */
 async function loadGA() {
   const { data } = await sb.from('guide_attractions').select('*').order('sort_order');
-  document.getElementById('ga-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">로드 실패</td></tr>'
+  document.getElementById('ga-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">加载失败</td></tr>'
     : data.map(a=>`<tr>
         <td>${a.attr_key}</td><td style="font-weight:700">${a.icon||''} ${a.name_ko}</td>
-        <td>${a.is_protected?'🔒 보호됨':'-'}</td>
-        <td><span class="badge ${a.is_active?'badge-live':'badge-draft'}">${a.is_active?'활성':'비활성'}</span></td><td>${a.sort_order}</td>
-        <td><div class="act-btns"><button class="btn-edit" onclick="openGAModal('${a.id}')">편집</button>
-        ${a.is_protected?'':`<button class="btn-del" onclick="deleteGA('${a.id}')">삭제</button>`}</div></td></tr>`).join('');
+        <td>${a.is_protected?'🔒 受保护':'-'}</td>
+        <td><span class="badge ${a.is_active?'badge-live':'badge-draft'}">${a.is_active?'启用':'禁用'}</span></td><td>${a.sort_order}</td>
+        <td><div class="act-btns"><button class="btn-edit" onclick="openGAModal('${a.id}')">编辑</button>
+        ${a.is_protected?'':`<button class="btn-del" onclick="deleteGA('${a.id}')">删除</button>`}</div></td></tr>`).join('');
 }
 function openGAModal(id) {
-  document.getElementById('ga-modal-title').textContent = id ? '경관지 편집' : '경관지 추가';
+  document.getElementById('ga-modal-title').textContent = id ? '编辑景区' : '添加景区';
   document.getElementById('ga-id-orig').value = id||'';
   if (!id) { ['ga-key','ga-name','ga-icon'].forEach(f=>document.getElementById(f).value=''); document.getElementById('ga-order').value='0'; document.getElementById('ga-active').value='1'; }
   else {
@@ -2743,21 +2754,21 @@ async function saveGA() {
   const origId = document.getElementById('ga-id-orig').value;
   const key = document.getElementById('ga-key').value.trim();
   const name = document.getElementById('ga-name').value.trim();
-  if (!key || !name) { toast('키와 이름을 입력하세요','error'); return; }
+  if (!key || !name) { toast('请输入key和名称','error'); return; }
   const payload = { attr_key:key, name_ko:name, icon: document.getElementById('ga-icon').value.trim()||'📍',
     sort_order: parseInt(document.getElementById('ga-order').value)||0, is_active: document.getElementById('ga-active').value==='1' };
   const { error } = origId ? await sb.from('guide_attractions').update(payload).eq('id',origId) : await sb.from('guide_attractions').insert(payload);
-  if (error) { toast('저장 실패: '+error.message,'error'); return; }
-  toast(origId?'수정되었습니다':'추가되었습니다','success'); closeGAModal(); loadGA(); loadCategoryData();
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast(origId?'已修改':'已添加','success'); closeGAModal(); loadGA(); loadCategoryData();
 }
 async function deleteGA(id) {
-  if (!confirm('삭제하시겠습니까? (보호된 경관지는 삭제할 수 없습니다)')) return;
+  if (!confirm('确定要删除吗？(受保护的景区无法删除)')) return;
   const { error } = await sb.from('guide_attractions').delete().eq('id',id);
-  if (error) { toast('삭제 실패: '+error.message,'error'); return; }
-  toast('삭제되었습니다'); loadGA(); loadCategoryData();
+  if (error) { toast('删除失败: '+error.message,'error'); return; }
+  toast('已删除'); loadGA(); loadCategoryData();
 }
 
-// 세션 자동 복원
+// 会话自动恢复
 (async () => {
   const { data:{ session } } = await sb.auth.getSession();
   if (session) await initApp(session.user);
