@@ -647,10 +647,10 @@ textarea.field-input{min-height:80px;resize:vertical}
       <div class="field-row">
         <div class="field-group"><label class="field-label">地点 ID *</label><input type="text" id="s-id" class="field-input" placeholder="forest_south_1"><div class="field-hint">英文_小写字母</div></div>
         <div class="field-group"><label class="field-label">景区 *</label>
-          <select id="s-attr" class="field-input"><option value="forest">森林公园</option><option value="tianmen">天门山</option><option value="canyon">峡谷</option></select></div>
+          <select id="s-attr" class="field-input" onchange="onSpotAttrChange()"><option value="forest">国家森林公园</option><option value="tianmen">天门山</option><option value="canyon">黄龙洞+大峡谷</option></select></div>
       </div>
       <div class="field-row">
-        <div class="field-group"><label class="field-label">区域</label><input type="text" id="s-zone" class="field-input" placeholder="south"></div>
+        <div class="field-group"><label class="field-label">区域</label><select id="s-zone" class="field-input"></select></div>
         <div class="field-group"><label class="field-label">类型 *</label>
           <select id="s-type" class="field-input">
             <option value="landmark">地标</option><option value="transport">交通/搭乘</option><option value="viewpoint">观景台</option>
@@ -1178,7 +1178,7 @@ textarea.field-input{min-height:80px;resize:vertical}
     </div>
     <div class="modal-body">
       <input type="hidden" id="ga-id-orig">
-      <div class="field-group"><label class="field-label">key (英文，唯一值) *</label><input type="text" id="ga-key" class="field-input" placeholder="phoenix_town"></div>
+      <div class="field-group"><label class="field-label">key（系统自动生成，无需填写）</label><input type="text" id="ga-key" class="field-input" readonly style="background:#f5f5f5;color:#999"></div>
       <div class="field-group"><label class="field-label">名称 *</label><input type="text" id="ga-name" class="field-input" placeholder="凤凰古城"></div>
       <div class="field-row">
         <div class="field-group"><label class="field-label">图标表情符号</label><input type="text" id="ga-icon" class="field-input" placeholder="🏯"></div>
@@ -2169,18 +2169,34 @@ async function loadSpots() {
         <td><div class="act-btns"><button class="btn-edit" onclick="openSpotModal('${s.id}')">编辑</button>
         <button class="btn-del" onclick="deleteSpot('${s.id}')">删除</button></div></td></tr>`).join('');
 }
+function populateZoneSelect(attrId, selected) {
+  const sel = document.getElementById('s-zone');
+  const zones = ZONE_LABELS[attrId] || {};
+  const entries = Object.entries(zones);
+  sel.innerHTML = entries.length ? entries.map(([k,label])=>`<option value="${k}">${label}</option>`).join('') : '<option value="">-</option>';
+  if (selected && zones[selected]) sel.value = selected;
+}
+function onSpotAttrChange() { populateZoneSelect(document.getElementById('s-attr').value, ''); }
+function syncSpotAttrLabels() {
+  ['forest','tianmen','canyon'].forEach(k => {
+    const opt = document.querySelector(`#s-attr option[value="${k}"]`);
+    if (opt && ATTR_LABELS[k]) opt.textContent = ATTR_LABELS[k];
+  });
+}
 function openSpotModal(id) {
   document.getElementById('spot-modal-title').textContent = id ? '编辑地点' : '添加地点';
+  syncSpotAttrLabels();
   if (!id) {
-    ['s-id','s-id-orig','s-zone','s-name-ko','s-name-cn','s-lat','s-lon','s-gaode','s-video-url','s-desc','s-tip','s-hours','s-price'].forEach(f=>document.getElementById(f).value='');
+    ['s-id','s-id-orig','s-name-ko','s-name-cn','s-lat','s-lon','s-gaode','s-video-url','s-desc','s-tip','s-hours','s-price'].forEach(f=>document.getElementById(f).value='');
     document.getElementById('s-attr').value='forest'; document.getElementById('s-type').value='landmark';
+    populateZoneSelect('forest', '');
     document.getElementById('s-order').value='0'; document.getElementById('s-status').value='live';
     setThumbWidget('s-img', []);
   } else {
     sb.from('guide_spots').select('*').eq('id',id).single().then(({data:s})=>{
       if (!s) return;
       document.getElementById('s-id').value=s.id; document.getElementById('s-id-orig').value=s.id;
-      document.getElementById('s-attr').value=s.attr_id; document.getElementById('s-zone').value=s.zone_id||'';
+      document.getElementById('s-attr').value=s.attr_id; populateZoneSelect(s.attr_id, s.zone_id||'');
       document.getElementById('s-type').value=s.type; document.getElementById('s-name-ko').value=s.name_ko||'';
       document.getElementById('s-name-cn').value=s.name_cn||''; document.getElementById('s-lat').value=s.lat||'';
       document.getElementById('s-lon').value=s.lon||''; document.getElementById('s-gaode').value=s.gaode_uri||'';
@@ -2734,17 +2750,22 @@ async function loadGA() {
         <td><div class="act-btns"><button class="btn-edit" onclick="openGAModal('${a.id}')">编辑</button>
         ${a.is_protected?'':`<button class="btn-del" onclick="deleteGA('${a.id}')">删除</button>`}</div></td></tr>`).join('');
 }
+function genAttrKey() { return 'custom_' + Date.now().toString(36); }
 function openGAModal(id) {
   document.getElementById('ga-modal-title').textContent = id ? '编辑景区' : '添加景区';
   document.getElementById('ga-id-orig').value = id||'';
-  if (!id) { ['ga-key','ga-name','ga-icon'].forEach(f=>document.getElementById(f).value=''); document.getElementById('ga-order').value='0'; document.getElementById('ga-active').value='1'; }
+  document.getElementById('ga-key').disabled = true; // key为系统内部标识，任何情况下都不需要手动输入/修改
+  if (!id) {
+    ['ga-name','ga-icon'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('ga-key').value = genAttrKey();
+    document.getElementById('ga-order').value='0'; document.getElementById('ga-active').value='1';
+  }
   else {
     sb.from('guide_attractions').select('*').eq('id',id).single().then(({data:a})=>{
       if (!a) return;
       document.getElementById('ga-key').value=a.attr_key||''; document.getElementById('ga-name').value=a.name_ko||'';
       document.getElementById('ga-icon').value=a.icon||''; document.getElementById('ga-order').value=a.sort_order||0;
       document.getElementById('ga-active').value=a.is_active?'1':'0';
-      document.getElementById('ga-key').disabled = !!a.is_protected;
     });
   }
   document.getElementById('ga-modal-bg').classList.add('open');
