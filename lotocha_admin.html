@@ -1495,7 +1495,7 @@ async function loadCategoryData() {
     const [{data:regions},{data:cats},{data:attrs}] = await Promise.all([
       sb.from('guide_regions').select('*').eq('is_active',true).order('sort_order'),
       sb.from('guide_place_categories').select('*').eq('is_active',true).order('sort_order'),
-      sb.from('travel_modules').select('*').is('parent_id',null).eq('is_active',true).order('sort_order'),
+      sb.from('travel_modules').select('*').is('parent_id',null).eq('show_on_guide',true).eq('is_active',true).order('sort_order'),
     ]);
     if (regions && regions.length) REGIONS_LIST = regions;
     if (cats && cats.length) { CATEGORIES_LIST = cats; Object.assign(CAT_LABELS, Object.fromEntries(cats.map(c=>[c.cat_key,c.name_ko]))); }
@@ -2474,7 +2474,7 @@ function moveSpot(id, dir) {
   moveSortItem(spotScope(s.parent_id, s.zone_id), id, dir, 'travel_modules', loadSpots);
 }
 async function loadSpots() {
-  const { data } = await sb.from('travel_modules').select('*').not('parent_id','is',null).order('parent_id').order('zone_id').order('sort_order');
+  const { data } = await sb.from('travel_modules').select('*').not('parent_id','is',null).eq('show_on_guide',true).order('parent_id').order('zone_id').order('sort_order');
   SPOTS_LIST = data || [];
   document.getElementById('spots-tbody').innerHTML = !data ? '<tr><td colspan="7" style="color:var(--red)">加载失败</td></tr>'
     : data.map(s=>{
@@ -3096,7 +3096,7 @@ async function deletePC(id) {
 let GA_LIST = [];
 function moveGA(id,dir){ moveSortItem(GA_LIST, id, dir, 'travel_modules', loadGA); }
 async function loadGA() {
-  const { data } = await sb.from('travel_modules').select('*').is('parent_id',null).order('sort_order');
+  const { data } = await sb.from('travel_modules').select('*').is('parent_id',null).eq('show_on_guide',true).order('sort_order');
   GA_LIST = data || [];
   document.getElementById('ga-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">加载失败</td></tr>'
     : data.map((a,i)=>`<tr>
@@ -3151,7 +3151,7 @@ async function deleteGA(id) {
 /* ───── 景区详情设置 (guide_attr_map_config / guide_plan_steps / guide_rain_items / guide_last_transport / guide_transport_options / guide_zones) ───── */
 let AD_CURRENT_ATTR = null;
 async function initADPanel() {
-  const { data } = await sb.from('travel_modules').select('module_key,name_ko,icon').is('parent_id',null).eq('is_active', true).order('sort_order');
+  const { data } = await sb.from('travel_modules').select('module_key,name_ko,icon').is('parent_id',null).eq('show_on_guide',true).eq('is_active', true).order('sort_order');
   const attrs = (data && data.length) ? data : ATTRACTIONS_LIST;
   if (!attrs.length) { document.getElementById('ad-attr-bar').innerHTML = '<span style="color:#999">暂无景区，请先点击右侧"+ 添加景区"</span>'; return; }
   if (!AD_CURRENT_ATTR || !attrs.some(a=>a.module_key===AD_CURRENT_ATTR)) AD_CURRENT_ATTR = attrs[0].module_key;
