@@ -1486,18 +1486,20 @@ const STORAGE_BUCKET = 'lotocha-media';
 /* ───── 分类数据 (地区 / 商户分类 / 景区) ───── */
 let REGIONS_LIST = [{name_ko:'市内'},{name_ko:'武陵源'},{name_ko:'天门山'},{name_ko:'黄龙洞'},{name_ko:'其他'}];
 let CATEGORIES_LIST = [{cat_key:'restaurant',name_ko:'餐厅'},{cat_key:'cafe',name_ko:'咖啡厅'},{cat_key:'hotel',name_ko:'酒店/住宿'},{cat_key:'shop',name_ko:'购物'},{cat_key:'attraction',name_ko:'景点游览'},{cat_key:'transport',name_ko:'交通'},{cat_key:'etc',name_ko:'其他'}];
-let ATTRACTIONS_LIST = [{attr_key:'forest',name_ko:'国家森林公园',is_protected:true},{attr_key:'tianmen',name_ko:'天门山',is_protected:true},{attr_key:'huanglongdong',name_ko:'黄龙洞',is_protected:true},{attr_key:'canyon',name_ko:'大峡谷',is_protected:true}];
+let ATTRACTIONS_LIST = [{id:null,module_key:'forest',name_ko:'国家森林公园',is_protected:true},{id:null,module_key:'tianmen',name_ko:'天门山',is_protected:true},{id:null,module_key:'huanglongdong',name_ko:'黄龙洞',is_protected:true},{id:null,module_key:'canyon',name_ko:'大峡谷',is_protected:true}];
+/* travel_modules 顶层大模块(景区) 조회 헬퍼 — id(uuid)로 찾기 */
+function attrById(id) { return ATTRACTIONS_LIST.find(a=>a.id===id); }
 
 async function loadCategoryData() {
   try {
     const [{data:regions},{data:cats},{data:attrs}] = await Promise.all([
       sb.from('guide_regions').select('*').eq('is_active',true).order('sort_order'),
       sb.from('guide_place_categories').select('*').eq('is_active',true).order('sort_order'),
-      sb.from('guide_attractions').select('*').eq('is_active',true).order('sort_order'),
+      sb.from('travel_modules').select('*').is('parent_id',null).eq('is_active',true).order('sort_order'),
     ]);
     if (regions && regions.length) REGIONS_LIST = regions;
     if (cats && cats.length) { CATEGORIES_LIST = cats; Object.assign(CAT_LABELS, Object.fromEntries(cats.map(c=>[c.cat_key,c.name_ko]))); }
-    if (attrs && attrs.length) { ATTRACTIONS_LIST = attrs; Object.assign(ATTR_LABELS, Object.fromEntries(attrs.map(a=>[a.attr_key,a.name_ko]))); }
+    if (attrs && attrs.length) { ATTRACTIONS_LIST = attrs; Object.assign(ATTR_LABELS, Object.fromEntries(attrs.map(a=>[a.module_key,a.name_ko]))); }
   } catch(e) { console.warn('分类加载失败', e); }
   populateCategorySelects();
 }
@@ -1507,9 +1509,9 @@ function populateCategorySelects() {
   const plArea = document.getElementById('pl-area');
   if (plArea) { const cur=plArea.value; plArea.innerHTML = REGIONS_LIST.map(r=>`<option value="${r.name_ko}">${r.name_ko}</option>`).join(''); if(cur) plArea.value=cur; }
   const sAttr = document.getElementById('s-attr');
-  if (sAttr) { const cur=sAttr.value; sAttr.innerHTML = ATTRACTIONS_LIST.map(a=>`<option value="${a.attr_key}">${a.name_ko}</option>`).join(''); if(cur) sAttr.value=cur; }
+  if (sAttr) { const cur=sAttr.value; sAttr.innerHTML = ATTRACTIONS_LIST.map(a=>`<option value="${a.id}">${a.name_ko}</option>`).join(''); if(cur) sAttr.value=cur; }
   const tpAttr = document.getElementById('tp-attr');
-  if (tpAttr) { const cur=tpAttr.value; tpAttr.innerHTML = ATTRACTIONS_LIST.map(a=>`<option value="${a.attr_key}">${a.name_ko}</option>`).join(''); if(cur) tpAttr.value=cur; }
+  if (tpAttr) { const cur=tpAttr.value; tpAttr.innerHTML = ATTRACTIONS_LIST.map(a=>`<option value="${a.module_key}">${a.name_ko}</option>`).join(''); if(cur) tpAttr.value=cur; }
 }
 
 async function uploadMedia(fileInput, targetId) {
@@ -2463,33 +2465,36 @@ async function deleteTour(id) {
 }
 
 let SPOTS_LIST = [];
-/* 향도지점은 '景区+区域'별로 순서가 따로 매겨지므로, 위/아래 이동도 같은 景区+区域 안에서만 이루어져야 함 */
-function spotScope(attrId, zoneId) { return SPOTS_LIST.filter(x=>x.attr_id===attrId && (x.zone_id||'')===(zoneId||'')); }
+/* 향도지점은 '景区+区域'별로 순서가 따로 매겨지므로, 위/아래 이동도 같은 景区+区域 안에서만 이루어져야 함
+   (travel_modules 통합 후: attr_id(text) 대신 parent_id(uuid)로 그룹핑) */
+function spotScope(parentId, zoneId) { return SPOTS_LIST.filter(x=>x.parent_id===parentId && (x.zone_id||'')===(zoneId||'')); }
 function moveSpot(id, dir) {
   const s = SPOTS_LIST.find(x=>String(x.id)===String(id));
   if (!s) return;
-  moveSortItem(spotScope(s.attr_id, s.zone_id), id, dir, 'guide_spots', loadSpots);
+  moveSortItem(spotScope(s.parent_id, s.zone_id), id, dir, 'travel_modules', loadSpots);
 }
 async function loadSpots() {
-  const { data } = await sb.from('guide_spots').select('*').order('attr_id').order('zone_id').order('sort_order');
+  const { data } = await sb.from('travel_modules').select('*').not('parent_id','is',null).order('parent_id').order('zone_id').order('sort_order');
   SPOTS_LIST = data || [];
   document.getElementById('spots-tbody').innerHTML = !data ? '<tr><td colspan="7" style="color:var(--red)">加载失败</td></tr>'
     : data.map(s=>{
-        const scope = spotScope(s.attr_id, s.zone_id);
+        const scope = spotScope(s.parent_id, s.zone_id);
         const idx = scope.findIndex(x=>x.id===s.id);
+        const parent = attrById(s.parent_id);
         return `<tr>
-        <td>${ATTR_LABELS[s.attr_id]||s.attr_id}</td>
-        <td style="color:#666">${zoneLabel(s.attr_id, s.zone_id)}</td>
-        <td style="font-weight:700">${s.name_ko}</td><td>${s.type}</td>
+        <td>${parent?parent.name_ko:(s.parent_id||'-')}</td>
+        <td style="color:#666">${zoneLabel(parent?parent.module_key:null, s.zone_id)}</td>
+        <td style="font-weight:700">${s.name_ko}</td><td>${s.type||''}</td>
         <td><span class="badge badge-${s.status}">${{live:'上线',draft:'草稿',pending:'审核中'}[s.status]||s.status}</span></td>
         <td>${moveBtnsHTML('moveSpot',s.id,idx,scope.length)}</td>
         <td><div class="act-btns"><button class="btn-edit" onclick="openSpotModal('${s.id}')">编辑</button>
         <button class="btn-del" onclick="deleteSpot('${s.id}')">删除</button></div></td></tr>`;
       }).join('');
 }
-function populateZoneSelect(attrId, selected) {
+function populateZoneSelect(parentId, selected) {
   const sel = document.getElementById('s-zone');
-  const zones = ZONE_LABELS[attrId] || {};
+  const parent = attrById(parentId);
+  const zones = (parent && ZONE_LABELS[parent.module_key]) || {};
   const entries = Object.entries(zones);
   sel.innerHTML = entries.length ? entries.map(([k,label])=>`<option value="${k}">${label}</option>`).join('') : '<option value="">-</option>';
   if (selected && zones[selected]) sel.value = selected;
@@ -2500,21 +2505,22 @@ function openSpotModal(id) {
   populateCategorySelects(); // s-attr/tp-attr 选项按ATTRACTIONS_LIST(DB)实时更新
   if (!id) {
     ['s-id','s-id-orig','s-name-ko','s-name-cn','s-lat','s-lon','s-gaode','s-video-url','s-desc','s-tip','s-hours','s-price'].forEach(f=>document.getElementById(f).value='');
-    document.getElementById('s-attr').value='forest'; document.getElementById('s-type').value='landmark';
-    populateZoneSelect('forest', '');
+    const defAttr = ATTRACTIONS_LIST.find(a=>a.module_key==='forest') || ATTRACTIONS_LIST[0] || {id:''};
+    document.getElementById('s-attr').value=defAttr.id; document.getElementById('s-type').value='landmark';
+    populateZoneSelect(defAttr.id, '');
     document.getElementById('s-status').value='live';
     setThumbWidget('s-img', []);
   } else {
-    sb.from('guide_spots').select('*').eq('id',id).single().then(({data:s})=>{
+    sb.from('travel_modules').select('*').eq('id',id).single().then(({data:s})=>{
       if (!s) return;
-      document.getElementById('s-id').value=s.id; document.getElementById('s-id-orig').value=s.id;
-      document.getElementById('s-attr').value=s.attr_id; populateZoneSelect(s.attr_id, s.zone_id||'');
-      document.getElementById('s-type').value=s.type; document.getElementById('s-name-ko').value=s.name_ko||'';
+      document.getElementById('s-id').value=s.module_key||''; document.getElementById('s-id-orig').value=s.id;
+      document.getElementById('s-attr').value=s.parent_id||''; populateZoneSelect(s.parent_id, s.zone_id||'');
+      document.getElementById('s-type').value=s.type||''; document.getElementById('s-name-ko').value=s.name_ko||'';
       document.getElementById('s-name-cn').value=s.name_cn||''; document.getElementById('s-lat').value=s.lat||'';
       document.getElementById('s-lon').value=s.lon||''; document.getElementById('s-gaode').value=s.gaode_uri||'';
-      setThumbWidget('s-img', s.images); document.getElementById('s-video-url').value=s.video_url||''; document.getElementById('s-desc').value=s.desc_ko||'';
+      setThumbWidget('s-img', s.images||[]); document.getElementById('s-video-url').value=s.video_url||''; document.getElementById('s-desc').value=s.desc_ko||'';
       document.getElementById('s-tip').value=s.tip_ko||''; document.getElementById('s-hours').value=s.hours||'';
-      document.getElementById('s-price').value=s.price||'';
+      document.getElementById('s-price').value=s.price_note||'';
       document.getElementById('s-status').value=s.status||'live';
     });
   }
@@ -2526,10 +2532,10 @@ function closeSpotModal(e) {
 }
 async function saveSpot() {
   const origId = document.getElementById('s-id-orig').value;
-  const newId = document.getElementById('s-id').value.trim();
-  if (!newId || !document.getElementById('s-name-ko').value.trim()) { toast('请输入ID和地点名称','error'); return; }
+  const newKey = document.getElementById('s-id').value.trim();
+  if (!newKey || !document.getElementById('s-name-ko').value.trim()) { toast('请输入ID和地点名称','error'); return; }
   const payload = {
-    id: newId, attr_id: document.getElementById('s-attr').value,
+    module_key: newKey, parent_id: document.getElementById('s-attr').value||null,
     zone_id: document.getElementById('s-zone').value.trim()||null,
     type: document.getElementById('s-type').value,
     name_ko: document.getElementById('s-name-ko').value.trim(),
@@ -2542,18 +2548,19 @@ async function saveSpot() {
     desc_ko: document.getElementById('s-desc').value.trim()||null,
     tip_ko: document.getElementById('s-tip').value.trim()||null,
     hours: document.getElementById('s-hours').value.trim()||null,
-    price: document.getElementById('s-price').value.trim()||null,
+    price_note: document.getElementById('s-price').value.trim()||null,
     status: document.getElementById('s-status').value,
+    show_on_guide: true,
     updated_at: new Date().toISOString(),
   };
-  if (!origId) payload.sort_order = nextSortOrder(spotScope(payload.attr_id, payload.zone_id));
-  const { error } = origId ? await sb.from('guide_spots').update(payload).eq('id',origId) : await sb.from('guide_spots').insert(payload);
+  if (!origId) payload.sort_order = nextSortOrder(spotScope(payload.parent_id, payload.zone_id));
+  const { error } = origId ? await sb.from('travel_modules').update(payload).eq('id',origId) : await sb.from('travel_modules').insert(payload);
   if (error) { toast('保存失败: '+error.message,'error'); return; }
   toast(origId?'已修改':'已添加','success'); closeSpotModal(); loadSpots();
 }
 async function deleteSpot(id) {
   if (!confirm('确定要删除吗？')) return;
-  const { error } = await sb.from('guide_spots').delete().eq('id',id);
+  const { error } = await sb.from('travel_modules').delete().eq('id',id);
   if (error) { toast('删除失败','error'); return; }
   toast('已删除'); loadSpots();
 }
@@ -3087,19 +3094,19 @@ async function deletePC(id) {
 
 /* ───── 景区 (guide_attractions) ───── */
 let GA_LIST = [];
-function moveGA(id,dir){ moveSortItem(GA_LIST, id, dir, 'guide_attractions', loadGA); }
+function moveGA(id,dir){ moveSortItem(GA_LIST, id, dir, 'travel_modules', loadGA); }
 async function loadGA() {
-  const { data } = await sb.from('guide_attractions').select('*').order('sort_order');
+  const { data } = await sb.from('travel_modules').select('*').is('parent_id',null).order('sort_order');
   GA_LIST = data || [];
   document.getElementById('ga-tbody').innerHTML = !data ? '<tr><td colspan="6" style="color:var(--red)">加载失败</td></tr>'
     : data.map((a,i)=>`<tr>
-        <td>${a.attr_key}</td><td style="font-weight:700">${a.icon||''} ${a.name_ko}</td>
+        <td>${a.module_key}</td><td style="font-weight:700">${a.icon||''} ${a.name_ko}</td>
         <td>${a.is_protected?'🔒 受保护':'-'}</td>
         <td><span class="badge ${a.is_active?'badge-live':'badge-draft'}">${a.is_active?'启用':'禁用'}</span></td><td>${moveBtnsHTML('moveGA',a.id,i,data.length)}</td>
         <td><div class="act-btns"><button class="btn-edit" onclick="openGAModal('${a.id}')">编辑</button>
         ${a.is_protected?'':`<button class="btn-del" onclick="deleteGA('${a.id}')">删除</button>`}</div></td></tr>`).join('');
 }
-function genAttrKey() { return 'custom_' + Date.now().toString(36); }
+function genAttrKey() { return genModuleKey(); }
 function openGAModal(id) {
   document.getElementById('ga-modal-title').textContent = id ? '编辑景区' : '添加景区';
   document.getElementById('ga-id-orig').value = id||'';
@@ -3110,9 +3117,9 @@ function openGAModal(id) {
     document.getElementById('ga-active').value='1';
   }
   else {
-    sb.from('guide_attractions').select('*').eq('id',id).single().then(({data:a})=>{
+    sb.from('travel_modules').select('*').eq('id',id).single().then(({data:a})=>{
       if (!a) return;
-      document.getElementById('ga-key').value=a.attr_key||''; document.getElementById('ga-name').value=a.name_ko||'';
+      document.getElementById('ga-key').value=a.module_key||''; document.getElementById('ga-name').value=a.name_ko||'';
       document.getElementById('ga-icon').value=a.icon||'';
       document.getElementById('ga-active').value=a.is_active?'1':'0';
     });
@@ -3125,17 +3132,17 @@ async function saveGA() {
   const key = document.getElementById('ga-key').value.trim();
   const name = document.getElementById('ga-name').value.trim();
   if (!key || !name) { toast('请输入key和名称','error'); return; }
-  const payload = { attr_key:key, name_ko:name, icon: document.getElementById('ga-icon').value.trim()||'📍',
+  const payload = { name_ko:name, icon: document.getElementById('ga-icon').value.trim()||'📍',
     is_active: document.getElementById('ga-active').value==='1' };
-  if (!origId) payload.sort_order = nextSortOrder(GA_LIST);
-  const { error } = origId ? await sb.from('guide_attractions').update(payload).eq('id',origId) : await sb.from('guide_attractions').insert(payload);
+  if (!origId) { payload.module_key = key; payload.parent_id = null; payload.show_on_guide = true; payload.bookable_in_tour = false; payload.sort_order = nextSortOrder(GA_LIST); }
+  const { error } = origId ? await sb.from('travel_modules').update(payload).eq('id',origId) : await sb.from('travel_modules').insert(payload);
   if (error) { toast('保存失败: '+error.message,'error'); return; }
   toast(origId?'已修改':'已添加','success'); closeGAModal(); loadGA(); loadCategoryData();
   if (document.getElementById('panel-attrdetail').classList.contains('active')) initADPanel();
 }
 async function deleteGA(id) {
   if (!confirm('确定要删除吗？(受保护的景区无法删除)')) return;
-  const { error } = await sb.from('guide_attractions').delete().eq('id',id);
+  const { error } = await sb.from('travel_modules').delete().eq('id',id);
   if (error) { toast('删除失败: '+error.message,'error'); return; }
   toast('已删除'); loadGA(); loadCategoryData();
   if (document.getElementById('panel-attrdetail').classList.contains('active')) initADPanel();
@@ -3144,11 +3151,11 @@ async function deleteGA(id) {
 /* ───── 景区详情设置 (guide_attr_map_config / guide_plan_steps / guide_rain_items / guide_last_transport / guide_transport_options / guide_zones) ───── */
 let AD_CURRENT_ATTR = null;
 async function initADPanel() {
-  const { data } = await sb.from('guide_attractions').select('attr_key,name_ko,icon').eq('is_active', true).order('sort_order');
+  const { data } = await sb.from('travel_modules').select('module_key,name_ko,icon').is('parent_id',null).eq('is_active', true).order('sort_order');
   const attrs = (data && data.length) ? data : ATTRACTIONS_LIST;
   if (!attrs.length) { document.getElementById('ad-attr-bar').innerHTML = '<span style="color:#999">暂无景区，请先点击右侧"+ 添加景区"</span>'; return; }
-  if (!AD_CURRENT_ATTR || !attrs.some(a=>a.attr_key===AD_CURRENT_ATTR)) AD_CURRENT_ATTR = attrs[0].attr_key;
-  document.getElementById('ad-attr-bar').innerHTML = attrs.map(a=>`<button class="subtab-btn${a.attr_key===AD_CURRENT_ATTR?' active':''}" onclick="selectADAttr('${a.attr_key}',this)">${a.icon||''} ${a.name_ko}</button>`).join('');
+  if (!AD_CURRENT_ATTR || !attrs.some(a=>a.module_key===AD_CURRENT_ATTR)) AD_CURRENT_ATTR = attrs[0].module_key;
+  document.getElementById('ad-attr-bar').innerHTML = attrs.map(a=>`<button class="subtab-btn${a.module_key===AD_CURRENT_ATTR?' active':''}" onclick="selectADAttr('${a.module_key}',this)">${a.icon||''} ${a.name_ko}</button>`).join('');
   const activeTab = document.querySelector('#panel-attrdetail .pricing-subtab.active');
   showADSubtab(activeTab ? activeTab.id.replace('adt-','') : 'mapcfg');
 }

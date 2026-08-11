@@ -584,7 +584,7 @@ async function loadAttrDetails(){
   if(!sb) return;
   try{
     const [{data:attrsList},{data:mapCfg},{data:steps},{data:rain},{data:lastT},{data:transOpt},{data:zones}] = await Promise.all([
-      sb.from('guide_attractions').select('*').eq('is_active',true).order('sort_order'),
+      sb.from('travel_modules').select('*').is('parent_id',null).eq('show_on_guide',true).eq('is_active',true).order('sort_order'),
       sb.from('guide_attr_map_config').select('*'),
       sb.from('guide_plan_steps').select('*').eq('is_active',true).order('attr_id').order('sort_order'),
       sb.from('guide_rain_items').select('*').eq('is_active',true).order('attr_id').order('sort_order'),
@@ -595,17 +595,17 @@ async function loadAttrDetails(){
     // 관리자 페이지에서 새 경관지를 추가하면 여기서 자동으로 ATTRS에 뼈대 항목을 만들어
     // 지도 탭에 바로 나타나게 함(지도 정보가 없으면 장가계 시내 중심 좌표를 임시로 사용).
     if(attrsList&&attrsList.length){
-      ATTR_ORDER = attrsList.map(a=>a.attr_key);
+      ATTR_ORDER = attrsList.map(a=>a.module_key);
       attrsList.forEach(a=>{
-        if(!ATTRS[a.attr_key]){
-          ATTRS[a.attr_key] = {
+        if(!ATTRS[a.module_key]){
+          ATTRS[a.module_key] = {
             name:a.name_ko, icon:a.icon||'📍', center:[29.117,110.480], zoom:12,
             gaode:'https://uri.amap.com/search?keyword='+encodeURIComponent('张家界'+a.name_ko),
             gaodeNav:'', lastTransport:[], plan:[], rainPlan:[], rainAvoid:[], tips:[],
           };
         } else {
-          ATTRS[a.attr_key].name = a.name_ko;
-          ATTRS[a.attr_key].icon = a.icon || ATTRS[a.attr_key].icon;
+          ATTRS[a.module_key].name = a.name_ko;
+          ATTRS[a.module_key].icon = a.icon || ATTRS[a.module_key].icon;
         }
       });
     }
@@ -799,14 +799,20 @@ function videoEmbed(url){
 }
 
 async function loadSpotsData(){
-  // 1. Supabase에서 로드 시도
+  // 1. Supabase에서 로드 시도 (travel_modules 통합 테이블: 최상위 경관지의 id → module_key 매핑 후, 하위 지점을 붙임)
   try{
     if(sb){
-      const{data,error}=await sb.from('guide_spots').select('*').eq('status','live').order('sort_order');
-      if(!error&&data&&data.length>0){
+      const [{data:parents},{data}] = await Promise.all([
+        sb.from('travel_modules').select('id,module_key').is('parent_id',null),
+        sb.from('travel_modules').select('*').not('parent_id','is',null).eq('show_on_guide',true).eq('is_active',true).eq('status','live').order('sort_order'),
+      ]);
+      if(data&&data.length>0){
+        const parentKey={}; (parents||[]).forEach(p=>{ parentKey[p.id]=p.module_key; });
         spotsData={};
         data.forEach(s=>{
-          const attr=s.attr_id,zone=s.zone_id||'default';
+          const attr=parentKey[s.parent_id];
+          if(!attr) return; // 소속 경관지가 향도 페이지에 표시되지 않는 경우(show_on_guide=false 등) 건너뜀
+          const zone=s.zone_id||'default';
           if(!spotsData[attr])spotsData[attr]={zones:{}};
           if(!spotsData[attr].zones[zone])spotsData[attr].zones[zone]={spots:[]};
           spotsData[attr].zones[zone].spots.push({
@@ -815,7 +821,7 @@ async function loadSpotsData(){
             image:(s.images&&s.images[0])||'',
             images:s.images||[],
             desc_ko:s.desc_ko||'',tip_ko:s.tip_ko||'',
-            hours:s.hours||'',price:s.price||'',
+            hours:s.hours||'',price:s.price_note||'',
             video_url:s.video_url||null,
             tags:[],
           });
