@@ -205,6 +205,9 @@ textarea.field-input{min-height:80px;resize:vertical}
           <button class="sb-item" data-panel="attrdetail" onclick="showPanel('attrdetail',this)">
             <span class="icon">🗺️</span>景区详情设置
           </button>
+          <button class="sb-item" data-panel="modules" onclick="showPanel('modules',this)">
+            <span class="icon">🧩</span>旅行模块(新)
+          </button>
           <button class="sb-item" data-panel="places" onclick="showPanel('places',this)">
             <span class="icon">🏪</span>本地商户
           </button>
@@ -460,6 +463,27 @@ textarea.field-input{min-height:80px;resize:vertical}
           <table><thead><tr><th>key</th><th>名称</th><th>图标</th><th>接驳车信息</th><th>排序</th><th>操作</th></tr></thead>
           <tbody id="adzone-tbody"></tbody></table>
         </div>
+      </div>
+    </div>
+
+    <!-- 旅行模块(统一数据库) -->
+    <div class="panel" id="panel-modules">
+      <div class="page-title">🧩 旅行模块(新，统一数据库)</div>
+      <div class="page-sub">景区/地点/可预订项目已合并为统一的"旅行模块"表，向导页面和定制行程页面后续都会从这里读取数据，一处编辑两边同步。子模块归属于某个顶层大模块(如"国家森林公园"下的"东门A线")；🔒受保护的模块无法删除或更改归属。</div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px">
+        <input type="text" id="mod-search" class="field-input" style="max-width:220px" placeholder="搜索名称..." oninput="renderModules()">
+        <select id="mod-filter-zone" class="field-input" style="max-width:150px" onchange="renderModules()">
+          <option value="">全部区位</option>
+          <option value="city">市区内</option>
+          <option value="wulingyuan">武陵源</option>
+          <option value="outside">张家界之外</option>
+        </select>
+        <div style="flex:1"></div>
+        <button class="btn-add" onclick="openModuleModal()">+ 添加模块</button>
+      </div>
+      <div class="table-wrap">
+        <table><thead><tr><th>名称</th><th>归属</th><th>区位</th><th>时长/价格</th><th>预约</th><th>显示位置</th><th>状态</th><th>顺序</th><th>操作</th></tr></thead>
+        <tbody id="modules-tbody"></tbody></table>
       </div>
     </div>
 
@@ -1242,6 +1266,88 @@ textarea.field-input{min-height:80px;resize:vertical}
   </div>
 </div>
 
+<!-- 旅行模块弹窗 -->
+<div class="modal-bg" id="mod-modal-bg">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="mod-modal-title">添加模块</h3>
+      <button class="modal-close" onclick="closeModuleModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="mod-id-orig">
+      <div class="dyn-section-title">基本信息</div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">归属(留空=顶层大模块)</label>
+          <select id="mod-parent" class="field-input"><option value="">— 无(顶层) —</option></select></div>
+        <div class="field-group"><label class="field-label">区位</label>
+          <select id="mod-zone" class="field-input">
+            <option value="">未设置</option><option value="city">市区内</option>
+            <option value="wulingyuan">武陵源</option><option value="outside">张家界之外</option>
+          </select></div>
+      </div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">名称(韩语) *</label><input type="text" id="mod-name-ko" class="field-input"></div>
+        <div class="field-group"><label class="field-label">名称(中文)</label><input type="text" id="mod-name-cn" class="field-input"></div>
+      </div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">图标表情符号</label><input type="text" id="mod-icon" class="field-input" placeholder="📍"></div>
+        <div class="field-group"><label class="field-label">类型标签(可选)</label><input type="text" id="mod-type" class="field-input" placeholder="landmark/viewpoint/food..."></div>
+      </div>
+      <div class="field-group"><label class="field-label">缩略图(最多2张)</label>
+        <div class="thumb-wrap" id="mod-img-wrap"></div>
+        <input type="hidden" id="mod-img-data" value="[]">
+      </div>
+      <div class="field-group"><label class="field-label">说明</label><textarea id="mod-desc" class="field-input"></textarea></div>
+
+      <div class="dyn-section-title" style="margin-top:14px">位置信息</div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">纬度</label><input type="number" id="mod-lat" class="field-input" step="0.0000001"></div>
+        <div class="field-group"><label class="field-label">经度</label><input type="number" id="mod-lon" class="field-input" step="0.0000001"></div>
+      </div>
+      <div class="field-group"><label class="field-label">高德地图链接</label><input type="text" id="mod-gaode" class="field-input"></div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">营业时间</label><input type="text" id="mod-hours" class="field-input" placeholder="07:00–18:00"></div>
+        <div class="field-group"><label class="field-label">价格说明(文字)</label><input type="text" id="mod-pricenote" class="field-input" placeholder="免费 / 门票另计"></div>
+      </div>
+
+      <div class="dyn-section-title" style="margin-top:14px">预订 · 预约</div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">时长类型</label>
+          <select id="mod-slot" class="field-input">
+            <option value="">未设置</option>
+            <option value="full_day">全天</option><option value="half_day">半天</option>
+            <option value="evening">晚上/夜间</option><option value="pm_evening">下午+晚上</option>
+            <option value="pm_evening_nextam">下午+晚上+次日上午</option>
+            <option value="free">自由活动(不安排行程)</option>
+          </select></div>
+        <div class="field-group"><label class="field-label">每人费用(人民币)</label><input type="number" id="mod-price" class="field-input" value="0"></div>
+      </div>
+      <div class="field-group"><label class="field-label"><input type="checkbox" id="mod-needsres" onchange="document.getElementById('mod-res-detail').style.display=this.checked?'block':'none'"> 需要提前预约</label></div>
+      <div id="mod-res-detail" style="display:none">
+        <div class="field-group"><label class="field-label">预约说明(线路/票种/提前时长等)</label><input type="text" id="mod-resnote" class="field-input" placeholder="例: A/B/C三线路，建议提前1天预约"></div>
+        <div class="field-row">
+          <div class="field-group"><label class="field-label">开放时段-起</label><input type="time" id="mod-opentime-start" class="field-input"></div>
+          <div class="field-group"><label class="field-label">开放时段-止</label><input type="time" id="mod-opentime-end" class="field-input"></div>
+        </div>
+      </div>
+
+      <div class="dyn-section-title" style="margin-top:14px">备注与显示</div>
+      <div class="field-group"><label class="field-label">自定义备注(体力要求等，可自由填写)</label><textarea id="mod-notes" class="field-input" placeholder="例: 需一定体力，山路较多台阶"></textarea></div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label"><input type="checkbox" id="mod-showguide"> 在向导页面显示</label></div>
+        <div class="field-group"><label class="field-label"><input type="checkbox" id="mod-bookable"> 可在定制行程中选择/预订</label></div>
+      </div>
+      <div class="field-group"><label class="field-label">状态</label>
+        <select id="mod-active" class="field-input"><option value="1">启用</option><option value="0">禁用</option></select></div>
+      <div class="field-hint" id="mod-protected-hint" style="display:none">🔒 该模块受保护，归属无法更改。</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModuleModal()">取消</button>
+      <button class="btn-save" onclick="saveModule()">保存</button>
+    </div>
+  </div>
+</div>
+
 <!-- 推荐行程 步骤弹窗 -->
 <div class="modal-bg" id="planstep-modal-bg">
   <div class="modal">
@@ -1592,7 +1698,7 @@ function showPanel(id, btn) {
     addonsvc:loadAddonSvc,
     showstickets:loadST,paymethods:loadPM,emergency:loadEI,phrases:loadPH,tips:loadTP,
     regions:loadRG,placecats:loadPC,guideattr:loadGA,
-    attrdetail:initADPanel};
+    attrdetail:initADPanel,modules:loadModules};
   if (loaders[id]) loaders[id]();
 }
 
@@ -1879,7 +1985,8 @@ async function deleteFlightPool(id) {
 
 /* ───── 景点管理 (全局公用, tour_attractions — 供定制游"自由安排行程"使用。与助手页面的景区guide_attractions是不同的表) ───── */
 const ATTR_POOL_CAT_LABELS = {large:'大型',feature:'特色',local:'人文'};
-const SLOT_TYPE_LABELS = {full_day:'全天',half_day:'半天',evening:'晚上/夜间',pm_evening:'下午+晚上',pm_evening_nextam:'下午+晚上+次日上午'};
+const SLOT_TYPE_LABELS = {full_day:'全天',half_day:'半天',evening:'晚上/夜间',pm_evening:'下午+晚上',pm_evening_nextam:'下午+晚上+次日上午',free:'自由活动'};
+const REGION_ZONE_LABELS = {city:'市区内',wulingyuan:'武陵源',outside:'张家界之外'};
 let ATP_LIST = [];
 async function loadAttractionPool() {
   const { data } = await sb.from('tour_attractions').select('*').order('sort_order');
@@ -3339,6 +3446,163 @@ async function deleteADZone(id) {
   const { error } = await sb.from('guide_zones').delete().eq('id',id);
   if (error) { toast('删除失败: '+error.message,'error'); return; }
   toast('已删除'); loadADZones();
+}
+
+/* ───── 旅行模块 (travel_modules，统一数据库) ───── */
+let MOD_LIST = [];
+function genModuleKey() { return 'mod_' + Date.now().toString(36) + Math.random().toString(36).slice(2,5); }
+function modScope(parentId) { return MOD_LIST.filter(m => (m.parent_id||null) === (parentId||null)).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)); }
+function moveModule(id,dir) {
+  const m = MOD_LIST.find(x=>String(x.id)===String(id));
+  if (!m) return;
+  moveSortItem(modScope(m.parent_id||null), id, dir, 'travel_modules', loadModules);
+}
+async function loadModules() {
+  const { data, error } = await sb.from('travel_modules').select('*').order('sort_order');
+  if (error) { document.getElementById('modules-tbody').innerHTML = '<tr><td colspan="9" style="color:var(--red)">加载失败</td></tr>'; return; }
+  MOD_LIST = data || [];
+  const parentSel = document.getElementById('mod-parent');
+  const curVal = parentSel.value;
+  parentSel.innerHTML = '<option value="">— 无(顶层) —</option>' +
+    MOD_LIST.filter(m=>!m.parent_id).map(m=>`<option value="${m.id}">${m.icon||''} ${m.name_ko}</option>`).join('');
+  parentSel.value = curVal;
+  renderModules();
+}
+function renderModules() {
+  const q = (document.getElementById('mod-search').value||'').trim().toLowerCase();
+  const zoneFilter = document.getElementById('mod-filter-zone').value;
+  const byId = {}; MOD_LIST.forEach(m=>byId[m.id]=m);
+  const matches = m => (!q || (m.name_ko||'').toLowerCase().includes(q) || (m.name_cn||'').toLowerCase().includes(q)) && (!zoneFilter || m.region_zone===zoneFilter);
+  const rowHtml = (m) => {
+    const scoped = modScope(m.parent_id||null);
+    const idx = scoped.findIndex(x=>x.id===m.id);
+    const parentName = m.parent_id && byId[m.parent_id] ? byId[m.parent_id].name_ko : '-';
+    const slotPrice = `${SLOT_TYPE_LABELS[m.slot_type]||(m.slot_type?m.slot_type:'-')}${m.booking_price?(' · ¥'+m.booking_price):''}`;
+    const zoneLabel = REGION_ZONE_LABELS[m.region_zone]||'-';
+    return `<tr>
+      <td style="font-weight:700">${m.parent_id?'　↳ ':''}${m.icon||''} ${m.name_ko}${m.is_protected?' 🔒':''}</td>
+      <td>${parentName}</td>
+      <td>${zoneLabel}</td>
+      <td>${slotPrice}</td>
+      <td>${m.needs_reservation?'需要':'-'}</td>
+      <td>${m.show_on_guide?'🗺️':''}${m.bookable_in_tour?'🎫':''}</td>
+      <td><span class="badge ${m.is_active?'badge-live':'badge-draft'}">${m.is_active?'启用':'禁用'}</span></td>
+      <td>${moveBtnsHTML('moveModule', m.id, idx, scoped.length)}</td>
+      <td><div class="act-btns"><button class="btn-edit" onclick="openModuleModal('${m.id}')">编辑</button>
+      ${m.is_protected?'':`<button class="btn-del" onclick="deleteModule('${m.id}')">删除</button>`}</div></td>
+    </tr>`;
+  };
+  let rows;
+  if (q || zoneFilter) {
+    rows = MOD_LIST.filter(matches).map(rowHtml).join('');
+  } else {
+    const tops = MOD_LIST.filter(m=>!m.parent_id).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
+    rows = tops.map(t => {
+      const children = MOD_LIST.filter(m=>m.parent_id===t.id).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
+      return rowHtml(t) + children.map(rowHtml).join('');
+    }).join('');
+  }
+  document.getElementById('modules-tbody').innerHTML = rows || '<tr><td colspan="9" style="color:#999">暂无模块</td></tr>';
+}
+function openModuleModal(id) {
+  document.getElementById('mod-modal-title').textContent = id ? '编辑模块' : '添加模块';
+  document.getElementById('mod-id-orig').value = id||'';
+  document.getElementById('mod-protected-hint').style.display = 'none';
+  document.getElementById('mod-parent').disabled = false;
+  if (!id) {
+    ['mod-name-ko','mod-name-cn','mod-icon','mod-type','mod-desc','mod-lat','mod-lon','mod-gaode','mod-hours','mod-pricenote','mod-resnote','mod-notes'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('mod-parent').value='';
+    document.getElementById('mod-zone').value='';
+    document.getElementById('mod-slot').value='';
+    document.getElementById('mod-price').value='0';
+    document.getElementById('mod-needsres').checked=false;
+    document.getElementById('mod-res-detail').style.display='none';
+    document.getElementById('mod-opentime-start').value='';
+    document.getElementById('mod-opentime-end').value='';
+    document.getElementById('mod-showguide').checked=true;
+    document.getElementById('mod-bookable').checked=false;
+    document.getElementById('mod-active').value='1';
+    setThumbWidget('mod-img', []);
+  } else {
+    const m = MOD_LIST.find(x=>String(x.id)===String(id));
+    if (!m) return;
+    document.getElementById('mod-parent').value = m.parent_id||'';
+    document.getElementById('mod-zone').value = m.region_zone||'';
+    document.getElementById('mod-name-ko').value = m.name_ko||'';
+    document.getElementById('mod-name-cn').value = m.name_cn||'';
+    document.getElementById('mod-icon').value = m.icon||'';
+    document.getElementById('mod-type').value = m.type||'';
+    setThumbWidget('mod-img', m.images||[]);
+    document.getElementById('mod-desc').value = m.desc_ko||'';
+    document.getElementById('mod-lat').value = m.lat||'';
+    document.getElementById('mod-lon').value = m.lon||'';
+    document.getElementById('mod-gaode').value = m.gaode_uri||'';
+    document.getElementById('mod-hours').value = m.hours||'';
+    document.getElementById('mod-pricenote').value = m.price_note||'';
+    document.getElementById('mod-slot').value = m.slot_type||'';
+    document.getElementById('mod-price').value = m.booking_price||0;
+    document.getElementById('mod-needsres').checked = !!m.needs_reservation;
+    document.getElementById('mod-res-detail').style.display = m.needs_reservation?'block':'none';
+    document.getElementById('mod-resnote').value = m.reservation_note||'';
+    document.getElementById('mod-opentime-start').value = m.open_time_start||'';
+    document.getElementById('mod-opentime-end').value = m.open_time_end||'';
+    document.getElementById('mod-notes').value = m.notes||'';
+    document.getElementById('mod-showguide').checked = !!m.show_on_guide;
+    document.getElementById('mod-bookable').checked = !!m.bookable_in_tour;
+    document.getElementById('mod-active').value = m.is_active?'1':'0';
+    if (m.is_protected) {
+      document.getElementById('mod-protected-hint').style.display='block';
+      document.getElementById('mod-parent').disabled = true;
+    }
+  }
+  document.getElementById('mod-modal-bg').classList.add('open');
+}
+function closeModuleModal(e) { if (e && e.target !== document.getElementById('mod-modal-bg')) return; document.getElementById('mod-modal-bg').classList.remove('open'); }
+async function saveModule() {
+  const origId = document.getElementById('mod-id-orig').value;
+  const nameKo = document.getElementById('mod-name-ko').value.trim();
+  if (!nameKo) { toast('请输入名称(韩语)','error'); return; }
+  const parentVal = document.getElementById('mod-parent').value || null;
+  const payload = {
+    parent_id: parentVal,
+    name_ko: nameKo,
+    name_cn: document.getElementById('mod-name-cn').value.trim()||null,
+    icon: document.getElementById('mod-icon').value.trim()||'📍',
+    region_zone: document.getElementById('mod-zone').value||null,
+    type: document.getElementById('mod-type').value.trim()||null,
+    images: thumbGetArr('mod-img'),
+    desc_ko: document.getElementById('mod-desc').value.trim()||null,
+    lat: document.getElementById('mod-lat').value ? Number(document.getElementById('mod-lat').value) : null,
+    lon: document.getElementById('mod-lon').value ? Number(document.getElementById('mod-lon').value) : null,
+    gaode_uri: document.getElementById('mod-gaode').value.trim()||null,
+    hours: document.getElementById('mod-hours').value.trim()||null,
+    price_note: document.getElementById('mod-pricenote').value.trim()||null,
+    slot_type: document.getElementById('mod-slot').value||null,
+    booking_price: Number(document.getElementById('mod-price').value)||0,
+    needs_reservation: document.getElementById('mod-needsres').checked,
+    reservation_note: document.getElementById('mod-resnote').value.trim()||null,
+    open_time_start: document.getElementById('mod-opentime-start').value||null,
+    open_time_end: document.getElementById('mod-opentime-end').value||null,
+    notes: document.getElementById('mod-notes').value.trim()||null,
+    show_on_guide: document.getElementById('mod-showguide').checked,
+    bookable_in_tour: document.getElementById('mod-bookable').checked,
+    is_active: document.getElementById('mod-active').value==='1',
+  };
+  if (!origId) {
+    payload.module_key = genModuleKey();
+    payload.sort_order = nextSortOrder(modScope(parentVal));
+  }
+  const { error } = origId ? await sb.from('travel_modules').update(payload).eq('id',origId) : await sb.from('travel_modules').insert(payload);
+  if (error) { toast('保存失败: '+error.message,'error'); return; }
+  toast(origId?'已修改':'已添加','success'); closeModuleModal(); loadModules();
+}
+async function deleteModule(id) {
+  const m = MOD_LIST.find(x=>String(x.id)===String(id));
+  if (m && m.is_protected) { toast('该模块受保护，无法删除','error'); return; }
+  if (!confirm('确定要删除吗？子模块会自动变为顶层模块。')) return;
+  const { error } = await sb.from('travel_modules').delete().eq('id',id);
+  if (error) { toast('删除失败: '+error.message,'error'); return; }
+  toast('已删除'); loadModules();
 }
 
 // 会话自动恢复
